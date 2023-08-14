@@ -3,11 +3,11 @@ Django==4.2.4
 django-environ==0.10.0
 marshmallow==3.20.1
 mysql-connector-python==8.1.0
-mysqlclient==2.2.0
+mysqlclient==2.1.1
 packaging==23.1
 protobuf==4.21.12
+PyMySQL==1.1.0
 pytz==2023.3
 sqlparse==0.4.4
 typing_extensions==4.7.1
 tzdata==2023.3
-
