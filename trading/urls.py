@@ -1,11 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
+from trading_app.views import *
 
 from django.views.generic import RedirectView
 
 urlpatterns = [
     path('', RedirectView.as_view(url='trading/', permanent=True)),
     path('admin/', admin.site.urls),
+    path('subscribe/', subscription_page, name='subscription_page'),
+    path('subscribe/endpoint/', subscription_endpoint, name='subscription_endpoint'),
     # Include your app's URL configurations here
     # For example, if your app's name is 'trading_app':
     # path('trading/', include('trading_app.urls')),
