@@ -2,6 +2,22 @@
 
 {% block content %}
   <h2>15 minute Price History for {{ ticker.symbol }}</h2>
+  <canvas id="candlestickChart" width="800" height="400"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    var ctx = document.getElementById('candlestickChart').getContext('2d');
+    var data = {
+      // Your candlestick data goes here
+    };
+    var options = {
+      // Chart options go here
+    };
+    var chart = new Chart(ctx, {
+      type: 'candlestick',
+      data: data,
+      options: options,
+    });
+  </script>
   <table>
     <thead>
       <tr>
