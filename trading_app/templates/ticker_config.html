@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Ticker Configuration</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+
+  <h3>Existing Tickers:</h3>
+  <table style="border: 1pt solid black;">
+    <thead>
+      <tr>
+        <th style="border: 1pt solid black; padding: 3pt;">Ticker Symbol</th>
+        <th style="border: 1pt solid black; padding: 3pt;">Daily Prices</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticker in tickers %}
+        <tr style="border: 1pt solid black;">
+          <td style="border: 1pt solid black; padding: 3pt;">
+            <a href="{% url 'edit_ticker' ticker.id %}">{{ ticker.symbol }}</a>
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt;">
+            {% if ticker.is_daily %}
+              <a href="{% url 'daily_price_list' ticker.id %}">Daily Prices</a>
+            {% endif %}
+          </td>
+                    <td style="border: 1pt solid black; padding: 3pt;">
+            {% if ticker.is_fifteen_min %}
+              <a href="{% url 'fifteen_min_price_list' ticker.id %}">15 min prices</a>
+            {% endif %}
+          </td>
+
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

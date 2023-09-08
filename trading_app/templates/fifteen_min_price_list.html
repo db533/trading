@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>15 minute Price History for {{ ticker.symbol }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20ch;">Date</th>
+        <th style="width: 10ch;">Open</th>
+        <th style="width: 10ch;">High</th>
+        <th style="width: 10ch;">Low</th>
+        <th style="width: 10ch;">Close</th>
+        <th style="width: 10ch;">Volume</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fifteen_min_price in fifteen_min_prices %}
+        <tr>
+          <td>{{ fifteen_min_price.datetime }}</td>
+          <td>{{ fifteen_min_price.open_price }}</td>
+          <td>{{ fifteen_min_price.high_price }}</td>
+          <td>{{ fifteen_min_price.low_price }}</td>
+          <td>{{ fifteen_min_price.close_price }}</td>
+          <td>{{ fifteen_min_price.volume }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6">No 15 min price data available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'ticker_config' %}">Back to Ticker Configuration</a>
+{% endblock %}
