@@ -9,7 +9,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', RedirectView.as_view(url='trading/', permanent=True)),
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('trading/', index, name='index'),
     path('ticker-config/', ticker_config, name='ticker_config'),
     path('edit-ticker/<int:ticker_id>/', edit_ticker, name='edit_ticker'),
     path('login', login_view, name='login_view'),

@@ -20,6 +20,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta, timezone
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
 
 
 from rest_framework.response import Response
@@ -78,7 +80,7 @@ from django.shortcuts import render, redirect
 from .models import Ticker
 from .forms import TickerForm
 
-
+@login_required
 def ticker_config(request):
     tickers = Ticker.objects.all()
 
@@ -174,7 +176,7 @@ column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hamme
                 'dark_cloud_cover', 'gravestone_doji','dragonfly_doji', 'doji_star', 'piercing_pattern', 'morning_star', 'morning_star_doji',
                 #'evening_star', 'evening_star_doji'
                 ]
-
+@login_required
 def edit_ticker(request, ticker_id):
     # Retrieve the Ticker instance to be edited or create a new one if it doesn't exist
     ticker = get_object_or_404(Ticker, id=ticker_id)
@@ -341,19 +343,21 @@ def edit_ticker(request, ticker_id):
 from django.shortcuts import render
 from .models import Ticker, DailyPrice
 
-
+@login_required
 def daily_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     daily_prices = DailyPrice.objects.filter(ticker=ticker)
 
     return render(request, 'price_list.html', {'ticker': ticker, 'candles': daily_prices, 'heading_text' : 'Daily'})
 
+@login_required
 def fifteen_min_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     fifteen_min_prices = FifteenMinPrice.objects.filter(ticker=ticker)
 
     return render(request, 'price_list.html', {'ticker': ticker, 'candles': fifteen_min_prices, 'heading_text' : '15 Minute'})
 
+@login_required
 def five_min_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     five_min_prices = FiveMinPrice.objects.filter(ticker=ticker)

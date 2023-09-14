@@ -16,10 +16,9 @@
       <div class="col-sm-2">
       {% block sidebar %}
         <ul class="sidebar-nav">
-          <li><a href="{% url 'index' %}">Sākums</a></li>
           {% if user.is_authenticated %}
+            <h2>Trading trends</h2>
             <li><a href="{% url 'ticker_config' %}">Ticker config</a></li>
-            <li><a href="{% url 'index' %}">Mani vēlamie produkti</a></li>
             <p><li><strong><a href="{% url 'logout' %}?next={{ request.path }}">Atslēgties</a></strong></li></p>
           {% else %}
             <li><a href="{% url 'login' %}?next={{ request.path }}">Pieslēgties</a></li>
