@@ -1,6 +1,7 @@
 appdirs==1.4.4
 asgiref==3.7.2
 beautifulsoup4==4.12.2
+candlestick-patterns-subodh101==1.1.0
 certifi==2023.7.22
 cffi==1.15.1
 charset-normalizer==3.2.0
@@ -33,6 +34,6 @@ soupsieve==2.5
 sqlparse==0.4.4
 typing_extensions==4.7.1
 tzdata==2023.3
-urllib3==2.0.4
+urllib3==1.26.14
 webencodings==0.5.1
 yfinance==0.2.28
