@@ -20,6 +20,23 @@ class BasePrice(models.Model):
     high_price = models.DecimalField(max_digits=10, decimal_places=2)
     low_price = models.DecimalField(max_digits=10, decimal_places=2)
     close_price = models.DecimalField(max_digits=10, decimal_places=2)
+    bullish_engulfing = models.BooleanField(default=False) # Bullish
+    bullish_harami = models.BooleanField(default=False) # Bullish
+    hammer = models.BooleanField(default=False) # Bullish
+    inverted_hammer = models.BooleanField(default=False) # Bullish
+    hanging_man = models.BooleanField(default=False) # Bullish
+    shooting_star = models.BooleanField(default=False) # Bullish
+    bearish_engulfing = models.BooleanField(default=False) # Bearish
+    bearish_harami = models.BooleanField(default=False) # Bearish
+    dark_cloud_cover = models.BooleanField(default=False) # Bearish
+    gravestone_doji = models.BooleanField(default=False)  # Bearish
+    dragonfly_doji = models.BooleanField(default=False) # Reversal
+    doji_star = models.BooleanField(default=False) # Reversal
+    piercing_pattern = models.BooleanField(default=False)  # Reversal
+    morning_star = models.BooleanField(default=False)  # Bullish Reversal
+    morning_star_doji = models.BooleanField(default=False)  # Bullish Reversal
+    #evening_star = models.BooleanField(default=False) # Bearish Reversal
+    #evening_star_doji = models.BooleanField(default=False)  # Bearish Reversal
     volume = models.IntegerField()
 
     class Meta:

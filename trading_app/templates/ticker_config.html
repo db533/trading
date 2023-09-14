@@ -28,9 +28,14 @@
               <a href="{% url 'daily_price_list' ticker.id %}">Daily Prices</a>
             {% endif %}
           </td>
-                    <td style="border: 1pt solid black; padding: 3pt;">
+          <td style="border: 1pt solid black; padding: 3pt;">
             {% if ticker.is_fifteen_min %}
               <a href="{% url 'fifteen_min_price_list' ticker.id %}">15 min prices</a>
+            {% endif %}
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt;">
+            {% if ticker.is_five_min %}
+              <a href="{% url 'five_min_price_list' ticker.id %}">5 min prices</a>
             {% endif %}
           </td>
 

@@ -5,6 +5,8 @@ from pathlib import Path
 import yfinance as yf
 import pandas as pd
 import time
+import json
+from candlestick import candlestick
 
 from django.shortcuts import render
 from .models import *
@@ -16,7 +18,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum, Max, Count
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from django.utils import timezone
 
 
@@ -99,8 +101,13 @@ from django.utils import timezone
 
 def get_price_data(ticker, interval, start_time, finish_time):
     try:
+        # Ensure start_time and finish_time are timezone-aware
+        start_time = start_time.replace(tzinfo=timezone.utc)
+        finish_time = finish_time.replace(tzinfo=timezone.utc)
+
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
         if not data.empty:
+
             data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
 
             # Create a 'Datetime' column from the index
@@ -110,7 +117,10 @@ def get_price_data(ticker, interval, start_time, finish_time):
             data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
 
             # Set the timezone to your project's timezone (e.g., UTC)
-            data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
+            #data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
+            # Ensure the datetime index is in UTC timezone
+            #data.index = data.index.tz_convert(timezone.utc)
+            data = data.tz_localize(None)
 
             # Reorder the columns
             data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume']]
@@ -135,8 +145,35 @@ def get_missing_dates(ticker, interval, start_day, finish_day):
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
         missing_dates = [date for date in all_dates if date not in existing_dates]
         #print('all_dates:',all_dates)
-    print('missing_dates:',missing_dates)
+    if interval == '5m':
+        existing_dates = FiveMinPrice.objects.filter(ticker=ticker,
+                                                        datetime__range=(start_day, finish_day)).values_list(
+            'datetime', flat=True)
+        all_dates = pd.date_range(start=start_day, end=finish_day, freq='5T')
+        missing_dates = [date for date in all_dates if date not in existing_dates]
+        print('all_dates:',all_dates)
+        print('missing_dates:',missing_dates)
     return missing_dates
+
+def add_candle_data(price_history, candlestick_functions, column_names):
+    for candlestick_func, column_name in zip(candlestick_functions, column_names):
+        price_history = candlestick_func(price_history, target=column_name, ohlc=['Open', 'High', 'Low', 'Close'])
+        price_history[column_name].fillna(False, inplace=True)
+    return price_history
+
+# List of candlestick functions to replace 'candlestick.xxx'
+candlestick_functions = [candlestick.bullish_engulfing, candlestick.bullish_harami, candlestick.hammer, candlestick.inverted_hammer,
+                         candlestick.hanging_man, candlestick.shooting_star, candlestick.bearish_engulfing, candlestick.bearish_harami,
+                         candlestick.dark_cloud_cover, candlestick.gravestone_doji, candlestick.dragonfly_doji, candlestick.doji_star,
+                         candlestick.piercing_pattern, candlestick.morning_star, candlestick.morning_star_doji,
+                         #candlestick.evening_star, candlestick.evening_star_doji
+                         ]
+
+# List of column names to replace 'xxx' in price_history
+column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star', 'bearish_engulfing', 'bearish_harami',
+                'dark_cloud_cover', 'gravestone_doji','dragonfly_doji', 'doji_star', 'piercing_pattern', 'morning_star', 'morning_star_doji',
+                #'evening_star', 'evening_star_doji'
+                ]
 
 def edit_ticker(request, ticker_id):
     # Retrieve the Ticker instance to be edited or create a new one if it doesn't exist
@@ -144,12 +181,12 @@ def edit_ticker(request, ticker_id):
 
     if request.method == 'POST':
         form = TickerForm(request.POST, instance=ticker)
+        print('Checking', ticker.symbol)
         if form.is_valid():
             if ticker.is_daily:
                 start_day = timezone.now() - timedelta(days=31)
                 finish_day = timezone.now()
                 interval = '1D'
-                print('Checking', ticker.symbol)
 
                 # Get the list of missing dates
                 missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
@@ -163,6 +200,10 @@ def edit_ticker(request, ticker_id):
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
 
+                    #price_history = candlestick.bullish_engulfing(price_history, target='bullish_engulfing', ohlc=['Open','High','Low','Close'])
+                    #price_history['bullish_engulfing'].fillna(False, inplace=True)
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
+
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
                         if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
@@ -173,11 +214,26 @@ def edit_ticker(request, ticker_id):
                                 high_price=row['High'],
                                 low_price=row['Low'],
                                 close_price=row['Close'],
-                                volume=row['Volume']
+                                volume=row['Volume'],
+                                bullish_engulfing=row['bullish_engulfing'],
+                                bullish_harami=row['bullish_harami'],
+                                hammer=row['hammer'],
+                                inverted_hammer=row['inverted_hammer'],
+                                hanging_man=row['hanging_man'],
+                                shooting_star=row['shooting_star'],
+                                bearish_engulfing=row['bearish_engulfing'],
+                                bearish_harami=row['bearish_harami'],
+                                dark_cloud_cover=row['dark_cloud_cover'],
+                                gravestone_doji=row['gravestone_doji'],
+                                dragonfly_doji=row['dragonfly_doji'],
+                                doji_star=row['doji_star'],
+                                piercing_pattern=row['piercing_pattern'],
+                                morning_star=row['morning_star'],
+                                morning_star_doji=row['morning_star_doji']
                             )
                             daily_price.save()
 
-            elif ticker.is_fifteen_min:
+            if ticker.is_fifteen_min:
                 start_day = timezone.now() - timedelta(days=7)
                 finish_day = timezone.now()
                 interval = '15m'
@@ -194,6 +250,7 @@ def edit_ticker(request, ticker_id):
 
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -205,12 +262,72 @@ def edit_ticker(request, ticker_id):
                                 high_price=row['High'],
                                 low_price=row['Low'],
                                 close_price=row['Close'],
-                                volume=row['Volume']
+                                volume=row['Volume'],
+                                bullish_engulfing=row['bullish_engulfing'],
+                                bullish_harami=row['bullish_harami'],
+                                hammer=row['hammer'],
+                                inverted_hammer=row['inverted_hammer'],
+                                hanging_man=row['hanging_man'],
+                                shooting_star=row['shooting_star'],
+                                bearish_engulfing=row['bearish_engulfing'],
+                                bearish_harami=row['bearish_harami'],
+                                dark_cloud_cover=row['dark_cloud_cover'],
+                                gravestone_doji=row['gravestone_doji'],
+                                dragonfly_doji=row['dragonfly_doji'],
+                                doji_star=row['doji_star'],
+                                piercing_pattern=row['piercing_pattern'],
+                                morning_star=row['morning_star'],
+                                morning_star_doji=row['morning_star_doji']
                             )
                             fifteenmin_price.save()
-            elif ticker.is_five_min:
-                pass
-            elif ticker.is_one_min:
+            if ticker.is_five_min:
+                start_day = timezone.now() - timedelta(days=5)
+                finish_day = timezone.now()
+                interval = '5m'
+                print('Checking 5 min data for', ticker.symbol)
+
+                # Get the list of missing dates
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
+
+                if missing_dates:
+                    # Set start_day to the smallest date and finish_day to the largest date in missing_dates
+                    start_day = min(missing_dates)
+                    finish_day = max(missing_dates)
+                    print('Retrieving data from ', start_day, ' to ', finish_day)
+
+                    # Request price data for the entire missing date range
+                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
+
+                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                    for index, row in price_history.iterrows():
+                        if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                            fivemin_price = FiveMinPrice(
+                                ticker=ticker,
+                                datetime=row['Datetime'],
+                                open_price=row['Open'],
+                                high_price=row['High'],
+                                low_price=row['Low'],
+                                close_price=row['Close'],
+                                volume=row['Volume'],
+                                bullish_engulfing=row['bullish_engulfing'],
+                                bullish_harami=row['bullish_harami'],
+                                hammer=row['hammer'],
+                                inverted_hammer=row['inverted_hammer'],
+                                hanging_man=row['hanging_man'],
+                                shooting_star=row['shooting_star'],
+                                bearish_engulfing=row['bearish_engulfing'],
+                                bearish_harami=row['bearish_harami'],
+                                dark_cloud_cover=row['dark_cloud_cover'],
+                                gravestone_doji=row['gravestone_doji'],
+                                dragonfly_doji=row['dragonfly_doji'],
+                                doji_star=row['doji_star'],
+                                piercing_pattern=row['piercing_pattern'],
+                                morning_star=row['morning_star'],
+                                morning_star_doji=row['morning_star_doji']
+                            )
+                            fivemin_price.save()
+            if ticker.is_one_min:
                 pass
             form.save()
 
@@ -229,11 +346,16 @@ def daily_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     daily_prices = DailyPrice.objects.filter(ticker=ticker)
 
-    return render(request, 'daily_price_list.html', {'ticker': ticker, 'daily_prices': daily_prices})
+    return render(request, 'price_list.html', {'ticker': ticker, 'candles': daily_prices, 'heading_text' : 'Daily'})
 
 def fifteen_min_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     fifteen_min_prices = FifteenMinPrice.objects.filter(ticker=ticker)
 
-    return render(request, 'fifteen_min_price_list.html', {'ticker': ticker, 'fifteen_min_prices': fifteen_min_prices})
+    return render(request, 'price_list.html', {'ticker': ticker, 'candles': fifteen_min_prices, 'heading_text' : '15 Minute'})
 
+def five_min_price_list(request, ticker_id):
+    ticker = get_object_or_404(Ticker, id=ticker_id)
+    five_min_prices = FiveMinPrice.objects.filter(ticker=ticker)
+
+    return render(request, 'price_list.html', {'ticker': ticker, 'candles': five_min_prices, 'heading_text' : '5 Minute'})

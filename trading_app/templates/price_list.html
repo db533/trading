@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ heading_text }} Price History for {{ ticker.symbol }}</h2>
+  <table style="border-collapse: collapse; border: 1px solid black;">
+    <thead>
+      <!-- First row for grouped categories -->
+           <tr>
+        <th rowspan="2" style="width: {% if heading_text == 'Daily' %}20ch{% else %}24ch{% endif %}; border-left: 1px solid black; border-right: 1px solid black;">Date</th>
+        <th colspan="5" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Price Data</th>
+        <th colspan="6" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bullish</th>
+        <th colspan="4" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bearish</th>
+        <th colspan="3" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Reversal</th>
+        <th colspan="2" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bullish Reversal</th>
+      </tr>
+      <!-- Second row for specific column names -->
+      <tr>
+        <th style="width: 10ch; border-left: 1px solid black;">Open</th>
+        <th style="width: 10ch;">High</th>
+        <th style="width: 10ch;">Low</th>
+        <th style="width: 10ch;">Close</th>
+        <th style="width: 10ch;">Volume</th>
+        <!-- Add your specific candlestick patterns under each category -->
+
+        <th style="border-left: 1px solid black">Bullish Engulfing</th>
+        <th>Bullish Harami</th>
+        <th>Hammer</th>
+        <th>Inverted Hammer</th>
+        <th>Hanging Man</th>
+        <th>Shooting Star</th>
+        <th style="border-left: 1px solid black">Bearish Engulfing</th>
+        <th>Bearish Harami</th>
+        <th>Dark Cloud Cover</th>
+        <th>Gravestone Doji</th>
+        <th style="border-left: 1px solid black">Dragonfly Doji</th>
+        <th>Doji Star</th>
+        <th>Piercing Pattern</th>
+        <th style="border-left: 1px solid black">Morning Star</th>
+        <th>Morning Star Doji</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for candle in candles %}
+        <tr>
+          <td>{% if heading_text == 'Daily' %}{{ candle.datetime|date:"d/m/Y" }}{% else %}{{ candle.datetime }}{% endif %}</td>
+          <td style="border-left: 1px solid black">{{ candle.open_price }}</td>
+          <td>{{ candle.high_price }}</td>
+          <td>{{ candle.low_price }}</td>
+          <td>{{ candle.close_price }}</td>
+          <td>{{ candle.volume }}</td>
+          <td style="text-align:center; color: {% if candle.bullish_engulfing %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.bullish_engulfing %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.bullish_engulfing }}</td>
+          <td style="text-align:center; color: {% if candle.bullish_harami %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.bullish_harami %}bold{% else %}normal{% endif %};">{{ candle.bullish_harami }}</td>
+          <td style="text-align:center; color: {% if candle.hammer %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.hammer %}bold{% else %}normal{% endif %};">{{ candle.hammer }}</td>
+          <td style="text-align:center; color: {% if candle.inverted_hammer %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.inverted_hammer %}bold{% else %}normal{% endif %};">{{ candle.inverted_hammer }}</td>
+          <td style="text-align:center; color: {% if candle.hanging_man %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.hanging_man %}bold{% else %}normal{% endif %};">{{ candle.hanging_man }}</td>
+          <td style="text-align:center; color: {% if candle.shooting_star %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.shooting_star %}bold{% else %}normal{% endif %};">{{ candle.shooting_star }}</td>
+          <td style="text-align:center; color: {% if candle.bearish_engulfing %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_engulfing %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.bearish_engulfing }}</td>
+          <td style="text-align:center; color: {% if candle.bearish_harami %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_harami %}bold{% else %}normal{% endif %};">{{ candle.bearish_harami }}</td>
+          <td style="text-align:center; color: {% if candle.dark_cloud_cover %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.dark_cloud_cover %}bold{% else %}normal{% endif %};">{{ candle.dark_cloud_cover }}</td>
+          <td style="text-align:center; color: {% if candle.gravestone_doji %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.gravestone_doji %}bold{% else %}normal{% endif %};">{{ candle.gravestone_doji }}</td>
+          <td style="text-align:center; color: {% if candle.dragonfly_doji %}black{% else %}lightgrey{% endif %}; font-weight: {% if candle.dragonfly_doji %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.dragonfly_doji }}</td>
+          <td style="text-align:center; color: {% if candle.doji_star %}black{% else %}lightgrey{% endif %}; font-weight: {% if candle.doji_star %}bold{% else %}normal{% endif %};">{{ candle.doji_star }}</td>
+          <td style="text-align:center; color: {% if candle.piercing_pattern %}black{% else %}lightgrey{% endif %}; font-weight: {% if candle.piercing_pattern %}bold{% else %}normal{% endif %};">{{ candle.piercing_pattern }}</td>
+          <td style="text-align:center; color: {% if candle.morning_star %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.morning_star %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.morning_star }}</td>
+          <td style="text-align:center; color: {% if candle.morning_star_doji %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.morning_star_doji %}bold{% else %}normal{% endif %};">{{ candle.morning_star_doji }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="31">No price data available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'ticker_config' %}">Back to Ticker Configuration</a>
+{% endblock %}

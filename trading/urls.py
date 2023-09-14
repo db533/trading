@@ -16,9 +16,14 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),  # Add logout view
     path('ticker/<int:ticker_id>/daily-prices/', daily_price_list, name='daily_price_list'),
     path('ticker/<int:ticker_id>/fifteen-min-prices/', fifteen_min_price_list, name='fifteen_min_price_list'),
+    path('ticker/<int:ticker_id>/five-min-prices/', five_min_price_list, name='five_min_price_list'),
 ]
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+urlpatterns += [
+    path('accounts/', include('django.contrib.auth.urls')),
+]
