@@ -37,6 +37,7 @@ class BasePrice(models.Model):
     morning_star_doji = models.BooleanField(default=False)  # Bullish Reversal
     #evening_star = models.BooleanField(default=False) # Bearish Reversal
     #evening_star_doji = models.BooleanField(default=False)  # Bearish Reversal
+    three_white_soldiers = models.BooleanField(default=False) # Bullish
     volume = models.IntegerField()
 
     class Meta:

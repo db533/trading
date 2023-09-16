@@ -8,7 +8,7 @@
            <tr>
         <th rowspan="2" style="width: {% if heading_text == 'Daily' %}20ch{% else %}24ch{% endif %}; border-left: 1px solid black; border-right: 1px solid black;">Date</th>
         <th colspan="5" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Price Data</th>
-        <th colspan="6" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bullish</th>
+        <th colspan="7" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bullish</th>
         <th colspan="4" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bearish</th>
         <th colspan="3" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Reversal</th>
         <th colspan="2" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Bullish Reversal</th>
@@ -27,6 +27,7 @@
         <th>Hammer</th>
         <th>Inverted Hammer</th>
         <th>Hanging Man</th>
+        <th>Three White Soldiers</th>
         <th>Shooting Star</th>
         <th style="border-left: 1px solid black">Bearish Engulfing</th>
         <th>Bearish Harami</th>
@@ -53,6 +54,7 @@
           <td style="text-align:center; color: {% if candle.hammer %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.hammer %}bold{% else %}normal{% endif %};">{{ candle.hammer }}</td>
           <td style="text-align:center; color: {% if candle.inverted_hammer %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.inverted_hammer %}bold{% else %}normal{% endif %};">{{ candle.inverted_hammer }}</td>
           <td style="text-align:center; color: {% if candle.hanging_man %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.hanging_man %}bold{% else %}normal{% endif %};">{{ candle.hanging_man }}</td>
+          <td style="text-align:center; color: {% if candle.three_white_soldiers %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.three_white_soldiers %}bold{% else %}normal{% endif %};">{{ candle.three_white_soldiers }}</td>
           <td style="text-align:center; color: {% if candle.shooting_star %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.shooting_star %}bold{% else %}normal{% endif %};">{{ candle.shooting_star }}</td>
           <td style="text-align:center; color: {% if candle.bearish_engulfing %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_engulfing %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.bearish_engulfing }}</td>
           <td style="text-align:center; color: {% if candle.bearish_harami %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_harami %}bold{% else %}normal{% endif %};">{{ candle.bearish_harami }}</td>

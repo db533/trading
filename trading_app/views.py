@@ -6,7 +6,6 @@ import yfinance as yf
 import pandas as pd
 import time
 import json
-from candlestick import candlestick
 
 from django.shortcuts import render
 from .models import *
@@ -21,15 +20,14 @@ from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta, timezone
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-
-
+from candlestick import candlestick
+from . import db_candlestick
 
 from rest_framework.response import Response
 
 # https://manojadhikari.medium.com/track-email-opened-status-django-rest-framework-5fcd1fbdecfb
 from rest_framework.views import APIView
 from django.contrib.sessions.models import Session
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 #print('BASE_DIR:',BASE_DIR)
@@ -163,6 +161,14 @@ def add_candle_data(price_history, candlestick_functions, column_names):
         price_history[column_name].fillna(False, inplace=True)
     return price_history
 
+def add_db_candle_data(price_history, db_candlestick_functions, db_column_names):
+    for db_candlestick_func, column_name in zip(db_candlestick_functions, db_column_names):
+        price_history = db_candlestick_func(price_history, target=column_name, ohlc=['Open', 'High', 'Low', 'Close'])
+        price_history[column_name].fillna(False, inplace=True)
+        #print('column_name:',column_name)
+        #print(price_history[column_name])
+    return price_history
+
 # List of candlestick functions to replace 'candlestick.xxx'
 candlestick_functions = [candlestick.bullish_engulfing, candlestick.bullish_harami, candlestick.hammer, candlestick.inverted_hammer,
                          candlestick.hanging_man, candlestick.shooting_star, candlestick.bearish_engulfing, candlestick.bearish_harami,
@@ -176,6 +182,15 @@ column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hamme
                 'dark_cloud_cover', 'gravestone_doji','dragonfly_doji', 'doji_star', 'piercing_pattern', 'morning_star', 'morning_star_doji',
                 #'evening_star', 'evening_star_doji'
                 ]
+
+# List of candlestick functions to replace 'candlestick.xxx'
+db_candlestick_functions = [db_candlestick.three_white_soldiers, db_candlestick.rising,
+                         ]
+
+# List of column names to replace 'xxx' in price_history
+db_column_names = ['three_white_soldiers', 'rising',
+                ]
+
 @login_required
 def edit_ticker(request, ticker_id):
     # Retrieve the Ticker instance to be edited or create a new one if it doesn't exist
@@ -205,6 +220,10 @@ def edit_ticker(request, ticker_id):
                     #price_history = candlestick.bullish_engulfing(price_history, target='bullish_engulfing', ohlc=['Open','High','Low','Close'])
                     #price_history['bullish_engulfing'].fillna(False, inplace=True)
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                    #price_history = db_candlestick.three_white_soldiers(price_history, target='three_white_soldiers',
+                    #                                                    ohlc=['Open', 'High', 'Low', 'Close'])
+                    #price_history['three_white_soldiers'].fillna(False, inplace=True)
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -231,7 +250,8 @@ def edit_ticker(request, ticker_id):
                                 doji_star=row['doji_star'],
                                 piercing_pattern=row['piercing_pattern'],
                                 morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji']
+                                morning_star_doji=row['morning_star_doji'],
+                                three_white_soldiers=row['three_white_soldiers']
                             )
                             daily_price.save()
 
@@ -253,6 +273,11 @@ def edit_ticker(request, ticker_id):
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
+
+                    price_history = db_candlestick.three_white_soldiers(price_history, target='three_white_soldiers',
+                                                                        ohlc=['Open', 'High', 'Low', 'Close'])
+                    price_history['three_white_soldiers'].fillna(False, inplace=True)
+
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -279,7 +304,8 @@ def edit_ticker(request, ticker_id):
                                 doji_star=row['doji_star'],
                                 piercing_pattern=row['piercing_pattern'],
                                 morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji']
+                                morning_star_doji=row['morning_star_doji'],
+                                three_white_soldiers=row['three_white_soldiers']
                             )
                             fifteenmin_price.save()
             if ticker.is_five_min:
@@ -300,6 +326,10 @@ def edit_ticker(request, ticker_id):
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
+
+                    price_history = db_candlestick.three_white_soldiers(price_history, target='three_white_soldiers',
+                                                                        ohlc=['Open', 'High', 'Low', 'Close'])
+                    price_history['three_white_soldiers'].fillna(False, inplace=True)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -326,7 +356,8 @@ def edit_ticker(request, ticker_id):
                                 doji_star=row['doji_star'],
                                 piercing_pattern=row['piercing_pattern'],
                                 morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji']
+                                morning_star_doji=row['morning_star_doji'],
+                                three_white_soldiers=row['three_white_soldiers']
                             )
                             fivemin_price.save()
             if ticker.is_one_min:
