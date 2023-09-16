@@ -184,11 +184,11 @@ column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hamme
                 ]
 
 # List of candlestick functions to replace 'candlestick.xxx'
-db_candlestick_functions = [db_candlestick.three_white_soldiers, db_candlestick.rising,
+db_candlestick_functions = [db_candlestick.three_white_soldiers,
                          ]
 
 # List of column names to replace 'xxx' in price_history
-db_column_names = ['three_white_soldiers', 'rising',
+db_column_names = ['three_white_soldiers',
                 ]
 
 @login_required
