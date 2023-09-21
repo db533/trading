@@ -20,25 +20,21 @@ class BasePrice(models.Model):
     high_price = models.DecimalField(max_digits=10, decimal_places=2)
     low_price = models.DecimalField(max_digits=10, decimal_places=2)
     close_price = models.DecimalField(max_digits=10, decimal_places=2)
-    bullish_engulfing = models.BooleanField(default=False) # Bullish
-    bullish_harami = models.BooleanField(default=False) # Bullish
-    hammer = models.BooleanField(default=False) # Bullish
-    inverted_hammer = models.BooleanField(default=False) # Bullish
-    hanging_man = models.BooleanField(default=False) # Bullish
-    shooting_star = models.BooleanField(default=False) # Bullish
-    bearish_engulfing = models.BooleanField(default=False) # Bearish
-    bearish_harami = models.BooleanField(default=False) # Bearish
-    dark_cloud_cover = models.BooleanField(default=False) # Bearish
-    gravestone_doji = models.BooleanField(default=False)  # Bearish
-    dragonfly_doji = models.BooleanField(default=False) # Reversal
-    doji_star = models.BooleanField(default=False) # Reversal
-    piercing_pattern = models.BooleanField(default=False)  # Reversal
-    morning_star = models.BooleanField(default=False)  # Bullish Reversal
-    morning_star_doji = models.BooleanField(default=False)  # Bullish Reversal
-    #evening_star = models.BooleanField(default=False) # Bearish Reversal
-    #evening_star_doji = models.BooleanField(default=False)  # Bearish Reversal
-    three_white_soldiers = models.BooleanField(default=False) # Bullish
+    percent_change = models.FloatField( null=True, blank=True)
+    bearish_detected = models.DecimalField(max_digits=2, decimal_places=0)
+    bullish_detected = models.DecimalField(max_digits=2, decimal_places=0)
+    reversal_detected = models.DecimalField(max_digits=2, decimal_places=0)
+    bearish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0)
+    bullish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0)
+    patterns_detected = models.CharField(max_length=255, null=True, blank=True)
     volume = models.IntegerField()
+    level = models.DecimalField(max_digits=10, decimal_places=3, null=True)
+    level_type = models.IntegerField(default=0) # 1 = Support, 2 = Resistance
+    level_strength = models.IntegerField(default=0)
+    ema_200 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    ema_50 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    trend = models.IntegerField(default=0) # 1 = Rising, -1 = Falling, 0 = Stable
+    #resistance_strength = models.IntegerField()
 
     class Meta:
         abstract = True

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ heading_text }} Price History for {{ ticker.symbol }}</h2>
+  <table style="border-collapse: collapse; border: 1px solid black;">
+    <thead>
+      <!-- First row for grouped categories -->
+           <tr>
+        <th rowspan="2" style="text-align:center; width: {% if heading_text == 'Daily' %}20ch{% else %}24ch{% endif %}; border-left: 1px solid black; border-right: 1px solid black;">Date</th>
+        <th colspan="9" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Price Data</th>
+        <th colspan="4" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Candlestick patterns</th>
+        <th colspan="2" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Support and resistance</th>
+      </tr>
+      <!-- Second row for specific column names -->
+      <tr>
+        <th style="text-align:center; width: 8ch; border-left: 1px solid black;">Open</th>
+        <th style="text-align:center; width: 8ch;">High</th>
+        <th style="text-align:center; width: 8ch;">Low</th>
+        <th style="text-align:center; width: 8ch;">Close</th>
+        <th style="text-align:center; width: 10h;">% change</th>
+        <th style="text-align:center; width: 10h;">EMA 50</th>
+        <th style="text-align:center; width: 10h;">EMA 200</th>
+        <th style="text-align:center; width: 10h;">Trend</th>
+        <th style="text-align:center; width: 10ch;">Volume</th>
+        <!-- Add your specific candlestick patterns under each category -->
+
+        <th style="text-align:center; border-left: 1px solid black; width: 10ch;">Bullish patterns</th>
+        <th style="text-align:center; width: 10ch;">Bearish patterns</th>
+        <th style="text-align:center; width: 10ch;">Reversal patterns</th>
+        <th style="text-align:center; width: 15ch;">Name of detected patterns</th>
+        <th style="text-align:center; border-left: 1px solid black">Level</th>
+        <th style="text-align:center; width: 8ch;">Level strength</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for candle in candles %}
+        <tr>
+          <td style="text-align:center;">{% if heading_text == 'Daily' %}{{ candle.datetime|date:"d/m/Y" }}{% else %}{{ candle.datetime }}{% endif %}</td>
+          <td style="text-align:center; border-left: 1px solid black;">{{ candle.open_price }}</td>
+          <td style="text-align:center;">{{ candle.high_price }}</td>
+          <td style="text-align:center;">{{ candle.low_price }}</td>
+          <td style="text-align:center; ">{{ candle.close_price }}</td>
+          <td style="text-align:center; color: {% if candle.percent_change > 0 %}green{% elif candle.percent_change < 0%}red{% endif %};">{% if candle.percent_change > 0 %}+{% endif %}{{ candle.percent_change|floatformat:2 }} %</td>
+          <td style="text-align:center; ">{{ candle.ema_50 }}</td>
+          <td style="text-align:center; ">{{ candle.ema_200 }}</td>
+          <td style="text-align:center; ">{{ candle.trend }}</td>
+          <td style="text-align:center;">{{ candle.volume }}</td>
+          <td style="text-align:center; color: {% if candle.bullish_detected %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.bullish_detected %}bold{% else %}normal{% endif %}; border-left: 1px solid black">{{ candle.bullish_detected }}</td>
+          <td style="text-align:center; color: {% if candle.bearish_detected %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_detected %}bold{% else %}normal{% endif %};">{{ candle.bearish_detected }}</td>
+          <td style="text-align:center; color: {% if candle.reversal_detected %}black{% elif candle.bearish_reversal_detected %}red{% elif candle.bullish_reversal_detected %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.reversal_detected or candle.bearish_reversal_detected or candle.bullish_reversal_detected %}bold{% else %}normal{% endif %};">{{ candle.sum_reversals}}</td>
+          <td style="text-align:center; color: {% if candle.patterns_detected %}black{% else %}lightgrey{% endif %};">{{ candle.patterns_detected }}</td>
+          <td style="text-align:center; color: {% if candle.level_type == 1 %}green{% elif candle.level_type == 2 %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.level %}bold{% else %}normal{% endif %};">{{ candle.level }}</td>
+          <td style="text-align:center; color: {% if candle.level_strength > 0 %}black{% else %}lightgrey{% endif %}; font-weight: {% if candle.level_strength %}bold{% else %}normal{% endif %};">{{ candle.level_strength }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="31">No price data available.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% url 'ticker_config' %}">Back to Ticker Configuration</a>
+{% endblock %}

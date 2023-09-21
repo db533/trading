@@ -7,6 +7,7 @@ import pandas as pd
 import time
 import json
 
+
 from django.shortcuts import render
 from .models import *
 from .forms import *
@@ -114,7 +115,9 @@ def get_price_data(ticker, interval, start_time, finish_time):
             data['Datetime'] = data.index
 
             # Convert the datetime to a naive datetime
-            data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
+            #data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
+            # Set the timezone to your project's timezone (e.g., UTC)
+            #data['Datetime'] = data['Datetime']
 
             # Set the timezone to your project's timezone (e.g., UTC)
             #data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
@@ -122,8 +125,11 @@ def get_price_data(ticker, interval, start_time, finish_time):
             #data.index = data.index.tz_convert(timezone.utc)
             data = data.tz_localize(None)
 
+            data['PercentChange'] = data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
+            data.at[data.index[0], 'PercentChange'] = 0
+
             # Reorder the columns
-            data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume']]
+            data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume','PercentChange']]
 
             time.sleep(1)
             print(data)
@@ -191,17 +197,173 @@ db_candlestick_functions = [db_candlestick.three_white_soldiers,
 db_column_names = ['three_white_soldiers',
                 ]
 
+pattern_types = {'bullish' : ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star', 'three_white_soldiers'],
+                 'bearish' : ['bearish_engulfing', 'bearish_harami','dark_cloud_cover', 'gravestone_doji'],
+                 'reversal' : ['dragonfly_doji', 'doji_star', 'piercing_pattern'],
+                 'bullish_reversal' : ['morning_star', 'morning_star_doji'],
+                 'bearish_reversal' : [],}
+
+
+def count_patterns(df, pattern_types):
+    # Initialize new columns with zeros
+    for pattern_type in pattern_types.keys():
+        df[pattern_type] = 0
+
+    # Loop through each pattern_type and its corresponding column names
+    for pattern_type, columns in pattern_types.items():
+        # Sum the boolean values across the relevant columns and assign to the new column
+        df[pattern_type] = df[columns].sum(axis=1)
+
+    # Create the 'patterns' column using a vectorized operation
+    all_columns = [col for columns in pattern_types.values() for col in columns]
+
+    bool_df = df[all_columns]
+    df['patterns_detected'] = bool_df.dot(bool_df.columns + ' ').str.strip()
+
+def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_percent=0.01):
+#def find_levels(df, columns=['Close'], window=20, retest_threshold_percent=0.001):
+    support = {}
+    resistance = {}
+    sr_level = {}
+    retests = {}   # Keep track of retest counts and last retest datetime for each level
+
+    # First pass to identify initial support and resistance levels
+    for i in range(window, len(df) - window):
+        combined_window = pd.concat([df[col][i - window:i + window] for col in columns])
+        min_val = combined_window.min()
+        max_val = combined_window.max()
+
+        current_close = df.iloc[i]['Close']
+        current_open = df.iloc[i]['Open']
+
+        if current_close == min_val:
+            support[current_close] = df.index[i]
+            sr_level[current_close] = df.index[i]
+
+        elif current_open == min_val:
+            support[current_open] = df.index[i]
+            sr_level[current_open] = df.index[i]
+
+        if current_close == max_val:
+            resistance[current_close] = df.index[i]
+            sr_level[current_close] = df.index[i]
+
+        elif current_open == max_val:
+            resistance[current_open] = df.index[i]
+            sr_level[current_open] = df.index[i]
+
+    # Helper function to check if two levels are within threshold of each other
+    def within_threshold(level1, level2, threshold_percent):
+        close_levels = []
+        for future_level in level2:
+            if abs(level1 - future_level) <= level1 * threshold_percent:
+                print('Future level close to level1:',future_level)
+                close_levels.append(future_level)
+        #print('Level1:', level1, 'Level2:',level2, 'abs(level1 - level2):',abs(level1 - level2),'threshold_value:',level1 * threshold_percent, 'Within threshold?',abs(level1 - level2) <= level1 * threshold_percent)
+        return close_levels
+
+    # Remove sr_levels that are within threshold of a previous support level
+    print('sr_level:',sr_level)
+    sr_keys_sorted = sorted(sr_level, key=sr_level.get)  # sort by datetime
+    #print('sr_keys_sorted:',sr_keys_sorted)
+    for i in range(len(sr_keys_sorted)):
+        level1 = sr_keys_sorted[i]
+        if level1 in sr_level:
+            #print('Level1:', level1)
+            compared_levels = sr_keys_sorted[i + 1:]
+            close_levels = within_threshold(level1, compared_levels, retest_threshold_percent)
+            if len(close_levels) > 0:
+                #print('close_levels:', close_levels)
+                all_levels = [level1] + close_levels
+                #print('all_levels:', all_levels)
+                avg_level = sum(all_levels) / len(all_levels)
+                print('level1 changed from',level1,'to avg_level', avg_level)
+                datetime_for_avg_level = sr_level[level1]  # store datetime associated with original level
+                del sr_level[level1]
+                for level in close_levels:
+                    if level in sr_level:
+                        del sr_level[level]
+                sr_level[avg_level] = datetime_for_avg_level
+                sr_keys_sorted[i] = avg_level  # Update the current key with average level
+
+    # Second pass to update levels if they are breached and track retests
+    for i in range(len(df)):
+        current_datetime = df.index[i]
+        current_close = df.iloc[i]['Close']
+        current_open = df.iloc[i]['Open']
+
+        # Check if current price breaches or retests any prior support levels
+        for level in list(sr_level.keys()):
+            level_datetime = sr_level[level]
+
+            if level_datetime < current_datetime:
+                threshold = level * retest_threshold_percent  # Calculate threshold as a % of the level
+                #if abs(level - current_close) <= threshold or abs(level - current_open) <= threshold:
+                if abs(level - current_close) <= threshold:
+                    # Handle retests
+                    retests.setdefault(level, {'count': 0, 'last_retest': None})
+                    retests[level]['count'] += 1
+                    retests[level]['last_retest'] = current_datetime
+                    print(f"Support/resistance level {level} retested at {current_datetime}.")
+
+    return sr_level, retests
+
+def add_levels_to_price_history(df, sr_levels, retests):
+    # Initialize new columns with default values
+    df['level'] = None
+    df['level_type'] = 0
+    df['level_strength'] = 0
+    #print('Adding levels to price_history...')
+
+    # Update 'level', 'level_type', and 'level_strength' based on the retests dictionary and the support levels
+    for level, level_datetime in sr_levels.items():
+        #print('Found support level:', level, level_datetime)
+        df.at[level_datetime, 'level'] = level
+        df.at[level_datetime, 'level_type'] = 1
+        if level in retests:
+            #print('Found retest of support level.')
+            count = retests[level]['count']
+            df.at[level_datetime, 'level_strength'] = count + 1
+        else:
+            df.at[level_datetime, 'level_strength'] = 1
+
+    return df
+
+
+def add_ema_and_trend(price_history):
+    # Calculate the Exponential Moving Average for 200 data points
+    price_history['EMA_200'] = price_history['Close'].ewm(span=200, adjust=False).mean()
+
+    # Calculate the Exponential Moving Average for 50 data points
+    price_history['EMA_50'] = price_history['Close'].ewm(span=50, adjust=False).mean()
+
+    # Infer trend based on the 2 EMA calculations
+    def infer_trend(row):
+        if row['EMA_50'] > row['EMA_200']:
+            return 1
+        elif row['EMA_50'] < row['EMA_200']:
+            return -1
+        else:
+            return 0
+
+    price_history['Trend'] = price_history.apply(infer_trend, axis=1)
+
+    return price_history
+
 @login_required
 def edit_ticker(request, ticker_id):
     # Retrieve the Ticker instance to be edited or create a new one if it doesn't exist
     ticker = get_object_or_404(Ticker, id=ticker_id)
+    support = {}
+    resistance = {}
+    retests = {}
 
     if request.method == 'POST':
         form = TickerForm(request.POST, instance=ticker)
         print('Checking', ticker.symbol)
         if form.is_valid():
             if ticker.is_daily:
-                start_day = timezone.now() - timedelta(days=31)
+                start_day = timezone.now() - timedelta(days=365)
                 finish_day = timezone.now()
                 interval = '1D'
 
@@ -225,6 +387,11 @@ def edit_ticker(request, ticker_id):
                     #price_history['three_white_soldiers'].fillna(False, inplace=True)
                     price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
+                    count_patterns(price_history, pattern_types)
+                    sr_levels, retests = find_levels(price_history, window=20)
+                    price_history = add_levels_to_price_history(price_history, sr_levels, retests)
+                    price_history = add_ema_and_trend(price_history)
+
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
                         if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
@@ -235,25 +402,36 @@ def edit_ticker(request, ticker_id):
                                 high_price=row['High'],
                                 low_price=row['Low'],
                                 close_price=row['Close'],
+                                percent_change=row['PercentChange'],
                                 volume=row['Volume'],
-                                bullish_engulfing=row['bullish_engulfing'],
-                                bullish_harami=row['bullish_harami'],
-                                hammer=row['hammer'],
-                                inverted_hammer=row['inverted_hammer'],
-                                hanging_man=row['hanging_man'],
-                                shooting_star=row['shooting_star'],
-                                bearish_engulfing=row['bearish_engulfing'],
-                                bearish_harami=row['bearish_harami'],
-                                dark_cloud_cover=row['dark_cloud_cover'],
-                                gravestone_doji=row['gravestone_doji'],
-                                dragonfly_doji=row['dragonfly_doji'],
-                                doji_star=row['doji_star'],
-                                piercing_pattern=row['piercing_pattern'],
-                                morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji'],
-                                three_white_soldiers=row['three_white_soldiers']
+                                patterns_detected = row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
+                                level=row['level'],
+                                level_type=row['level_type'],
+                                level_strength=row['level_strength'],
+                                ema_200=row['EMA_200'],
+                                ema_50=row['EMA_50'],
+                                trend=row['Trend'],
                             )
-                            daily_price.save()
+                        else:
+                            daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            daily_price.patterns_detected = row['patterns_detected']
+                            daily_price.bullish_detected = row['bullish']
+                            daily_price.bearish_detected = row['bearish']
+                            daily_price.reversal_detected = row['reversal']
+                            daily_price.bullish_reversal_detected = row['bullish_reversal']
+                            daily_price.bearish_reversal_detected = row['bearish_reversal']
+                            daily_price.level = row['level']
+                            daily_price.level_type = row['level_type']
+                            daily_price.level_strength = row['level_strength']
+                            daily_price.ema_200 = row['EMA_200']
+                            daily_price.ema_50 = row['EMA_50']
+                            daily_price.trend = row['Trend']
+                        daily_price.save()
 
             if ticker.is_fifteen_min:
                 start_day = timezone.now() - timedelta(days=7)
@@ -273,11 +451,8 @@ def edit_ticker(request, ticker_id):
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
-
-                    price_history = db_candlestick.three_white_soldiers(price_history, target='three_white_soldiers',
-                                                                        ohlc=['Open', 'High', 'Low', 'Close'])
-                    price_history['three_white_soldiers'].fillna(False, inplace=True)
-
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    count_patterns(price_history, pattern_types)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -289,25 +464,24 @@ def edit_ticker(request, ticker_id):
                                 high_price=row['High'],
                                 low_price=row['Low'],
                                 close_price=row['Close'],
+                                percent_change=row['PercentChange'],
                                 volume=row['Volume'],
-                                bullish_engulfing=row['bullish_engulfing'],
-                                bullish_harami=row['bullish_harami'],
-                                hammer=row['hammer'],
-                                inverted_hammer=row['inverted_hammer'],
-                                hanging_man=row['hanging_man'],
-                                shooting_star=row['shooting_star'],
-                                bearish_engulfing=row['bearish_engulfing'],
-                                bearish_harami=row['bearish_harami'],
-                                dark_cloud_cover=row['dark_cloud_cover'],
-                                gravestone_doji=row['gravestone_doji'],
-                                dragonfly_doji=row['dragonfly_doji'],
-                                doji_star=row['doji_star'],
-                                piercing_pattern=row['piercing_pattern'],
-                                morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji'],
-                                three_white_soldiers=row['three_white_soldiers']
+                                patterns_detected=row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
                             )
-                            fifteenmin_price.save()
+                        else:
+                            fifteenmin_price=FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            fifteenmin_price.patterns_detected = row['patterns_detected']
+                            fifteenmin_price.bullish_detected = row['bullish']
+                            fifteenmin_price.bearish_detected = row['bearish']
+                            fifteenmin_price.reversal_detected = row['reversal']
+                            fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
+                            fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
+                        fifteenmin_price.save()
             if ticker.is_five_min:
                 start_day = timezone.now() - timedelta(days=5)
                 finish_day = timezone.now()
@@ -326,10 +500,8 @@ def edit_ticker(request, ticker_id):
                     # Request price data for the entire missing date range
                     price_history = get_price_data(ticker, interval, start_day, finish_day)
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
-
-                    price_history = db_candlestick.three_white_soldiers(price_history, target='three_white_soldiers',
-                                                                        ohlc=['Open', 'High', 'Low', 'Close'])
-                    price_history['three_white_soldiers'].fillna(False, inplace=True)
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    count_patterns(price_history, pattern_types)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
@@ -341,25 +513,24 @@ def edit_ticker(request, ticker_id):
                                 high_price=row['High'],
                                 low_price=row['Low'],
                                 close_price=row['Close'],
+                                percent_change=row['PercentChange'],
                                 volume=row['Volume'],
-                                bullish_engulfing=row['bullish_engulfing'],
-                                bullish_harami=row['bullish_harami'],
-                                hammer=row['hammer'],
-                                inverted_hammer=row['inverted_hammer'],
-                                hanging_man=row['hanging_man'],
-                                shooting_star=row['shooting_star'],
-                                bearish_engulfing=row['bearish_engulfing'],
-                                bearish_harami=row['bearish_harami'],
-                                dark_cloud_cover=row['dark_cloud_cover'],
-                                gravestone_doji=row['gravestone_doji'],
-                                dragonfly_doji=row['dragonfly_doji'],
-                                doji_star=row['doji_star'],
-                                piercing_pattern=row['piercing_pattern'],
-                                morning_star=row['morning_star'],
-                                morning_star_doji=row['morning_star_doji'],
-                                three_white_soldiers=row['three_white_soldiers']
+                                patterns_detected=row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
                             )
-                            fivemin_price.save()
+                        else:
+                            fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            fivemin_price.patterns_detected = row['patterns_detected']
+                            fivemin_price.bullish_detected = row['bullish']
+                            fivemin_price.bearish_detected = row['bearish']
+                            fivemin_price.reversal_detected = row['reversal']
+                            fivemin_price.bullish_reversal_detected = row['bullish_reversal']
+                            fivemin_price.bearish_reversal_detected = row['bearish_reversal']
+                        fivemin_price.save()
             if ticker.is_one_min:
                 pass
             form.save()
@@ -372,25 +543,44 @@ def edit_ticker(request, ticker_id):
 
 
 from django.shortcuts import render
-from .models import Ticker, DailyPrice
+import pytz
 
 @login_required
 def daily_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
-    daily_prices = DailyPrice.objects.filter(ticker=ticker)
+    daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
 
-    return render(request, 'price_list.html', {'ticker': ticker, 'candles': daily_prices, 'heading_text' : 'Daily'})
+
+    riga_tz = pytz.timezone('Europe/Riga')  # Define the timezone object
+
+    for daily_price in daily_prices:
+        daily_price.datetime = timezone.localtime(daily_price.datetime, riga_tz)  # Use the defined timezone object
+        daily_price.sum_reversals = daily_price.reversal_detected + daily_price.bearish_reversal_detected + daily_price.bullish_reversal_detected
+
+    return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': daily_prices, 'heading_text' : 'Daily'})
 
 @login_required
 def fifteen_min_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
-    fifteen_min_prices = FifteenMinPrice.objects.filter(ticker=ticker)
+    fifteen_min_prices = FifteenMinPrice.objects.filter(ticker=ticker).order_by('datetime')
 
-    return render(request, 'price_list.html', {'ticker': ticker, 'candles': fifteen_min_prices, 'heading_text' : '15 Minute'})
+    riga_tz = pytz.timezone('Europe/Riga')  # Define the timezone object
+
+    for fifteen_min_price in fifteen_min_prices:
+        fifteen_min_price.datetime = timezone.localtime(fifteen_min_price.datetime, riga_tz)
+        fifteen_min_price.sum_reversals = fifteen_min_price.reversal_detected + fifteen_min_price.bearish_reversal_detected + fifteen_min_price.bullish_reversal_detected\
+
+    return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': fifteen_min_prices, 'heading_text' : '15 Minute'})
 
 @login_required
 def five_min_price_list(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
-    five_min_prices = FiveMinPrice.objects.filter(ticker=ticker)
+    five_min_prices = FiveMinPrice.objects.filter(ticker=ticker).order_by('datetime')
 
-    return render(request, 'price_list.html', {'ticker': ticker, 'candles': five_min_prices, 'heading_text' : '5 Minute'})
+    riga_tz = pytz.timezone('Europe/Riga')  # Define the timezone object
+
+    for five_min_price in five_min_prices:
+        five_min_price.datetime = timezone.localtime(five_min_price.datetime, riga_tz)
+        five_min_price.sum_reversals = five_min_price.reversal_detected + five_min_price.bearish_reversal_detected + five_min_price.bullish_reversal_detected\
+
+    return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': five_min_prices, 'heading_text' : '5 Minute'})
