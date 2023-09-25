@@ -31,7 +31,7 @@ def compute_ma_200_trend_strength(ticker, data_points):
         try:
             ma_200_trend_strength = abs(last_closing_price - moving_avg) / last_closing_price
             if last_closing_price < moving_avg:
-                ticker.ma_200_trend_strength = -ticker.ma_200_trend_strength
+                ma_200_trend_strength = -ma_200_trend_strength
         except ZeroDivisionError:
             ma_200_trend_strength = None
     ticker.ma_200_trend_strength = ma_200_trend_strength
