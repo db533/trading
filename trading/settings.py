@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'trading_app.apps.TradingAppConfig',
-
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +161,8 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/ticker-config/'
+
+CRON_CLASSES = [
+    #'trading_app.cron.UpdateTickerMetricsCronJob',
+    'trading_app.cron.TestCronJob',
+]

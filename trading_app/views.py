@@ -18,11 +18,14 @@ from django.contrib.auth.models import User
 from django.db.models import Sum, Max, Count
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from candlestick import candlestick
 from . import db_candlestick
+from . import update_ticker_metrics
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from rest_framework.response import Response
 
@@ -81,18 +84,72 @@ from .forms import TickerForm
 
 @login_required
 def ticker_config(request):
-    tickers = Ticker.objects.all()
+    tickers = Ticker.objects.all().order_by('symbol')  # Order by symbol in ascending order
+
+    tickers_with_data = []
+    print('Computing data for tickers...')
+    for ticker in tickers:
+        # Fetching the most recent DailyPrice's close_price
+        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        latest_close_price = latest_candle.close_price if latest_candle else None
+        daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level',
+                                                                                                'level_strength')
+        current_date = date.today()
+        smallest_range_to_level = 100
+        smallest_level_type = ''
+        sr_level = None
+        print('Ticker:', ticker.symbol)
+        print('latest_close_price:', latest_close_price)
+        for dp in daily_prices_query:
+            days_difference = (current_date - dp.datetime.date()).days
+            if latest_close_price and latest_close_price != 0:
+                print('dp.level:', dp.level)
+                close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
+                print('close_price_percentage:', close_price_percentage)
+                if close_price_percentage < smallest_range_to_level:
+                    smallest_range_to_level = close_price_percentage
+                    print('smallest_range_to_level is now:', smallest_range_to_level)
+                    sr_level = dp.level
+                    print('sr_level:', sr_level)
+                    if dp.close_price < dp.level:
+                        smallest_level_type = 'Resistance'
+                    else:
+                        smallest_level_type = 'Support'
+            else:
+                close_price_percentage = None
+
+        #if smallest_range_to_level > 2:
+            # We are more than 1% from a support / resistance level
+        smallest_level_type = ''
+        if ticker.last_high_low != None:
+            if smallest_range_to_level < 2:
+                if latest_close_price < ticker.last_high_low:
+                    smallest_level_type = 'Support'
+                else:
+                    smallest_level_type = 'Resistance'
+            else:
+                if latest_close_price > sr_level:
+                    smallest_level_type = 'Support'
+                else:
+                    smallest_level_type = 'Resistance'
+
+        tickers_with_data.append({
+            'ticker': ticker,
+            'latest_candle': latest_candle,
+            'smallest_level_type' : smallest_level_type,
+            'smallest_range_to_level' : smallest_range_to_level,
+            'sr_level' : sr_level
+        })
 
     if request.method == 'POST':
         form = TickerForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('ticker_config')
-
     else:
         form = TickerForm()
 
-    return render(request, 'ticker_config.html', {'form': form, 'tickers': tickers})
+    return render(request, 'ticker_config.html', {'form': form, 'tickers_with_data': tickers_with_data})
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticker
@@ -225,7 +282,9 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
     support = {}
     resistance = {}
     sr_level = {}
+    last_high_low_level=None
     retests = {}   # Keep track of retest counts and last retest datetime for each level
+    window_last_high = 5
 
     # First pass to identify initial support and resistance levels
     for i in range(window, len(df) - window):
@@ -251,6 +310,27 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
         elif current_open == max_val:
             resistance[current_open] = df.index[i]
             sr_level[current_open] = df.index[i]
+
+    # Now look for a min/max for the most recent high/low:
+    for i in range(window_last_high, len(df) - window_last_high):
+        combined_last_low_high_window = pd.concat(
+            [df[col][i - window_last_high:i + window_last_high] for col in columns])
+        last_min_val = combined_last_low_high_window.min()
+        last_max_val = combined_last_low_high_window.max()
+
+        current_close = df.iloc[i]['Close']
+        current_open = df.iloc[i]['Open']
+        if current_close == last_min_val:
+            last_high_low_level = current_close
+
+        elif current_open == last_min_val:
+            last_high_low_level = current_open
+
+        if current_close == last_max_val:
+            last_high_low_level = current_close
+
+        elif current_open == last_max_val:
+            last_high_low_level = current_open
 
     # Helper function to check if two levels are within threshold of each other
     def within_threshold(level1, level2, threshold_percent):
@@ -306,7 +386,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
                     retests[level]['last_retest'] = current_datetime
                     print(f"Support/resistance level {level} retested at {current_datetime}.")
 
-    return sr_level, retests
+    return sr_level, retests, last_high_low_level
 
 def add_levels_to_price_history(df, sr_levels, retests):
     # Initialize new columns with default values
@@ -388,7 +468,9 @@ def edit_ticker(request, ticker_id):
                     price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
                     count_patterns(price_history, pattern_types)
-                    sr_levels, retests = find_levels(price_history, window=20)
+                    sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
+                    ticker.last_high_low = last_high_low_level
+                    ticker.save()
                     price_history = add_levels_to_price_history(price_history, sr_levels, retests)
                     price_history = add_ema_and_trend(price_history)
 
@@ -584,3 +666,64 @@ def five_min_price_list(request, ticker_id):
         five_min_price.sum_reversals = five_min_price.reversal_detected + five_min_price.bearish_reversal_detected + five_min_price.bullish_reversal_detected\
 
     return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': five_min_prices, 'heading_text' : '5 Minute'})
+
+@login_required
+def update_metrics_view(request):
+    update_ticker_metrics.update_ticker_metrics()
+    return HttpResponseRedirect(reverse('ticker_config'))  # Redirect to admin dashboard or any other desired URL
+
+
+def ticker_detail(request, ticker_id):
+    ticker = get_object_or_404(Ticker, id=ticker_id)
+    daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
+
+    # Fetching the most recent DailyPrice's close_price
+    latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+    latest_close_price = latest_candle.close_price if latest_candle else None
+    # Computing the number of days from datetime to today for each DailyPrice instance
+    current_date = date.today()
+    daily_prices = []
+    smallest_range_to_level = 100
+    smallest_level_type = ''
+    for dp in daily_prices_query:
+        days_difference = (current_date - dp.datetime.date()).days
+        if latest_close_price and latest_close_price != 0:
+            close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
+            if close_price_percentage < smallest_range_to_level:
+                smallest_range_to_level = close_price_percentage
+                #if dp.close_price < dp.level:
+                #    smallest_level_type = 'Resistance'
+                #else:
+                #    smallest_level_type = 'Support'
+        else:
+            close_price_percentage = None
+
+        daily_prices.append({
+            'daily_price': dp,
+            'days_from_today': days_difference,
+            'close_price_percentage': close_price_percentage,
+            'latest_candle' : latest_candle,
+        })
+    if ticker.last_high_low != None:
+        if smallest_range_to_level < 2:
+            # Price is close to support / resistance level, so look back to the most recent high / low to determine if this is a support / resistance.
+            if latest_close_price < ticker.last_high_low:
+                smallest_level_type = 'Support'
+            else:
+                smallest_level_type = 'Resistance'
+        else:
+            # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
+            if latest_close_price > sr_level:
+                smallest_level_type = 'Support'
+            else:
+                smallest_level_type = 'Resistance'
+
+    context = {
+        'ticker': ticker,
+        'daily_prices': daily_prices,
+        'close_price': latest_close_price,
+        'smallest_level_type' : smallest_level_type,
+        'smallest_range_to_level' : smallest_range_to_level,
+    }
+    return render(request, 'ticker_detail.html', context)
+

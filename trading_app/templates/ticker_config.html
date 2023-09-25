@@ -13,31 +13,82 @@
   <table style="border: 1pt solid black;">
     <thead>
       <tr>
-        <th style="border: 1pt solid black; padding: 3pt;">Ticker Symbol</th>
-        <th style="border: 1pt solid black; padding: 3pt;">Daily Prices</th>
+        <th  colspan="2" style="border: 1pt solid black; padding: 3pt;">Ticker Symbol</th>
+        <th  colspan="4" style="border: 1pt solid black; padding: 3pt;">Price history</th>
+        <th  colspan="1" style="border: 1pt solid black; padding: 3pt;">Trend</th>
+        <th  colspan="3" style="border: 1pt solid black; padding: 3pt;">Area of Value</th>
+        <th  colspan="4" style="border: 1pt solid black; padding: 3pt;">Event</th>
       </tr>
+        <tr>
+        <th style="text-align:center; width: 8ch; border-left: 1px solid black;">Symbol</th>
+        <th style="text-align:center; width: 8ch;">Details</th>
+        <th style="text-align:center; width: 8ch;border-left: 1pt solid black; padding: 3pt;"">Daily</th>
+        <th style="text-align:center; width: 8ch;">15 mins</th>
+        <th style="text-align:center; width: 8ch;">5 mins</th>
+          <th style="text-align:center; width: 8ch;">Current</th>
+        <th style="text-align:center; width: 8ch;border-left: 1pt solid black; padding: 3pt;"">MA strength</th>
+        <th style="text-align:center; width: 8ch;">% to support / resistance</th>
+        <th style="text-align:center; width: 8ch;">Level type</th>
+        <th style="text-align:center; width: 8ch;">Level value</th>
+        <th style="text-align:center; width: 8ch;">Bullish pattern</th>
+        <th style="text-align:center; width: 8ch;">Bullish reversal pattern</th>
+        <th style="text-align:center; width: 8ch;">Reversal pattern</th>
+        <th style="text-align:center; width: 8ch;">Bearish pattern</th>
+        </tr>
     </thead>
     <tbody>
-      {% for ticker in tickers %}
+      {% for item in tickers_with_data %}
         <tr style="border: 1pt solid black;">
-          <td style="border: 1pt solid black; padding: 3pt;">
-            <a href="{% url 'edit_ticker' ticker.id %}">{{ ticker.symbol }}</a>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            <a href="{% url 'edit_ticker' item.ticker.id %}">{{ item.ticker.symbol }}</a>
           </td>
-          <td style="border: 1pt solid black; padding: 3pt;">
-            {% if ticker.is_daily %}
-              <a href="{% url 'daily_price_list' ticker.id %}">Daily Prices</a>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            <a href="{% url 'ticker_detail' item.ticker.id %}">Details</a>
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {% if item.ticker.is_daily %}
+              <a href="{% url 'daily_price_list' item.ticker.id %}">Daily</a>
             {% endif %}
           </td>
-          <td style="border: 1pt solid black; padding: 3pt;">
-            {% if ticker.is_fifteen_min %}
-              <a href="{% url 'fifteen_min_price_list' ticker.id %}">15 min prices</a>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {% if item.ticker.is_fifteen_min %}
+              <a href="{% url 'fifteen_min_price_list' item.ticker.id %}">15 min</a>
             {% endif %}
           </td>
-          <td style="border: 1pt solid black; padding: 3pt;">
-            {% if ticker.is_five_min %}
-              <a href="{% url 'five_min_price_list' ticker.id %}">5 min prices</a>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {% if item.ticker.is_five_min %}
+              <a href="{% url 'five_min_price_list' item.ticker.id %}">5 min</a>
             {% endif %}
           </td>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {{ item.latest_candle.close_price }}
+          </td>
+
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {{ item.ticker.ma_200_trend_strength }}
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+            {{ item.smallest_range_to_level|floatformat:2 }} %
+          </td>
+          <td style="text-align:center;">
+            {{ item.smallest_level_type }}
+          </td>
+          <td style="text-align:center;">
+            {{ item.sr_level|floatformat:2 }}
+          </td>
+          <td style="text-align:center;">
+            {{ item.latest_candle.bullish_detected }}
+          </td>
+          <td style="text-align:center;">
+            {{ item.latest_candle.bullish_reversal_detected }}
+          </td style="text-align:center;">
+          <td>
+            {{ item.latest_candle.reversal_detected }}
+          </td>
+          <td style="text-align:center;">
+            {{ item.latest_candle.bearish_detected }}
+          </td>
+
 
         </tr>
       {% endfor %}

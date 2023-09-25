@@ -31,9 +31,9 @@ class ThreeWhiteSoldiers(CandlestickFinder):
         b2_prev_high = b2_prev_candle[self.high_column]
         b2_prev_low = b2_prev_candle[self.low_column]
 
-        b_body_long = ((b_prev_high - b_prev_low) * .95 > (b_prev_open - b_prev_close))
-        prev_body_long = ((prev_high - prev_low) * .95 > (prev_open - prev_close))
-        body_long = ((high - low) * .95 > (open - close))
+        b_body_long = ((b_prev_high - b_prev_low) * .9 > (b_prev_open - b_prev_close))
+        prev_body_long = ((prev_high - prev_low) * .9 > (prev_open - prev_close))
+        body_long = ((high - low) * .90 > (open - close))
 
         return (
                b2_prev_close < b2_prev_open  # Oldest candle is downward

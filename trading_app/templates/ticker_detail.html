@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>{{ ticker.symbol }} - {{ ticker.company_name }}</h3>
+
+<p>Last close price: <strong>{{ close_price }}</strong></p>
+<p>Moving average 200 strength = abs(MA - price)/price: {{ ticker.ma_200_trend_strength }}</p>
+<p>% of price to nearest support / resistance: {{ smallest_range_to_level|floatformat:2 }} %</p>
+<h4>Candlestick pattern from yesterday:</h4>
+<p>Patterns detected: {{ latest_candle.patterns_detected }}</p>
+<p>Bullish pattern detected: {{ latest_candle.bullish_detected }}</p>
+<p>Bullish reversal pattern detected: {{ latest_candle.bullish_reversal_detected }}</p>
+<p>Reversal pattern detected: {{ latest_candle.reversal_detected }}</p>
+<p>Bearish pattern detected: {{ latest_candle.bearish_detected }}</p>
+
+<p>Currently at support / resistance level: <strong>
+    <span style="color: {% if smallest_level_type == 'Support' %}green{% else %}red{% endif %};">
+        {{ smallest_level_type }}
+    </span></strong>
+</p>
+
+
+<h4>Support / Resistance Levels</h4>
+<table>
+    <thead>
+        <tr>
+            <th style="text-align:center; width: 20ch;">Datetime</th>
+            <th style="text-align:center; width: 8ch;">Days ago</th>
+            <th style="text-align:center; width: 8ch;">Level</th>
+            <th style="text-align:center; width: 8ch;">Retest count</th>
+            <th style="text-align:center; width: 10ch;">Close Price (%)</th> <!-- New header -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for sr_level in daily_prices %}
+        <tr>
+            <td>{{ sr_level.daily_price.datetime|date:"d/m/Y" }}</td>
+            <td>{{ sr_level.days_from_today }}</td>
+            <td style="color: {% if sr_level.daily_price.level > close_price %}red{% else %}green{% endif %};">
+                {{ sr_level.daily_price.level }}
+            </td>
+            <td style="text-align:center;">{{ sr_level.daily_price.level_strength }}</td>
+            <td style="text-align:center;">{{ sr_level.close_price_percentage|floatformat:2 }}%</td> <!-- New cell for displaying percentage -->
+        </tr>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
