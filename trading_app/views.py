@@ -77,11 +77,6 @@ def login_view(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid credentials'})
 
-
-from django.shortcuts import render, redirect
-from .models import Ticker
-from .forms import TickerForm
-
 @login_required
 def ticker_config(request):
     tickers = Ticker.objects.all().order_by('symbol')  # Order by symbol in ascending order
