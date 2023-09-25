@@ -30,7 +30,7 @@ class UpdateTickerMetricsCronJob(CronJobBase):
         update_ticker_metrics()
 
 class TestCronJob(CronJobBase):
-    schedule = Schedule(run_every_mins=1)  # Run once a day
+    schedule = Schedule(run_every_mins=5)  # Run once a day
 
     code = 'trading_app.test_cron_job'
 
