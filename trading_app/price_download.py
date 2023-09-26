@@ -295,14 +295,16 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def download_prices(timeframe='Ad hoc'):
+def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
     print('Running download_prices()...')
     display_local_time()
     print('Timeframe:', timeframe)
+    print('Ticker:', ticker_symbol)
 
     for ticker in Ticker.objects.all().order_by('symbol'):
-        print('Ticker:', ticker.symbol)
-        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc'):
+        if ticker_symbol == 'All':
+            print('Ticker:', ticker.symbol)
+        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
@@ -380,7 +382,7 @@ def download_prices(timeframe='Ad hoc'):
                         daily_price.ema_50 = row['EMA_50']
                         daily_price.trend = row['Trend']
                     daily_price.save()
-        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc'):
+        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
             interval = '15m'
@@ -429,7 +431,7 @@ def download_prices(timeframe='Ad hoc'):
                         fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
                         fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
                     fifteenmin_price.save()
-        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc'):
+        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'
