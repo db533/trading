@@ -19,6 +19,8 @@ urlpatterns = [
     path('ticker/<int:ticker_id>/five-min-prices/', five_min_price_list, name='five_min_price_list'),
     path('update_metrics/', update_metrics_view, name='update_metrics'),
     path('ticker/<int:ticker_id>/', ticker_detail, name='ticker_detail'),
+    path('ticker_delete/<int:ticker_id>/', ticker_delete, name='ticker_delete'),
+
 ]
 
 from django.conf import settings

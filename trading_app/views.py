@@ -719,3 +719,21 @@ def ticker_detail(request, ticker_id):
     }
     return render(request, 'ticker_detail.html', context)
 
+from django.shortcuts import redirect
+from django.http import HttpResponseNotFound
+
+def ticker_delete(request, ticker_id):
+    try:
+        ticker = Ticker.objects.get(id=ticker_id)
+    except Ticker.DoesNotExist:
+        return HttpResponseNotFound("Ticker not found.")
+
+    # Manually deleting associated objects if CASCADE isn't set on the ForeignKey in your models.
+    # If CASCADE is set, these deletions would be automatic, and you won't need these lines.
+    #DailyPrice.objects.filter(ticker=ticker).delete()
+    #FifteenMinsPrice.objects.filter(ticker=ticker).delete()
+    #FiveMinsPrice.objects.filter(ticker=ticker).delete()
+
+    ticker.delete()
+
+    return redirect('ticker_config')

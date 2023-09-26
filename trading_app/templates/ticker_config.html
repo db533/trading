@@ -43,7 +43,7 @@
             <a href="{% url 'edit_ticker' item.ticker.id %}">{{ item.ticker.symbol }}</a>
           </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
-            <a href="{% url 'ticker_detail' item.ticker.id %}">Details</a>
+            <a href="{% url 'ticker_detail' item.ticker.id %}">Details</a> <a href="{% url 'ticker_delete' item.ticker.id %}">Delete</a>
           </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
             {% if item.ticker.is_daily %}
