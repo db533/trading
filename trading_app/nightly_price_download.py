@@ -295,10 +295,10 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def download_prices():
-    display_local_time()
+#def download_prices():
+#    display_local_time()
 
-def download_prices_real():
+def download_prices():
     display_local_time()
 
     print('Downloading daily prices:')
