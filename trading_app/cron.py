@@ -2,13 +2,13 @@
 
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
-from .nightly_price_download import download_prices
+from .nightly_price_download import *
 from .test_cron_job import test_cron_job
 
 class DailyPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['00:01']  # Run at 1:00 AM local time
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    # schedule = Schedule(run_every_mins=60*24)  # Run once a day
+    #RUN_AT_TIMES = ['09:40']  # Run at 1:00 AM local time
+    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    schedule = Schedule(run_every_mins=1)  # Run once a day
 
     code = 'trading_app.daily_price_download_cron_job'
 
@@ -30,7 +30,7 @@ class UpdateTickerMetricsCronJob(CronJobBase):
         update_ticker_metrics()
 
 class TestCronJob(CronJobBase):
-    schedule = Schedule(run_every_mins=5)  # Run once a day
+    schedule = Schedule(run_every_mins=1)  # Run once a day
 
     code = 'trading_app.test_cron_job'
 

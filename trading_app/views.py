@@ -98,14 +98,14 @@ def ticker_config(request):
         for dp in daily_prices_query:
             days_difference = (current_date - dp.datetime.date()).days
             if latest_close_price and latest_close_price != 0:
-                print('dp.level:', dp.level)
+                #print('dp.level:', dp.level)
                 close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
-                print('close_price_percentage:', close_price_percentage)
+                #print('close_price_percentage:', close_price_percentage)
                 if close_price_percentage < smallest_range_to_level:
                     smallest_range_to_level = close_price_percentage
-                    print('smallest_range_to_level is now:', smallest_range_to_level)
+                    #print('smallest_range_to_level is now:', smallest_range_to_level)
                     sr_level = dp.level
-                    print('sr_level:', sr_level)
+                    #print('sr_level:', sr_level)
                     if dp.close_price < dp.level:
                         smallest_level_type = 'Resistance'
                     else:
