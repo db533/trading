@@ -381,5 +381,4 @@ def download_prices():
                         daily_price.ema_50 = row['EMA_50']
                         daily_price.trend = row['Trend']
                     daily_price.save()
-                    print('daily_price:',daily_price)
 
