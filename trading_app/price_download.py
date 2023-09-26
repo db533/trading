@@ -295,14 +295,14 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def download_prices(timeframe='Daily'):
+def download_prices(timeframe='Ad hoc'):
     print('Running download_prices()...')
     display_local_time()
     print('Timeframe:', timeframe)
 
-    for ticker in Ticker.objects.filter(is_daily=True):
+    for ticker in Ticker.objects.all().order_by('symbol'):
         print('Ticker:', ticker.symbol)
-        if ticker.is_daily and timeframe == 'Daily':
+        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc'):
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
@@ -380,7 +380,7 @@ def download_prices(timeframe='Daily'):
                         daily_price.ema_50 = row['EMA_50']
                         daily_price.trend = row['Trend']
                     daily_price.save()
-        if ticker.is_fifteen_min and timeframe == '15 mins':
+        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
             interval = '15m'
@@ -429,7 +429,7 @@ def download_prices(timeframe='Daily'):
                         fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
                         fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
                     fifteenmin_price.save()
-        if ticker.is_five_min and timeframe == '5 mins':
+        if ticker.is_five_min and (timeframe == '5 mins' or timeframe == 'Ad hoc'):
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'
