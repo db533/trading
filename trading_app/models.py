@@ -11,7 +11,7 @@ class Ticker(models.Model):
     ma_200_trend_strength = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     last_high_low = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     atr = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    avg_volume_100_days = models.IntegerField()
+    avg_volume_100_days = models.IntegerField(null=True)
 
     def __str__(self):
         return self.symbol

@@ -8,7 +8,7 @@ from .test_cron_job import test_cron_job
 class DailyPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['00:01']  # Run at 1:00 AM local time
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    schedule = Schedule(run_every_mins=1)  # Run once a day
+    # schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.daily_price_download_cron_job'
 
     def do(self):

@@ -708,7 +708,7 @@ def ticker_detail(request, ticker_id):
                 smallest_level_type = 'Resistance'
         else:
             # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
-            if latest_close_price > sr_level:
+            if latest_close_price > ticker.last_high_low:
                 smallest_level_type = 'Support'
             else:
                 smallest_level_type = 'Resistance'
