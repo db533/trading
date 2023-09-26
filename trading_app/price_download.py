@@ -322,11 +322,11 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
             print('Ticker:', ticker.symbol)
-        print("timeframe == '5 mins':", timeframe == '5 mins')
-        print("ticker_symbol == 'All':", ticker_symbol == 'All')
-        print("ticker.is_daily:", ticker.is_daily)
-        print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
-        print("ticker.is_five_min:", ticker.is_five_min)
+        #print("timeframe == '5 mins':", timeframe == '5 mins')
+        #print("ticker_symbol == 'All':", ticker_symbol == 'All')
+        #print("ticker.is_daily:", ticker.is_daily)
+        #print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
+        #print("ticker.is_five_min:", ticker.is_five_min)
         if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc') and (
                 ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             print('Downloading daily prices...')
