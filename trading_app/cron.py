@@ -31,7 +31,7 @@ class FiveMinsPriceDownloadCronJob(CronJobBase):
 
     def do(self):
         # Run the update_ticker_metrics function
-        download_prices(timeframe='1 mins')
+        download_prices(timeframe='5 mins')
 
 class UpdateTickerMetricsCronJob(CronJobBase):
     RUN_AT_TIMES = ['01:00']  # Run at 1:00 AM local time
