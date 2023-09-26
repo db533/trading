@@ -1,4 +1,5 @@
 import logging
+
 logging.basicConfig(level=logging.INFO)
 import yfinance as yf
 import time
@@ -9,6 +10,7 @@ from datetime import datetime, timedelta, timezone, date
 from candlestick import candlestick
 from . import db_candlestick
 from django.utils import timezone
+
 
 def display_local_time():
     # Get the current datetime in UTC
@@ -21,6 +23,7 @@ def display_local_time():
     # Format and print the local datetime
     local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
     print(f'Current datetime: {local_datetime_str}')
+    return local_datetime.time()
 
 def get_price_data(ticker, interval, start_time, finish_time):
     try:
@@ -30,28 +33,27 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
         if not data.empty:
-
             data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
 
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index
 
             # Convert the datetime to a naive datetime
-            #data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
+            # data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
             # Set the timezone to your project's timezone (e.g., UTC)
-            #data['Datetime'] = data['Datetime']
+            # data['Datetime'] = data['Datetime']
 
             # Set the timezone to your project's timezone (e.g., UTC)
-            #data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
+            # data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
             # Ensure the datetime index is in UTC timezone
-            #data.index = data.index.tz_convert(timezone.utc)
+            # data.index = data.index.tz_convert(timezone.utc)
             data = data.tz_localize(None)
 
             data['PercentChange'] = data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
             data.at[data.index[0], 'PercentChange'] = 0
 
             # Reorder the columns
-            data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume','PercentChange']]
+            data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
 
             time.sleep(1)
             print(data)
@@ -61,27 +63,31 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
     return data
 
+
 def get_missing_dates(ticker, interval, start_day, finish_day):
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
     if interval == '1D':
-        existing_dates = DailyPrice.objects.filter(ticker=ticker, datetime__range=(start_day, finish_day)).values_list('datetime', flat=True)
+        existing_dates = DailyPrice.objects.filter(ticker=ticker, datetime__range=(start_day, finish_day)).values_list(
+            'datetime', flat=True)
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='D')
         missing_dates = [date for date in all_dates if date not in existing_dates]
     if interval == '15m':
-        existing_dates = FifteenMinPrice.objects.filter(ticker=ticker, datetime__range=(start_day, finish_day)).values_list(
+        existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
+                                                        datetime__range=(start_day, finish_day)).values_list(
             'datetime', flat=True)
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
         missing_dates = [date for date in all_dates if date not in existing_dates]
-        #print('all_dates:',all_dates)
+        # print('all_dates:',all_dates)
     if interval == '5m':
         existing_dates = FiveMinPrice.objects.filter(ticker=ticker,
-                                                        datetime__range=(start_day, finish_day)).values_list(
+                                                     datetime__range=(start_day, finish_day)).values_list(
             'datetime', flat=True)
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='5T')
         missing_dates = [date for date in all_dates if date not in existing_dates]
-        print('all_dates:',all_dates)
-        print('missing_dates:',missing_dates)
+        # print('all_dates:',all_dates)
+        # print('missing_dates:',missing_dates)
     return missing_dates
+
 
 def add_candle_data(price_history, candlestick_functions, column_names):
     for candlestick_func, column_name in zip(candlestick_functions, column_names):
@@ -89,41 +95,50 @@ def add_candle_data(price_history, candlestick_functions, column_names):
         price_history[column_name].fillna(False, inplace=True)
     return price_history
 
+
 def add_db_candle_data(price_history, db_candlestick_functions, db_column_names):
     for db_candlestick_func, column_name in zip(db_candlestick_functions, db_column_names):
         price_history = db_candlestick_func(price_history, target=column_name, ohlc=['Open', 'High', 'Low', 'Close'])
         price_history[column_name].fillna(False, inplace=True)
-        #print('column_name:',column_name)
-        #print(price_history[column_name])
+        # print('column_name:',column_name)
+        # print(price_history[column_name])
     return price_history
 
+
 # List of candlestick functions to replace 'candlestick.xxx'
-candlestick_functions = [candlestick.bullish_engulfing, candlestick.bullish_harami, candlestick.hammer, candlestick.inverted_hammer,
-                         candlestick.hanging_man, candlestick.shooting_star, candlestick.bearish_engulfing, candlestick.bearish_harami,
-                         candlestick.dark_cloud_cover, candlestick.gravestone_doji, candlestick.dragonfly_doji, candlestick.doji_star,
+candlestick_functions = [candlestick.bullish_engulfing, candlestick.bullish_harami, candlestick.hammer,
+                         candlestick.inverted_hammer,
+                         candlestick.hanging_man, candlestick.shooting_star, candlestick.bearish_engulfing,
+                         candlestick.bearish_harami,
+                         candlestick.dark_cloud_cover, candlestick.gravestone_doji, candlestick.dragonfly_doji,
+                         candlestick.doji_star,
                          candlestick.piercing_pattern, candlestick.morning_star, candlestick.morning_star_doji,
-                         #candlestick.evening_star, candlestick.evening_star_doji
+                         # candlestick.evening_star, candlestick.evening_star_doji
                          ]
 
 # List of column names to replace 'xxx' in price_history
-column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star', 'bearish_engulfing', 'bearish_harami',
-                'dark_cloud_cover', 'gravestone_doji','dragonfly_doji', 'doji_star', 'piercing_pattern', 'morning_star', 'morning_star_doji',
-                #'evening_star', 'evening_star_doji'
+column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star',
+                'bearish_engulfing', 'bearish_harami',
+                'dark_cloud_cover', 'gravestone_doji', 'dragonfly_doji', 'doji_star', 'piercing_pattern',
+                'morning_star', 'morning_star_doji',
+                # 'evening_star', 'evening_star_doji'
                 ]
 
 # List of candlestick functions to replace 'candlestick.xxx'
 db_candlestick_functions = [db_candlestick.three_white_soldiers,
-                         ]
+                            ]
 
 # List of column names to replace 'xxx' in price_history
 db_column_names = ['three_white_soldiers',
-                ]
+                   ]
 
-pattern_types = {'bullish' : ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star', 'three_white_soldiers'],
-                 'bearish' : ['bearish_engulfing', 'bearish_harami','dark_cloud_cover', 'gravestone_doji'],
-                 'reversal' : ['dragonfly_doji', 'doji_star', 'piercing_pattern'],
-                 'bullish_reversal' : ['morning_star', 'morning_star_doji'],
-                 'bearish_reversal' : [],}
+pattern_types = {
+    'bullish': ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star',
+                'three_white_soldiers'],
+    'bearish': ['bearish_engulfing', 'bearish_harami', 'dark_cloud_cover', 'gravestone_doji'],
+    'reversal': ['dragonfly_doji', 'doji_star', 'piercing_pattern'],
+    'bullish_reversal': ['morning_star', 'morning_star_doji'],
+    'bearish_reversal': [], }
 
 
 def count_patterns(df, pattern_types):
@@ -142,13 +157,14 @@ def count_patterns(df, pattern_types):
     bool_df = df[all_columns]
     df['patterns_detected'] = bool_df.dot(bool_df.columns + ' ').str.strip()
 
+
 def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_percent=0.01):
-#def find_levels(df, columns=['Close'], window=20, retest_threshold_percent=0.001):
+    # def find_levels(df, columns=['Close'], window=20, retest_threshold_percent=0.001):
     support = {}
     resistance = {}
     sr_level = {}
-    last_high_low_level=None
-    retests = {}   # Keep track of retest counts and last retest datetime for each level
+    last_high_low_level = None
+    retests = {}  # Keep track of retest counts and last retest datetime for each level
     window_last_high = 5
 
     # First pass to identify initial support and resistance levels
@@ -202,27 +218,27 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
         close_levels = []
         for future_level in level2:
             if abs(level1 - future_level) <= level1 * threshold_percent:
-                print('Future level close to level1:',future_level)
+                print('Future level close to level1:', future_level)
                 close_levels.append(future_level)
-        #print('Level1:', level1, 'Level2:',level2, 'abs(level1 - level2):',abs(level1 - level2),'threshold_value:',level1 * threshold_percent, 'Within threshold?',abs(level1 - level2) <= level1 * threshold_percent)
+        # print('Level1:', level1, 'Level2:',level2, 'abs(level1 - level2):',abs(level1 - level2),'threshold_value:',level1 * threshold_percent, 'Within threshold?',abs(level1 - level2) <= level1 * threshold_percent)
         return close_levels
 
     # Remove sr_levels that are within threshold of a previous support level
-    print('sr_level:',sr_level)
+    print('sr_level:', sr_level)
     sr_keys_sorted = sorted(sr_level, key=sr_level.get)  # sort by datetime
-    #print('sr_keys_sorted:',sr_keys_sorted)
+    # print('sr_keys_sorted:',sr_keys_sorted)
     for i in range(len(sr_keys_sorted)):
         level1 = sr_keys_sorted[i]
         if level1 in sr_level:
-            #print('Level1:', level1)
+            # print('Level1:', level1)
             compared_levels = sr_keys_sorted[i + 1:]
             close_levels = within_threshold(level1, compared_levels, retest_threshold_percent)
             if len(close_levels) > 0:
-                #print('close_levels:', close_levels)
+                # print('close_levels:', close_levels)
                 all_levels = [level1] + close_levels
-                #print('all_levels:', all_levels)
+                # print('all_levels:', all_levels)
                 avg_level = sum(all_levels) / len(all_levels)
-                print('level1 changed from',level1,'to avg_level', avg_level)
+                print('level1 changed from', level1, 'to avg_level', avg_level)
                 datetime_for_avg_level = sr_level[level1]  # store datetime associated with original level
                 del sr_level[level1]
                 for level in close_levels:
@@ -243,7 +259,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 
             if level_datetime < current_datetime:
                 threshold = level * retest_threshold_percent  # Calculate threshold as a % of the level
-                #if abs(level - current_close) <= threshold or abs(level - current_open) <= threshold:
+                # if abs(level - current_close) <= threshold or abs(level - current_open) <= threshold:
                 if abs(level - current_close) <= threshold:
                     # Handle retests
                     retests.setdefault(level, {'count': 0, 'last_retest': None})
@@ -253,20 +269,21 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 
     return sr_level, retests, last_high_low_level
 
+
 def add_levels_to_price_history(df, sr_levels, retests):
     # Initialize new columns with default values
     df['level'] = None
     df['level_type'] = 0
     df['level_strength'] = 0
-    #print('Adding levels to price_history...')
+    # print('Adding levels to price_history...')
 
     # Update 'level', 'level_type', and 'level_strength' based on the retests dictionary and the support levels
     for level, level_datetime in sr_levels.items():
-        #print('Found support level:', level, level_datetime)
+        # print('Found support level:', level, level_datetime)
         df.at[level_datetime, 'level'] = level
         df.at[level_datetime, 'level_type'] = 1
         if level in retests:
-            #print('Found retest of support level.')
+            # print('Found retest of support level.')
             count = retests[level]['count']
             df.at[level_datetime, 'level_strength'] = count + 1
         else:
@@ -295,23 +312,30 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
+
 def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
     print('Running download_prices()...')
-    display_local_time()
+    local_time = display_local_time()
     print('Timeframe:', timeframe)
-    print('Ticker:', ticker_symbol)
+    print('ticker_symbol:', ticker_symbol)
 
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
             print('Ticker:', ticker.symbol)
-        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+        print("timeframe == '5 mins':", timeframe == '5 mins')
+        print("ticker_symbol == 'All':", ticker_symbol == 'All')
+        print("ticker.is_daily:", ticker.is_daily)
+        print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
+        print("ticker.is_five_min:", ticker.is_five_min)
+        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc') and (
+                ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
             interval = '1D'
 
             # Get the list of missing dates
-            #print('About to call missing_dates()...')
+            # print('About to call missing_dates()...')
             missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
 
             if missing_dates:
@@ -321,28 +345,28 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                 print('Retrieving data from ', start_day, ' to ', finish_day)
 
                 # Request price data for the entire missing date range
-                #print('About to call get_price_data()...')
+                # print('About to call get_price_data()...')
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
 
-                #print('About to call add_candle_data()...')
+                # print('About to call add_candle_data()...')
                 price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                #print('About to call add_db_candle_data()...')
+                # print('About to call add_db_candle_data()...')
                 price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
-                #print('About to call count_patterns()...')
+                # print('About to call count_patterns()...')
                 count_patterns(price_history, pattern_types)
-                #print('About to call find_levels()...')
+                # print('About to call find_levels()...')
                 sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                #print('About to update ticker...')
+                # print('About to update ticker...')
                 ticker.last_high_low = last_high_low_level
                 ticker.save()
-                #print('About to call add_levels_to_price_history()...')
+                # print('About to call add_levels_to_price_history()...')
                 price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                #print('About to call add_ema_and_trend()...')
+                # print('About to call add_ema_and_trend()...')
                 price_history = add_ema_and_trend(price_history)
 
                 # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                #print('About to add new daily price rows...')
+                # print('About to add new daily price rows...')
                 for index, row in price_history.iterrows():
                     if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
                         daily_price = DailyPrice(
@@ -382,7 +406,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                         daily_price.ema_50 = row['EMA_50']
                         daily_price.trend = row['Trend']
                     daily_price.save()
-        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc') and (
+                ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
             interval = '15m'
@@ -423,7 +448,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                             bearish_reversal_detected=row['bearish_reversal'],
                         )
                     else:
-                        fifteenmin_price=FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                        fifteenmin_price = FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
                         fifteenmin_price.patterns_detected = row['patterns_detected']
                         fifteenmin_price.bullish_detected = row['bullish']
                         fifteenmin_price.bearish_detected = row['bearish']
@@ -431,21 +456,19 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                         fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
                         fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
                     fifteenmin_price.save()
-        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc') and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc') and (
+                ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'
             print('Checking 5 min data for', ticker.symbol)
-
             # Get the list of missing dates
             missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
-
             if missing_dates:
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
                 start_day = min(missing_dates)
                 finish_day = max(missing_dates)
                 print('Retrieving data from ', start_day, ' to ', finish_day)
-
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
                 price_history = add_candle_data(price_history, candlestick_functions, column_names)
