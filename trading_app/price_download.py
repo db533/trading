@@ -429,7 +429,7 @@ def download_prices(timeframe='Ad hoc'):
                         fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
                         fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
                     fifteenmin_price.save()
-        if ticker.is_five_min and (timeframe == '5 mins' or timeframe == 'Ad hoc'):
+        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc'):
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'
