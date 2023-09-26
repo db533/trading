@@ -312,7 +312,6 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-
 def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
     print('Running download_prices()...')
     local_time = display_local_time()
@@ -347,65 +346,69 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                 # Request price data for the entire missing date range
                 # print('About to call get_price_data()...')
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
+                print('len(price_history):', len(price_history))
+                if len(price_history) >= 3:
 
-                # print('About to call add_candle_data()...')
-                price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                # print('About to call add_db_candle_data()...')
-                price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    # print('About to call add_candle_data()...')
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                    # print('About to call add_db_candle_data()...')
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
-                # print('About to call count_patterns()...')
-                count_patterns(price_history, pattern_types)
-                # print('About to call find_levels()...')
-                sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                # print('About to update ticker...')
-                ticker.last_high_low = last_high_low_level
-                ticker.save()
-                # print('About to call add_levels_to_price_history()...')
-                price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                # print('About to call add_ema_and_trend()...')
-                price_history = add_ema_and_trend(price_history)
+                    # print('About to call count_patterns()...')
+                    count_patterns(price_history, pattern_types)
+                    # print('About to call find_levels()...')
+                    sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
+                    # print('About to update ticker...')
+                    ticker.last_high_low = last_high_low_level
+                    ticker.save()
+                    # print('About to call add_levels_to_price_history()...')
+                    price_history = add_levels_to_price_history(price_history, sr_levels, retests)
+                    # print('About to call add_ema_and_trend()...')
+                    price_history = add_ema_and_trend(price_history)
 
-                # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                # print('About to add new daily price rows...')
-                for index, row in price_history.iterrows():
-                    if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                        daily_price = DailyPrice(
-                            ticker=ticker,
-                            datetime=row['Datetime'],
-                            open_price=row['Open'],
-                            high_price=row['High'],
-                            low_price=row['Low'],
-                            close_price=row['Close'],
-                            percent_change=row['PercentChange'],
-                            volume=row['Volume'],
-                            patterns_detected=row['patterns_detected'],
-                            bullish_detected=row['bullish'],
-                            bearish_detected=row['bearish'],
-                            reversal_detected=row['reversal'],
-                            bullish_reversal_detected=row['bullish_reversal'],
-                            bearish_reversal_detected=row['bearish_reversal'],
-                            level=row['level'],
-                            level_type=row['level_type'],
-                            level_strength=row['level_strength'],
-                            ema_200=row['EMA_200'],
-                            ema_50=row['EMA_50'],
-                            trend=row['Trend'],
-                        )
-                    else:
-                        daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                        daily_price.patterns_detected = row['patterns_detected']
-                        daily_price.bullish_detected = row['bullish']
-                        daily_price.bearish_detected = row['bearish']
-                        daily_price.reversal_detected = row['reversal']
-                        daily_price.bullish_reversal_detected = row['bullish_reversal']
-                        daily_price.bearish_reversal_detected = row['bearish_reversal']
-                        daily_price.level = row['level']
-                        daily_price.level_type = row['level_type']
-                        daily_price.level_strength = row['level_strength']
-                        daily_price.ema_200 = row['EMA_200']
-                        daily_price.ema_50 = row['EMA_50']
-                        daily_price.trend = row['Trend']
-                    daily_price.save()
+                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                    # print('About to add new daily price rows...')
+                    for index, row in price_history.iterrows():
+                        if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                            daily_price = DailyPrice(
+                                ticker=ticker,
+                                datetime=row['Datetime'],
+                                open_price=row['Open'],
+                                high_price=row['High'],
+                                low_price=row['Low'],
+                                close_price=row['Close'],
+                                percent_change=row['PercentChange'],
+                                volume=row['Volume'],
+                                patterns_detected=row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
+                                level=row['level'],
+                                level_type=row['level_type'],
+                                level_strength=row['level_strength'],
+                                ema_200=row['EMA_200'],
+                                ema_50=row['EMA_50'],
+                                trend=row['Trend'],
+                            )
+                        else:
+                            daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            daily_price.patterns_detected = row['patterns_detected']
+                            daily_price.bullish_detected = row['bullish']
+                            daily_price.bearish_detected = row['bearish']
+                            daily_price.reversal_detected = row['reversal']
+                            daily_price.bullish_reversal_detected = row['bullish_reversal']
+                            daily_price.bearish_reversal_detected = row['bearish_reversal']
+                            daily_price.level = row['level']
+                            daily_price.level_type = row['level_type']
+                            daily_price.level_strength = row['level_strength']
+                            daily_price.ema_200 = row['EMA_200']
+                            daily_price.ema_50 = row['EMA_50']
+                            daily_price.trend = row['Trend']
+                        daily_price.save()
+                else:
+                    print('Insufficient data.')
         if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc') and (
                 ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
             start_day = timezone.now() - timedelta(days=7)
@@ -424,38 +427,42 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
 
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
-                price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                count_patterns(price_history, pattern_types)
+                print('len(price_history):', len(price_history))
+                if len(price_history) >= 3:
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    count_patterns(price_history, pattern_types)
 
-                # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                for index, row in price_history.iterrows():
-                    if not FifteenMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                        fifteenmin_price = FifteenMinPrice(
-                            ticker=ticker,
-                            datetime=row['Datetime'],
-                            open_price=row['Open'],
-                            high_price=row['High'],
-                            low_price=row['Low'],
-                            close_price=row['Close'],
-                            percent_change=row['PercentChange'],
-                            volume=row['Volume'],
-                            patterns_detected=row['patterns_detected'],
-                            bullish_detected=row['bullish'],
-                            bearish_detected=row['bearish'],
-                            reversal_detected=row['reversal'],
-                            bullish_reversal_detected=row['bullish_reversal'],
-                            bearish_reversal_detected=row['bearish_reversal'],
-                        )
-                    else:
-                        fifteenmin_price = FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                        fifteenmin_price.patterns_detected = row['patterns_detected']
-                        fifteenmin_price.bullish_detected = row['bullish']
-                        fifteenmin_price.bearish_detected = row['bearish']
-                        fifteenmin_price.reversal_detected = row['reversal']
-                        fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
-                        fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
-                    fifteenmin_price.save()
+                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                    for index, row in price_history.iterrows():
+                        if not FifteenMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                            fifteenmin_price = FifteenMinPrice(
+                                ticker=ticker,
+                                datetime=row['Datetime'],
+                                open_price=row['Open'],
+                                high_price=row['High'],
+                                low_price=row['Low'],
+                                close_price=row['Close'],
+                                percent_change=row['PercentChange'],
+                                volume=row['Volume'],
+                                patterns_detected=row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
+                            )
+                        else:
+                            fifteenmin_price = FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            fifteenmin_price.patterns_detected = row['patterns_detected']
+                            fifteenmin_price.bullish_detected = row['bullish']
+                            fifteenmin_price.bearish_detected = row['bearish']
+                            fifteenmin_price.reversal_detected = row['reversal']
+                            fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
+                            fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
+                        fifteenmin_price.save()
+                else:
+                    print('Insufficient data.')
         if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc') and (
                 ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
             start_day = timezone.now() - timedelta(days=5)
@@ -471,35 +478,39 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                 print('Retrieving data from ', start_day, ' to ', finish_day)
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
-                price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                count_patterns(price_history, pattern_types)
+                print('len(price_history):', len(price_history))
+                if len(price_history) >= 3:
+                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    count_patterns(price_history, pattern_types)
 
-                # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                for index, row in price_history.iterrows():
-                    if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                        fivemin_price = FiveMinPrice(
-                            ticker=ticker,
-                            datetime=row['Datetime'],
-                            open_price=row['Open'],
-                            high_price=row['High'],
-                            low_price=row['Low'],
-                            close_price=row['Close'],
-                            percent_change=row['PercentChange'],
-                            volume=row['Volume'],
-                            patterns_detected=row['patterns_detected'],
-                            bullish_detected=row['bullish'],
-                            bearish_detected=row['bearish'],
-                            reversal_detected=row['reversal'],
-                            bullish_reversal_detected=row['bullish_reversal'],
-                            bearish_reversal_detected=row['bearish_reversal'],
-                        )
-                    else:
-                        fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                        fivemin_price.patterns_detected = row['patterns_detected']
-                        fivemin_price.bullish_detected = row['bullish']
-                        fivemin_price.bearish_detected = row['bearish']
-                        fivemin_price.reversal_detected = row['reversal']
-                        fivemin_price.bullish_reversal_detected = row['bullish_reversal']
-                        fivemin_price.bearish_reversal_detected = row['bearish_reversal']
-                    fivemin_price.save()
+                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                    for index, row in price_history.iterrows():
+                        if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                            fivemin_price = FiveMinPrice(
+                                ticker=ticker,
+                                datetime=row['Datetime'],
+                                open_price=row['Open'],
+                                high_price=row['High'],
+                                low_price=row['Low'],
+                                close_price=row['Close'],
+                                percent_change=row['PercentChange'],
+                                volume=row['Volume'],
+                                patterns_detected=row['patterns_detected'],
+                                bullish_detected=row['bullish'],
+                                bearish_detected=row['bearish'],
+                                reversal_detected=row['reversal'],
+                                bullish_reversal_detected=row['bullish_reversal'],
+                                bearish_reversal_detected=row['bearish_reversal'],
+                            )
+                        else:
+                            fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                            fivemin_price.patterns_detected = row['patterns_detected']
+                            fivemin_price.bullish_detected = row['bullish']
+                            fivemin_price.bearish_detected = row['bearish']
+                            fivemin_price.reversal_detected = row['reversal']
+                            fivemin_price.bullish_reversal_detected = row['bullish_reversal']
+                            fivemin_price.bearish_reversal_detected = row['bearish_reversal']
+                        fivemin_price.save()
+                else:
+                    print('Insufficient data.')
