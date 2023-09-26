@@ -7,7 +7,6 @@ class Ticker(models.Model):
     is_daily = models.BooleanField(default=False)
     is_fifteen_min = models.BooleanField(default=False)
     is_five_min = models.BooleanField(default=False)
-    is_one_min = models.BooleanField(default=False)
     ma_200_trend_strength = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     last_high_low = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     atr = models.DecimalField(max_digits=10, decimal_places=2, null=True)

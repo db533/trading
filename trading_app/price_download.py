@@ -478,5 +478,3 @@ def download_prices(timeframe='Daily'):
                         fivemin_price.bullish_reversal_detected = row['bullish_reversal']
                         fivemin_price.bearish_reversal_detected = row['bearish_reversal']
                     fivemin_price.save()
-        if ticker.is_one_min:
-            pass
