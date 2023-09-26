@@ -312,7 +312,7 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
+def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     print('Running download_prices()...')
     local_time = display_local_time()
     print('Timeframe:', timeframe)
@@ -326,8 +326,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
         #print("ticker.is_daily:", ticker.is_daily)
         #print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
         #print("ticker.is_five_min:", ticker.is_five_min)
-        if ticker.is_daily and (timeframe == 'Daily' or timeframe == 'Ad hoc') and (
-                ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+        if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
@@ -409,8 +408,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                         daily_price.save()
                 else:
                     print('Insufficient data.')
-        if ticker.is_fifteen_min and (timeframe == '15 mins' or timeframe == 'Ad hoc') and (
-                ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
+        if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 8 and local_time.hour < 18) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
             interval = '15m'
@@ -463,8 +461,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All"):
                         fifteenmin_price.save()
                 else:
                     print('Insufficient data.')
-        if ticker.is_five_min and (timeframe == '15 mins' or timeframe == '5 mins' or timeframe == 'Ad hoc') and (
-                ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and local_time.hour > 8 and local_time.hour < 18:
+        if timeframe == '5 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 8 and local_time.hour < 18) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'

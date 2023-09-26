@@ -441,13 +441,13 @@ def edit_ticker(request, ticker_id):
         if form.is_valid():
             if ticker.is_daily:
                 print('About to call download_prices(timeframe="Daily")...')
-                download_prices(timeframe="Daily", ticker_symbol=ticker.symbol)
+                download_prices(timeframe="Daily", ticker_symbol=ticker.symbol, trigger='User')
             if ticker.is_fifteen_min:
                 print('About to call download_prices(timeframe="15 mins")...')
-                download_prices(timeframe="15 mins", ticker_symbol=ticker.symbol)
+                download_prices(timeframe="15 mins", ticker_symbol=ticker.symbol, trigger='User')
             if ticker.is_five_min:
                 print('About to call download_prices(timeframe="5 mins")...')
-                download_prices(timeframe="5 mins", ticker_symbol=ticker.symbol)
+                download_prices(timeframe="5 mins", ticker_symbol=ticker.symbol, trigger='User')
             if False:
                 print('Running legacy code...')
                 if ticker.is_daily:
