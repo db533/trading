@@ -4,7 +4,6 @@ import yfinance as yf
 import time
 from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice
 import pandas as pd
-import datetime
 import pytz
 from datetime import datetime, timedelta, timezone, date
 from candlestick import candlestick
@@ -13,7 +12,7 @@ from django.utils import timezone
 
 def display_local_time():
     # Get the current datetime in UTC
-    utc_now = datetime.datetime.utcnow()
+    utc_now = datetime.utcnow()
 
     # Convert UTC datetime to the local timezone
     local_timezone = pytz.timezone('Europe/Riga')  # Replace with your local timezone
@@ -297,17 +296,7 @@ def add_ema_and_trend(price_history):
     return price_history
 
 def download_prices():
-    print('Running download_prices() in nightly_price_download.py...')
-    # Get the current datetime in UTC
-    utc_now = datetime.datetime.utcnow()
-
-    # Convert UTC datetime to the local timezone
-    local_timezone = pytz.timezone('Europe/Riga')  # Replace with your local timezone
-    local_datetime = utc_now.replace(tzinfo=pytz.utc).astimezone(local_timezone)
-
-    # Format and print the local datetime
-    local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
-    print(f'Current datetime: {local_datetime_str}')
+    display_local_time()
 
 def download_prices_real():
     display_local_time()
