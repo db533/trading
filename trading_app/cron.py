@@ -2,7 +2,7 @@
 
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
-from .nightly_price_download import *
+from .nightly_price_download import download_prices
 from .test_cron_job import test_cron_job
 
 class DailyPriceDownloadCronJob(CronJobBase):
