@@ -295,9 +295,6 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-#def download_prices():
-#    display_local_time()
-
 def download_prices():
     display_local_time()
 
@@ -310,7 +307,7 @@ def download_prices():
             interval = '1D'
 
             # Get the list of missing dates
-            print('About to call missing_dates()...')
+            #print('About to call missing_dates()...')
             missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
 
             if missing_dates:
@@ -320,28 +317,28 @@ def download_prices():
                 print('Retrieving data from ', start_day, ' to ', finish_day)
 
                 # Request price data for the entire missing date range
-                print('About to call get_price_data()...')
+                #print('About to call get_price_data()...')
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
 
-                print('About to call add_candle_data()...')
+                #print('About to call add_candle_data()...')
                 price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                print('About to call add_db_candle_data()...')
+                #print('About to call add_db_candle_data()...')
                 price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
 
-                print('About to call count_patterns()...')
+                #print('About to call count_patterns()...')
                 count_patterns(price_history, pattern_types)
-                print('About to call find_levels()...')
+                #print('About to call find_levels()...')
                 sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                print('About to update ticker...')
+                #print('About to update ticker...')
                 ticker.last_high_low = last_high_low_level
                 ticker.save()
-                print('About to call add_levels_to_price_history()...')
+                #print('About to call add_levels_to_price_history()...')
                 price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                print('About to call add_ema_and_trend()...')
+                #print('About to call add_ema_and_trend()...')
                 price_history = add_ema_and_trend(price_history)
 
                 # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                print('About to add new daily price rows...')
+                #print('About to add new daily price rows...')
                 for index, row in price_history.iterrows():
                     if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
                         daily_price = DailyPrice(
