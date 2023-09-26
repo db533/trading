@@ -16,7 +16,7 @@ class DailyPriceDownloadCronJob(CronJobBase):
         download_prices(timeframe='Daily')
 
 class FifteenMinsPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['{:02d}:{:02d}'.format(hour, minute) for hour in range(9, 23) for minute in [1, 16, 31, 46]]
+    RUN_AT_TIMES = ['{:02d}:{:02d}'.format(hour, minute) for hour in range(7, 21) for minute in [1, 16, 31, 46]]
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'trading_app.15_min_price_download_cron_job'
 
@@ -25,7 +25,7 @@ class FifteenMinsPriceDownloadCronJob(CronJobBase):
         download_prices(timeframe='15 mins')
 
 class FiveMinsPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['{:02d}:{:02d}'.format(hour, minute) for hour in range(9, 23) for minute in [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56]]
+    RUN_AT_TIMES = ['{:02d}:{:02d}'.format(hour, minute) for hour in range(7, 21) for minute in [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56]]
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'trading_app.5_min_price_download_cron_job'
 
