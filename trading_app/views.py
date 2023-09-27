@@ -101,10 +101,18 @@ def ticker_config(request):
 
     tickers_with_data = []
     print('Computing data for ticker config listing...')
+    hourly_price_query_count = 0
     for ticker in tickers:
         # Fetching the most recent DailyPrice's close_price
         latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         latest_close_price = latest_candle.close_price if latest_candle else None
+
+        # Increment hourly_price_query_count if 15 or 5 min updates are desired.
+        if ticker.is_fifteen_min:
+            hourly_price_query_count += 4
+        if ticker.is_five_min:
+            hourly_price_query_count += 12
+
         daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level',
                                                                                                 'level_strength')
         current_date = date.today()
@@ -154,7 +162,10 @@ def ticker_config(request):
             'sr_level' : sr_level
         })
 
-    return render(request, 'ticker_config.html', {'form': form, 'tickers_with_data': tickers_with_data})
+    yahoo_update_rate_percent = round(hourly_price_query_count * 100 / 200)
+
+    return render(request, 'ticker_config.html', {'form': form, 'tickers_with_data': tickers_with_data, 'yahoo_update_rate_percent' : yahoo_update_rate_percent,
+                                                    'hourly_price_query_count' : hourly_price_query_count})
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticker
