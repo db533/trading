@@ -66,10 +66,10 @@
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
             {{ item.latest_candle.close_price }}
           </td>
-          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center; color: {% if item.ticker.avg_volume_100_days < 250 %}red{% endif %};">
             {{ item.ticker.avg_volume_100_days|intcomma }}
           </td>
-          <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center; color: {% if item.ticker.ma_200_trend_strength > 0.2 %}green{% elif item.ticker.ma_200_trend_strength > -0.2 %}orange{% else %}red{% endif %};">
             {{ item.ticker.ma_200_trend_strength }}
           </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
