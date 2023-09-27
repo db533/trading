@@ -149,10 +149,11 @@ def ticker_config(request):
                 else:
                     smallest_level_type = 'Resistance'
             else:
-                if latest_close_price > sr_level:
-                    smallest_level_type = 'Support'
-                else:
-                    smallest_level_type = 'Resistance'
+                if sr_level is not None:
+                    if latest_close_price > sr_level:
+                        smallest_level_type = 'Support'
+                    else:
+                        smallest_level_type = 'Resistance'
 
         tickers_with_data.append({
             'ticker': ticker,
