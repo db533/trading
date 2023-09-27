@@ -82,7 +82,7 @@ def ticker_config(request):
     tickers = Ticker.objects.all().order_by('symbol')  # Order by symbol in ascending order
 
     tickers_with_data = []
-    print('Computing data for tickers...')
+    print('Computing data for ticker config listing...')
     for ticker in tickers:
         # Fetching the most recent DailyPrice's close_price
         latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
@@ -93,8 +93,8 @@ def ticker_config(request):
         smallest_range_to_level = 100
         smallest_level_type = ''
         sr_level = None
-        print('Ticker:', ticker.symbol)
-        print('latest_close_price:', latest_close_price)
+        #print('Ticker:', ticker.symbol)
+        #print('latest_close_price:', latest_close_price)
         for dp in daily_prices_query:
             days_difference = (current_date - dp.datetime.date()).days
             if latest_close_price and latest_close_price != 0:

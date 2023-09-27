@@ -59,6 +59,18 @@ def compute_atr(ticker, last_30_data_points):
     print('atr:', atr)
     return ticker
 
+def compute_average_volume(ticker, last_100_data_points):
+    volumes = [dp.volume for dp in
+               reversed(last_100_data_points)]  # Reverse to get the values in ascending order of date
+    volumes_series = pd.Series(volumes)
+    # print('closing_series:',closing_series)
+    # print('opening_series:', opening_series)
+    average_volume=volumes_series.mean()
+    ticker.avg_volume_100_days = average_volume
+    print('average_volume:', average_volume)
+    return ticker
+
+
 def update_ticker_metrics():
     display_local_time()
 
@@ -69,6 +81,8 @@ def update_ticker_metrics():
         last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 200 data points
         last_30_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:30]  # Get the last 200 data points
 
-        ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
-        ticker = compute_atr(ticker, last_30_data_points)
-        ticker.save()
+        if len(last_200_data_points) > 3:
+            ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
+            ticker = compute_atr(ticker, last_30_data_points)
+            ticker = compute_average_volume(ticker, last_100_data_points)
+            ticker.save()
