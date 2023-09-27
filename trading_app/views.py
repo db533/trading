@@ -79,6 +79,24 @@ def login_view(request):
 
 @login_required
 def ticker_config(request):
+    if request.method == 'POST':
+        form = TickerForm(request.POST)
+        if form.is_valid():
+            print('Adding new ticker:')
+            ticker_symbol = form.cleaned_data['symbol']
+            print('ticker_symbol:',ticker_symbol)
+            form.save()
+            new_ticker=Ticker.objects.get(symbol=ticker_symbol)
+            existing_daily_prices = DailyPrice.objects.filter(ticker=new_ticker)
+            if len(existing_daily_prices) == 0:
+                print('Retrieving daily prices as new ticker added.')
+                download_prices(timeframe="Daily", ticker_symbol=ticker_symbol, trigger='User')
+                print('Updating metrics as new ticker added.')
+                update_ticker_metrics.update_ticker_metrics()
+            #return redirect('ticker_config')
+    else:
+        form = TickerForm()
+
     tickers = Ticker.objects.all().order_by('symbol')  # Order by symbol in ascending order
 
     tickers_with_data = []
@@ -135,14 +153,6 @@ def ticker_config(request):
             'smallest_range_to_level' : smallest_range_to_level,
             'sr_level' : sr_level
         })
-
-    if request.method == 'POST':
-        form = TickerForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('ticker_config')
-    else:
-        form = TickerForm()
 
     return render(request, 'ticker_config.html', {'form': form, 'tickers_with_data': tickers_with_data})
 

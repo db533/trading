@@ -408,7 +408,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                         daily_price.save()
                 else:
                     print('Insufficient data.')
-        if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 8 and local_time.hour < 18) or trigger=='User'):
+        if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
             interval = '15m'
@@ -461,7 +461,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                         fifteenmin_price.save()
                 else:
                     print('Insufficient data.')
-        if timeframe == '5 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 8 and local_time.hour < 18) or trigger=='User'):
+        if timeframe == '5 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=5)
             finish_day = timezone.now()
             interval = '5m'

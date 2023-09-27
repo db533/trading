@@ -65,9 +65,10 @@ def compute_average_volume(ticker, last_100_data_points):
     volumes_series = pd.Series(volumes)
     # print('closing_series:',closing_series)
     # print('opening_series:', opening_series)
-    average_volume=volumes_series.mean()
+    average_volume=round(volumes_series.mean()/1000)
+
     ticker.avg_volume_100_days = average_volume
-    print('average_volume:', average_volume)
+    print('average_volume (k):', average_volume)
     return ticker
 
 

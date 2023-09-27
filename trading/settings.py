@@ -51,9 +51,9 @@ else:
     db_user = env.str('MYSQL_LOCAL_DB_USER')
     db_pwd = env.str('MYSQL_LOCAL_PWD')
 
-print('db_name:',db_name)
-print('db_user:',db_user)
-print('db_pwd:',db_pwd)
+#print('db_name:',db_name)
+#print('db_user:',db_user)
+#print('db_pwd:',db_pwd)
 # Application definition
 
 INSTALLED_APPS = [
@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'trading_app.apps.TradingAppConfig',
     'django_cron',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
