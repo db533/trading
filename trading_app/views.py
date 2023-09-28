@@ -84,8 +84,12 @@ def ticker_config(request):
         if form.is_valid():
             print('Adding new ticker:')
             ticker_symbol = form.cleaned_data['symbol']
-            print('ticker_symbol:',ticker_symbol)
-            form.save()
+            existing_ticker = Ticker.objects.filter(symbol=ticker_symbol)
+            if len(existing_ticker) == 0:
+                print('ticker_symbol:',ticker_symbol)
+                form.save()
+            else:
+                print('Ticker already exists. Not saving.')
             new_ticker=Ticker.objects.get(symbol=ticker_symbol)
             existing_daily_prices = DailyPrice.objects.filter(ticker=new_ticker)
             if len(existing_daily_prices) == 0:
