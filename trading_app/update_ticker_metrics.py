@@ -172,7 +172,7 @@ def update_sr_level_data(ticker):
             # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
             if smallest_range_to_level == 100:
                 smallest_level_type = None
-            if latest_close_price > ticker.last_high_low:
+            if latest_close_price > nearest_level_value:
                 smallest_level_type = 'Support'
             else:
                 smallest_level_type = 'Resistance'
