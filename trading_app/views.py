@@ -711,6 +711,24 @@ def ticker_detail(request, ticker_id):
     # Fetching the most recent DailyPrice's close_price
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
     latest_close_price = latest_candle.close_price if latest_candle else None
+    patterns_detected = latest_candle.patterns_detected
+    if latest_candle.bullish_detected:
+        bullish_detected = 'True'
+    else:
+        bullish_detected = 'False'
+    if latest_candle.bullish_reversal_detected:
+        bullish_reversal_detected = 'True'
+    else:
+        bullish_reversal_detected = 'False'
+    if latest_candle.bearish_detected:
+        bearish_detected = 'True'
+    else:
+        bearish_detected = 'False'
+    if latest_candle.reversal_detected:
+        reversal_detected = 'True'
+    else:
+        reversal_detected = 'False'
+
     # Computing the number of days from datetime to today for each DailyPrice instance
     current_date = date.today()
     daily_prices = []
@@ -755,6 +773,11 @@ def ticker_detail(request, ticker_id):
         'close_price': latest_close_price,
         'smallest_level_type' : smallest_level_type,
         'smallest_range_to_level' : smallest_range_to_level,
+        'patterns_detected' : patterns_detected,
+        'bullish_detected' : bullish_detected,
+        'bullish_reversal_detected' : bullish_reversal_detected,
+        'bearish_detected' : bearish_detected,
+        'reversal_detected' : reversal_detected,
     }
     return render(request, 'ticker_detail.html', context)
 

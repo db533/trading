@@ -11,11 +11,11 @@
 <p>Average trade range: {{ ticker.atr|floatformat:2 }}</p>
 <p>Average volume (100 days): {{ ticker.avg_volume_100_days|floatformat:0 }}k</p>
 <h4>Candlestick pattern from yesterday:</h4>
-<p>Patterns detected: {{ latest_candle.patterns_detected }}</p>
-<p>Bullish pattern detected: {{ latest_candle.bullish_detected }}</p>
-<p>Bullish reversal pattern detected: {{ latest_candle.bullish_reversal_detected }}</p>
-<p>Reversal pattern detected: {{ latest_candle.reversal_detected }}</p>
-<p>Bearish pattern detected: {{ latest_candle.bearish_detected }}</p>
+<p>Patterns detected: <strong>{{ patterns_detected }}</strong></p>
+<p>Bullish pattern detected: <span style="color: {% if bullish_detected == 'True' %}green{% endif %}; {% if bullish_detected == 'True' %}font-weight:bold{% endif %};">{{ bullish_detected }}</span></p>
+<p>Bullish reversal pattern detected: <span style="color: {% if bullish_reversal_detected == 'True' %}green{% endif %}; {% if bullish_reversal_detected == 'True' %}font-weight:bold{% endif %};">{{ bullish_reversal_detected }}</></p>
+<p>Reversal pattern detected: <span style="{% if reversal_detected == 'True' %}font-weight:bold{% endif %};">{{ reversal_detected }}</p>
+<p>Bearish pattern detected: <span style="color: {% if bearish_detected == 'True' %}red{% endif %}; {% if bearish_detected == 'True' %}font-weight:bold{% endif %};">{{ bearish_detected }}</span></p>
 
 <p>Currently at support / resistance level: <strong>
     <span style="color: {% if smallest_level_type == 'Support' %}green{% else %}red{% endif %};">
