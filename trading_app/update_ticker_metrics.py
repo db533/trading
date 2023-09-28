@@ -71,7 +71,6 @@ def compute_average_volume(ticker, last_100_data_points):
     print('average_volume (k):', average_volume)
     return ticker
 
-
 def compute_rsi(data_points, period=14):
     # Get closing prices in ascending order of date
     closing_prices = [dp.close_price for dp in reversed(data_points)]
@@ -110,6 +109,32 @@ def compute_rsi(data_points, period=14):
 
     return RSI
 
+def compute_period_high(ticker, data_points):
+    # Get closing prices in ascending order of date
+    closing_prices = [dp.close_price for dp in reversed(data_points)]
+
+    # Convert to Pandas Series
+    closing_series = pd.Series(closing_prices)
+    #print('closing_series:',closing_series)
+
+    max_close = closing_series.max()
+    ticker.seven_day_max = max_close
+
+    return ticker
+
+def compute_period_low(ticker, data_points):
+    # Get closing prices in ascending order of date
+    closing_prices = [dp.close_price for dp in reversed(data_points)]
+
+    # Convert to Pandas Series
+    closing_series = pd.Series(closing_prices)
+    # print('closing_series:',closing_series)
+
+    min_close = closing_series.min()
+    ticker.seven_day_min = min_close
+
+    return ticker
+
 
 def update_ticker_metrics():
     display_local_time()
@@ -122,6 +147,8 @@ def update_ticker_metrics():
         last_30_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:30]  # Get the last 30 data points
         last_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:2]  # Get the last 2 data points
         prior_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[1:3]
+        last_7_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[
+                             :7]  # Get the last 2 data points
 
         if len(last_200_data_points) > 3:
             ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
@@ -132,4 +159,7 @@ def update_ticker_metrics():
             prior_2_day_rsi = compute_rsi(prior_2_data_points, period=2)
             cumulative_two_period_two_day_rsi = (current_2_day_rsi + prior_2_day_rsi)/2
             ticker.cumulative_two_period_two_day_rsi = cumulative_two_period_two_day_rsi
+            ticker = compute_period_high(ticker, last_7_data_points)
+            ticker = compute_period_low(ticker, last_7_data_points)
+
             ticker.save()
