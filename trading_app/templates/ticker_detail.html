@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 
+{% load humanize %}
 {% block content %}
 <h3>{{ ticker.symbol }} - {{ ticker.company_name }}</h3>
 
 <p>Last close price: <strong>{{ close_price }}</strong></p>
 <p>Moving average 200 strength = abs(MA - price)/price: {{ ticker.ma_200_trend_strength }}</p>
 <p>% of price to nearest support / resistance: {{ smallest_range_to_level|floatformat:2 }} %</p>
+<p>2 period cumulative RSI: <span style="color: {% if ticker.cumulative_two_period_two_day_rsi < 10 %}green{% elif ticker.cumulative_two_period_two_day_rsi > 65 %}red{% endif %};">{{ ticker.cumulative_two_period_two_day_rsi|floatformat:1 }}</span></p>
+<p>Average trade range: {{ ticker.atr|floatformat:2 }}</p>
+<p>Average volume (100 days): {{ ticker.avg_volume_100_days|floatformat:0 }}k</p>
 <h4>Candlestick pattern from yesterday:</h4>
 <p>Patterns detected: {{ latest_candle.patterns_detected }}</p>
 <p>Bullish pattern detected: {{ latest_candle.bullish_detected }}</p>

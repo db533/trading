@@ -20,6 +20,7 @@
         <th  colspan="1" style="border: 1pt solid black; padding: 3pt;">Trend</th>
         <th  colspan="3" style="border: 1pt solid black; padding: 3pt;">Area of Value</th>
         <th  colspan="4" style="border: 1pt solid black; padding: 3pt;">Event</th>
+        <th  colspan="1" style="border: 1pt solid black; padding: 3pt;">2 period cumulative RSI</th>
       </tr>
         <tr>
         <th style="text-align:center; width: 8ch; border-left: 1px solid black;">Symbol</th>
@@ -37,6 +38,7 @@
         <th style="text-align:center; width: 8ch;">Bullish reversal pattern</th>
         <th style="text-align:center; width: 8ch;">Reversal pattern</th>
         <th style="text-align:center; width: 8ch;">Bearish pattern</th>
+        <th style="text-align:center; width: 8ch;"></th>
         </tr>
     </thead>
     <tbody>
@@ -92,6 +94,9 @@
           </td>
           <td style="text-align:center;">
             {{ item.latest_candle.bearish_detected }}
+          </td>
+          <td style="text-align:center; color: {% if item.ticker.cumulative_two_period_two_day_rsi < 10 %}green{% elif item.ticker.cumulative_two_period_two_day_rsi > 65 %}red{% endif %}; {% if item.ticker.cumulative_two_period_two_day_rsi < 10 %}font-weight:bold{% endif %};">
+            {{ item.ticker.cumulative_two_period_two_day_rsi|floatformat:1 }}
           </td>
 
 
