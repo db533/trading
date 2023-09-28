@@ -18,6 +18,14 @@ class Ticker(models.Model):
     nearest_level_type = models.CharField(max_length=20, null = True)
     nearest_level_days_since_retest = models.IntegerField(null = True)
     nearest_level_percent_distance = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    tae_strategy_score = models.DecimalField(max_digits=5, decimal_places=1, null=True)
+    bearish_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
+    bullish_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
+    reversal_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
+    bearish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
+    bullish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
+    patterns_detected = models.CharField(max_length=255, null=True, blank=True)
+
 
     def __str__(self):
         return self.symbol

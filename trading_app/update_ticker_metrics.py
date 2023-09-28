@@ -181,18 +181,47 @@ def update_sr_level_data(ticker):
             smallest_level_type = 'Support'
         else:
             smallest_level_type = 'Resistance'
+
     ticker.nearest_level_value = nearest_level_value
     ticker.nearest_level_type = smallest_level_type
     ticker.nearest_level_days_since_retest = days_since_last_tested
     ticker.nearest_level_percent_distance = smallest_range_to_level
+    ticker.patterns_detected = latest_candle.patterns_detected
+    ticker.bullish_detected = latest_candle.bullish_detected
+    ticker.bullish_reversal_detected = latest_candle.bullish_reversal_detected
+    ticker.bearish_detected = latest_candle.bearish_detected
+    ticker.reversal_detected = latest_candle.reversal_detected
+
     ticker.save()
     return ticker
 
-def test_tae_upward_strategy(ticker):
+def test_tae_strategy(ticker):
+    trend_weight = 40
+    sr_level_weight = 40
+    candle_weight = 20
+    ma_strength_threshold = 0.065
+
+    strategy_score=0
     ma_strength = ticker.ma_200_trend_strength
+    dist_to_sr_level = ticker.nearest_level_percent_distance
+    sr_level_type = ticker.nearest_level_type
+    candle_bullish = ticker.bullish_detected
+    candle_bullish_reversal = ticker.bullish_reversal_detected
+    candle_bearish = ticker.bearish_detected
 
+    # Is ticker in a general upward trend?
+    if ma_strength > ma_strength_threshold and sr_level_type == 'Support' and (candle_bullish or candle_bullish_reversal):
+        strategy_score += (ma_strength-ma_strength_threshold)*trend_weight
+        strategy_score += float((candle_bullish + candle_bullish_reversal)) * candle_weight
+        strategy_score += float((max(5-float(dist_to_sr_level),0))*sr_level_weight/5)
 
+    if ma_strength < -ma_strength_threshold and sr_level_type == 'Resistance' and (candle_bearish):
+        strategy_score +=  -(ma_strength + ma_strength_threshold) * trend_weight
+        strategy_score += float((candle_bearish)) * candle_weight
+        strategy_score += float((max(5 - float(dist_to_sr_level), 0)) * sr_level_weight / 5)
 
+    ticker.tae_strategy_score = strategy_score
+    return ticker
 
 def update_ticker_metrics():
     display_local_time()
@@ -224,6 +253,7 @@ def update_ticker_metrics():
             ticker = compute_period_high(ticker, last_7_data_points)
             ticker = compute_period_low(ticker, last_7_data_points)
 
-
+            # Now update strategy fulfillment:
+            ticker = test_tae_strategy(ticker)
 
             ticker.save()
