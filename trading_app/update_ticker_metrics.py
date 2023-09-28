@@ -1,11 +1,11 @@
 from .models import Ticker, DailyPrice
 import pandas as pd
-import datetime
 import pytz
+from datetime import datetime, timedelta, timezone, date
 
 def display_local_time():
     # Get the current datetime in UTC
-    utc_now = datetime.datetime.utcnow()
+    utc_now = datetime.utcnow()
 
     # Convert UTC datetime to the local timezone
     local_timezone = pytz.timezone('Europe/Riga')  # Replace with your local timezone
@@ -135,6 +135,64 @@ def compute_period_low(ticker, data_points):
 
     return ticker
 
+def update_sr_level_data(ticker):
+    daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
+    latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+    latest_close_price = latest_candle.close_price if latest_candle else None
+
+    # Computing the number of days from datetime to today for each DailyPrice instance
+    current_date = date.today()
+    daily_prices = []
+    smallest_range_to_level = 100
+    nearest_level_value=None
+    days_since_last_tested = None
+    for dp in daily_prices_query:
+        days_difference = (current_date - dp.datetime.date()).days
+        if latest_close_price and latest_close_price != 0:
+            close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
+            if close_price_percentage < smallest_range_to_level:
+                smallest_range_to_level = close_price_percentage
+                nearest_level_value = dp.level
+                days_since_last_tested = days_difference
+                #if dp.close_price < dp.level:
+                #    smallest_level_type = 'Resistance'
+                #else:
+                #    smallest_level_type = 'Support'
+        else:
+            close_price_percentage = None
+
+    if ticker.last_high_low != None:
+        if smallest_range_to_level < 2:
+            # Price is close to support / resistance level, so look back to the most recent high / low to determine if this is a support / resistance.
+            if latest_close_price < ticker.last_high_low:
+                smallest_level_type = 'Support'
+            else:
+                smallest_level_type = 'Resistance'
+        else:
+            # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
+            if smallest_range_to_level == 100:
+                smallest_level_type = None
+            if latest_close_price > ticker.last_high_low:
+                smallest_level_type = 'Support'
+            else:
+                smallest_level_type = 'Resistance'
+    else:
+        if latest_close_price < nearest_level_value:
+            smallest_level_type = 'Support'
+        else:
+            smallest_level_type = 'Resistance'
+    ticker.nearest_level_value = nearest_level_value
+    ticker.nearest_level_type = smallest_level_type
+    ticker.nearest_level_days_since_retest = days_since_last_tested
+    ticker.nearest_level_percent_distance = smallest_range_to_level
+    ticker.save()
+    return ticker
+
+def test_tae_upward_strategy(ticker):
+    ma_strength = ticker.ma_200_trend_strength
+
+
+
 
 def update_ticker_metrics():
     display_local_time()
@@ -142,6 +200,10 @@ def update_ticker_metrics():
     print('Updating metrics:')
     for ticker in Ticker.objects.filter(is_daily=True):
         print('Ticker:', ticker.symbol)
+
+        # Recompute the support / resistance levels.
+        ticker = update_sr_level_data(ticker)
+
         last_200_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:200]  # Get the last 200 data points
         last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 100 data points
         last_30_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:30]  # Get the last 30 data points
@@ -161,5 +223,7 @@ def update_ticker_metrics():
             ticker.cumulative_two_period_two_day_rsi = cumulative_two_period_two_day_rsi
             ticker = compute_period_high(ticker, last_7_data_points)
             ticker = compute_period_low(ticker, last_7_data_points)
+
+
 
             ticker.save()

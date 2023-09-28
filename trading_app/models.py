@@ -14,6 +14,10 @@ class Ticker(models.Model):
     cumulative_two_period_two_day_rsi = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     seven_day_max = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     seven_day_min = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    nearest_level_value = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    nearest_level_type = models.CharField(max_length=20, null = True)
+    nearest_level_days_since_retest = models.IntegerField(null = True)
+    nearest_level_percent_distance = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     def __str__(self):
         return self.symbol

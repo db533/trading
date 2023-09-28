@@ -117,54 +117,12 @@ def ticker_config(request):
         if ticker.is_five_min:
             hourly_price_query_count += 12
 
-        daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level',
-                                                                                                'level_strength')
-        current_date = date.today()
-        smallest_range_to_level = 100
-        smallest_level_type = ''
-        sr_level = None
-        #print('Ticker:', ticker.symbol)
-        #print('latest_close_price:', latest_close_price)
-        for dp in daily_prices_query:
-            days_difference = (current_date - dp.datetime.date()).days
-            if latest_close_price and latest_close_price != 0:
-                #print('dp.level:', dp.level)
-                close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
-                #print('close_price_percentage:', close_price_percentage)
-                if close_price_percentage < smallest_range_to_level:
-                    smallest_range_to_level = close_price_percentage
-                    #print('smallest_range_to_level is now:', smallest_range_to_level)
-                    sr_level = dp.level
-                    #print('sr_level:', sr_level)
-                    if dp.close_price < dp.level:
-                        smallest_level_type = 'Resistance'
-                    else:
-                        smallest_level_type = 'Support'
-            else:
-                close_price_percentage = None
-
-        #if smallest_range_to_level > 2:
-            # We are more than 1% from a support / resistance level
-        smallest_level_type = ''
-        if ticker.last_high_low != None:
-            if smallest_range_to_level < 2:
-                if latest_close_price < ticker.last_high_low:
-                    smallest_level_type = 'Support'
-                else:
-                    smallest_level_type = 'Resistance'
-            else:
-                if sr_level is not None:
-                    if latest_close_price > sr_level:
-                        smallest_level_type = 'Support'
-                    else:
-                        smallest_level_type = 'Resistance'
-
         tickers_with_data.append({
             'ticker': ticker,
             'latest_candle': latest_candle,
-            'smallest_level_type' : smallest_level_type,
-            'smallest_range_to_level' : smallest_range_to_level,
-            'sr_level' : sr_level
+            #'smallest_level_type' : smallest_level_type,
+            #'smallest_range_to_level' : smallest_range_to_level,
+            #'sr_level' : sr_level
         })
 
     yahoo_update_rate_percent = round(hourly_price_query_count * 100 / 200)
@@ -474,178 +432,6 @@ def edit_ticker(request, ticker_id):
             if ticker.is_five_min:
                 print('About to call download_prices(timeframe="5 mins")...')
                 download_prices(timeframe="5 mins", ticker_symbol=ticker.symbol, trigger='User')
-            if False:
-                print('Running legacy code...')
-                if ticker.is_daily:
-                    start_day = timezone.now() - timedelta(days=365)
-                    finish_day = timezone.now()
-                    interval = '1D'
-
-                    # Get the list of missing dates
-                    missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
-
-                    if missing_dates:
-                        # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                        start_day = min(missing_dates)
-                        finish_day = max(missing_dates)
-                        print('Retrieving data from ', start_day,' to ', finish_day)
-
-                        # Request price data for the entire missing date range
-                        price_history = get_price_data(ticker, interval, start_day, finish_day)
-                        print('len(price_history):',len(price_history))
-                        if len(price_history) >= 3:
-                            price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                            price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                            count_patterns(price_history, pattern_types)
-                            sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                            ticker.last_high_low = last_high_low_level
-                            ticker.save()
-                            price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                            price_history = add_ema_and_trend(price_history)
-
-                            # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                            for index, row in price_history.iterrows():
-                                if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                                    daily_price = DailyPrice(
-                                        ticker=ticker,
-                                        datetime=row['Datetime'],
-                                        open_price=row['Open'],
-                                        high_price=row['High'],
-                                        low_price=row['Low'],
-                                        close_price=row['Close'],
-                                        percent_change=row['PercentChange'],
-                                        volume=row['Volume'],
-                                        patterns_detected = row['patterns_detected'],
-                                        bullish_detected=row['bullish'],
-                                        bearish_detected=row['bearish'],
-                                        reversal_detected=row['reversal'],
-                                        bullish_reversal_detected=row['bullish_reversal'],
-                                        bearish_reversal_detected=row['bearish_reversal'],
-                                        level=row['level'],
-                                        level_type=row['level_type'],
-                                        level_strength=row['level_strength'],
-                                        ema_200=row['EMA_200'],
-                                        ema_50=row['EMA_50'],
-                                        trend=row['Trend'],
-                                    )
-                                else:
-                                    daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                                    daily_price.patterns_detected = row['patterns_detected']
-                                    daily_price.bullish_detected = row['bullish']
-                                    daily_price.bearish_detected = row['bearish']
-                                    daily_price.reversal_detected = row['reversal']
-                                    daily_price.bullish_reversal_detected = row['bullish_reversal']
-                                    daily_price.bearish_reversal_detected = row['bearish_reversal']
-                                    daily_price.level = row['level']
-                                    daily_price.level_type = row['level_type']
-                                    daily_price.level_strength = row['level_strength']
-                                    daily_price.ema_200 = row['EMA_200']
-                                    daily_price.ema_50 = row['EMA_50']
-                                    daily_price.trend = row['Trend']
-                                daily_price.save()
-
-                if ticker.is_fifteen_min:
-                    start_day = timezone.now() - timedelta(days=7)
-                    finish_day = timezone.now()
-                    interval = '15m'
-                    print('Checking 15 min data for', ticker.symbol)
-
-                    # Get the list of missing dates
-                    missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
-
-                    if missing_dates:
-                        # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                        start_day = min(missing_dates)
-                        finish_day = max(missing_dates)
-                        print('Retrieving data from ', start_day, ' to ', finish_day)
-
-                        # Request price data for the entire missing date range
-                        price_history = get_price_data(ticker, interval, start_day, finish_day)
-                        print('len(price_history):', len(price_history))
-                        if len(price_history) >= 3:
-                            price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                            price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                            count_patterns(price_history, pattern_types)
-
-                            # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                            for index, row in price_history.iterrows():
-                                if not FifteenMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                                    fifteenmin_price = FifteenMinPrice(
-                                        ticker=ticker,
-                                        datetime=row['Datetime'],
-                                        open_price=row['Open'],
-                                        high_price=row['High'],
-                                        low_price=row['Low'],
-                                        close_price=row['Close'],
-                                        percent_change=row['PercentChange'],
-                                        volume=row['Volume'],
-                                        patterns_detected=row['patterns_detected'],
-                                        bullish_detected=row['bullish'],
-                                        bearish_detected=row['bearish'],
-                                        reversal_detected=row['reversal'],
-                                        bullish_reversal_detected=row['bullish_reversal'],
-                                        bearish_reversal_detected=row['bearish_reversal'],
-                                    )
-                                else:
-                                    fifteenmin_price=FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                                    fifteenmin_price.patterns_detected = row['patterns_detected']
-                                    fifteenmin_price.bullish_detected = row['bullish']
-                                    fifteenmin_price.bearish_detected = row['bearish']
-                                    fifteenmin_price.reversal_detected = row['reversal']
-                                    fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
-                                    fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
-                                fifteenmin_price.save()
-                if ticker.is_five_min:
-                    start_day = timezone.now() - timedelta(days=5)
-                    finish_day = timezone.now()
-                    interval = '5m'
-                    print('Checking 5 min data for', ticker.symbol)
-
-                    # Get the list of missing dates
-                    missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
-
-                    if missing_dates:
-                        # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                        start_day = min(missing_dates)
-                        finish_day = max(missing_dates)
-                        print('Retrieving data from ', start_day, ' to ', finish_day)
-
-                        # Request price data for the entire missing date range
-                        price_history = get_price_data(ticker, interval, start_day, finish_day)
-                        print('len(price_history):', len(price_history))
-                        if len(price_history) >= 3:
-                            price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                            price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                            count_patterns(price_history, pattern_types)
-
-                            # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                            for index, row in price_history.iterrows():
-                                if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                                    fivemin_price = FiveMinPrice(
-                                        ticker=ticker,
-                                        datetime=row['Datetime'],
-                                        open_price=row['Open'],
-                                        high_price=row['High'],
-                                        low_price=row['Low'],
-                                        close_price=row['Close'],
-                                        percent_change=row['PercentChange'],
-                                        volume=row['Volume'],
-                                        patterns_detected=row['patterns_detected'],
-                                        bullish_detected=row['bullish'],
-                                        bearish_detected=row['bearish'],
-                                        reversal_detected=row['reversal'],
-                                        bullish_reversal_detected=row['bullish_reversal'],
-                                        bearish_reversal_detected=row['bearish_reversal'],
-                                    )
-                                else:
-                                    fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                                    fivemin_price.patterns_detected = row['patterns_detected']
-                                    fivemin_price.bullish_detected = row['bullish']
-                                    fivemin_price.bearish_detected = row['bearish']
-                                    fivemin_price.reversal_detected = row['reversal']
-                                    fivemin_price.bullish_reversal_detected = row['bullish_reversal']
-                                    fivemin_price.bearish_reversal_detected = row['bearish_reversal']
-                                fivemin_price.save()
             form.save()
 
             return redirect('ticker_config')  # Redirect back to the configuration page
@@ -733,17 +519,12 @@ def ticker_detail(request, ticker_id):
     current_date = date.today()
     daily_prices = []
     smallest_range_to_level = 100
-    smallest_level_type = ''
     for dp in daily_prices_query:
         days_difference = (current_date - dp.datetime.date()).days
         if latest_close_price and latest_close_price != 0:
             close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
             if close_price_percentage < smallest_range_to_level:
                 smallest_range_to_level = close_price_percentage
-                #if dp.close_price < dp.level:
-                #    smallest_level_type = 'Resistance'
-                #else:
-                #    smallest_level_type = 'Support'
         else:
             close_price_percentage = None
 
@@ -753,26 +534,13 @@ def ticker_detail(request, ticker_id):
             'close_price_percentage': close_price_percentage,
             'latest_candle' : latest_candle,
         })
-    if ticker.last_high_low != None:
-        if smallest_range_to_level < 2:
-            # Price is close to support / resistance level, so look back to the most recent high / low to determine if this is a support / resistance.
-            if latest_close_price < ticker.last_high_low:
-                smallest_level_type = 'Support'
-            else:
-                smallest_level_type = 'Resistance'
-        else:
-            # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
-            if latest_close_price > ticker.last_high_low:
-                smallest_level_type = 'Support'
-            else:
-                smallest_level_type = 'Resistance'
 
     context = {
         'ticker': ticker,
         'daily_prices': daily_prices,
         'close_price': latest_close_price,
-        'smallest_level_type' : smallest_level_type,
-        'smallest_range_to_level' : smallest_range_to_level,
+        #'smallest_level_type' : smallest_level_type,
+        #'smallest_range_to_level' : smallest_range_to_level,
         'patterns_detected' : patterns_detected,
         'bullish_detected' : bullish_detected,
         'bullish_reversal_detected' : bullish_reversal_detected,

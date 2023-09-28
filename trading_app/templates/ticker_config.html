@@ -78,13 +78,13 @@
             {{ item.ticker.ma_200_trend_strength }}
           </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
-            {{ item.smallest_range_to_level|floatformat:2 }} %
+            {{ item.ticker.nearest_level_percent_distance|floatformat:2 }} %
           </td>
           <td style="text-align:center;">
-            {{ item.smallest_level_type }}
+            {{ item.ticker.nearest_level_type }}
           </td>
           <td style="text-align:center;">
-            {{ item.sr_level|floatformat:2 }}
+            {{ item.ticker.nearest_level_value|floatformat:2 }}
           </td>
           <td style="text-align:center;">
             {{ item.latest_candle.bullish_detected }}
