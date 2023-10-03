@@ -85,21 +85,51 @@ def ticker_config(request):
         if category_form.is_valid():
             selected_categories = category_form.cleaned_data['categories']
             include_not_defined = request.POST.get('categories') == 'not_defined'
+            uptrend = category_form.cleaned_data['uptrend']
+            downtrend = category_form.cleaned_data['downtrend']
+            tae_score = category_form.cleaned_data['tae_score']
+            two_period_cum_rsi = category_form.cleaned_data['two_period_cum_rsi']
         else:
             selected_categories = TickerCategory.objects.all()
             include_not_defined = True
+            uptrend = False
+            downtrend = False
+            tae_score = False
+            two_period_cum_rsi = False
+
     else:
         category_form = CategorySelectForm()
         selected_categories = TickerCategory.objects.all()
         include_not_defined = True
+        uptrend = False
+        downtrend = False
+        tae_score = False
+        two_period_cum_rsi = False
 
     tickers_q = Q(categories__in=selected_categories)
 
-    # Include tickers without categories if 'Not defined' is selected
     if include_not_defined:
         tickers_q |= Q(categories=None)
 
-    tickers = Ticker.objects.filter(tickers_q).distinct().order_by('symbol')
+    if uptrend:
+        tickers_q &= Q(ma_200_trend_strength__gt=0)
+        order_by = '-ma_200_trend_strength'
+    elif downtrend:
+        tickers_q &= Q(ma_200_trend_strength__lt=0)
+        order_by = 'ma_200_trend_strength'
+    elif tae_score:
+        tickers_q &= Q(tae_strategy_score__gt=0)
+        order_by = '-tae_strategy_score'
+    elif two_period_cum_rsi:
+        tickers_q &= (
+                Q(cumulative_two_period_two_day_rsi__lt=10) |
+                Q(cumulative_two_period_two_day_rsi__gt=70)
+        )
+        order_by = 'cumulative_two_period_two_day_rsi'
+    else:
+        order_by = 'symbol'
+
+    tickers = Ticker.objects.filter(tickers_q).distinct().order_by(order_by)
 
     tickers_with_data = []
     print('Computing data for ticker config listing...')
@@ -118,9 +148,9 @@ def ticker_config(request):
         tickers_with_data.append({
             'ticker': ticker,
             'latest_candle': latest_candle,
-            #'smallest_level_type' : smallest_level_type,
-            #'smallest_range_to_level' : smallest_range_to_level,
-            #'sr_level' : sr_level
+            # 'smallest_level_type' : smallest_level_type,
+            # 'smallest_range_to_level' : smallest_range_to_level,
+            # 'sr_level' : sr_level
         })
 
     yahoo_update_rate_percent = round(hourly_price_query_count * 100 / 200)

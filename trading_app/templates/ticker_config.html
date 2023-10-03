@@ -2,13 +2,29 @@
 
 {% load humanize %}
 {% block content %}
-  <h3>Ticker Configuration</h3>
+  <h3>Ticker List</h3>
   <form method="post" action="">
-      {% csrf_token %}
-      {{ category_form.as_p }}
-      <input type="submit" value="Refresh">
+    {% csrf_token %}
+    {{ category_form.as_p }}
+    <input type="submit" value="Filter">
   </form>
 
+  <h3>Data filters</h3>
+  <div>
+      <label>
+          <input type="checkbox" name="uptrend" {% if category_form.uptrend.value %}checked{% endif %}> Uptrend
+      </label>
+      <label>
+          <input type="checkbox" name="downtrend" {% if category_form.downtrend.value %}checked{% endif %}> Downtrend
+      </label>
+      <label>
+          <input type="checkbox" name="tae_score" {% if category_form.tae_score.value %}checked{% endif %}> TAE score
+      </label>
+      <label>
+          <input type="checkbox" name="two_period_cum_rsi" {% if category_form.two_period_cum_rsi.value %}checked{% endif %}> 2-period cum RSI
+      </label>
+
+  </div>
   <h3>Existing Tickers:</h3>
   <p>Current hourly yahoo price update count: {{ hourly_price_query_count }} ({{ yahoo_update_rate_percent }}% of rate limit).</p>
   <a href="{% url 'ticker_add' %}">Add a Ticker</a>
@@ -50,7 +66,6 @@
         <tr style="border: 1pt solid black;">
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
             <a href="{% url 'edit_ticker' item.ticker.id %}">{{ item.ticker.symbol }}</a>
-          </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
             <a href="{% url 'ticker_detail' item.ticker.id %}">Details</a> <a href="{% url 'ticker_delete' item.ticker.id %}">Delete</a>
           </td>

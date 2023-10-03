@@ -7,14 +7,21 @@ class TickerForm(forms.ModelForm):
         fields = ['symbol', 'company_name', 'categories' , 'is_daily', 'is_fifteen_min', 'is_five_min']
 
 
+# forms.py
+from django import forms
+from .models import TickerCategory
+
 class CategorySelectForm(forms.Form):
     NOT_DEFINED_CHOICE = ('not_defined', 'Not defined')
-
     categories = forms.ModelMultipleChoiceField(
         queryset=TickerCategory.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        required=False  # Allow no selection
+        required=False
     )
+    uptrend = forms.BooleanField(required=False)
+    downtrend = forms.BooleanField(required=False)
+    tae_score = forms.BooleanField(required=False)
+    two_period_cum_rsi = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
