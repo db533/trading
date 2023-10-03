@@ -327,6 +327,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         #print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
         #print("ticker.is_five_min:", ticker.is_five_min)
         if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+            display_local_time()
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
@@ -406,6 +407,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.ema_50 = row['EMA_50']
                             daily_price.trend = row['Trend']
                         daily_price.save()
+                        time.sleep(19)
                 else:
                     print('Insufficient data.')
         if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):

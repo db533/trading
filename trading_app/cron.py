@@ -8,7 +8,7 @@ from .test_cron_job import test_cron_job
 # RUN_AT_TIMES actually execute 3 hours later than defined here.
 
 class DailyPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['21:45']  # Run at 1:00 AM local time
+    RUN_AT_TIMES = ['20:00']  # Run at 1:00 AM local time
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     # schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.daily_price_download_cron_job'
@@ -18,7 +18,7 @@ class DailyPriceDownloadCronJob(CronJobBase):
         download_prices(timeframe='Daily')
 
 class UpdateTickerMetricsCronJob(CronJobBase):
-    RUN_AT_TIMES = ['22:00']  # Run at 1:00 AM local time
+    RUN_AT_TIMES = ['03:00']  # Run at 1:00 AM local time
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     # schedule = Schedule(run_every_mins=60*24)  # Run once a day
     code = 'trading_app.update_ticker_metrics_cron_job'
