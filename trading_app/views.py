@@ -26,6 +26,7 @@ from . import db_candlestick
 from . import update_ticker_metrics
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from rest_framework.response import Response
 
@@ -80,28 +81,25 @@ def login_view(request):
 @login_required
 def ticker_config(request):
     if request.method == 'POST':
-        form = TickerForm(request.POST)
-        if form.is_valid():
-            print('Adding new ticker:')
-            ticker_symbol = form.cleaned_data['symbol']
-            existing_ticker = Ticker.objects.filter(symbol=ticker_symbol)
-            if len(existing_ticker) == 0:
-                print('ticker_symbol:',ticker_symbol)
-                form.save()
-            else:
-                print('Ticker already exists. Not saving.')
-            new_ticker=Ticker.objects.get(symbol=ticker_symbol)
-            existing_daily_prices = DailyPrice.objects.filter(ticker=new_ticker)
-            if len(existing_daily_prices) == 0:
-                print('Retrieving daily prices as new ticker added.')
-                download_prices(timeframe="Daily", ticker_symbol=ticker_symbol, trigger='User')
-                print('Updating metrics as new ticker added.')
-                update_ticker_metrics.update_ticker_metrics()
-            #return redirect('ticker_config')
+        category_form = CategorySelectForm(request.POST)
+        if category_form.is_valid():
+            selected_categories = category_form.cleaned_data['categories']
+            include_not_defined = request.POST.get('categories') == 'not_defined'
+        else:
+            selected_categories = TickerCategory.objects.all()
+            include_not_defined = True
     else:
-        form = TickerForm()
+        category_form = CategorySelectForm()
+        selected_categories = TickerCategory.objects.all()
+        include_not_defined = True
 
-    tickers = Ticker.objects.all().order_by('symbol')  # Order by symbol in ascending order
+    tickers_q = Q(categories__in=selected_categories)
+
+    # Include tickers without categories if 'Not defined' is selected
+    if include_not_defined:
+        tickers_q |= Q(categories=None)
+
+    tickers = Ticker.objects.filter(tickers_q).distinct().order_by('symbol')
 
     tickers_with_data = []
     print('Computing data for ticker config listing...')
@@ -127,8 +125,38 @@ def ticker_config(request):
 
     yahoo_update_rate_percent = round(hourly_price_query_count * 100 / 200)
 
-    return render(request, 'ticker_config.html', {'form': form, 'tickers_with_data': tickers_with_data, 'yahoo_update_rate_percent' : yahoo_update_rate_percent,
-                                                    'hourly_price_query_count' : hourly_price_query_count})
+    return render(request, 'ticker_config.html', {
+        'tickers_with_data': tickers_with_data,
+        'yahoo_update_rate_percent': yahoo_update_rate_percent,
+        'hourly_price_query_count': hourly_price_query_count,
+        'category_form': category_form
+    })
+
+def add_ticker(request):
+    if request.method == 'POST':
+        form = TickerForm(request.POST)
+        if form.is_valid():
+            print('Adding new ticker:')
+            ticker_symbol = form.cleaned_data['symbol']
+            existing_ticker = Ticker.objects.filter(symbol=ticker_symbol)
+            if len(existing_ticker) == 0:
+                print('ticker_symbol:',ticker_symbol)
+                form.save()
+            else:
+                print('Ticker already exists. Not saving.')
+            new_ticker=Ticker.objects.get(symbol=ticker_symbol)
+            existing_daily_prices = DailyPrice.objects.filter(ticker=new_ticker)
+            if len(existing_daily_prices) == 0:
+                print('Retrieving daily prices as new ticker added.')
+                download_prices(timeframe="Daily", ticker_symbol=ticker_symbol, trigger='User')
+                print('Updating metrics as new ticker added.')
+                update_ticker_metrics.update_ticker_metrics()
+            return redirect('ticker_config')
+    else:
+        form = TickerForm()
+
+    return render(request, 'add_config.html', {'form': form})
+
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Ticker
@@ -424,8 +452,10 @@ def edit_ticker(request, ticker_id):
         print('Checking', ticker.symbol)
         if form.is_valid():
             if ticker.is_daily:
-                print('About to call download_prices(timeframe="Daily")...')
-                download_prices(timeframe="Daily", ticker_symbol=ticker.symbol, trigger='User')
+                existing_prices = DailyPrice.objects.all()
+                if len(existing_prices) == 0:
+                    print('About to call download_prices(timeframe="Daily")...')
+                    download_prices(timeframe="Daily", ticker_symbol=ticker.symbol, trigger='User')
             if ticker.is_fifteen_min:
                 print('About to call download_prices(timeframe="15 mins")...')
                 download_prices(timeframe="15 mins", ticker_symbol=ticker.symbol, trigger='User')

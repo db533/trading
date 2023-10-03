@@ -1,10 +1,17 @@
 from django.db import models
 
+class TickerCategory(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
 # Ticker Model
 class Ticker(models.Model):
     symbol = models.CharField(max_length=10)
     company_name = models.CharField(max_length=255)
-    is_daily = models.BooleanField(default=False)
+    categories = models.ManyToManyField(TickerCategory, blank=True)
+    is_daily = models.BooleanField(default=True)
     is_fifteen_min = models.BooleanField(default=False)
     is_five_min = models.BooleanField(default=False)
     ma_200_trend_strength = models.DecimalField(max_digits=10, decimal_places=2, null=True)

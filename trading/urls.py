@@ -20,6 +20,7 @@ urlpatterns = [
     path('update_metrics/', update_metrics_view, name='update_metrics'),
     path('ticker/<int:ticker_id>/', ticker_detail, name='ticker_detail'),
     path('ticker_delete/<int:ticker_id>/', ticker_delete, name='ticker_delete'),
+    path('add-ticker/', add_ticker, name='ticker_add'),
 
 ]
 

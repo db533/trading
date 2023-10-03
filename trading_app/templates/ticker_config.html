@@ -3,15 +3,15 @@
 {% load humanize %}
 {% block content %}
   <h3>Ticker Configuration</h3>
-
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
+  <form method="post" action="">
+      {% csrf_token %}
+      {{ category_form.as_p }}
+      <input type="submit" value="Refresh">
   </form>
 
   <h3>Existing Tickers:</h3>
   <p>Current hourly yahoo price update count: {{ hourly_price_query_count }} ({{ yahoo_update_rate_percent }}% of rate limit).</p>
+  <a href="{% url 'ticker_add' %}">Add a Ticker</a>
   <table style="border: 1pt solid black;">
     <thead>
       <tr>
