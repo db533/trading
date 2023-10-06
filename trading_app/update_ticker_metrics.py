@@ -223,11 +223,15 @@ def test_tae_strategy(ticker):
     ticker.tae_strategy_score = strategy_score
     return ticker
 
-def update_ticker_metrics():
+def update_ticker_metrics(ticker_symbol="All"):
     display_local_time()
 
     print('Updating metrics:')
-    for ticker in Ticker.objects.filter(is_daily=True):
+    if ticker_symbol == 'All':
+        ticker_list = Ticker.objects.filter(is_daily=True)
+    else:
+        ticker_list = Ticker.objects.filter(symbol=ticker_symbol).filter(is_daily=True)
+    for ticker in ticker_list:
         print('Ticker:', ticker.symbol)
 
         # Recompute the support / resistance levels.

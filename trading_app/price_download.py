@@ -2,11 +2,11 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 import yfinance as yf
-import time
+from time import sleep
 from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice
 import pandas as pd
 import pytz
-from datetime import datetime, timedelta, timezone, date
+from datetime import datetime, timedelta, timezone, date, time
 from candlestick import candlestick
 from . import db_candlestick
 from django.utils import timezone
@@ -26,6 +26,24 @@ def display_local_time():
     return local_datetime.time()
 
 def get_price_data(ticker, interval, start_time, finish_time):
+    # Fetching existing data from the database
+    try:
+        existing_data = DailyPrice.objects.filter(ticker=ticker).values()
+        existing_df = pd.DataFrame.from_records(existing_data)
+        existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
+        existing_df['Open'] = existing_df['open_price'].astype(float)
+        existing_df['High'] = existing_df['high_price'].astype(float)
+        existing_df['Low'] = existing_df['low_price'].astype(float)
+        existing_df['Close'] = existing_df['close_price'].astype(float)
+        existing_df['Volume'] = existing_df['volume']
+        existing_df = existing_df.drop(columns=['datetime', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
+        #print(existing_df.tail(5))
+        #print('existing_df.iloc[1]:', existing_df.iloc[1])
+    except Exception as e:
+        print(f"Error fetching existing data for {ticker.symbol}: {e}")
+        existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
+
+
     try:
         # Ensure start_time and finish_time are timezone-aware
         start_time = start_time.replace(tzinfo=timezone.utc)
@@ -33,49 +51,77 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
         if not data.empty:
-            data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
+            print('Retrieve new price data records...')
 
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index
-
-            # Convert the datetime to a naive datetime
-            # data['Datetime'] = data['Datetime'].apply(lambda x: x.replace(tzinfo=None) if x.tzinfo else x)
-            # Set the timezone to your project's timezone (e.g., UTC)
-            # data['Datetime'] = data['Datetime']
-
-            # Set the timezone to your project's timezone (e.g., UTC)
-            # data['Datetime'] = data['Datetime'].apply(timezone.make_aware, timezone=timezone.utc)
-            # Ensure the datetime index is in UTC timezone
-            # data.index = data.index.tz_convert(timezone.utc)
             data = data.tz_localize(None)
 
-            data['PercentChange'] = data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
-            data.at[data.index[0], 'PercentChange'] = 0
+            # Concatenating the new and existing data, while ensuring no duplicate entries
+            combined_data = pd.concat([data, existing_df], ignore_index=True)
+            #print('combined_data.columns:',combined_data.columns)
+            #print(combined_data.tail(5))
+            combined_data = combined_data.set_index('Datetime')
+            combined_data.index = pd.to_datetime(combined_data.index, utc=True)
+
+            combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
+
+            combined_data = combined_data.sort_values(by='Datetime', ascending=True)
+
+            combined_data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
+            combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
+            combined_data.at[data.index[0], 'PercentChange'] = 0
+
+            # Duplicating the Datetime index into a new column
+            combined_data['Datetime'] = combined_data.index.copy()
+            combined_data = combined_data.dropna(subset=['Open'])
 
             # Reorder the columns
-            data = data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
-
-            time.sleep(1)
-            print(data)
+            combined_data = combined_data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
+            #print(combined_data)
+            print(combined_data.tail(5))
     except Exception as e:
         print(f"Error fetching data for {ticker.symbol}: {e}")
-        data = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
+        combined_data = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
 
-    return data
+    return combined_data
 
 
 def get_missing_dates(ticker, interval, start_day, finish_day):
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
+    #print('start_day:',start_day,'timezone.make_naive(start_day):',timezone.make_naive(start_day))
+    #print('finish_day:', finish_day, 'timezone.make_naive(finish_day):', timezone.make_naive(finish_day))
     if interval == '1D':
-        existing_dates = DailyPrice.objects.filter(ticker=ticker, datetime__range=(start_day, finish_day)).values_list(
-            'datetime', flat=True)
-        all_dates = pd.date_range(start=start_day, end=finish_day, freq='D')
+        existing_dates = DailyPrice.objects.filter(
+            ticker=ticker, datetime__range=(start_day, finish_day)
+        ).values_list('datetime', flat=True)
+
+        # Ensure existing_dates is a list of timezone-naive or aware datetime objects
+        existing_dates = [timezone.make_naive(date) for date in existing_dates]
+        #print('existing_dates:', existing_dates[:3])
+
+        # Ensure that start_day and finish_day have the time set to 4:00
+        start_day_with_time = datetime.combine(start_day, time(4, 0))
+        finish_day_with_time = datetime.combine(finish_day, time(4, 0))
+
+        all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
+        all_dates = all_dates.tz_localize(None)
+
+        # Ensure all_dates is a list of native python datetime objects
+        all_dates = [date.to_pydatetime() for date in all_dates]
+
+        #print('all_dates:', all_dates[:3])
+
         missing_dates = [date for date in all_dates if date not in existing_dates]
+
+        #print('missing_dates:', missing_dates[:3])
+        #print('min(missing_dates):',min(missing_dates))
     if interval == '15m':
         existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
                                                         datetime__range=(start_day, finish_day)).values_list(
             'datetime', flat=True)
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
+        all_dates.tz_localize(None)
         missing_dates = [date for date in all_dates if date not in existing_dates]
         # print('all_dates:',all_dates)
     if interval == '5m':
@@ -83,6 +129,7 @@ def get_missing_dates(ticker, interval, start_day, finish_day):
                                                      datetime__range=(start_day, finish_day)).values_list(
             'datetime', flat=True)
         all_dates = pd.date_range(start=start_day, end=finish_day, freq='5T')
+        all_dates.tz_localize(None)
         missing_dates = [date for date in all_dates if date not in existing_dates]
         # print('all_dates:',all_dates)
         # print('missing_dates:',missing_dates)
@@ -160,6 +207,7 @@ def count_patterns(df, pattern_types):
 
 def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_percent=0.01):
     # def find_levels(df, columns=['Close'], window=20, retest_threshold_percent=0.001):
+    df.index = pd.to_datetime(df.index, utc=True)
     support = {}
     resistance = {}
     sr_level = {}
@@ -313,6 +361,15 @@ def add_ema_and_trend(price_history):
     return price_history
 
 def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+    # timeframe = Timeframe for which to download prices.
+        # valid values = "Daily", "15 mins", "5 mins"
+    # ticker_symbol = which ticker to download
+        # valid values = 'AAPL'
+        # "All" means all the tickers that are in the database.
+    # trigger = what started this call.
+        # trigger = "Cron" means a cron job.
+        # trigger = "User" means that the user has triggered the price download.
+
     print('Running download_prices()...')
     local_time = display_local_time()
     print('Timeframe:', timeframe)
@@ -326,6 +383,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         #print("ticker.is_daily:", ticker.is_daily)
         #print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
         #print("ticker.is_five_min:", ticker.is_five_min)
+        new_record_count=0
         if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             display_local_time()
             print('Downloading daily prices...')
@@ -369,7 +427,9 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     # print('About to add new daily price rows...')
                     for index, row in price_history.iterrows():
+                        #print(row)
                         if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                            new_record_count += 1
                             daily_price = DailyPrice(
                                 ticker=ticker,
                                 datetime=row['Datetime'],
@@ -407,9 +467,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.ema_50 = row['EMA_50']
                             daily_price.trend = row['Trend']
                         daily_price.save()
-                        time.sleep(19)
+                        #sleep(19)
                 else:
                     print('Insufficient data.')
+            print('new_record_count:',new_record_count)
         if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()

@@ -545,8 +545,8 @@ def five_min_price_list(request, ticker_id):
     return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': five_min_prices, 'heading_text' : '5 Minute'})
 
 @login_required
-def update_metrics_view(request):
-    update_ticker_metrics.update_ticker_metrics()
+def update_metrics_view(request, ticker_symbol):
+    update_ticker_metrics.update_ticker_metrics(ticker_symbol=ticker_symbol)
     return HttpResponseRedirect(reverse('ticker_config'))  # Redirect to admin dashboard or any other desired URL
 
 
@@ -627,3 +627,16 @@ def ticker_delete(request, ticker_id):
     ticker.delete()
 
     return redirect('ticker_config')
+
+# View to refresh all desired price data
+def manual_download(request, ticker_id, timeframe):
+
+    valid_timeframes = {"day" : "Daily", "15mins" : "15 mins", "5mins" : "5 mins"}
+    if timeframe not in valid_timeframes.keys():
+        print("manual_download() called with invalid timeframe:", timeframe)
+    else:
+        timeframe_label=valid_timeframes[timeframe]
+        ticker = get_object_or_404(Ticker, id=ticker_id)
+        download_prices(timeframe=timeframe_label, ticker_symbol=ticker.symbol, trigger='User')
+    return redirect('ticker_config')
+

@@ -53,4 +53,13 @@
         {% endfor %}
     </tbody>
 </table>
+<h4>Manual Download</h4>
+<p>Refresh the data:</p>
+<ul>
+    <li><a href="{% url 'manual_download' ticker.id 'day' %}">Download daily prices</a></li>
+    <li><a href="{% url 'manual_download' ticker.id '15mins' %}">Download 15 mins prices</a></li>
+    <li><a href="{% url 'manual_download' ticker.id '5mins' %}">Download 5 mins prices</a></li>
+    <li><a href="{% url 'update_metrics' ticker.symbol %}">Recalculate Metrics</a></li>
+</ul>
+
 {% endblock %}
