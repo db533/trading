@@ -378,11 +378,6 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
             print('Ticker:', ticker.symbol)
-        #print("timeframe == '5 mins':", timeframe == '5 mins')
-        #print("ticker_symbol == 'All':", ticker_symbol == 'All')
-        #print("ticker.is_daily:", ticker.is_daily)
-        #print("ticker.is_fifteen_min:", ticker.is_fifteen_min)
-        #print("ticker.is_five_min:", ticker.is_five_min)
         new_record_count=0
         if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
             display_local_time()
@@ -392,7 +387,6 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             interval = '1D'
 
             # Get the list of missing dates
-            # print('About to call missing_dates()...')
             missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
 
             if missing_dates:
@@ -402,32 +396,19 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 print('Retrieving data from ', start_day, ' to ', finish_day)
 
                 # Request price data for the entire missing date range
-                # print('About to call get_price_data()...')
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
-                print('len(price_history):', len(price_history))
                 if len(price_history) >= 3:
-
-                    # print('About to call add_candle_data()...')
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                    # print('About to call add_db_candle_data()...')
                     price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-
-                    # print('About to call count_patterns()...')
                     count_patterns(price_history, pattern_types)
-                    # print('About to call find_levels()...')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                    # print('About to update ticker...')
                     ticker.last_high_low = last_high_low_level
                     ticker.save()
-                    # print('About to call add_levels_to_price_history()...')
                     price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                    # print('About to call add_ema_and_trend()...')
                     price_history = add_ema_and_trend(price_history)
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                    # print('About to add new daily price rows...')
                     for index, row in price_history.iterrows():
-                        #print(row)
                         if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
                             new_record_count += 1
                             daily_price = DailyPrice(
@@ -467,7 +448,6 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.ema_50 = row['EMA_50']
                             daily_price.trend = row['Trend']
                         daily_price.save()
-                        #sleep(19)
                 else:
                     print('Insufficient data.')
             print('new_record_count:',new_record_count)

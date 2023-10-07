@@ -78,6 +78,8 @@ def login_view(request):
     else:
         return JsonResponse({'success': False, 'error': 'Invalid credentials'})
 
+from django.db.models import OuterRef, Subquery, F
+
 @login_required
 def ticker_config(request):
     if request.method == 'POST':
@@ -131,13 +133,30 @@ def ticker_config(request):
 
     tickers = Ticker.objects.filter(tickers_q).distinct().order_by(order_by)
 
+    latest_daily_prices = DailyPrice.objects.filter(ticker=OuterRef('pk')).order_by('-datetime')
+
+    tickers = tickers.annotate(
+        latest_candle_close_price=Subquery(latest_daily_prices.values('close_price')[:1]),
+        latest_candle_bearish_detected = Subquery(latest_daily_prices.values('bearish_detected')[:1]),
+        latest_candle_bullish_detected = Subquery(latest_daily_prices.values('bullish_detected')[:1]),
+        latest_candle_reversal_detected = Subquery(latest_daily_prices.values('reversal_detected')[:1]),
+        latest_candle_bullish_reversal_detected=Subquery(latest_daily_prices.values('bullish_reversal_detected')[:1]),
+    )
+
     tickers_with_data = []
     print('Computing data for ticker config listing...')
     hourly_price_query_count = 0
     for ticker in tickers:
         # Fetching the most recent DailyPrice's close_price
-        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-        latest_close_price = latest_candle.close_price if latest_candle else None
+        #latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        #latest_close_price = latest_candle.close_price if latest_candle else None
+        latest_candle = {
+            'close_price': ticker.latest_candle_close_price,
+            'bearish_detected': ticker.latest_candle_bearish_detected,
+            'bullish_detected': ticker.latest_candle_bullish_detected,
+            'reversal_detected': ticker.latest_candle_reversal_detected,
+            'bullish_reversal_detected': ticker.latest_candle_bullish_reversal_detected,
+        }
 
         # Increment hourly_price_query_count if 15 or 5 min updates are desired.
         if ticker.is_fifteen_min:
