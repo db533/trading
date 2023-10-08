@@ -3,6 +3,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 from pathlib import Path
 import yfinance as yf
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import pandas as pd
 import time
 import json
