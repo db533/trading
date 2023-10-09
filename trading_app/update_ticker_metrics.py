@@ -34,6 +34,9 @@ def compute_ma_200_trend_strength(ticker, data_points):
                 ma_200_trend_strength = -ma_200_trend_strength
         except ZeroDivisionError:
             ma_200_trend_strength = None
+            print('Divide by zero error as last_closing_price =', last_closing_price)
+    else:
+        print('To few data points to compute 200 day MA:', len(data_points))
     ticker.ma_200_trend_strength = ma_200_trend_strength
     print('ma_200_trend_strength:',ma_200_trend_strength)
     return ticker
@@ -210,17 +213,20 @@ def test_tae_strategy(ticker):
     candle_bearish = ticker.bearish_detected
 
     # Is ticker in a general upward trend?
-    if ma_strength > ma_strength_threshold and sr_level_type == 'Support' and (candle_bullish or candle_bullish_reversal):
-        strategy_score += (ma_strength-ma_strength_threshold)*trend_weight
-        strategy_score += float((candle_bullish + candle_bullish_reversal)) * candle_weight
-        strategy_score += float((max(5-float(dist_to_sr_level),0))*sr_level_weight/5)
+    if ma_strength is not None:
+        if ma_strength > ma_strength_threshold and sr_level_type == 'Support' and (candle_bullish or candle_bullish_reversal):
+            strategy_score += (ma_strength-ma_strength_threshold)*trend_weight
+            strategy_score += float((candle_bullish + candle_bullish_reversal)) * candle_weight
+            strategy_score += float((max(5-float(dist_to_sr_level),0))*sr_level_weight/5)
 
-    if ma_strength < -ma_strength_threshold and sr_level_type == 'Resistance' and (candle_bearish):
-        strategy_score +=  -(ma_strength + ma_strength_threshold) * trend_weight
-        strategy_score += float((candle_bearish)) * candle_weight
-        strategy_score += float((max(5 - float(dist_to_sr_level), 0)) * sr_level_weight / 5)
+        if ma_strength < -ma_strength_threshold and sr_level_type == 'Resistance' and (candle_bearish):
+            strategy_score +=  -(ma_strength + ma_strength_threshold) * trend_weight
+            strategy_score += float((candle_bearish)) * candle_weight
+            strategy_score += float((max(5 - float(dist_to_sr_level), 0)) * sr_level_weight / 5)
 
-    ticker.tae_strategy_score = strategy_score
+        ticker.tae_strategy_score = strategy_score
+    else:
+        ticker.tae_strategy_score = 0
     return ticker
 
 def update_ticker_metrics(ticker_symbol="All"):

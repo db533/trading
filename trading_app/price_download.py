@@ -29,16 +29,19 @@ def get_price_data(ticker, interval, start_time, finish_time):
     # Fetching existing data from the database
     try:
         existing_data = DailyPrice.objects.filter(ticker=ticker).values()
-        existing_df = pd.DataFrame.from_records(existing_data)
-        existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
-        existing_df['Open'] = existing_df['open_price'].astype(float)
-        existing_df['High'] = existing_df['high_price'].astype(float)
-        existing_df['Low'] = existing_df['low_price'].astype(float)
-        existing_df['Close'] = existing_df['close_price'].astype(float)
-        existing_df['Volume'] = existing_df['volume']
-        existing_df = existing_df.drop(columns=['datetime', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
-        #print(existing_df.tail(5))
-        #print('existing_df.iloc[1]:', existing_df.iloc[1])
+        if len(existing_data) > 0:
+            existing_data = True
+        else:
+            existing_data = False
+        if existing_data == True:
+            existing_df = pd.DataFrame.from_records(existing_data)
+            existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
+            existing_df['Open'] = existing_df['open_price'].astype(float)
+            existing_df['High'] = existing_df['high_price'].astype(float)
+            existing_df['Low'] = existing_df['low_price'].astype(float)
+            existing_df['Close'] = existing_df['close_price'].astype(float)
+            existing_df['Volume'] = existing_df['volume']
+            existing_df = existing_df.drop(columns=['datetime', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -57,12 +60,18 @@ def get_price_data(ticker, interval, start_time, finish_time):
             data['Datetime'] = data.index
             data = data.tz_localize(None)
 
-            # Concatenating the new and existing data, while ensuring no duplicate entries
-            combined_data = pd.concat([data, existing_df], ignore_index=True)
-            #print('combined_data.columns:',combined_data.columns)
-            #print(combined_data.tail(5))
+            if existing_data == True:
+                # Concatenating the new and existing data, while ensuring no duplicate entries
+                combined_data = pd.concat([data, existing_df], ignore_index=True)
+                #print('combined_data.columns:',combined_data.columns)
+                #print(combined_data.tail(5))
+            else:
+                combined_data = data
             combined_data = combined_data.set_index('Datetime')
-            combined_data.index = pd.to_datetime(combined_data.index, utc=True)
+            # To create an index that is timezone-aware, uncomment next line:
+            #combined_data.index = pd.to_datetime(combined_data.index, utc=True)
+            # To make the index timezone-naive, use the following line
+            combined_data.index = combined_data.index.tz_localize(None)
 
             combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
 
@@ -70,16 +79,19 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
             combined_data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
             combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
-            combined_data.at[data.index[0], 'PercentChange'] = 0
+            #print('combined_data.index[0]:',combined_data.index[0])
+            #print("combined_data.at[combined_data.index[0], 'PercentChange']:", combined_data.at[combined_data.index[0], 'PercentChange'])
+            combined_data.at[combined_data.index[0], 'PercentChange'] = 0
 
             # Duplicating the Datetime index into a new column
             combined_data['Datetime'] = combined_data.index.copy()
+            combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize('UTC')
             combined_data = combined_data.dropna(subset=['Open'])
 
             # Reorder the columns
             combined_data = combined_data[['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
             #print(combined_data)
-            print(combined_data.tail(5))
+            #print(combined_data.tail(5))
     except Exception as e:
         print(f"Error fetching data for {ticker.symbol}: {e}")
         combined_data = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -398,11 +410,17 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
                 if len(price_history) >= 3:
+                    #print('Step 1')
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                    #print('Step 2')
                     price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                    #print('Step 3')
                     count_patterns(price_history, pattern_types)
+                    #print('Step 4')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
+                    #print('Step 5')
                     ticker.last_high_low = last_high_low_level
+                    #print('Step 6')
                     ticker.save()
                     price_history = add_levels_to_price_history(price_history, sr_levels, retests)
                     price_history = add_ema_and_trend(price_history)

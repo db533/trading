@@ -9,7 +9,6 @@ import pandas as pd
 import time
 import json
 
-
 from django.shortcuts import render
 from .models import *
 from .forms import *
