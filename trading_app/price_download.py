@@ -23,7 +23,7 @@ def display_local_time():
     # Format and print the local datetime
     local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
     print(f'Current datetime: {local_datetime_str}')
-    return local_datetime.time()
+    return local_datetime
 
 def get_price_data(ticker, interval, start_time, finish_time):
     # Fetching existing data from the database
@@ -388,13 +388,13 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     print('ticker_symbol:', ticker_symbol)
 
     for ticker in Ticker.objects.all().order_by('symbol'):
-        start_time = time.time()  # record the start time of the loop
         if ticker_symbol == 'All':
             print('Ticker:', ticker.symbol)
-            print('Time:', start_time)
+
         new_record_count=0
         if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
-            display_local_time()
+            print('start_time:')
+            start_time = display_local_time()  # record the start time of the loop
             print('Downloading daily prices...')
             start_day = timezone.now() - timedelta(days=365)
             finish_day = timezone.now()
@@ -471,12 +471,13 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 else:
                     print('Insufficient data.')
             print('new_record_count:',new_record_count)
-            end_time = time.time()  # record the end time of the loop
+            end_time = display_local_time()  # record the end time of the loop
             elapsed_time = end_time - start_time  # calculate elapsed time
 
             # Ensure at least 20 seconds before the next iteration
-            if elapsed_time < 20 and ticker_symbol == 'All':
-                time.sleep(20 - elapsed_time)
+            if elapsed_time.total_seconds() < 20:
+                print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
+                sleep(20 - elapsed_time.total_seconds())
         if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()

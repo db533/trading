@@ -648,7 +648,7 @@ def ticker_delete(request, ticker_id):
 
     return redirect('ticker_config')
 
-# View to refresh all desired price data
+# View to refresh price data for a specific ticker
 def manual_download(request, ticker_id, timeframe):
 
     valid_timeframes = {"day" : "Daily", "15mins" : "15 mins", "5mins" : "5 mins"}
@@ -660,3 +660,14 @@ def manual_download(request, ticker_id, timeframe):
         download_prices(timeframe=timeframe_label, ticker_symbol=ticker.symbol, trigger='User')
     return redirect('ticker_config')
 
+# View to refresh price data for a specific ticker
+def manual_category_download(request, category):
+    # Retrieve all tickers that are in the given category.
+    tickers = Ticker.objects.filter(categories__name=category)
+
+    # Iterate through all retrieved tickers and download prices.
+    for ticker in tickers:
+        download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
+
+    # Redirect to the 'ticker_config' URL pattern.
+    return redirect('ticker_config')
