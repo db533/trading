@@ -30,10 +30,10 @@ def get_price_data(ticker, interval, start_time, finish_time):
     try:
         existing_data = DailyPrice.objects.filter(ticker=ticker).values()
         if len(existing_data) > 0:
-            existing_data = True
+            existing_data_retrieved = True
         else:
-            existing_data = False
-        if existing_data == True:
+            existing_data_retrieved = False
+        if existing_data_retrieved == True:
             existing_df = pd.DataFrame.from_records(existing_data)
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
             existing_df['Open'] = existing_df['open_price'].astype(float)
@@ -58,20 +58,23 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index
-            data = data.tz_localize(None)
+            #data = data.tz_localize(None)
 
-            if existing_data == True:
+            if existing_data_retrieved == True:
                 # Concatenating the new and existing data, while ensuring no duplicate entries
                 combined_data = pd.concat([data, existing_df], ignore_index=True)
                 #print('combined_data.columns:',combined_data.columns)
                 #print(combined_data.tail(5))
             else:
                 combined_data = data
-            combined_data = combined_data.set_index('Datetime')
+            #combined_data = combined_data.set_index('Datetime')
+            combined_data.index = pd.to_datetime(combined_data.index)
+            combined_data.index = combined_data.index.tz_localize(None)
+
             # To create an index that is timezone-aware, uncomment next line:
             #combined_data.index = pd.to_datetime(combined_data.index, utc=True)
             # To make the index timezone-naive, use the following line
-            combined_data.index = combined_data.index.tz_localize(None)
+            #combined_data.index = combined_data.index.tz_localize(None)
 
             combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
 
@@ -85,6 +88,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
 
             # Duplicating the Datetime index into a new column
             combined_data['Datetime'] = combined_data.index.copy()
+            combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'])
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize('UTC')
             combined_data = combined_data.dropna(subset=['Open'])
 
@@ -93,7 +97,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
             #print(combined_data)
             #print(combined_data.tail(5))
     except Exception as e:
-        print(f"Error fetching data for {ticker.symbol}: {e}")
+        print(f"Error downloading data for {ticker.symbol}: {e}")
         combined_data = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
 
     return combined_data
@@ -278,13 +282,13 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
         close_levels = []
         for future_level in level2:
             if abs(level1 - future_level) <= level1 * threshold_percent:
-                print('Future level close to level1:', future_level)
+                #print('Future level close to level1:', future_level)
                 close_levels.append(future_level)
         # print('Level1:', level1, 'Level2:',level2, 'abs(level1 - level2):',abs(level1 - level2),'threshold_value:',level1 * threshold_percent, 'Within threshold?',abs(level1 - level2) <= level1 * threshold_percent)
         return close_levels
 
     # Remove sr_levels that are within threshold of a previous support level
-    print('sr_level:', sr_level)
+    #print('sr_level:', sr_level)
     sr_keys_sorted = sorted(sr_level, key=sr_level.get)  # sort by datetime
     # print('sr_keys_sorted:',sr_keys_sorted)
     for i in range(len(sr_keys_sorted)):
@@ -298,7 +302,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
                 all_levels = [level1] + close_levels
                 # print('all_levels:', all_levels)
                 avg_level = sum(all_levels) / len(all_levels)
-                print('level1 changed from', level1, 'to avg_level', avg_level)
+                #print('level1 changed from', level1, 'to avg_level', avg_level)
                 datetime_for_avg_level = sr_level[level1]  # store datetime associated with original level
                 del sr_level[level1]
                 for level in close_levels:
@@ -325,7 +329,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
                     retests.setdefault(level, {'count': 0, 'last_retest': None})
                     retests[level]['count'] += 1
                     retests[level]['last_retest'] = current_datetime
-                    print(f"Support/resistance level {level} retested at {current_datetime}.")
+                    #print(f"Support/resistance level {level} retested at {current_datetime}.")
 
     return sr_level, retests, last_high_low_level
 
@@ -386,6 +390,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     local_time = display_local_time()
     print('Timeframe:', timeframe)
     print('ticker_symbol:', ticker_symbol)
+
+    ticker_count = Ticker.objects.all().count()
 
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
@@ -475,7 +481,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             elapsed_time = end_time - start_time  # calculate elapsed time
 
             # Ensure at least 20 seconds before the next iteration
-            if elapsed_time.total_seconds() < 20:
+            if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
                 print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
                 sleep(20 - elapsed_time.total_seconds())
         if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):

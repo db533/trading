@@ -165,7 +165,9 @@ LOGIN_REDIRECT_URL = '/ticker-config/'
 
 CRON_CLASSES = [
     'trading_app.cron.UpdateTickerMetricsCronJob',
-    'trading_app.cron.DailyPriceDownloadCronJob',
+    #'trading_app.cron.DailyPriceDownloadCronJob',
+    'trading_app.cron.DailyUSPriceDownloadCronJob',
+    'trading_app.cron.DailyTSEPriceDownloadCronJob',
     #'trading_app.cron.FifteenMinsPriceDownloadCronJob',
     #'trading_app.cron.FiveMinsPriceDownloadCronJob',
 

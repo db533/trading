@@ -4,8 +4,24 @@ from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
 from .price_download import download_prices
 from .test_cron_job import test_cron_job
+from datetime import datetime, timedelta, timezone, date, time
+import pytz
 
 # RUN_AT_TIMES actually execute 3 hours later than defined here.
+
+def display_local_time():
+    # Get the current datetime in UTC
+    utc_now = datetime.utcnow()
+
+    # Convert UTC datetime to the local timezone
+    local_timezone = pytz.timezone('Europe/Riga')  # Replace with your local timezone
+    local_datetime = utc_now.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+
+    # Format and print the local datetime
+    local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
+    print(f'Current datetime: {local_datetime_str}')
+    return local_datetime
+
 
 class DailyPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['20:00']  # Run at 1:00 AM local time
@@ -16,6 +32,56 @@ class DailyPriceDownloadCronJob(CronJobBase):
     def do(self):
         # Run the update_ticker_metrics function
         download_prices(timeframe='Daily')
+
+class DailyUSPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['23:00']  # Run at 1:00 AM local time
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    # schedule = Schedule(run_every_mins=1)  # Run once a day
+    code = 'trading_app.daily_us_price_download_cron_job'
+
+    def do(self):
+        # Run the update_ticker_metrics function
+        tickers = Ticker.objects.filter(categories__name='US stocks')
+        ticker_count = Ticker.objects.filter(categories__name='US stocks').count()
+
+        # Iterate through all retrieved tickers and download prices.
+        for ticker in tickers:
+            start_time = display_local_time()  # record the start time of the loop
+            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+
+            end_time = display_local_time()  # record the end time of the loop
+            elapsed_time = end_time - start_time  # calculate elapsed time
+
+            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
+                print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
+                sleep(20 - elapsed_time.total_seconds())
+
+
+
+class DailyTSEPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['20:00']  # Run at 1:00 AM local time
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    # schedule = Schedule(run_every_mins=1)  # Run once a day
+    code = 'trading_app.daily_tse_price_download_cron_job'
+
+    def do(self):
+        # Run the update_ticker_metrics function
+        tickers = Ticker.objects.filter(categories__name='TSE stocks')
+        ticker_count = Ticker.objects.filter(categories__name='TSE stocks').count()
+
+        # Iterate through all retrieved tickers and download prices.
+        for ticker in tickers:
+            start_time = display_local_time()  # record the start time of the loop
+            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+
+            end_time = display_local_time()  # record the end time of the loop
+            elapsed_time = end_time - start_time  # calculate elapsed time
+
+            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
+                print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
+                sleep(20 - elapsed_time.total_seconds())
+
+
 
 class UpdateTickerMetricsCronJob(CronJobBase):
     RUN_AT_TIMES = ['03:00']  # Run at 1:00 AM local time
