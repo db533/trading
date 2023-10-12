@@ -1,4 +1,6 @@
 from .models import Ticker, DailyPrice
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, timezone, date

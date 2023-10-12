@@ -4,6 +4,9 @@ logging.basicConfig(level=logging.INFO)
 import yfinance as yf
 from time import sleep
 from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, timezone, date, time
