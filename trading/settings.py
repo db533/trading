@@ -173,3 +173,26 @@ CRON_CLASSES = [
 
     #'trading_app.cron.TestCronJob',
 ]
+
+LOGGING_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOGGING_DIR):
+    os.makedirs(LOGGING_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'stderr': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGGING_DIR, 'stderr.log'),
+            'level': 'ERROR',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['stderr'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}

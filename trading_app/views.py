@@ -28,7 +28,9 @@ from . import update_ticker_metrics
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
+import logging
 
+logger = logging.getLogger('django')
 from rest_framework.response import Response
 
 # https://manojadhikari.medium.com/track-email-opened-status-django-rest-framework-5fcd1fbdecfb
