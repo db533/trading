@@ -416,7 +416,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
     ticker_count = Ticker.objects.all().count()
-    logger.error(f'ticker_count: {str(ticker_count)}')
+    if ticker_symbol == 'All':
+        logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
 
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
@@ -618,3 +619,30 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                         fivemin_price.save()
                 else:
                     print('Insufficient data.')
+
+# Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
+def category_price_download(category_name):
+        # Run the update_ticker_metrics function
+        logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
+        tickers = Ticker.objects.filter(categories__name=category_name)
+        ticker_count = Ticker.objects.filter(categories__name=category_name).count()
+        logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
+        if ticker_count > 195:
+            logger.error(f'Rate throttling will occur.')
+        else:
+            logger.error(f'No rate throttling needed.')
+
+        # Iterate through all retrieved tickers and download prices.
+        for ticker in tickers:
+            start_time = display_local_time()  # record the start time of the loop
+            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
+            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+
+            end_time = display_local_time()  # record the end time of the loop
+            elapsed_time = end_time - start_time  # calculate elapsed time
+
+            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
+                pause_duration = 20 - elapsed_time.total_seconds()
+                print('Rate throttling for',pause_duration,'secs...')
+                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                sleep(pause_duration)

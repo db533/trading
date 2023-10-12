@@ -2,13 +2,11 @@
 
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
-from .price_download import download_prices
+from .price_download import download_prices, category_price_download
 from .test_cron_job import test_cron_job
 from datetime import datetime, timedelta, timezone, date, time
 import pytz
 import logging
-from .models import Ticker
-from time import sleep
 
 logger = logging.getLogger('django')
 
@@ -40,58 +38,22 @@ class DailyPriceDownloadCronJob(CronJobBase):
 
 class DailyUSPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['23:00']  # Run at 1:00 AM local time
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    # schedule = Schedule(run_every_mins=1)  # Run once a day
+    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    schedule = Schedule(run_every_mins=3)  # Run once a day
     code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
-        # Run the update_ticker_metrics function
-        tickers = Ticker.objects.filter(categories__name='US stocks')
-        ticker_count = Ticker.objects.filter(categories__name='US stocks').count()
-
-        # Iterate through all retrieved tickers and download prices.
-        for ticker in tickers:
-            start_time = display_local_time()  # record the start time of the loop
-            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
-
-            end_time = display_local_time()  # record the end time of the loop
-            elapsed_time = end_time - start_time  # calculate elapsed time
-
-            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
-                print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
-                sleep(20 - elapsed_time.total_seconds())
-
+        category_price_download('US stocks')
 
 
 class DailyTSEPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['20:00']  # Run at 1:00 AM local time
-    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    schedule = Schedule(run_every_mins=3)  # Run once a day
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=3)  # Run once a day
     code = 'trading_app.daily_tse_price_download_cron_job'
 
     def do(self):
-        # Run the update_ticker_metrics function
-        logger.error(f'TSE price download cron starting...')
-        tickers = Ticker.objects.filter(categories__name='TSE stocks')
-        ticker_count = Ticker.objects.filter(categories__name='TSE stocks').count()
-        logger.error(f'TSE price download cron. Ticker_count: {str(ticker_count)}')
-
-        # Iterate through all retrieved tickers and download prices.
-        for ticker in tickers:
-            start_time = display_local_time()  # record the start time of the loop
-            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
-            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
-
-            end_time = display_local_time()  # record the end time of the loop
-            elapsed_time = end_time - start_time  # calculate elapsed time
-
-            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
-                pause_duration = 20 - elapsed_time.total_seconds()
-                print('Rate throttling for',pause_duration,'secs...')
-                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-
-                sleep(pause_duration)
-
+        category_price_download('TSE stocks')
 
 
 class UpdateTickerMetricsCronJob(CronJobBase):
