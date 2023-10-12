@@ -7,6 +7,8 @@ from .test_cron_job import test_cron_job
 from datetime import datetime, timedelta, timezone, date, time
 import pytz
 import logging
+from .models import Ticker
+from time import sleep
 
 logger = logging.getLogger('django')
 
@@ -64,7 +66,7 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
 class DailyTSEPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['20:00']  # Run at 1:00 AM local time
     #schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    schedule = Schedule(run_every_mins=5)  # Run once a day
+    schedule = Schedule(run_every_mins=3)  # Run once a day
     code = 'trading_app.daily_tse_price_download_cron_job'
 
     def do(self):
@@ -77,7 +79,7 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
         # Iterate through all retrieved tickers and download prices.
         for ticker in tickers:
             start_time = display_local_time()  # record the start time of the loop
-            logger.error(f'ticker_symbol: {str(ticker_symbol)}')
+            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
             download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
 
             end_time = display_local_time()  # record the end time of the loop
