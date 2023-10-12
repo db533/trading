@@ -665,10 +665,12 @@ def manual_download(request, ticker_id, timeframe):
 # View to refresh price data for a specific ticker
 def manual_category_download(request, category):
     # Retrieve all tickers that are in the given category.
+    logger.error(f'manual_category_download() starting...')
     tickers = Ticker.objects.filter(categories__name=category)
 
     # Iterate through all retrieved tickers and download prices.
     for ticker in tickers:
+        logger.error(f'ticker.symbol: {str(ticker.symbol)}')
         download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
 
     # Redirect to the 'ticker_config' URL pattern.
