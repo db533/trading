@@ -10,6 +10,9 @@ from datetime import datetime, timedelta, timezone, date, time
 from candlestick import candlestick
 from . import db_candlestick
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger('django')
 
 
 def display_local_time():
@@ -410,12 +413,15 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     local_time = display_local_time()
     print('Timeframe:', timeframe)
     print('ticker_symbol:', ticker_symbol)
+    logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
     ticker_count = Ticker.objects.all().count()
+    logger.error(f'ticker_count: {str(ticker_count)}')
 
     for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
             print('Ticker:', ticker.symbol)
+            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
 
         new_record_count=0
         if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
@@ -434,6 +440,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 start_day = min(missing_dates)
                 finish_day = max(missing_dates)
                 print('Retrieving data from ', start_day, ' to ', finish_day)
+                logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
@@ -498,13 +505,16 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 else:
                     print('Insufficient data.')
             print('new_record_count:',new_record_count)
+            logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
             end_time = display_local_time()  # record the end time of the loop
             elapsed_time = end_time - start_time  # calculate elapsed time
 
             # Ensure at least 20 seconds before the next iteration
             if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
-                print('Rate throttling for',20 - elapsed_time.total_seconds(),'secs...')
-                sleep(20 - elapsed_time.total_seconds())
+                pause_duration = 20 - elapsed_time.total_seconds()
+                print('Rate throttling for',pause_duration,'secs...')
+                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                sleep(pause_duration)
         if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
             start_day = timezone.now() - timedelta(days=7)
             finish_day = timezone.now()
