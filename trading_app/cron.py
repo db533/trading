@@ -38,8 +38,8 @@ class DailyPriceDownloadCronJob(CronJobBase):
 
 class DailyUSPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['23:00']  # Run at 1:00 AM local time
-    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    schedule = Schedule(run_every_mins=3)  # Run once a day
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=3)  # Run once a day
     code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
