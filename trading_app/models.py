@@ -41,6 +41,7 @@ class Ticker(models.Model):
 class BasePrice(models.Model):
     ticker = models.ForeignKey(Ticker, on_delete=models.CASCADE)
     datetime = models.DateTimeField()
+    datetime_tz = models.DateTimeField(null=True)
     open_price = models.DecimalField(max_digits=10, decimal_places=2)
     high_price = models.DecimalField(max_digits=10, decimal_places=2)
     low_price = models.DecimalField(max_digits=10, decimal_places=2)

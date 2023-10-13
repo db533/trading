@@ -578,44 +578,53 @@ def ticker_detail(request, ticker_id):
 
     # Fetching the most recent DailyPrice's close_price
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-    latest_close_price = latest_candle.close_price if latest_candle else None
-    patterns_detected = latest_candle.patterns_detected
-    if latest_candle.bullish_detected:
-        bullish_detected = 'True'
-    else:
-        bullish_detected = 'False'
-    if latest_candle.bullish_reversal_detected:
-        bullish_reversal_detected = 'True'
-    else:
-        bullish_reversal_detected = 'False'
-    if latest_candle.bearish_detected:
-        bearish_detected = 'True'
-    else:
-        bearish_detected = 'False'
-    if latest_candle.reversal_detected:
-        reversal_detected = 'True'
-    else:
-        reversal_detected = 'False'
-
-    # Computing the number of days from datetime to today for each DailyPrice instance
-    current_date = date.today()
-    daily_prices = []
-    smallest_range_to_level = 100
-    for dp in daily_prices_query:
-        days_difference = (current_date - dp.datetime.date()).days
-        if latest_close_price and latest_close_price != 0:
-            close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
-            if close_price_percentage < smallest_range_to_level:
-                smallest_range_to_level = close_price_percentage
+    if latest_candle is not None:
+        latest_close_price = latest_candle.close_price if latest_candle else None
+        patterns_detected = latest_candle.patterns_detected
+        if latest_candle.bullish_detected:
+            bullish_detected = 'True'
         else:
-            close_price_percentage = None
+            bullish_detected = 'False'
+        if latest_candle.bullish_reversal_detected:
+            bullish_reversal_detected = 'True'
+        else:
+            bullish_reversal_detected = 'False'
+        if latest_candle.bearish_detected:
+            bearish_detected = 'True'
+        else:
+            bearish_detected = 'False'
+        if latest_candle.reversal_detected:
+            reversal_detected = 'True'
+        else:
+            reversal_detected = 'False'
 
-        daily_prices.append({
-            'daily_price': dp,
-            'days_from_today': days_difference,
-            'close_price_percentage': close_price_percentage,
-            'latest_candle' : latest_candle,
-        })
+        # Computing the number of days from datetime to today for each DailyPrice instance
+        current_date = date.today()
+        daily_prices = []
+        smallest_range_to_level = 100
+        for dp in daily_prices_query:
+            days_difference = (current_date - dp.datetime.date()).days
+            if latest_close_price and latest_close_price != 0:
+                close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
+                if close_price_percentage < smallest_range_to_level:
+                    smallest_range_to_level = close_price_percentage
+            else:
+                close_price_percentage = None
+
+            daily_prices.append({
+                'daily_price': dp,
+                'days_from_today': days_difference,
+                'close_price_percentage': close_price_percentage,
+                'latest_candle' : latest_candle,
+            })
+    else:
+        daily_prices = {}
+        latest_close_price = 'False'
+        patterns_detected  = 'False'
+        bullish_detected = 'False'
+        bullish_reversal_detected = 'False'
+        bearish_detected = 'False'
+        reversal_detected = 'False'
 
     context = {
         'ticker': ticker,
@@ -675,3 +684,25 @@ def manual_category_download(request, category):
 
     # Redirect to the 'ticker_config' URL pattern.
     return redirect('ticker_config')
+
+from django.contrib import messages
+from django.http import Http404
+from .models import DailyPrice, Ticker
+
+def delete_daily_price(request, symbol=None):
+    if request.method == "POST":  # Ensure requests are POST for data modifications
+        try:
+            if symbol:  # if symbol provided, delete where symbol matches
+                ticker_instance = Ticker.objects.get(symbol=symbol)
+                DailyPrice.objects.filter(ticker=ticker_instance).delete()
+                messages.success(request, f"DailyPrice instances with symbol {symbol} deleted successfully!")
+            else:  # if symbol not provided, delete all
+                DailyPrice.objects.all().delete()
+                messages.success(request, "All DailyPrice instances deleted successfully!")
+        except Ticker.DoesNotExist:
+            raise Http404("Ticker with provided symbol does not exist")
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('ticker_config')  # Redirect to a confirmation page or the main page
+    else:
+        raise Http404("Invalid request method")  # Prevent deletion on GET request

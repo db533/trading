@@ -23,6 +23,8 @@ urlpatterns = [
     path('ticker_delete/<int:ticker_id>/', ticker_delete, name='ticker_delete'),
     path('add-ticker/', add_ticker, name='ticker_add'),
     path('manual_category_download/<str:category>/', manual_category_download, name='manual_category_download'),
+    path('delete_daily_price/', delete_daily_price, name='delete_daily_price'),
+    path('delete_daily_price/<str:symbol>/', delete_daily_price, name='delete_daily_price_with_symbol'),
 
 ]
 
