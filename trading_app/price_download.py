@@ -50,14 +50,18 @@ def get_price_data(ticker, interval, start_time, finish_time):
             existing_df['Volume'] = existing_df['volume']
 
             # Check if there is at least one NaT in 'Datetime_TZ'
-            if existing_data['Datetime_TZ'].isna().any():
+            #print('Step 1')
+            if existing_df['Datetime_TZ'].isna().any():
                 # Replace 'Datetime_TZ' column values with 'Datetime' column values
-                existing_data['Datetime_TZ'] = existing_data['Datetime']
+                #print('Step 2')
+                existing_df['Datetime_TZ'] = existing_df['Datetime']
 
             #print('existing_df.tail(5) before set_index:')
             #print(existing_df.tail(5))
 
+            #print('Step 3')
             existing_df = existing_df.set_index('Datetime')
+            #print('Step 4')
             existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             #print('existing_df.head(5):')
             #print(existing_df.head(5))
@@ -146,7 +150,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
     return combined_data
 
 
-def get_missing_dates(ticker, interval, start_day, finish_day):
+def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
     #print('start_day:',start_day,'timezone.make_naive(start_day):',timezone.make_naive(start_day))
     #print('finish_day:', finish_day, 'timezone.make_naive(finish_day):', timezone.make_naive(finish_day))
@@ -160,8 +164,8 @@ def get_missing_dates(ticker, interval, start_day, finish_day):
         #print('existing_dates:', existing_dates[:3])
 
         # Ensure that start_day and finish_day have the time set to 4:00
-        start_day_with_time = datetime.combine(start_day, time(4, 0))
-        finish_day_with_time = datetime.combine(finish_day, time(4, 0))
+        start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
+        finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
 
         all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
         all_dates = all_dates.tz_localize(None)
@@ -459,8 +463,21 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             print('Deleted', deleted_count, 'older DailyPrice records.')
             logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
+            # Find the hour value for existing records for this ticker.
+            existing_price = DailyPrice.objects.filter(ticker=ticker).first()
+            # Check if an instance was found
+            if existing_price:
+                # Extract the hour part from datetime_tz using the `hour` lookup
+                if existing_price.datetime_tz is not None:
+                    hour_offset = existing_price.datetime_tz.hour
+                else:
+                    hour_offset = existing_price.datetime.hour
+            else:
+                # Handle the case where no instance was found
+                hour_offset = 0
+            logger.error(f'hour_offset = {str(hour_offset)}')
             # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
+            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
 
             if missing_dates:
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
@@ -553,7 +570,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             print('Checking 15 min data for', ticker.symbol)
 
             # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
+            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, 23)
 
             if missing_dates:
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
@@ -605,7 +622,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             interval = '5m'
             print('Checking 5 min data for', ticker.symbol)
             # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day)
+            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day,23)
             if missing_dates:
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
                 start_day = min(missing_dates)
