@@ -117,8 +117,6 @@
           <td style="text-align:center;
             color: {% if item.ticker.tae_strategy_score > 0 and item.ticker.ma_200_trend_strength > 0 %}green{% elif item.ticker.tae_strategy_score > 0 and item.ticker.ma_200_trend_strength < 0 %}red{% endif %};
             font-weight: {% if item.ticker.tae_strategy_score > 0 %}bold{% endif %};">
-          </td>
-
             {{ item.ticker.tae_strategy_score }}
           </td>
 
