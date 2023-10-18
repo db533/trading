@@ -675,7 +675,12 @@ def manual_download(request, ticker_id, timeframe):
 def manual_category_download(request, category):
     # Retrieve all tickers that are in the given category.
     logger.error(f'manual_category_download() starting...')
+    logger.error(f'category: {str(category)}')
+    category = category.replace('%20',' ')
+    logger.error(f'Cleaned category: {str(category)}')
     tickers = Ticker.objects.filter(categories__name=category)
+    ticker_count = Ticker.objects.filter(categories__name=category).count()
+    logger.error(f'ticker_count: {str(ticker_count)}')
 
     # Iterate through all retrieved tickers and download prices.
     for ticker in tickers:
