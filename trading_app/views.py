@@ -677,6 +677,7 @@ def manual_category_download(request, category):
     logger.error(f'manual_category_download() starting...')
     logger.error(f'category: {str(category)}')
     category = category.replace('%20',' ')
+    category = category.replace('%2520', ' ')
     logger.error(f'Cleaned category: {str(category)}')
     tickers = Ticker.objects.filter(categories__name=category)
     ticker_count = Ticker.objects.filter(categories__name=category).count()
