@@ -1,3 +1,5 @@
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 from django.contrib import admin
 from django.urls import path, include
 from trading_app.views import *
