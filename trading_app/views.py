@@ -123,8 +123,8 @@ def ticker_config(request):
         tickers_q &= Q(ma_200_trend_strength__lt=0)
         order_by = 'ma_200_trend_strength'
     elif tae_score:
-        tickers_q &= (Q(tae_strategy_score__gt=0) & Q(ma_200_trend_strength__gt=0))
-        order_by = '-tae_strategy_score'
+        tickers_q &= Q(tae_strategy_score__gt=0)
+        order_by = '-ma_200_trend_strength'
     elif two_period_cum_rsi:
         tickers_q &= (
             (Q(cumulative_two_period_two_day_rsi__lt=10) & Q(ma_200_trend_strength__gt=0)) |
