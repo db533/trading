@@ -59,5 +59,6 @@
       {% endfor %}
     </tbody>
   </table>
-  <a href="{% url 'ticker_config' %}">Back to Ticker Configuration</a>
+  <p><a href="{% url 'manual_download' ticker.id 'day' %}">Refresh daily prices</a> |
+  <a href="{% url 'ticker_config' %}">Back to Ticker Configuration</a></p>
 {% endblock %}
