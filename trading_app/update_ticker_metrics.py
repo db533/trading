@@ -151,6 +151,7 @@ def update_sr_level_data(ticker):
     smallest_range_to_level = 100
     nearest_level_value=None
     days_since_last_tested = None
+
     for dp in daily_prices_query:
         days_difference = (current_date - dp.datetime.date()).days
         if latest_close_price and latest_close_price != 0:
@@ -216,12 +217,12 @@ def test_tae_strategy(ticker):
 
     # Is ticker in a general upward trend?
     if ma_strength is not None:
-        if ma_strength > ma_strength_threshold and sr_level_type == 'Support' and (candle_bullish or candle_bullish_reversal):
+        if ma_strength > ma_strength_threshold and sr_level_type == 'Support' and (candle_bullish or candle_bullish_reversal) and not (candle_bearish):
             strategy_score += (ma_strength-ma_strength_threshold)*trend_weight
             strategy_score += float((candle_bullish + candle_bullish_reversal)) * candle_weight
             strategy_score += float((max(5-float(dist_to_sr_level),0))*sr_level_weight/5)
 
-        if ma_strength < -ma_strength_threshold and sr_level_type == 'Resistance' and (candle_bearish):
+        if ma_strength < -ma_strength_threshold and sr_level_type == 'Resistance' and (candle_bearish) and not (candle_bullish or candle_bullish_reversal):
             strategy_score +=  -(ma_strength + ma_strength_threshold) * trend_weight
             strategy_score += float((candle_bearish)) * candle_weight
             strategy_score += float((max(5 - float(dist_to_sr_level), 0)) * sr_level_weight / 5)
