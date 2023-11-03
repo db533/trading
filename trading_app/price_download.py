@@ -5,7 +5,7 @@ import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import yfinance as yf
 from time import sleep
-from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice
+from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory
 
 import pandas as pd
 import pytz
@@ -14,6 +14,8 @@ from candlestick import candlestick
 from . import db_candlestick
 from django.utils import timezone
 import logging
+from decimal import Decimal
+import math
 
 logger = logging.getLogger('django')
 
@@ -56,17 +58,17 @@ def get_price_data(ticker, interval, start_time, finish_time):
                 #print('Step 2')
                 existing_df['Datetime_TZ'] = existing_df['Datetime']
 
-            #print('existing_df.tail(5) before set_index:')
-            #print(existing_df.tail(5))
+            print('existing_df.tail(5) before set_index:')
+            print(existing_df.tail(5))
 
             #print('Step 3')
             existing_df = existing_df.set_index('Datetime')
             #print('Step 4')
             existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
-            #print('existing_df.head(5):')
-            #print(existing_df.head(5))
-            #print('existing_df.tail(5) after set_index:')
-            #print(existing_df.tail(5))
+            print('existing_df.head(5) after set_index:')
+            print(existing_df.head(5))
+            print('existing_df.tail(5) after set_index:')
+            print(existing_df.tail(5))
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -85,10 +87,10 @@ def get_price_data(ticker, interval, start_time, finish_time):
             data['Datetime'] = data.index
             data['Datetime_TZ'] = data.index
             #data = data.tz_localize(None)
-            #print('data.head(5):')
-            #print(data.head(5))
-            #print('data.tail(5):')
-            #print(data.tail(5))
+            print('data.head(5):')
+            print(data.head(5))
+            print('data.tail(5):')
+            print(data.tail(5))
 
 
 
@@ -99,7 +101,8 @@ def get_price_data(ticker, interval, start_time, finish_time):
             else:
                 combined_data = data
             #print('combined_data.columns:', combined_data.columns)
-            #print(combined_data.tail(5))
+            print('combined_data.head(5):', combined_data.head(5))
+            print('combined_data.tail(5):',combined_data.tail(5))
             #print('Step 1')
             combined_data = combined_data.set_index('Datetime')
             # Step 1.5: Create a new 'Datetime_TZ' column to retain the timezone-aware datetime
@@ -158,10 +161,11 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
         existing_dates = DailyPrice.objects.filter(
             ticker=ticker, datetime__range=(start_day, finish_day)
         ).values_list('datetime', flat=True)
+        logger.error(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
 
         # Ensure existing_dates is a list of timezone-naive or aware datetime objects
         existing_dates = [timezone.make_naive(date) for date in existing_dates]
-        #print('existing_dates:', existing_dates[:3])
+        print('existing_dates:', existing_dates[:3])
 
         # Ensure that start_day and finish_day have the time set to 4:00
         start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
@@ -173,12 +177,12 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
         # Ensure all_dates is a list of native python datetime objects
         all_dates = [date.to_pydatetime() for date in all_dates]
 
-        #print('all_dates:', all_dates[:3])
+        print('all_dates:', all_dates[:3])
 
         missing_dates = [date for date in all_dates if date not in existing_dates]
 
-        #print('missing_dates:', missing_dates[:3])
-        #print('min(missing_dates):',min(missing_dates))
+        print('missing_dates:', missing_dates[:3])
+        print('max(missing_dates):',max(missing_dates))
     if interval == '15m':
         existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
                                                         datetime__range=(start_day, finish_day)).values_list(
@@ -380,6 +384,78 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 
     return sr_level, retests, last_high_low_level
 
+from decimal import Decimal
+
+def identify_highs_lows(df, window=20):
+    df['higher_high'] = False
+    df['higher_low'] = False
+    df['lower_high'] = False
+    df['lower_low'] = False
+    #print('df.columns:',df.columns)
+    print('len(df):',len(df))
+
+    opening_price = df.iloc[0]['Open']
+    last_high_value = None
+    last_low_value = None
+
+    print('window =',window,'. i from:',window,'to',len(df) - window - 1)
+    i = window
+    print('first window_slice. from: 0 to',i + window + 1)
+    print('last window_slice. from:',len(df) - window - 1,'to', len(df) - window - 1 + window + 1)
+    for i in range(window, len(df) - window - 1):
+        window_slice = df.iloc[i - window:i + window + 1]
+        current_close = df.iloc[i]['Close']
+        current_open = df.iloc[i]['Open']
+
+        max_val = window_slice['Close'].max()
+        min_val = window_slice['Close'].min()
+        bullish_candle = Decimal(int(df.iloc[i+1]['bullish']))
+        bearish_candle = Decimal(int(df.iloc[i+1]['bearish']))
+        bullish_reversal_candle = Decimal(int(df.iloc[i+1]['bullish_reversal']))
+        bearish_reversal_candle = Decimal(int(df.iloc[i+1]['bearish_reversal']))
+        reversal_candle = Decimal(int(df.iloc[i+1]['reversal']))
+        print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
+        index_label = df.index[i]
+
+        if current_close == max_val:
+            if (bearish_candle or bearish_reversal_candle or reversal_candle) and not (bullish_candle or bullish_reversal_candle):
+                # Close is at a peak and we have a bearish pattern following, so this is a valid high.
+                # Need to detect if it is higher or lower than the prior valid high.
+                if last_high_value is not None:
+                    last_high_reference = last_high_value
+                else:
+                    last_high_reference = opening_price
+                if current_close > last_high_reference:
+                    df.at[index_label, 'higher_high'] = True
+                    print(df.iloc[i]['Datetime_TZ'],': HIGHER HIGH = ',current_close, '***')
+                else:
+                    df.at[index_label, 'lower_high'] = True
+                    print(df.iloc[i]['Datetime_TZ'], ': LOWER HIGH = ', current_close, '***')
+                last_high_value = current_close
+                #print('df.iloc[i]:', df.iloc[i])
+            else:
+                print(df.iloc[i]['Datetime_TZ'], ': Local max = ', current_close)
+        if current_close == min_val:
+
+            if (bullish_candle or bullish_reversal_candle or reversal_candle) and not (bearish_candle or bearish_reversal_candle):
+                # Close is at a trough and we have a bullish pattern after the close so this is a valid low.
+                # Need to detect if it is higher or lower than prior low.
+                if last_low_value is not None:
+                    last_low_reference = last_low_value
+                else:
+                    last_low_reference = opening_price
+                if current_close > last_low_reference:
+                    df.at[index_label, 'higher_low'] = True
+                    print(df.iloc[i]['Datetime_TZ'], ': HIGHER LOW = ', current_close, '***')
+                else:
+                    df.at[index_label, 'lower_low'] = True
+                    print(df.iloc[i]['Datetime_TZ'], ': LOWER LOW = ', current_close, '***')
+                last_low_value = current_close
+                #print('df.iloc[i]:',df.iloc[i])
+            else:
+                print(df.iloc[i]['Datetime_TZ'], ': Local min = ', current_close)
+    return df
+
 
 def add_levels_to_price_history(df, sr_levels, retests):
     # Initialize new columns with default values
@@ -440,6 +516,12 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
     ticker_count = Ticker.objects.all().count()
+    # Check if the 'TSE stocks' category exists
+    tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+    if not tse_stocks_category:
+        # 'TSE stocks' category doesn't exist, handle it as you wish (e.g., raise an exception or return an error response)
+        print('TSE stocks category does not exist!!')
+
     if ticker_symbol == 'All':
         logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
 
@@ -463,18 +545,12 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             print('Deleted', deleted_count, 'older DailyPrice records.')
             logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
-            # Find the hour value for existing records for this ticker.
-            existing_price = DailyPrice.objects.filter(ticker=ticker).first()
-            # Check if an instance was found
-            if existing_price:
-                # Extract the hour part from datetime_tz using the `hour` lookup
-                if existing_price.datetime_tz is not None:
-                    hour_offset = existing_price.datetime_tz.hour
-                else:
-                    hour_offset = existing_price.datetime.hour
+            # Check if the stock is marked as a TSE stock.
+            is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+            if is_in_tse_stocks:
+                hour_offset = 15
             else:
-                # Handle the case where no instance was found
-                hour_offset = 0
+                hour_offset = 4
             logger.error(f'hour_offset = {str(hour_offset)}')
             # Get the list of missing dates
             missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
@@ -489,26 +565,30 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
                 if len(price_history) >= 3:
-                    #print('Step 11')
+                    print('Step 11')
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                    #print('Step 12')
+                    print('Step 12')
                     price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                    #print('Step 13')
+                    print('Step 13')
                     count_patterns(price_history, pattern_types)
-                    #print('Step 14')
+                    print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                    #print('Step 15')
+                    print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
+                    price_history = identify_highs_lows(price_history, window=5)
+                    print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
+                    print('Step 15')
                     ticker.last_high_low = last_high_low_level
-                    #print('Step 16')
+                    print('Step 16')
                     ticker.save()
                     price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                    #print('Step 17')
+                    print('Step 17')
                     price_history = add_ema_and_trend(price_history)
-                    #print('Step 18')
+                    print('Step 18')
 
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
-                        #print(row)
+                        if math.isnan(row['Close']):
+                            print(row)
                         if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime_TZ']).exists():
                             new_record_count += 1
                             daily_price = DailyPrice(
@@ -533,6 +613,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                 ema_200=row['EMA_200'],
                                 ema_50=row['EMA_50'],
                                 trend=row['Trend'],
+                                higher_high=row['higher_high'],
+                                higher_low = row['higher_low'],
+                                lower_high=row['lower_high'],
+                                lower_low=row['lower_low'],
                             )
                         else:
                             daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
@@ -549,6 +633,11 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.ema_200 = row['EMA_200']
                             daily_price.ema_50 = row['EMA_50']
                             daily_price.trend = row['Trend']
+                            daily_price.higher_high = row['higher_high']
+                            daily_price.higher_low = row['higher_low']
+                            daily_price.lower_high = row['lower_high']
+                            daily_price.lower_low = row['lower_low']
+
                         daily_price.save()
                 else:
                     print('Insufficient data.')
