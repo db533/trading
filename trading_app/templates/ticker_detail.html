@@ -98,12 +98,13 @@
 <table style="border: 1pt solid black;">
     <thead>
         <tr>
-            <th colspan="2" style="text-align:center;">Swing points</th>
+            <th colspan="3" style="text-align:center;">Swing points</th>
         </tr>
 
         <tr>
             <th style="text-align:center; width: 12ch;">Datetime</th>
             <th style="text-align:center; width: 8ch;">Type</th>
+            <th style="text-align:center; width: 8ch;">Close</th>
         </tr>
     </thead>
     <tbody>
@@ -112,6 +113,7 @@
         <tr>
             <td>{{ sp.swing_point.datetime|date:"d/m/Y" }}</td>
             <td style="color: {% if sp.swing_direction < 0 %}red{% else %}green{% endif %};">{{ sp.swing_point.swing_point_label }}</td>
+            <td>{{ sp.swing_point.close_price }}</td>
         </tr>
         {% endfor %}
     </tbody>

@@ -643,7 +643,8 @@ def ticker_detail(request, ticker_id):
                 swing_direction = -1
             swing_points.append(
                 {'swing_point' : sp,
-                 'swing_direction' : swing_direction}
+                 'swing_direction' : swing_direction,
+                 }
             )
 
     else:
