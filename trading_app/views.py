@@ -166,7 +166,7 @@ def ticker_config(request):
             'reversal_detected': ticker.latest_candle_reversal_detected,
             'bullish_reversal_detected': ticker.latest_candle_bullish_reversal_detected,
         }
-        print('tickers_config. ',ticker.symbol,'ticker.swing_point_current_trend:',ticker.swing_point_current_trend)
+        #print('tickers_config. ',ticker.symbol,'ticker.swing_point_current_trend:',ticker.swing_point_current_trend)
 
         # Increment hourly_price_query_count if 15 or 5 min updates are desired.
         if ticker.is_fifteen_min:

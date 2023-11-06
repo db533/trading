@@ -97,7 +97,7 @@
           <td style="border: 1pt solid black; padding: 3pt; text-align:center; color: {% if item.ticker.ma_200_trend_strength > 0.065 %}green{% elif item.ticker.ma_200_trend_strength > -0.065 %}orange{% else %}red{% endif %};">
             {{ item.ticker.ma_200_trend_strength }}
           </td>
-          <td style="border: 1pt solid black; padding: 3pt; text-align:center; "> <!-- color: {% if item.swing_point_current_trend > 0 %}green{% elif item.swing_point_current_trend < 0 %}red{% endif %}; -->
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center; color: {% if item.ticker.swing_point_current_trend > 0 %}green{% elif item.ticker.swing_point_current_trend < 0 %}red{% endif %};"> <!-- color: {% if item.swing_point_current_trend > 0 %}green{% elif item.swing_point_current_trend < 0 %}red{% endif %}; -->
             {{ item.ticker.swing_point_current_trend }}
           </td>
 
