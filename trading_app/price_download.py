@@ -412,16 +412,26 @@ def identify_highs_lows(df, window=20):
 
         max_val = window_slice['Close'].max()
         min_val = window_slice['Close'].min()
-        bullish_candle = Decimal(int(df.iloc[i+1]['bullish']))
-        bearish_candle = Decimal(int(df.iloc[i+1]['bearish']))
-        bullish_reversal_candle = Decimal(int(df.iloc[i+1]['bullish_reversal']))
-        bearish_reversal_candle = Decimal(int(df.iloc[i+1]['bearish_reversal']))
-        reversal_candle = Decimal(int(df.iloc[i+1]['reversal']))
+
         #print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
         index_label = df.index[i]
 
+        if current_close == max_val or current_close == min_val:
+            # Count presence of bullish, bearish and reversal patterns over next 3 days.
+            bullish_candle_score = 0
+            bearish_candle_score = 0
+            reversal_score = 0
+            for j in (1,3):
+                if Decimal(int(df.iloc[i+j]['bullish']))>0 or Decimal(int(df.iloc[i + j]['bullish_reversal'])) > 0:
+                    bullish_candle_score += 1
+                if Decimal(int(df.iloc[i + j]['bearish'])) > 0 or Decimal(int(df.iloc[i + j]['bearish_reversal'])) > 0:
+                    bearish_candle_score += 1
+                if Decimal(int(df.iloc[i + j]['reversal'])) > 0:
+                    reversal_score += 1
+
         if current_close == max_val:
-            if (bearish_candle or bearish_reversal_candle or reversal_candle) and not (bullish_candle or bullish_reversal_candle):
+            if (bearish_candle_score + reversal_score) > 1 and bullish_candle_score == 0:
+            #if (bearish_candle or bearish_reversal_candle or reversal_candle) and not (bullish_candle or bullish_reversal_candle):
                 # Close is at a peak and we have a bearish pattern following, so this is a valid high.
                 # Need to detect if it is higher or lower than the prior valid high.
                 if last_high_value is not None:
@@ -461,8 +471,8 @@ def identify_highs_lows(df, window=20):
             #else:
                 #print(df.iloc[i]['Datetime_TZ'], ': Local max = ', current_close)
         if current_close == min_val:
-
-            if (bullish_candle or bullish_reversal_candle or reversal_candle) and not (bearish_candle or bearish_reversal_candle):
+            if (bullish_candle_score + reversal_score) > 1 and bearish_candle_score == 0:
+            #if (bullish_candle or bullish_reversal_candle or reversal_candle) and not (bearish_candle or bearish_reversal_candle):
                 # Close is at a trough and we have a bullish pattern after the close so this is a valid low.
                 # Need to detect if it is higher or lower than prior low.
                 if last_low_value is not None:
@@ -518,7 +528,6 @@ def identify_highs_lows(df, window=20):
         #print(index_label, 'setting to',final_swing_point_trend)
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
-
 
 def add_levels_to_price_history(df, sr_levels, retests):
     # Initialize new columns with default values

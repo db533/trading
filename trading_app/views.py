@@ -592,7 +592,7 @@ def ticker_detail(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
     swing_daily_prices_query = DailyPrice.objects.filter(ticker=ticker, swing_point_label__isnull=False)\
-        .exclude(swing_point_label="").only('datetime', 'swing_point_label')
+        .exclude(swing_point_label="").only('datetime', 'swing_point_label').order_by('datetime')
 
     # Fetching the most recent DailyPrice's close_price
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
