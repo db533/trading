@@ -327,7 +327,6 @@ pattern_types = {
     'bullish_reversal': ['morning_star', 'morning_star_doji'],
     'bearish_reversal': [], }
 
-
 def count_patterns(df, pattern_types):
     # Initialize new columns with zeros
     for pattern_type in pattern_types.keys():
