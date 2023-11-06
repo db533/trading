@@ -20,6 +20,7 @@ class CategorySelectForm(forms.Form):
     )
     uptrend = forms.BooleanField(required=False)
     downtrend = forms.BooleanField(required=False)
+    swing_trend = forms.BooleanField(required=False)
     tae_score = forms.BooleanField(required=False)
     two_period_cum_rsi = forms.BooleanField(required=False)
 

@@ -15,6 +15,7 @@ class Ticker(models.Model):
     is_fifteen_min = models.BooleanField(default=False)
     is_five_min = models.BooleanField(default=False)
     ma_200_trend_strength = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    swing_point_current_trend = models.IntegerField(null=True, default=0)
     last_high_low = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     atr = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     avg_volume_100_days = models.IntegerField(null=True)

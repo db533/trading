@@ -110,7 +110,7 @@
         {% for sp in swing_points %}
 
         <tr>
-            <td>{{ sp.swing_point.datetime|date:"d/m/Y" }}</td>  <!-- {{ sp.daily_price.datetime|date:"d/m/Y" }} -->
+            <td>{{ sp.swing_point.datetime|date:"d/m/Y" }}</td>
             <td style="color: {% if sp.swing_direction < 0 %}red{% else %}green{% endif %};">{{ sp.swing_point.swing_point_label }}</td>
         </tr>
         {% endfor %}

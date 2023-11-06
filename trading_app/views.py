@@ -92,6 +92,7 @@ def ticker_config(request):
             include_not_defined = request.POST.get('categories') == 'not_defined'
             uptrend = category_form.cleaned_data['uptrend']
             downtrend = category_form.cleaned_data['downtrend']
+            swing_trend = category_form.cleaned_data['swing_trend']
             tae_score = category_form.cleaned_data['tae_score']
             two_period_cum_rsi = category_form.cleaned_data['two_period_cum_rsi']
         else:
@@ -99,6 +100,7 @@ def ticker_config(request):
             include_not_defined = True
             uptrend = False
             downtrend = False
+            swing_trend = False
             tae_score = False
             two_period_cum_rsi = False
 
@@ -108,6 +110,7 @@ def ticker_config(request):
         include_not_defined = True
         uptrend = False
         downtrend = False
+        swing_trend = False
         tae_score = False
         two_period_cum_rsi = False
 
@@ -122,6 +125,9 @@ def ticker_config(request):
     elif downtrend:
         tickers_q &= Q(ma_200_trend_strength__lt=0)
         order_by = 'ma_200_trend_strength'
+    elif swing_trend:
+        tickers_q &= ~Q(swing_point_current_trend=0) & ~Q(swing_point_current_trend__isnull=True)
+        order_by = '-ma_200_trend_strength'
     elif tae_score:
         tickers_q &= Q(tae_strategy_score__gt=0)
         order_by = '-ma_200_trend_strength'
@@ -160,6 +166,7 @@ def ticker_config(request):
             'reversal_detected': ticker.latest_candle_reversal_detected,
             'bullish_reversal_detected': ticker.latest_candle_bullish_reversal_detected,
         }
+        print('tickers_config. ',ticker.symbol,'ticker.swing_point_current_trend:',ticker.swing_point_current_trend)
 
         # Increment hourly_price_query_count if 15 or 5 min updates are desired.
         if ticker.is_fifteen_min:
