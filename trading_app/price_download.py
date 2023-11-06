@@ -239,17 +239,16 @@ column_names = ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hamme
                 ]
 
 # List of candlestick functions to replace 'candlestick.xxx'
-db_candlestick_functions = [db_candlestick.three_white_soldiers,
-                            ]
+db_candlestick_functions = [db_candlestick.three_white_soldiers,db_candlestick.bullish_kicker, db_candlestick.bearish_kicker]
 
 # List of column names to replace 'xxx' in price_history
-db_column_names = ['three_white_soldiers',
+db_column_names = ['three_white_soldiers','bullish_kicker', 'bearish_kicker'
                    ]
 
 pattern_types = {
     'bullish': ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star',
-                'three_white_soldiers'],
-    'bearish': ['bearish_engulfing', 'bearish_harami', 'dark_cloud_cover', 'gravestone_doji'],
+                'three_white_soldiers', 'bullish_kicker'],
+    'bearish': ['bearish_engulfing', 'bearish_harami', 'dark_cloud_cover', 'gravestone_doji', 'bearish_kicker'],
     'reversal': ['dragonfly_doji', 'doji_star', 'piercing_pattern'],
     'bullish_reversal': ['morning_star', 'morning_star_doji'],
     'bearish_reversal': [], }

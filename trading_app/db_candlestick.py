@@ -40,3 +40,10 @@ def three_white_soldiers(candles_df, ohlc=__default_ohlc, is_reversed=False, tar
 def rising(candles_df, ohlc=__default_ohlc, is_reversed=False, target=None):
     rising = __create_object("Rising", target)
     return rising.has_pattern(candles_df, ohlc, is_reversed)
+def bullish_kicker(candles_df, ohlc=__default_ohlc, is_reversed=False, target=None):
+    bullish_kicker = __create_object("BullishKicker", target)
+    return bullish_kicker.has_pattern(candles_df, ohlc, is_reversed)
+def bearish_kicker(candles_df, ohlc=__default_ohlc, is_reversed=False, target=None):
+    bearish_kicker = __create_object("BearishKicker", target)
+    return bearish_kicker.has_pattern(candles_df, ohlc, is_reversed)
+
