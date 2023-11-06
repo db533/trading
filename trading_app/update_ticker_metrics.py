@@ -141,64 +141,72 @@ def compute_period_low(ticker, data_points):
     return ticker
 
 def update_sr_level_data(ticker):
+    print('update_sr_level_data()...')
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
     latest_close_price = latest_candle.close_price if latest_candle else None
+    print('latest_close_price:', latest_close_price)
 
     # Computing the number of days from datetime to today for each DailyPrice instance
     current_date = date.today()
     daily_prices = []
-    smallest_range_to_level = 100
+    smallest_range_to_level = 1000
     nearest_level_value=None
     days_since_last_tested = None
 
-    for dp in daily_prices_query:
-        days_difference = (current_date - dp.datetime.date()).days
-        if latest_close_price and latest_close_price != 0:
-            close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
-            if close_price_percentage < smallest_range_to_level:
-                smallest_range_to_level = close_price_percentage
-                nearest_level_value = dp.level
-                days_since_last_tested = days_difference
-                #if dp.close_price < dp.level:
-                #    smallest_level_type = 'Resistance'
-                #else:
-                #    smallest_level_type = 'Support'
-        else:
-            close_price_percentage = None
+    if latest_close_price is not None:
+        for dp in daily_prices_query:
+            days_difference = (current_date - dp.datetime.date()).days
+            print('dp.level:',dp.level)
+            print('close_price_percentage:',(abs(dp.level-latest_close_price) / latest_close_price) * 100)
 
-    if ticker.last_high_low != None:
-        if smallest_range_to_level < 2:
-            # Price is close to support / resistance level, so look back to the most recent high / low to determine if this is a support / resistance.
-            if latest_close_price < ticker.last_high_low:
-                smallest_level_type = 'Support'
+            if latest_close_price and latest_close_price != 0:
+                close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
+                if close_price_percentage < smallest_range_to_level:
+                    smallest_range_to_level = close_price_percentage
+                    nearest_level_value = dp.level
+                    days_since_last_tested = days_difference
+                    #if dp.close_price < dp.level:
+                    #    smallest_level_type = 'Resistance'
+                    #else:
+                    #    smallest_level_type = 'Support'
             else:
-                smallest_level_type = 'Resistance'
+                close_price_percentage = None
+
+        if ticker.last_high_low != None:
+            if smallest_range_to_level < 2:
+                # Price is close to support / resistance level, so look back to the most recent high / low to determine if this is a support / resistance.
+                if latest_close_price < ticker.last_high_low:
+                    smallest_level_type = 'Support'
+                else:
+                    smallest_level_type = 'Resistance'
+            else:
+                # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
+                if smallest_range_to_level == 100:
+                    smallest_level_type = None
+                if latest_close_price > nearest_level_value:
+                    smallest_level_type = 'Support'
+                else:
+                    smallest_level_type = 'Resistance'
         else:
-            # Price is far from support / resistance level, so just compare the close price to the support / resistance level.
-            if smallest_range_to_level == 100:
-                smallest_level_type = None
-            if latest_close_price > nearest_level_value:
+            if latest_close_price < nearest_level_value:
                 smallest_level_type = 'Support'
             else:
                 smallest_level_type = 'Resistance'
+
+        ticker.nearest_level_value = nearest_level_value
+        ticker.nearest_level_type = smallest_level_type
+        ticker.nearest_level_days_since_retest = days_since_last_tested
+        ticker.nearest_level_percent_distance = smallest_range_to_level
+        ticker.patterns_detected = latest_candle.patterns_detected
+        ticker.bullish_detected = latest_candle.bullish_detected
+        ticker.bullish_reversal_detected = latest_candle.bullish_reversal_detected
+        ticker.bearish_detected = latest_candle.bearish_detected
+        ticker.reversal_detected = latest_candle.reversal_detected
+
+        ticker.save()
     else:
-        if latest_close_price < nearest_level_value:
-            smallest_level_type = 'Support'
-        else:
-            smallest_level_type = 'Resistance'
-
-    ticker.nearest_level_value = nearest_level_value
-    ticker.nearest_level_type = smallest_level_type
-    ticker.nearest_level_days_since_retest = days_since_last_tested
-    ticker.nearest_level_percent_distance = smallest_range_to_level
-    ticker.patterns_detected = latest_candle.patterns_detected
-    ticker.bullish_detected = latest_candle.bullish_detected
-    ticker.bullish_reversal_detected = latest_candle.bullish_reversal_detected
-    ticker.bearish_detected = latest_candle.bearish_detected
-    ticker.reversal_detected = latest_candle.reversal_detected
-
-    ticker.save()
+        print('No daily prices. Cannot compute metrics.')
     return ticker
 
 def test_tae_strategy(ticker):

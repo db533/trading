@@ -537,6 +537,15 @@ def daily_price_list(request, ticker_id):
     for daily_price in daily_prices:
         daily_price.datetime = timezone.localtime(daily_price.datetime, riga_tz)  # Use the defined timezone object
         daily_price.sum_reversals = daily_price.reversal_detected + daily_price.bearish_reversal_detected + daily_price.bullish_reversal_detected
+        daily_price.swing_direction = 0
+        if daily_price.swing_point_label == "HH":
+            daily_price.swing_direction = 1
+        if daily_price.swing_point_label == "LH":
+            daily_price.swing_direction = -1
+        if daily_price.swing_point_label == "HL":
+            daily_price.swing_direction = 1
+        if daily_price.swing_point_label == "LL":
+            daily_price.swing_direction = -1
 
     return render(request, 'price_list_v2.html', {'ticker': ticker, 'candles': daily_prices, 'heading_text' : 'Daily'})
 
@@ -575,6 +584,8 @@ def update_metrics_view(request, ticker_symbol):
 def ticker_detail(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
+    swing_daily_prices_query = DailyPrice.objects.filter(ticker=ticker, swing_point_label__isnull=False)\
+        .exclude(swing_point_label="").only('datetime', 'swing_point_label')
 
     # Fetching the most recent DailyPrice's close_price
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
@@ -610,15 +621,27 @@ def ticker_detail(request, ticker_id):
                     smallest_range_to_level = close_price_percentage
             else:
                 close_price_percentage = None
+            daily_prices.append(
+                {'daily_price' : dp,
+                 'days_from_today' : days_difference,
+                 'close_price_percentage' : close_price_percentage}
+            )
 
-            daily_prices.append({
-                'daily_price': dp,
-                'days_from_today': days_difference,
-                'close_price_percentage': close_price_percentage,
-                'latest_candle' : latest_candle,
-            })
+        # Add the swing direction to the swingpoint entries
+        swing_points = []
+        for sp in swing_daily_prices_query:
+            if sp.swing_point_label[0] == "H":
+                swing_direction = 1
+            else:
+                swing_direction = -1
+            swing_points.append(
+                {'swing_point' : sp,
+                 'swing_direction' : swing_direction}
+            )
+
     else:
         daily_prices = {}
+        swing_points = {}
         latest_close_price = 'False'
         patterns_detected  = 'False'
         bullish_detected = 'False'
@@ -626,9 +649,11 @@ def ticker_detail(request, ticker_id):
         bearish_detected = 'False'
         reversal_detected = 'False'
 
+
     context = {
         'ticker': ticker,
         'daily_prices': daily_prices,
+        'swing_points' : swing_points,
         'close_price': latest_close_price,
         #'smallest_level_type' : smallest_level_type,
         #'smallest_range_to_level' : smallest_range_to_level,

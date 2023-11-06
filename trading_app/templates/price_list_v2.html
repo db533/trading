@@ -10,6 +10,7 @@
         <th colspan="9" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Price Data</th>
         <th colspan="4" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Candlestick patterns</th>
         <th colspan="2" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Support and resistance</th>
+        <th colspan="2" style="text-align:center; border-left: 1px solid black; border-right: 1px solid black;">Swing points</th>
       </tr>
       <!-- Second row for specific column names -->
       <tr>
@@ -30,6 +31,8 @@
         <th style="text-align:center; width: 15ch;">Name of detected patterns</th>
         <th style="text-align:center; border-left: 1px solid black">Level</th>
         <th style="text-align:center; width: 8ch;">Level strength</th>
+        <th style="text-align:center; border-left: 1px solid black; width: 8ch;">Type</th>
+        <th style="text-align:center; border-right: 1px solid black; width: 8ch;">Trend</th>
       </tr>
     </thead>
     <tbody>
@@ -49,8 +52,10 @@
           <td style="text-align:center; color: {% if candle.bearish_detected %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.bearish_detected %}bold{% else %}normal{% endif %};">{{ candle.bearish_detected }}</td>
           <td style="text-align:center; color: {% if candle.reversal_detected %}black{% elif candle.bearish_reversal_detected %}red{% elif candle.bullish_reversal_detected %}green{% else %}lightgrey{% endif %}; font-weight: {% if candle.reversal_detected or candle.bearish_reversal_detected or candle.bullish_reversal_detected %}bold{% else %}normal{% endif %};">{{ candle.sum_reversals}}</td>
           <td style="text-align:center; color: {% if candle.patterns_detected %}black{% else %}lightgrey{% endif %};">{{ candle.patterns_detected }}</td>
-          <td style="text-align:center; color: {% if candle.level_type == 1 %}green{% elif candle.level_type == 2 %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.level %}bold{% else %}normal{% endif %};">{{ candle.level }}</td>
+          <td style="text-align:center; border-left: 1px solid black; color: {% if candle.level_type == 1 %}green{% elif candle.level_type == 2 %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.level %}bold{% else %}normal{% endif %};">{{ candle.level }}</td>
           <td style="text-align:center; color: {% if candle.level_strength > 0 %}black{% else %}lightgrey{% endif %}; font-weight: {% if candle.level_strength %}bold{% else %}normal{% endif %};">{{ candle.level_strength }}</td>
+          <td style="text-align:center; border-left: 1px solid black; color: {% if candle.swing_direction > 0 %}green{% elif candle.swing_direction < 0 %}red{% else %}lightgrey{% endif %}; font-weight: {% if candle.swing_direction != 0 %}bold{% else %}normal{% endif %};">{{ candle.swing_point_label }}</td>
+          <td style="text-align:center; border-right: 1px solid black; color: {% if candle.swing_point_current_trend > 0 %}green{% elif candle.swing_point_current_trend < 0 %}red{% else %}lightgrey{% endif %}; ">{{ candle.swing_point_current_trend }}</td>
         </tr>
       {% empty %}
         <tr>

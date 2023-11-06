@@ -60,10 +60,8 @@ class BasePrice(models.Model):
     ema_200 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     ema_50 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     trend = models.IntegerField(default=0) # 1 = Rising, -1 = Falling, 0 = Stable
-    higher_high = models.BooleanField(default=False)
-    higher_low = models.BooleanField(default=False)
-    lower_high = models.BooleanField(default=False)
-    lower_low = models.BooleanField(default=False)
+    swing_point_label = models.CharField(max_length=3, null=True, blank=True)
+    swing_point_current_trend = models.IntegerField(default=0) # 1 = Up-trend, -1 Down-trend, 0 = Pattern not evident
 
     #resistance_strength = models.IntegerField()
 

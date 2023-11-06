@@ -387,12 +387,16 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 from decimal import Decimal
 
 def identify_highs_lows(df, window=20):
-    df['higher_high'] = False
-    df['higher_low'] = False
-    df['lower_high'] = False
-    df['lower_low'] = False
+    print('Detecting swing points...')
+    df['swing_point_label'] = ''
+    df['swing_point_current_trend'] = 0
     #print('df.columns:',df.columns)
     print('len(df):',len(df))
+
+    making_up_trend = False
+    making_down_trend = False
+    most_recent_swing_point_type = None
+    current_trend_seq_count = 0
 
     opening_price = df.iloc[0]['Open']
     last_high_value = None
@@ -400,8 +404,8 @@ def identify_highs_lows(df, window=20):
 
     print('window =',window,'. i from:',window,'to',len(df) - window - 1)
     i = window
-    print('first window_slice. from: 0 to',i + window + 1)
-    print('last window_slice. from:',len(df) - window - 1,'to', len(df) - window - 1 + window + 1)
+    #print('first window_slice. from: 0 to',i + window + 1)
+    #print('last window_slice. from:',len(df) - window - 1,'to', len(df) - window - 1 + window + 1)
     for i in range(window, len(df) - window - 1):
         window_slice = df.iloc[i - window:i + window + 1]
         current_close = df.iloc[i]['Close']
@@ -414,7 +418,7 @@ def identify_highs_lows(df, window=20):
         bullish_reversal_candle = Decimal(int(df.iloc[i+1]['bullish_reversal']))
         bearish_reversal_candle = Decimal(int(df.iloc[i+1]['bearish_reversal']))
         reversal_candle = Decimal(int(df.iloc[i+1]['reversal']))
-        print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
+        #print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
         index_label = df.index[i]
 
         if current_close == max_val:
@@ -426,11 +430,33 @@ def identify_highs_lows(df, window=20):
                 else:
                     last_high_reference = opening_price
                 if current_close > last_high_reference:
-                    df.at[index_label, 'higher_high'] = True
+                    #df.at[index_label, 'higher_high'] = True
+                    df.at[index_label, 'swing_point_label'] = "HH"
                     print(df.iloc[i]['Datetime_TZ'],': HIGHER HIGH = ',current_close, '***')
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "HL":
+                        making_up_trend = True
+                        current_trend_seq_count += 1
+                        print("HL to HH. Uptrend in progress...")
+                    if most_recent_swing_point_type == "LL" or most_recent_swing_point_type == "LH":
+                        making_up_trend = True
+                        making_down_trend = False
+                        current_trend_seq_count = 1
+                        print("LL or LH to HH. Start of uptrend...")
+                    most_recent_swing_point_type = "HH"
                 else:
-                    df.at[index_label, 'lower_high'] = True
+                    #df.at[index_label, 'lower_high'] = True
+                    df.at[index_label, 'swing_point_label'] = "LH"
                     print(df.iloc[i]['Datetime_TZ'], ': LOWER HIGH = ', current_close, '***')
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "LL":
+                        making_down_trend = True
+                        current_trend_seq_count += 1
+                        print("LL to LH. Downtrend in progress...")
+                    if most_recent_swing_point_type == "HL" or most_recent_swing_point_type == "HH":
+                        making_up_trend = False
+                        making_down_trend = True
+                        current_trend_seq_count = 1
+                        print("HL or HH to LH. Start of downtrend...")
+                    most_recent_swing_point_type = "LH"
                 last_high_value = current_close
                 #print('df.iloc[i]:', df.iloc[i])
             else:
@@ -445,15 +471,53 @@ def identify_highs_lows(df, window=20):
                 else:
                     last_low_reference = opening_price
                 if current_close > last_low_reference:
-                    df.at[index_label, 'higher_low'] = True
+                    #df.at[index_label, 'higher_low'] = True
+                    df.at[index_label, 'swing_point_label'] = "HL"
                     print(df.iloc[i]['Datetime_TZ'], ': HIGHER LOW = ', current_close, '***')
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "HH":
+                        making_up_trend = True
+                        current_trend_seq_count += 1
+                        print("HH to HL. Uptrend in progress...")
+                    if most_recent_swing_point_type == "LH" or most_recent_swing_point_type == "LL":
+                        making_up_trend = True
+                        making_down_trend = False
+                        current_trend_seq_count = 1
+                        print("LH or LL to HL. Start of uptrend...")
+                    most_recent_swing_point_type = "HL"
                 else:
-                    df.at[index_label, 'lower_low'] = True
+                    #df.at[index_label, 'lower_low'] = True
+                    df.at[index_label, 'swing_point_label'] = "LL"
                     print(df.iloc[i]['Datetime_TZ'], ': LOWER LOW = ', current_close, '***')
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "LH":
+                        making_down_trend = True
+                        current_trend_seq_count += 1
+                        print("LH to LL. Downtrend in progress...")
+                    if most_recent_swing_point_type == "HH" or most_recent_swing_point_type == "HL":
+                        making_up_trend = False
+                        making_down_trend = True
+                        current_trend_seq_count = 1
+                        print("HH or HL to LL. Start of downtrend...")
+                    most_recent_swing_point_type = "LL"
                 last_low_value = current_close
                 #print('df.iloc[i]:',df.iloc[i])
             else:
                 print(df.iloc[i]['Datetime_TZ'], ': Local min = ', current_close)
+        print('current_trend_seq_count:',current_trend_seq_count)
+        if current_trend_seq_count > 2 :
+            # This data point is part of a swing trend.
+            if most_recent_swing_point_type[0] == "H":
+                df.at[index_label, 'swing_point_current_trend'] = 1
+                print('Setting uptrend.')
+            elif most_recent_swing_point_type[0] == "L":
+                df.at[index_label, 'swing_point_current_trend'] = -1
+                print('Setting downtrend.')
+    # Now set the swing_point_current_trend for the most recent data points to the same as the last computed value.
+    final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
+    print('final_swing_point_trend')
+    for i in range(len(df) - window-1, len(df)):
+        index_label = df.index[i]
+        print(index_label, 'setting to',final_swing_point_trend)
+        df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df
 
 
@@ -573,9 +637,9 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     count_patterns(price_history, pattern_types)
                     print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                    print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
+                    #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     price_history = identify_highs_lows(price_history, window=5)
-                    print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
+                    #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                     print('Step 15')
                     ticker.last_high_low = last_high_low_level
                     print('Step 16')
@@ -613,11 +677,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                 ema_200=row['EMA_200'],
                                 ema_50=row['EMA_50'],
                                 trend=row['Trend'],
-                                higher_high=row['higher_high'],
-                                higher_low = row['higher_low'],
-                                lower_high=row['lower_high'],
-                                lower_low=row['lower_low'],
+                                swing_point_label=row['swing_point_label'],
+                                swing_point_current_trend=row['swing_point_current_trend']
                             )
+                            logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                         else:
                             daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
                             daily_price.datetime_tz = daily_price.datetime
@@ -633,11 +696,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.ema_200 = row['EMA_200']
                             daily_price.ema_50 = row['EMA_50']
                             daily_price.trend = row['Trend']
-                            daily_price.higher_high = row['higher_high']
-                            daily_price.higher_low = row['higher_low']
-                            daily_price.lower_high = row['lower_high']
-                            daily_price.lower_low = row['lower_low']
-
+                            daily_price.swing_point_label = row['swing_point_label']
+                            daily_price.swing_point_current_trend = row['swing_point_current_trend']
                         daily_price.save()
                 else:
                     print('Insufficient data.')
