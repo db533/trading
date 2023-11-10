@@ -402,7 +402,7 @@ def identify_highs_lows(df, window=20):
     last_low_value = None
 
     #print('window =',window,'. i from:',window,'to',len(df) - window - 1)
-    i = window
+    #i = window
     #print('first window_slice. from: 0 to',i + window + 1)
     #print('last window_slice. from:',len(df) - window - 1,'to', len(df) - window - 1 + window + 1)
     for i in range(window, len(df) - window - 1):
@@ -421,7 +421,7 @@ def identify_highs_lows(df, window=20):
             bullish_candle_score = 0
             bearish_candle_score = 0
             reversal_score = 0
-            for j in (1,3):
+            for j in (0,1):
                 if Decimal(int(df.iloc[i+j]['bullish']))>0 or Decimal(int(df.iloc[i + j]['bullish_reversal'])) > 0:
                     bullish_candle_score += 1
                 if Decimal(int(df.iloc[i + j]['bearish'])) > 0 or Decimal(int(df.iloc[i + j]['bearish_reversal'])) > 0:
