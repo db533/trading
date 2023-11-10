@@ -320,9 +320,9 @@ db_column_names = ['three_white_soldiers','bullish_kicker', 'bearish_kicker'
                    ]
 
 pattern_types = {
-    'bullish': ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man', 'shooting_star',
+    'bullish': ['bullish_engulfing', 'bullish_harami', 'hammer', 'inverted_hammer', 'hanging_man',
                 'three_white_soldiers', 'bullish_kicker'],
-    'bearish': ['bearish_engulfing', 'bearish_harami', 'dark_cloud_cover', 'gravestone_doji', 'bearish_kicker'],
+    'bearish': ['bearish_engulfing', 'bearish_harami', 'dark_cloud_cover', 'gravestone_doji', 'bearish_kicker', 'shooting_star'],
     'reversal': ['dragonfly_doji', 'doji_star', 'piercing_pattern'],
     'bullish_reversal': ['morning_star', 'morning_star_doji'],
     'bearish_reversal': [], }
