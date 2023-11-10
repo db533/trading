@@ -421,7 +421,7 @@ def identify_highs_lows(df, window=20):
             bullish_candle_score = 0
             bearish_candle_score = 0
             reversal_score = 0
-            for j in (0,1):
+            for j in (0,2):
                 if Decimal(int(df.iloc[i+j]['bullish']))>0 or Decimal(int(df.iloc[i + j]['bullish_reversal'])) > 0:
                     bullish_candle_score += 1
                 if Decimal(int(df.iloc[i + j]['bearish'])) > 0 or Decimal(int(df.iloc[i + j]['bearish_reversal'])) > 0:
