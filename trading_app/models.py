@@ -63,6 +63,8 @@ class BasePrice(models.Model):
     trend = models.IntegerField(default=0) # 1 = Rising, -1 = Falling, 0 = Stable
     swing_point_label = models.CharField(max_length=3, null=True, blank=True)
     swing_point_current_trend = models.IntegerField(default=0) # 1 = Up-trend, -1 Down-trend, 0 = Pattern not evident
+    healthy_bullish_count = models.IntegerField(default=0)  # Count of number of healthy bullish candles since last swing point.
+    healthy_bearish_count = models.IntegerField(default=0)  # Count of number of healthy bearish candles since last swing point.
 
     #resistance_strength = models.IntegerField()
 

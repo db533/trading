@@ -385,6 +385,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 
 from decimal import Decimal
 
+# Following function is no longer used. Replaced by identify_highs_lows2()
 def identify_highs_lows(df, window=20):
     print('Detecting swing points...')
     logger.error(f'Detecting swing points...')
@@ -530,6 +531,157 @@ def identify_highs_lows(df, window=20):
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
 
+def identify_highs_lows2(df, window=20):
+    # Rewriting function to count number of healthy bullish / bearish candles.
+    # Healthy candle = > 1,5% price move from open to close AND body >=60% of total candle length.
+    print('Detecting swing points...')
+    logger.error(f'Detecting swing points...')
+    df['swing_point_label'] = ''
+    df['swing_point_current_trend'] = 0
+    #print('df.columns:',df.columns)
+    print('len(df):',len(df))
+
+    healthy_bullish_count = 0
+    healthy_bearish_count = 0
+    making_up_trend = False
+    making_down_trend = False
+    most_recent_swing_point_type = None
+    current_trend_seq_count = 0
+
+    opening_price = df.iloc[0]['Open']
+    last_high_value = None
+    last_low_value = None
+    df['healthy_bullish_candle'] = ((df['Close'] > df['Open'] * 1.02) &
+                                    ((df['Close'] - df['Open']) / (df['High'] - df['Low']) > 0.6)).astype(int)
+    df['healthy_bearish_candle'] = ((df['Open'] > df['Close'] * 1.02) &
+                                    ((df['Open'] - df['Close']) / (df['High'] - df['Low']) > 0.6)).astype(int)
+
+    #print('window =',window,'. i from:',window,'to',len(df) - window - 1)
+    #i = window
+    #print('first window_slice. from: 0 to',i + window + 1)
+    #print('last window_slice. from:',len(df) - window - 1,'to', len(df) - window - 1 + window + 1)
+    for i in range(window, len(df) - window - 1):
+        index_label = df.index[i]
+        window_slice = df.iloc[i - window:i + window + 1]
+        current_close = df.iloc[i]['Close']
+        current_open = df.iloc[i]['Open']
+
+        max_val = window_slice['Close'].max()
+        min_val = window_slice['Close'].min()
+
+        healthy_bullish_count += df.iloc[i]['healthy_bullish_candle']
+        healthy_bearish_count += df.iloc[i]['healthy_bearish_candle']
+
+        #print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
+        print(index_label, 'O:', round(df.iloc[i]['Open'], 2), 'C:', round(df.iloc[i]['Close'], 2), 'H:',
+              round(df.iloc[i]['High'], 2), 'L:',
+              round(df.iloc[i]['Low'], 2), 'C > O * 1.02:', current_close > current_open * 1.02, 'O > C * 1.02:',
+              current_open > current_close * 1.02, '60% body:',
+              round((abs(current_close - current_open) / (df.iloc[i]['High'] - df.iloc[i]['Low'])) * 100, 1), '% bull_count:',
+              healthy_bullish_count,'% bear_count:',healthy_bearish_count)
+
+        if current_close == max_val:
+            count_difference = healthy_bullish_count - healthy_bearish_count
+            if count_difference > 1:
+                # Close is at a peak and we have a bearish pattern following, so this is a valid high.
+                # Need to detect if it is higher or lower than the prior valid high.
+                if last_high_value is not None:
+                    last_high_reference = last_high_value
+                else:
+                    last_high_reference = opening_price
+                if current_close > last_high_reference:
+                    df.at[index_label, 'swing_point_label'] = "HH"
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "HL":
+                        making_up_trend = True
+                        current_trend_seq_count += 1
+                    if most_recent_swing_point_type == "LL" or most_recent_swing_point_type == "LH":
+                        making_up_trend = True
+                        making_down_trend = False
+                        current_trend_seq_count = 1
+                    most_recent_swing_point_type = "HH"
+                    df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
+                    df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+                    # Reset the healthy candle count ahead of the next swing point.
+                    healthy_bullish_count = 0
+                    healthy_bearish_count = 0
+                else:
+                    df.at[index_label, 'swing_point_label'] = "LH"
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "LL":
+                        making_down_trend = True
+                        current_trend_seq_count += 1
+                    if most_recent_swing_point_type == "HL" or most_recent_swing_point_type == "HH":
+                        making_up_trend = False
+                        making_down_trend = True
+                        current_trend_seq_count = 1
+                    most_recent_swing_point_type = "LH"
+                    df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
+                    df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+                    # Reset the healthy candle count ahead of the next swing point.
+                    healthy_bullish_count = 0
+                    healthy_bearish_count = 0
+                last_high_value = current_close
+        elif current_close == min_val:
+            count_difference = healthy_bearish_count - healthy_bullish_count
+            if count_difference > 1:
+                # Need to detect if it is higher or lower than prior low.
+                if last_low_value is not None:
+                    last_low_reference = last_low_value
+                else:
+                    last_low_reference = opening_price
+                if current_close > last_low_reference:
+                    df.at[index_label, 'swing_point_label'] = "HL"
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "HH":
+                        making_up_trend = True
+                        current_trend_seq_count += 1
+                    if most_recent_swing_point_type == "LH" or most_recent_swing_point_type == "LL":
+                        making_up_trend = True
+                        making_down_trend = False
+                        current_trend_seq_count = 1
+                    most_recent_swing_point_type = "HL"
+                    df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
+                    df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+                    # Reset the healthy candle count ahead of the next swing point.
+                    healthy_bullish_count = 0
+                    healthy_bearish_count = 0
+                else:
+                    df.at[index_label, 'swing_point_label'] = "LL"
+                    if most_recent_swing_point_type is None or most_recent_swing_point_type == "LH":
+                        making_down_trend = True
+                        current_trend_seq_count += 1
+                        #print("LH to LL. Downtrend in progress...")
+                    if most_recent_swing_point_type == "HH" or most_recent_swing_point_type == "HL":
+                        making_up_trend = False
+                        making_down_trend = True
+                        current_trend_seq_count = 1
+                    most_recent_swing_point_type = "LL"
+                    df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
+                    df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+                    # Reset the healthy candle count ahead of the next swing point.
+                    healthy_bullish_count = 0
+                    healthy_bearish_count = 0
+                last_low_value = current_close
+        else:
+            # Not a swing point, so reset the healthy candle count to 0 for this data point
+            df.at[index_label, 'healthy_bullish_candle'] = 0
+            df.at[index_label, 'healthy_bearish_candle'] = 0
+        if current_trend_seq_count > 2 :
+            # This data point is part of a swing trend.
+            if most_recent_swing_point_type[0] == "H":
+                df.at[index_label, 'swing_point_current_trend'] = 1
+                #print('Setting uptrend.')
+            elif most_recent_swing_point_type[0] == "L":
+                df.at[index_label, 'swing_point_current_trend'] = -1
+                #print('Setting downtrend.')
+    # Now set the swing_point_current_trend for the most recent data points to the same as the last computed value.
+    final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
+    #print('final_swing_point_trend')
+    for i in range(len(df) - window-1, len(df)):
+        index_label = df.index[i]
+        #print(index_label, 'setting to',final_swing_point_trend)
+        df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
+    return df, final_swing_point_trend
+
+
 def add_levels_to_price_history(df, sr_levels, retests):
     # Initialize new columns with default values
     df['level'] = None
@@ -647,7 +799,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
-                    price_history, swing_point_current_trend = identify_highs_lows(price_history, window=3)
+                    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3)
 
                     #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                     #print('Step 15')
@@ -690,7 +842,9 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                 ema_50=row['EMA_50'],
                                 trend=row['Trend'],
                                 swing_point_label=row['swing_point_label'],
-                                swing_point_current_trend=row['swing_point_current_trend']
+                                swing_point_current_trend=row['swing_point_current_trend'],
+                                healthy_bullish_count = row['healthy_bullish_candle'],
+                                healthy_bearish_count=row['healthy_bearish_candle'],
                             )
                             logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                         else:
@@ -710,6 +864,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.trend = row['Trend']
                             daily_price.swing_point_label = row['swing_point_label']
                             daily_price.swing_point_current_trend = row['swing_point_current_trend']
+                            daily_price.healthy_bullish_count = row['healthy_bullish_candle']
+                            daily_price.healthy_bearish_count = row['healthy_bearish_candle']
                         daily_price.save()
                 else:
                     print('Insufficient data.')
