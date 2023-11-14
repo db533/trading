@@ -93,61 +93,59 @@ def get_price_data(ticker, interval, start_time, finish_time):
             #print(data.head(5))
             #print('data.tail(5):')
             #print(data.tail(5))
+        if existing_data_retrieved == True:
+            # Concatenating the new and existing data, while ensuring no duplicate entries
+            combined_data = pd.concat([data, existing_df], ignore_index=True)
 
+        else:
+            combined_data = data
+        #print('combined_data.columns:', combined_data.columns)
+        #print('combined_data.head(5):', combined_data.head(5))
+        #print('combined_data.tail(5):',combined_data.tail(5))
+        #print('Step 1')
+        combined_data = combined_data.set_index('Datetime')
+        # Step 1.5: Create a new 'Datetime_TZ' column to retain the timezone-aware datetime
 
+        # Step 5: No need to duplicate the datetime index since it's preserved in 'Datetime_TZ'.
 
-            if existing_data_retrieved == True:
-                # Concatenating the new and existing data, while ensuring no duplicate entries
-                combined_data = pd.concat([data, existing_df], ignore_index=True)
+        #combined_data.index = pd.to_datetime(combined_data.index)
+        combined_data.index = combined_data.index.tz_localize(None)
 
-            else:
-                combined_data = data
-            #print('combined_data.columns:', combined_data.columns)
-            #print('combined_data.head(5):', combined_data.head(5))
-            #print('combined_data.tail(5):',combined_data.tail(5))
-            #print('Step 1')
-            combined_data = combined_data.set_index('Datetime')
-            # Step 1.5: Create a new 'Datetime_TZ' column to retain the timezone-aware datetime
+        # To create an index that is timezone-aware, uncomment next line:
+        #combined_data.index = pd.to_datetime(combined_data.index, utc=True)
+        # To make the index timezone-naive, use the following line
+        #combined_data.index = combined_data.index.tz_localize(None)
 
-            # Step 5: No need to duplicate the datetime index since it's preserved in 'Datetime_TZ'.
+        #print('Step 2')
+        combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
 
-            #combined_data.index = pd.to_datetime(combined_data.index)
-            combined_data.index = combined_data.index.tz_localize(None)
+        #print('Step 3')
+        combined_data = combined_data.sort_values(by='Datetime_TZ', ascending=True)
 
-            # To create an index that is timezone-aware, uncomment next line:
-            #combined_data.index = pd.to_datetime(combined_data.index, utc=True)
-            # To make the index timezone-naive, use the following line
-            #combined_data.index = combined_data.index.tz_localize(None)
+        #print('Step 4')
+        combined_data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
+        combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
+        #print('combined_data.index[0]:',combined_data.index[0])
+        #print("combined_data.at[combined_data.index[0], 'PercentChange']:", combined_data.at[combined_data.index[0], 'PercentChange'])
+        combined_data.at[combined_data.index[0], 'PercentChange'] = 0
 
-            #print('Step 2')
-            combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
+        # Duplicating the Datetime index into a new column
+        #print('Step 5')
+        #combined_data['Datetime'] = combined_data.index.copy()
+        #print('Step 6')
+        #combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'], utc=True)
+        #print('Step 7')
+        #combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize('UTC')
+        #print('Step 8')
+        combined_data = combined_data.dropna(subset=['Open'])
 
-            #print('Step 3')
-            combined_data = combined_data.sort_values(by='Datetime_TZ', ascending=True)
+        # Reorder the columns
+        combined_data = combined_data[['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
+        #print('combined_data.head(5):')
+        #print(combined_data.head(5))
+        #print('combined_data.tail(5):')
+        #print(combined_data.tail(5))
 
-            #print('Step 4')
-            combined_data['Ticker'] = ticker.symbol  # Add 'Ticker' column with the symbol
-            combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100  # Multiply by 100 to get a percentage
-            #print('combined_data.index[0]:',combined_data.index[0])
-            #print("combined_data.at[combined_data.index[0], 'PercentChange']:", combined_data.at[combined_data.index[0], 'PercentChange'])
-            combined_data.at[combined_data.index[0], 'PercentChange'] = 0
-
-            # Duplicating the Datetime index into a new column
-            #print('Step 5')
-            #combined_data['Datetime'] = combined_data.index.copy()
-            #print('Step 6')
-            #combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'], utc=True)
-            #print('Step 7')
-            #combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize('UTC')
-            #print('Step 8')
-            combined_data = combined_data.dropna(subset=['Open'])
-
-            # Reorder the columns
-            combined_data = combined_data[['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
-            #print('combined_data.head(5):')
-            #print(combined_data.head(5))
-            #print('combined_data.tail(5):')
-            #print(combined_data.tail(5))
     except Exception as e:
         print(f"Error downloading data for {ticker.symbol}: {e}")
         combined_data = pd.DataFrame(columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
