@@ -992,11 +992,12 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 # Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
 def category_price_download(category_name):
         # Run the update_ticker_metrics function
+        tickers_for_throtlling = 195
         logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
         tickers = Ticker.objects.filter(categories__name=category_name)
         ticker_count = Ticker.objects.filter(categories__name=category_name).count()
         logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
-        if ticker_count > 195:
+        if ticker_count > tickers_for_throtlling:
             logger.error(f'Rate throttling will occur.')
         else:
             logger.error(f'No rate throttling needed.')
@@ -1009,8 +1010,11 @@ def category_price_download(category_name):
 
             end_time = display_local_time()  # record the end time of the loop
             elapsed_time = end_time - start_time  # calculate elapsed time
+            logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
+            logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
+            logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
 
-            if elapsed_time.total_seconds() < 20 and ticker_count > 195:
+            if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
                 pause_duration = 20 - elapsed_time.total_seconds()
                 print('Rate throttling for',pause_duration,'secs...')
                 logger.error(f'Rate throttling for {str(pause_duration)} secs...')

@@ -6,7 +6,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import django
 
 # Set up the Django environment
-sys.path.append('C:\\Users\\db533\\PycharmProjects\\trading\\trading\\trading')
+sys.path.append('/trading/trading')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'trading.settings')
 django.setup()
 
