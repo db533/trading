@@ -42,6 +42,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
         else:
             existing_data_retrieved = False
         if existing_data_retrieved == True:
+            logger.error(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
@@ -72,7 +73,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
-
+    logger.error(f'get_price_data(). Existing data retrieval is complete.')
 
     try:
         # Ensure start_time and finish_time are timezone-aware
@@ -80,6 +81,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
         finish_time = finish_time.replace(tzinfo=timezone.utc)
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
+        logger.error(f'get_price_data(). data retrieval performed.')
         if not data.empty:
             print('Retrieve new price data records...')
 
