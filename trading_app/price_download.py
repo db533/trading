@@ -531,9 +531,10 @@ def identify_highs_lows(df, window=20):
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
 
-def identify_highs_lows2(df, window=20):
+def identify_highs_lows2(df, window=20, price_move_percent=1.5):
     # Rewriting function to count number of healthy bullish / bearish candles.
     # Healthy candle = > 1,5% price move from open to close AND body >=60% of total candle length.
+    price_move_percent = price_move_percent / 100
     print('Detecting swing points...')
     logger.error(f'Detecting swing points...')
     df['swing_point_label'] = ''
@@ -551,9 +552,9 @@ def identify_highs_lows2(df, window=20):
     opening_price = df.iloc[0]['Open']
     last_high_value = None
     last_low_value = None
-    df['healthy_bullish_candle'] = ((df['Close'] > df['Open'] * 1.02) &
+    df['healthy_bullish_candle'] = ((df['Close'] > df['Open'] * (1 +price_move_percent)) &
                                     ((df['Close'] - df['Open']) / (df['High'] - df['Low']) > 0.6)).astype(int)
-    df['healthy_bearish_candle'] = ((df['Open'] > df['Close'] * 1.02) &
+    df['healthy_bearish_candle'] = ((df['Open'] > df['Close'] * (1 +price_move_percent)) &
                                     ((df['Open'] - df['Close']) / (df['High'] - df['Low']) > 0.6)).astype(int)
 
     #print('window =',window,'. i from:',window,'to',len(df) - window - 1)
@@ -575,8 +576,8 @@ def identify_highs_lows2(df, window=20):
         #print('i:',i,'DateTime_TZ:',df.iloc[i]['Datetime_TZ'], ' index label:',df.index[i])
         print(index_label, 'O:', round(df.iloc[i]['Open'], 2), 'C:', round(df.iloc[i]['Close'], 2), 'H:',
               round(df.iloc[i]['High'], 2), 'L:',
-              round(df.iloc[i]['Low'], 2), 'C > O * 1.02:', current_close > current_open * 1.02, 'O > C * 1.02:',
-              current_open > current_close * 1.02, '60% body:',
+              round(df.iloc[i]['Low'], 2), 'C > O *',(1 +price_move_percent),':', current_close > current_open * (1 +price_move_percent), 'O > C *',(1 +price_move_percent),':',
+              current_open > current_close * (1 +price_move_percent), '60% body:',
               round((abs(current_close - current_open) / (df.iloc[i]['High'] - df.iloc[i]['Low'])) * 100, 1), '% bull_count:',
               healthy_bullish_count,'% bear_count:',healthy_bearish_count)
 
@@ -602,7 +603,7 @@ def identify_highs_lows2(df, window=20):
                     df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
                     df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                     # Reset the healthy candle count ahead of the next swing point.
-                    healthy_bullish_count = 0
+                    #healthy_bullish_count = 0
                     healthy_bearish_count = 0
                 else:
                     df.at[index_label, 'swing_point_label'] = "LH"
@@ -617,9 +618,10 @@ def identify_highs_lows2(df, window=20):
                     df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
                     df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                     # Reset the healthy candle count ahead of the next swing point.
-                    healthy_bullish_count = 0
+                    #healthy_bullish_count = 0
                     healthy_bearish_count = 0
                 last_high_value = current_close
+            healthy_bullish_count = 0
         elif current_close == min_val:
             count_difference = healthy_bearish_count - healthy_bullish_count
             if count_difference > 1:
@@ -642,7 +644,7 @@ def identify_highs_lows2(df, window=20):
                     df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                     # Reset the healthy candle count ahead of the next swing point.
                     healthy_bullish_count = 0
-                    healthy_bearish_count = 0
+                    #healthy_bearish_count = 0
                 else:
                     df.at[index_label, 'swing_point_label'] = "LL"
                     if most_recent_swing_point_type is None or most_recent_swing_point_type == "LH":
@@ -658,8 +660,9 @@ def identify_highs_lows2(df, window=20):
                     df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                     # Reset the healthy candle count ahead of the next swing point.
                     healthy_bullish_count = 0
-                    healthy_bearish_count = 0
+                    #healthy_bearish_count = 0
                 last_low_value = current_close
+            healthy_bearish_count = 0
         else:
             # Not a swing point, so reset the healthy candle count to 0 for this data point
             df.at[index_label, 'healthy_bullish_candle'] = 0
@@ -799,7 +802,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
-                    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3)
+                    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
                     #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                     #print('Step 15')
