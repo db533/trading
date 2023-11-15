@@ -11,6 +11,7 @@ django-compat==1.0.15
 django-cron==0.6.0
 django-environ==0.10.0
 django-webpush==0.3.5
+django4-background-tasks==1.2.9
 djangorestframework==3.14.0
 frozendict==2.3.8
 html5lib==1.1
