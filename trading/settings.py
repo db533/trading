@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'trading_app.apps.TradingAppConfig',
     'django_cron',
     'django.contrib.humanize',
+    'background_task',
 ]
 
 MIDDLEWARE = [

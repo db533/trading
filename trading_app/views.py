@@ -28,9 +28,8 @@ from . import update_ticker_metrics
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
-import logging
 from time import sleep
-
+from .tasks import background_manual_category_download
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
@@ -719,8 +718,13 @@ def manual_download(request, ticker_id, timeframe):
         download_prices(timeframe=timeframe_label, ticker_symbol=ticker.symbol, trigger='User')
     return redirect('ticker_config')
 
-# View to refresh price data for a specific ticker
 def manual_category_download(request, category_name):
+    background_manual_category_download(category_name)
+    logger.error(f'Called background_manual_category_download from manual_category_download(). category "{str(category_name)}"...')
+    return redirect('ticker_config')
+
+# View to refresh price data for a specific ticker
+def manual_category_download_original(request, category_name):
     # Retrieve all tickers that are in the given category.
     tickers_for_throtlling = 195
     logger.error(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
