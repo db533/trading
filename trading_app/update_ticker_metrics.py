@@ -154,7 +154,7 @@ def update_sr_level_data(ticker):
     nearest_level_value=None
     days_since_last_tested = None
 
-    if latest_close_price is not None:
+    if latest_close_price is not None and nearest_level_value is not None:
         for dp in daily_prices_query:
             days_difference = (current_date - dp.datetime.date()).days
             print('dp.level:',dp.level)

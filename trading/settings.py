@@ -197,3 +197,6 @@ LOGGING = {
         },
     },
 }
+
+# For background task processing:
+MAX_RUN_TIME = 21600 # 6 hours.
