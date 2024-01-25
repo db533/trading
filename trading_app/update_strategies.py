@@ -6,7 +6,7 @@ import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import yfinance as yf
 from time import sleep
-from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, TradingOpp
+from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, TradingOpp, TradingStrategy
 
 import pandas as pd
 import pytz
@@ -40,6 +40,8 @@ class BaseStrategy:
         raise NotImplementedError("Each strategy must implement its own check_criteria method.")
 
 class StrategyA(BaseStrategy):
+    name="Rising trend"
+
     def check_criteria(self):
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
@@ -58,15 +60,16 @@ def process_trading_opportunities():
     strategies = [StrategyA]  # List of strategy classes
 
     for ticker in tickers:
-        print('Ticker:',ticker.symbol)
-        logger.error(f'Ticker: "{str(ticker.symbol)}"...')
+        #print('Ticker:',ticker.symbol)
+        #logger.error(f'Ticker: "{str(ticker.symbol)}"...')
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
-            print('strategy:', strategy)
-            logger.error(f'strategy: "{str(strategy)}"...')
+            #print('strategy:', strategy)
+            logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             if strategy.check_criteria():
-                print('Strategy criteria met for', ticker.symbol)
+                #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
+                strategy_instance = TradingStrategy.objects.get(name=strategy.name)
                 TradingOpp.objects.create(
                     ticker=ticker,
                     strategy=strategy,
