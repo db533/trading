@@ -68,16 +68,32 @@ def process_trading_opportunities():
             #print('strategy:', strategy)
             logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             strategy_valid, data = strategy.check_criteria()
+            strategy_instance = TradingStrategy.objects.get(name=strategy.name)
+            existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(
+                strategy=strategy_instance)
+            if len(existing_tradingopp) > 0:
+                existing_tradingopp = existing_tradingopp[0]
+            else:
+                existing_tradingopp = None
             if strategy_valid:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
-                strategy_instance = TradingStrategy.objects.get(name=strategy.name)
+                if existing_tradingopp is not None:
+                    existing_tradingopp.count += 1
+                    existing_tradingopp.save()
                 TradingOpp.objects.create(
                     ticker=ticker,
                     strategy=strategy_instance,
                     datetime_identified=timezone.now(),
-                    metrics_snapshot=data  # Capture relevant metrics
+                    metrics_snapshot=data, # Capture relevant metrics
+                    count = 1,
                 )
+            else:
+                # The strategy is not valid for the ticker.
+                # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
+                if existing_tradingopp is not None:
+                    existing_tradingopp.is_active = False
+                    existing_tradingopp.save()
     logger.error(f'Finished process_trading_opportunities().')
 
 # Call this function daily after metrics update
