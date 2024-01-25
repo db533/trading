@@ -74,7 +74,7 @@ def process_trading_opportunities():
                     ticker=ticker,
                     strategy=strategy_instance,
                     datetime_identified=timezone.now(),
-                    metrics_snapshot={...}  # Capture relevant metrics
+                    metrics_snapshot={'Strategy name' : 'Rising trend'}  # Capture relevant metrics
                 )
     logger.error(f'Finished process_trading_opportunities().')
 
