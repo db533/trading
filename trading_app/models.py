@@ -103,6 +103,7 @@ class TradingOpp(models.Model):
     metrics_snapshot = models.JSONField()  # Snapshot of metrics at the time of identification
     is_active = models.BooleanField(default=True)
     count = models.IntegerField(default=1)
+    action_buy = models.BooleanField(default=True)
     # Any additional fields that might be necessary
 
     def __str__(self):

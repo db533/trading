@@ -39,26 +39,33 @@ class BaseStrategy:
     def check_criteria(self):
         raise NotImplementedError("Each strategy must implement its own check_criteria method.")
 
-class StrategyA(BaseStrategy):
-    name="Rising trend"
+class TAEStrategy(BaseStrategy):
+    name="Trend - Area of value - Event strategy"
 
     def check_criteria(self):
         data = {}
+        action = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        ma_200_trend_strength = self.ticker.ma_200_trend_strength
+        tae_strategy_score = self.ticker.tae_strategy_score
 
-        # Check if latest_price meets the criteria
-        if latest_price and latest_price.trend == 1:
-            data ={'trend' : str(latest_price.trend), 'bullish_detected' : str(latest_price.bullish_detected)}
-            return True, data
-        return False, data
+        if tae_strategy_score > 0:
+            if ma_200_trend_strength > 0:
+                action = "buy"
+            else:
+                action = "sell"
+            data = {'tae_strategy_score': str(tae_strategy_score), 'ma_200_trend_strength' : str(ma_200_trend_strength),
+                    'bullish_detected': str(latest_price.bullish_detected), 'bearish_detected': str(latest_price.bearish_detected)}
+            return action, data
+        return action, data
 
 from django.utils import timezone
 
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
-    strategies = [StrategyA]  # List of strategy classes
+    strategies = [TAEStrategy]  # List of strategy classes
 
     for ticker in tickers:
         #print('Ticker:',ticker.symbol)
@@ -67,7 +74,7 @@ def process_trading_opportunities():
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
             logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
-            strategy_valid, data = strategy.check_criteria()
+            action, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
             existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(
                 strategy=strategy_instance)
@@ -75,7 +82,7 @@ def process_trading_opportunities():
                 existing_tradingopp = existing_tradingopp[0]
             else:
                 existing_tradingopp = None
-            if strategy_valid:
+            if action is not None:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
                 if existing_tradingopp is not None:
