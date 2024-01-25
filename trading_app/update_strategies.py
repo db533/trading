@@ -41,16 +41,17 @@ class BaseStrategy:
 
 class StrategyA(BaseStrategy):
     name="Rising trend"
+    data = {}
 
     def check_criteria(self):
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
 
-
         # Check if latest_price meets the criteria
         if latest_price and latest_price.trend == 1:
-            return True
-        return False
+            data ={'trend' : latest_price.trend, 'latest_price' : latest_price}
+            return True, data
+        return False, data
 
 from django.utils import timezone
 
@@ -66,7 +67,8 @@ def process_trading_opportunities():
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
             logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
-            if strategy.check_criteria():
+            strategy_valid, data = strategy.check_criteria()
+            if strategy_valid:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
                 strategy_instance = TradingStrategy.objects.get(name=strategy.name)
@@ -74,7 +76,7 @@ def process_trading_opportunities():
                     ticker=ticker,
                     strategy=strategy_instance,
                     datetime_identified=timezone.now(),
-                    metrics_snapshot={'Strategy name' : 'Rising trend'}  # Capture relevant metrics
+                    metrics_snapshot=data  # Capture relevant metrics
                 )
     logger.error(f'Finished process_trading_opportunities().')
 
