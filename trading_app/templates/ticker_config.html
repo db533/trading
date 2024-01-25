@@ -36,7 +36,7 @@
       <tr>
         <th  colspan="2" style="border: 1pt solid black; padding: 3pt;">Ticker Symbol</th>
         <th  colspan="5" style="border: 1pt solid black; padding: 3pt;">Price history</th>
-        <th  colspan="2" style="border: 1pt solid black; padding: 3pt;">Trend</th>
+        <th  colspan="4" style="border: 1pt solid black; padding: 3pt;">Trend</th>
         <th  colspan="3" style="border: 1pt solid black; padding: 3pt;">Area of Value</th>
         <th  colspan="5" style="border: 1pt solid black; padding: 3pt;">Event</th>
         <th  colspan="1" style="border: 1pt solid black; padding: 3pt;">2 period cumulative RSI</th>
@@ -52,10 +52,12 @@
         <th style="text-align:center; width: 8ch;">Avg vol 100 days (k)</th>
         <th style="text-align:center; width: 8ch;border-left: 1pt solid black; padding: 3pt;"">MA strength</th>
         <th style="text-align:center; width: 8ch;">Swing trend</th>
+        <th style="text-align:center; width: 8ch;">Range to HH</th>
+        <th style="text-align:center; width: 8ch;">% on way</th>
         <th style="text-align:center; width: 8ch;border-left: 1pt solid black; ">% to support / resistance</th>
         <th style="text-align:center; width: 8ch;">Level type</th>
         <th style="text-align:center; width: 8ch;">Level value</th>
-        <th style="text-align:center; width: 8ch;">Bullish pattern</th>
+        <th style="text-align:center; width: 8ch;border-left: 1pt solid black; ">Bullish pattern</th>
         <th style="text-align:center; width: 8ch;">Bullish reversal pattern</th>
         <th style="text-align:center; width: 8ch;">Reversal pattern</th>
         <th style="text-align:center; width: 8ch;">Bearish pattern</th>
@@ -99,6 +101,12 @@
           </td>
           <td style="border: 1pt solid black; padding: 3pt; text-align:center; color: {% if item.ticker.swing_point_current_trend > 0 %}green{% elif item.ticker.swing_point_current_trend < 0 %}red{% endif %};"> <!-- color: {% if item.swing_point_current_trend > 0 %}green{% elif item.swing_point_current_trend < 0 %}red{% endif %}; -->
             {{ item.ticker.swing_point_current_trend }}
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center; {% if item.ticker.uptrend_hl_range > 0 %}color: green; font-weight: bold{% endif %};">
+            {{ item.ticker.uptrend_hl_range }}
+          </td>
+          <td style="border: 1pt solid black; padding: 3pt; text-align:center; {% if item.ticker.uptrend_hl_range > 0 %}color: green; font-weight: bold{% endif %};">
+            {{ item.ticker.uptrend_hl_percent }}%
           </td>
 
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">

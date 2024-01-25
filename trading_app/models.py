@@ -33,6 +33,8 @@ class Ticker(models.Model):
     bearish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
     bullish_reversal_detected = models.DecimalField(max_digits=2, decimal_places=0, null=True)
     patterns_detected = models.CharField(max_length=255, null=True, blank=True)
+    uptrend_hl_range = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    uptrend_hl_percent = models.DecimalField(max_digits=5, decimal_places=1, null=True)
 
 
     def __str__(self):
@@ -86,3 +88,21 @@ class FiveMinPrice(BasePrice):
 # 1 Minute Price Model
 class OneMinPrice(BasePrice):
     pass
+
+class TradingStrategy(models.Model):
+    name = models.CharField(max_length=255)
+    # You can add more fields here to define strategy-specific parameters
+
+    def __str__(self):
+        return self.name
+
+class TradingOpp(models.Model):
+    ticker = models.ForeignKey(Ticker, on_delete=models.CASCADE)
+    strategy = models.ForeignKey(TradingStrategy, on_delete=models.CASCADE)
+    datetime_identified = models.DateTimeField(auto_now_add=True)
+    metrics_snapshot = models.JSONField()  # Snapshot of metrics at the time of identification
+    is_active = models.BooleanField(default=True)
+    # Any additional fields that might be necessary
+
+    def __str__(self):
+        return f"{self.ticker.symbol} - {self.strategy.name}"

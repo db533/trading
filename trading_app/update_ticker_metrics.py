@@ -140,6 +140,55 @@ def compute_period_low(ticker, data_points):
 
     return ticker
 
+def uptrend_hl(ticker, data_points, latest_data_point):
+    for latest_candle in latest_data_point:
+        swing_trend = latest_candle.swing_point_current_trend
+        healthy_bullish_counter = latest_candle.healthy_bullish_count
+        latest_close = latest_candle.close_price
+    if swing_trend == 1:
+        healthy_bullish_found = False
+        HL_found = False
+        HH_found = False
+        # Start stepping back from most recent candle.
+        for dp in data_points:
+            if HL_found == False and healthy_bullish_found == False and dp.healthy_bullish_count < healthy_bullish_counter:
+                # The newer candle must have been a bullish candle.
+                healthy_bullish_found = True
+                print('Found')
+            if HL_found == False and dp.swing_point_label == "HL":
+                # Have found the most recent HL.
+                if healthy_bullish_found == True:
+                    # The HL preceded a healthy bullish candle.
+                    HL_close = dp.close_price
+                    HL_found = True
+                else:
+                    # No healthy bullish candle found after the HL, so not an entry point.
+                    result = 0
+                    break
+            if HH_found == False and dp.swing_point_label == "HH":
+                if HL_found == True and healthy_bullish_found == True:
+                    # This is the prior HH.
+                    HH_close = dp.close_price
+                    HH_found = True
+                    break
+                else:
+                    # HH is not before a HL or we have had no healthy bullish candles.
+                    result = 0
+                    break
+        if HH_found == True:
+            price_range = HH_close - HL_close
+            percent_towards_HH = (latest_close-HL_close)/price_range
+            ticker.uptrend_hl_range = price_range
+            ticker.uptrend_hl_percent = percent_towards_HH * 100
+            result = price_range
+    else:
+        # Not in a swing uptrend so not an entry point
+        result = 0
+    if result == 0:
+        ticker.uptrend_hl_range = 0
+        ticker.uptrend_hl_percent = 0
+    return ticker
+
 def update_sr_level_data(ticker):
     print('update_sr_level_data()...')
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
@@ -261,6 +310,7 @@ def update_ticker_metrics(ticker_symbol="All"):
         prior_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[1:3]
         last_7_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[
                              :7]  # Get the last 2 data points
+        latest_data_point = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:1]  # Get the last data point
 
         if len(last_200_data_points) > 3:
             ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
@@ -273,6 +323,7 @@ def update_ticker_metrics(ticker_symbol="All"):
             ticker.cumulative_two_period_two_day_rsi = cumulative_two_period_two_day_rsi
             ticker = compute_period_high(ticker, last_7_data_points)
             ticker = compute_period_low(ticker, last_7_data_points)
+            ticker = uptrend_hl(ticker,last_200_data_points, latest_data_point)
 
             # Now update strategy fulfillment:
             ticker = test_tae_strategy(ticker)

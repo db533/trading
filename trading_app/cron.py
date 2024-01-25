@@ -3,6 +3,7 @@
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
 from .price_download import download_prices, category_price_download
+from .update_strategies import process_trading_opportunities
 from .test_cron_job import test_cron_job
 from datetime import datetime, timedelta, timezone, date, time
 import pytz
@@ -95,3 +96,10 @@ class TestCronJob(CronJobBase):
     def do(self):
         # Run the update_ticker_metrics function
         test_cron_job()
+
+class DailyTradingOppCreationCronJob(CronJobBase):
+    schedule = Schedule(run_every_mins=1)  # Run once a day
+    code = 'trading_app.trading_opp_creation_cron_job'
+    def do(self):
+        # Run the update_ticker_metrics function
+        process_trading_opportunities()
