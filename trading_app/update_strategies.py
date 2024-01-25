@@ -41,9 +41,9 @@ class BaseStrategy:
 
 class StrategyA(BaseStrategy):
     name="Rising trend"
-    data = {}
 
     def check_criteria(self):
+        data = {}
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
 
