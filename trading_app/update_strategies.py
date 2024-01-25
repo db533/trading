@@ -49,7 +49,7 @@ class StrategyA(BaseStrategy):
 
         # Check if latest_price meets the criteria
         if latest_price and latest_price.trend == 1:
-            data ={'trend' : latest_price.trend, 'bullish_detected' : latest_price.bullish_detected}
+            data ={'trend' : str(latest_price.trend), 'bullish_detected' : str(latest_price.bullish_detected)}
             return True, data
         return False, data
 
