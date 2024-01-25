@@ -46,17 +46,19 @@ class TAEStrategy(BaseStrategy):
         data = {}
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
-        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         ma_200_trend_strength = self.ticker.ma_200_trend_strength
         tae_strategy_score = self.ticker.tae_strategy_score
+        bullish_detected = self.ticker.bullish_detected
+        bearish_detected = self.ticker.bearish_detected
 
-        if tae_strategy_score > 0:
-            if ma_200_trend_strength > 0:
+        if tae_strategy_score > 0 and ma_200_trend_strength > 0 and bullish_detected == True:
                 action_buy = True
-            else:
+        if tae_strategy_score > 0 and ma_200_trend_strength < 0 and bearish_detected == True:
                 action_buy = False
+        if action_buy is not None:
             data = {'tae_strategy_score': str(tae_strategy_score), 'ma_200_trend_strength' : str(ma_200_trend_strength),
-                    'bullish_detected': str(latest_price.bullish_detected), 'bearish_detected': str(latest_price.bearish_detected)}
+                    'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected)}
             return action_buy, data
         return action_buy, data
 
