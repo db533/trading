@@ -94,6 +94,7 @@ def process_trading_opportunities():
                     datetime_identified=timezone.now(),
                     metrics_snapshot=data, # Capture relevant metrics
                     count = 1,
+                    action_buy = action
                 )
             else:
                 # The strategy is not valid for the ticker.
