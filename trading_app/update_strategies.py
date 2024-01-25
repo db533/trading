@@ -44,8 +44,9 @@ class StrategyA(BaseStrategy):
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
 
+
         # Check if latest_price meets the criteria
-        if latest_price and latest_price.healthy_bullish_count > 1 and latest_price.trend == 1:
+        if latest_price and latest_price.trend == 1:
             return True
         return False
 
