@@ -50,15 +50,16 @@ class TAEStrategy(BaseStrategy):
         ma_200_trend_strength = self.ticker.ma_200_trend_strength
         tae_strategy_score = self.ticker.tae_strategy_score
         bullish_detected = self.ticker.bullish_detected
+        bullish_reversal_detected = self.ticker.bullish_reversal_detected
         bearish_detected = self.ticker.bearish_detected
 
-        if tae_strategy_score > 0 and ma_200_trend_strength > 0 and bullish_detected == True:
+        if tae_strategy_score > 0 and ma_200_trend_strength > 0 and (bullish_detected > 0 or bullish_reversal_detected > 0):
                 action_buy = True
-        if tae_strategy_score > 0 and ma_200_trend_strength < 0 and bearish_detected == True:
+        if tae_strategy_score > 0 and ma_200_trend_strength < 0 and bearish_detected > 0:
                 action_buy = False
         if action_buy is not None:
             data = {'tae_strategy_score': str(tae_strategy_score), 'ma_200_trend_strength' : str(ma_200_trend_strength),
-                    'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected)}
+                    'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected), 'bullish_reversal_detected' : bullish_reversal_detected}
             return action_buy, data
         return action_buy, data
 
