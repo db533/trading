@@ -68,16 +68,13 @@ def process_trading_opportunities():
     strategies = [TAEStrategy]  # List of strategy classes
 
     for ticker in tickers:
-        #print('Ticker:',ticker.symbol)
-        #logger.error(f'Ticker: "{str(ticker.symbol)}"...')
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
             logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             action_buy, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
-            existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(
-                strategy=strategy_instance)
+            existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
             if len(existing_tradingopp) > 0:
                 existing_tradingopp = existing_tradingopp[0]
             else:
@@ -86,16 +83,19 @@ def process_trading_opportunities():
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
                 if existing_tradingopp is not None:
+                    # This Ticker / strategy exists as an active record. Increment the count.
                     existing_tradingopp.count += 1
                     existing_tradingopp.save()
-                TradingOpp.objects.create(
-                    ticker=ticker,
-                    strategy=strategy_instance,
-                    datetime_identified=timezone.now(),
-                    metrics_snapshot=data, # Capture relevant metrics
-                    count = 1,
-                    action_buy = action_buy
-                )
+                else:
+                    # This Ticker / strategy is new. Create a new TradingOpp instance.
+                    TradingOpp.objects.create(
+                        ticker=ticker,
+                        strategy=strategy_instance,
+                        datetime_identified=timezone.now(),
+                        metrics_snapshot=data, # Capture relevant metrics
+                        count = 1,
+                        action_buy = action_buy
+                    )
             else:
                 # The strategy is not valid for the ticker.
                 # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
