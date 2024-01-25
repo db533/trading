@@ -72,7 +72,7 @@ def process_trading_opportunities():
                 strategy_instance = TradingStrategy.objects.get(name=strategy.name)
                 TradingOpp.objects.create(
                     ticker=ticker,
-                    strategy=strategy,
+                    strategy=strategy_instance,
                     datetime_identified=timezone.now(),
                     metrics_snapshot={...}  # Capture relevant metrics
                 )
