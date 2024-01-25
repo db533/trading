@@ -44,7 +44,7 @@ class TAEStrategy(BaseStrategy):
 
     def check_criteria(self):
         data = {}
-        action = None
+        action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         ma_200_trend_strength = self.ticker.ma_200_trend_strength
@@ -52,13 +52,13 @@ class TAEStrategy(BaseStrategy):
 
         if tae_strategy_score > 0:
             if ma_200_trend_strength > 0:
-                action = "buy"
+                action_buy = True
             else:
-                action = "sell"
+                action_buy = False
             data = {'tae_strategy_score': str(tae_strategy_score), 'ma_200_trend_strength' : str(ma_200_trend_strength),
                     'bullish_detected': str(latest_price.bullish_detected), 'bearish_detected': str(latest_price.bearish_detected)}
-            return action, data
-        return action, data
+            return action_buy, data
+        return action_buy, data
 
 from django.utils import timezone
 
@@ -74,7 +74,7 @@ def process_trading_opportunities():
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
             logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
-            action, data = strategy.check_criteria()
+            action_buy, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
             existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(
                 strategy=strategy_instance)
@@ -82,7 +82,7 @@ def process_trading_opportunities():
                 existing_tradingopp = existing_tradingopp[0]
             else:
                 existing_tradingopp = None
-            if action is not None:
+            if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
                 if existing_tradingopp is not None:
@@ -94,7 +94,7 @@ def process_trading_opportunities():
                     datetime_identified=timezone.now(),
                     metrics_snapshot=data, # Capture relevant metrics
                     count = 1,
-                    action_buy = action
+                    action_buy = action_buy
                 )
             else:
                 # The strategy is not valid for the ticker.
