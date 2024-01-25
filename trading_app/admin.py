@@ -5,8 +5,8 @@ from .models import *
 
 admin.site.register(Ticker)
 admin.site.register(TickerCategory)
-admin.site.register(TickerStrategy)
-admin.site.register(TickerOpp)
+admin.site.register(TradingStrategy)
+admin.site.register(TradingOpp)
 admin.site.register(DailyPrice)
 admin.site.register(FifteenMinPrice)
 admin.site.register(FiveMinPrice)
