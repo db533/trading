@@ -11,7 +11,7 @@
         <ul>
         {% for opp in opps %}
             <li>
-                Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }}<br>
+                Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }} <strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong><br>
                 Metrics: {{ opp.metrics_snapshot }}
             </li>
         {% endfor %}
