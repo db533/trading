@@ -783,3 +783,21 @@ def delete_daily_price(request, symbol=None):
         return redirect('ticker_config')  # Redirect to a confirmation page or the main page
     else:
         raise Http404("Invalid request method")  # Prevent deletion on GET request
+
+def trading_opps_view(request):
+    # Get all active TradingOpp instances
+    active_trading_opps = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy')
+
+    # Group by Ticker
+    ticker_opps = {}
+    for opp in active_trading_opps:
+        ticker = opp.ticker
+        if ticker not in ticker_opps:
+            ticker_opps[ticker] = []
+        ticker_opps[ticker].append(opp)
+
+    context = {
+        'ticker_opps': ticker_opps
+    }
+
+    return render(request, 'trading_opp_list.html', context)

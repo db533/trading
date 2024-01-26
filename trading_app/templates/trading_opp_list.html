@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Trading Opportunities</title>
+</head>
+<body>
+    <h1>Active Trading Opportunities</h1>
+    {% for ticker, opps in ticker_opps.items %}
+        <h2>{{ ticker.symbol }} - {{ ticker.company_name }}</h2>
+        <ul>
+        {% for opp in opps %}
+            <li>
+                Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }}<br>
+                Metrics: {{ opp.metrics_snapshot }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% empty %}
+        <p>No active trading opportunities found.</p>
+    {% endfor %}
+  {% endblock %}

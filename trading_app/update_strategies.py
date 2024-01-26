@@ -69,6 +69,7 @@ def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
     strategies = [TAEStrategy]  # List of strategy classes
+    #ticker_id_in_strategy = []
 
     for ticker in tickers:
         for StrategyClass in strategies:
@@ -85,6 +86,7 @@ def process_trading_opportunities():
             if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
+                #ticker_id_in_strategy.append(ticker.id)
                 if existing_tradingopp is not None:
                     # This Ticker / strategy exists as an active record. Increment the count.
                     existing_tradingopp.count += 1
