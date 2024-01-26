@@ -59,7 +59,7 @@ class TAEStrategy(BaseStrategy):
                 action_buy = False
         if action_buy is not None:
             data = {'tae_strategy_score': str(tae_strategy_score), 'ma_200_trend_strength' : str(ma_200_trend_strength),
-                    'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected), 'bullish_reversal_detected' : bullish_reversal_detected}
+                    'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected), 'bullish_reversal_detected' : str(bullish_reversal_detected)}
             return action_buy, data
         return action_buy, data
 
