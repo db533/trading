@@ -90,17 +90,18 @@ class DoubleSevens(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        latest_close_price = latest_price.close_price
-        seven_day_max = self.ticker.seven_day_max
-        seven_day_min = self.ticker.seven_day_min
+        if latest_price is not None:
+            latest_close_price = latest_price.close_price
+            seven_day_max = self.ticker.seven_day_max
+            seven_day_min = self.ticker.seven_day_min
 
-        if latest_close_price is not None:
-            if latest_close_price <= seven_day_min:
-                action_buy = True
-                data = {'latest_close_price' : str(latest_close_price), 'seven_day_min': str(seven_day_min), }
-            elif latest_close_price >= seven_day_max:
-                action_buy = False
-                data = {'latest_close_price': str(latest_close_price), 'seven_day_max': str(seven_day_max), }
+            if latest_close_price is not None:
+                if latest_close_price <= seven_day_min:
+                    action_buy = True
+                    data = {'latest_close_price' : str(latest_close_price), 'seven_day_min': str(seven_day_min), }
+                elif latest_close_price >= seven_day_max:
+                    action_buy = False
+                    data = {'latest_close_price': str(latest_close_price), 'seven_day_max': str(seven_day_max), }
         if action_buy is not None:
             #data = {'cumulative_two_period_two_day_rsi': str(cumulative_two_period_two_day_rsi),}
             return action_buy, data
