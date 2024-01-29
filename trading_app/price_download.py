@@ -531,6 +531,121 @@ def identify_highs_lows(df, window=20):
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
 
+def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
+    # New function to compute swing points using WD Gann logic.
+    print('Detecting swing points according to Gann logic...')
+    logger.error(f'Detecting swing points according to Gann logic...')
+    df['swing_point_label'] = ''
+    df['swing_point_current_trend'] = 0
+    # print('df.columns:',df.columns)
+    print('len(df):', len(df))
+
+    healthy_bullish_count = 0
+    healthy_bearish_count = 0
+    making_up_trend = False
+    making_down_trend = False
+    most_recent_swing_point_type = None
+    current_trend_seq_count = 0
+
+    opening_price = df.iloc[0]['Open']
+    last_high_value = None
+    last_low_value = None
+    df['healthy_bullish_candle'] = ((df['Close'] > df['Open'] * (1 + price_move_percent)) &
+                                    ((df['Close'] - df['Open']) / (df['High'] - df['Low']) > 0.6)).astype(int)
+    df['healthy_bearish_candle'] = ((df['Open'] > df['Close'] * (1 + price_move_percent)) &
+                                    ((df['Open'] - df['Close']) / (df['High'] - df['Low']) > 0.6)).astype(int)
+
+    # Fields to be added to df:
+        # healthy_bullish_candle
+        # healthy_bearish_candle
+        # swing_point_label
+        # swing_point_current_trend
+
+    # Determine initial direction: If price closes higher, up trend, if lower, down trend
+    # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
+    # Down trend continues until high is higher on next 2 days.
+    for i in range(0, len(df) - reversal_days - 1):
+        if i == 0:
+            # This is start of data. Determine the initial direction.
+            index_label = df.index[0]
+            first_close = df.iloc[0]['Close']
+            second_close = df.iloc[1]['Close']
+            if first_close < second_close:
+                # Upward movement over first 2 candles. Assume up trend
+                uptrend_in_progress = True
+                last_swing_point = 'HL'
+            else:
+                uptrend_in_progress = False
+                last_swing_point = 'LH'
+            last_high_reference = df.iloc[0]['High']
+            last_low_reference = df.iloc[0]['Low']
+
+        index_label = df.index[i]
+        window_slice = df.iloc[i:i + reversal_days]
+        swing_point_occured = False
+        if uptrend_in_progress:
+            # Look for reversal to downtrend
+            # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
+            low_day_0 = df.iloc[i]['Low']
+            max_low = window_slice['Low'].max()
+            high_day_0 = df.iloc[i]['High']
+            if low_day_0 == max_low:
+                # The subsequent day(s) have had lows lower than on Day 0.
+                # Up trend ended on Day 0.
+                if high_day_0 > last_high_reference:
+                    # This high is higher than the previous high so this is a HH.
+                    df.at[index_label, 'swing_point_label'] = "HH"
+                    if last_swing_point == 'HL':
+                        current_trend_seq_count += 1
+                    if last_swing_point == 'LL':
+                        current_trend_seq_count = 1
+                else:
+                    df.at[index_label, 'swing_point_label'] = "LH"
+                    if last_swing_point == 'HL':
+                        current_trend_seq_count = 1
+                    if last_swing_point == 'LL':
+                        current_trend_seq_count += 1
+                uptrend_in_progress = False  # Now trend is downward.
+                last_high_reference = high_day_0
+
+
+                swing_point_occured = True
+        else:
+            # Look for reversal to uptrend
+            # Down trend continues until high is higher on next 2 days.
+            high_day_0 = df.iloc[i]['High']
+            min_high = window_slice['High'].min()
+            low_day_0 = df.iloc[i]['Low']
+            if high_day_0 == min_high:
+                # The subsequent day(s) have had higher highs than on Day 0.
+                # Down trend ended on Day 0.
+                if low_day_0 > last_low_reference:
+                    # This low is higher than the previous high so this is a HH.
+                    df.at[index_label, 'swing_point_label'] = "HL"
+                    if last_swing_point == 'HH':
+                        current_trend_seq_count += 1
+                    if last_swing_point == 'LH':
+                        current_trend_seq_count = 1
+                else:
+                    df.at[index_label, 'swing_point_label'] = "LL"
+                    if last_swing_point == 'HH':
+                        current_trend_seq_count = 1
+                    if last_swing_point == 'LH':
+                        current_trend_seq_count += 1
+                uptrend_in_progress = True  # Now trend is downward.
+                last_low_reference = low_day_0
+                swing_point_occured = True
+        if swing_point_occured == True:
+            df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
+            df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+            final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
+        else:
+            # Not a swing point, so reset the healthy candle count to 0 for this data point
+            df.at[index_label, 'healthy_bullish_candle'] = 0
+            df.at[index_label, 'healthy_bearish_candle'] = 0
+
+    return df, final_swing_point_trend
+
 def identify_highs_lows2(df, window=20, price_move_percent=1.5):
     # Rewriting function to count number of healthy bullish / bearish candles.
     # Healthy candle = > 1,5% price move from open to close AND body >=60% of total candle length.
@@ -802,7 +917,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
-                    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
+                    if ticker.symbol == 'NNOX':
+                        price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=2, price_move_percent=1.5)
+                    else:
+                        price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
                     #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                     #print('Step 15')
