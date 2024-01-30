@@ -565,7 +565,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
     # Determine initial direction: If price closes higher, up trend, if lower, down trend
     # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
     # Down trend continues until high is higher on next 2 days.
-    for i in range(0, len(df) - reversal_days - 1):
+    for i in range(0, len(df) - reversal_days ):
         if i == 0:
             # This is start of data. Determine the initial direction.
             index_label = df.index[0]
