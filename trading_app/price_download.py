@@ -534,7 +534,8 @@ def identify_highs_lows(df, window=20):
 def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
     # New function to compute swing points using WD Gann logic.
     print('Detecting swing points according to Gann logic...')
-    logger.error(f'Detecting swing points according to Gann logic...')
+    logger.info(f'Detecting swing points according to Gann logic...')
+    logger.info(f'reversal_days: {reversal_days}')
     df['swing_point_label'] = ''
     df['swing_point_current_trend'] = 0
     # print('df.columns:',df.columns)
@@ -631,6 +632,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     logger.info(f"i: {i} Downtrend.")
                     consequetive_highs = True
                     logger.info(f"len(window_slice): {len(window_slice)}")
+                    logger.info(f"window_slice['High']: {window_slice['High']}")
                     for x in range(0, len(window_slice)-2):
                         logger.info(f"window_slice[x]['High']: {window_slice[x]['High']} window_slice[x+1]['High']: {window_slice[x+1]['High']}")
                         if window_slice[x]['High'] > window_slice[x+1]['High']:
