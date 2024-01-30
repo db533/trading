@@ -1002,6 +1002,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                 swing_point_current_trend=row['swing_point_current_trend'],
                                 healthy_bullish_count = row['healthy_bullish_candle'],
                                 healthy_bearish_count=row['healthy_bearish_candle'],
+                                candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                             )
                             logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                         else:
@@ -1023,6 +1024,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.swing_point_current_trend = row['swing_point_current_trend']
                             daily_price.healthy_bullish_count = row['healthy_bullish_candle']
                             daily_price.healthy_bearish_count = row['healthy_bearish_candle']
+                            daily_price.candle_count_since_last_swing_point = row['candle_count_since_last_swing_point']
                         daily_price.save()
                 else:
                     print('Insufficient data.')
