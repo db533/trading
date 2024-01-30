@@ -628,13 +628,13 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     # Down trend continues until high is higher on next 2 days.
                     # Assume the consequetive highs will be higher and test each to check they are indeed.
                     # If they are not, then this is not a swing point.
-                    print('i:', i, 'Downtrend.')
+                    logger.info(f"i: {i} Downtrend.")
                     consequetive_highs = True
-                    print('len(window_slice):',len(window_slice))
+                    logger.info(f"len(window_slice): {len(window_slice)}")
                     for x in range(0, len(window_slice)-2):
-                        print("window_slice[x]['High']:",window_slice[x]['High'], "window_slice[x+1]['High']:",window_slice[x+1]['High'])
+                        logger.info(f"window_slice[x]['High']: {window_slice[x]['High']} window_slice[x+1]['High']: {window_slice[x+1]['High']}")
                         if window_slice[x]['High'] > window_slice[x+1]['High']:
-                            print('NOT A SWING POINT. x:',x)
+                            logger.info(f"NOT A SWING POINT. x: {x}")
                             consequetive_highs = False
                             break
                     if consequetive_highs == True:
