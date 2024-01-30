@@ -919,12 +919,13 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 hour_offset = 4
             logger.error(f'hour_offset = {str(hour_offset)}')
             # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
+            #missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
 
-            if missing_dates:
+            if True:
+            #if missing_dates:
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                start_day = min(missing_dates)
-                finish_day = max(missing_dates)
+                #start_day = min(missing_dates)
+                #finish_day = max(missing_dates)
                 print('Retrieving data from ', start_day, ' to ', finish_day)
                 logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
