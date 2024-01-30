@@ -608,12 +608,14 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                             current_trend_seq_count += 1
                         if last_swing_point == 'LL':
                             current_trend_seq_count = 1
+                        last_swing_point = 'HH'
                     else:
                         df.at[index_label, 'swing_point_label'] = "LH"
                         if last_swing_point == 'HL':
                             current_trend_seq_count = 1
                         if last_swing_point == 'LL':
                             current_trend_seq_count += 1
+                        last_swing_point = 'LH'
                     uptrend_in_progress = False  # Now trend is downward.
                     last_high_reference = high_day_0
                     swing_point_occured = True
@@ -645,12 +647,14 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                             current_trend_seq_count += 1
                         if last_swing_point == 'LH':
                             current_trend_seq_count = 1
+                        last_swing_point = 'HL'
                     else:
                         df.at[index_label, 'swing_point_label'] = "LL"
                         if last_swing_point == 'HH':
                             current_trend_seq_count = 1
                         if last_swing_point == 'LH':
                             current_trend_seq_count += 1
+                        last_swing_point = 'LL'
                     uptrend_in_progress = True  # Now trend is upward.
                     last_low_reference = low_day_0
                     swing_point_occured = True
@@ -658,6 +662,14 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
             df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
             df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
             final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
+            if current_trend_seq_count > 2:
+                # This data point is part of a swing trend.
+                if last_swing_point[0] == "H":
+                    df.at[index_label, 'swing_point_current_trend'] = 1
+                    # print('Setting uptrend.')
+                elif last_swing_point[0] == "L":
+                    df.at[index_label, 'swing_point_current_trend'] = -1
+                    # print('Setting downtrend.')
         else:
             # Not a swing point, so reset the healthy candle count to 0 for this data point
             df.at[index_label, 'healthy_bullish_candle'] = 0
