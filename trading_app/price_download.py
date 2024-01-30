@@ -634,7 +634,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     logger.info(f"len(window_slice): {len(window_slice)}")
                     logger.info(f"window_slice['High']: {window_slice['High']}")
                     for x in range(0, len(window_slice)-2):
-                        logger.info(f"window_slice[x]['High']: {window_slice[x]['High']} window_slice[x+1]['High']: {window_slice[x+1]['High']}")
+                        logger.info(f"window_slice.iloc[x]['High']: {window_slice.iloc[x]['High']} window_slice.iloc[x+1]['High']: {window_slice.iloc[x+1]['High']}")
                         if window_slice.iloc[x]['High'] > window_slice.iloc[x+1]['High']:
                             logger.info(f"NOT A SWING POINT. x: {x}")
                             consequetive_highs = False
