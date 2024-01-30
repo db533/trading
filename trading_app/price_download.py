@@ -594,12 +594,11 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
                 # Assume the consequetive lows will be lower and test each to check they are indeed.
                 # If they are not, then this is not a swing point.
-                consequetive_lows = True
+                count_consequetive = 0
                 for x in range(0, len(window_slice)-2):
                     if window_slice.iloc[x]['Low'] < window_slice.iloc[x+1]['Low']:
-                        consequetive_lows = False
-                        break
-                if consequetive_lows == True:
+                        count_consequetive += 1
+                if count_consequetive == reversal_days:
                     # The subsequent day(s) have had lows lower than on Day 0.
                     # Up trend ended on Day 0.
                     if high_day_0 > last_high_reference:
@@ -628,16 +627,15 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 # Assume the consequetive highs will be higher and test each to check they are indeed.
                 # If they are not, then this is not a swing point.
                 logger.info(f"i: {i} Downtrend.")
-                consequetive_highs = True
+                count_consequetive = 0
                 logger.info(f"len(window_slice): {len(window_slice)}")
                 logger.info(f"window_slice['High']: {window_slice['High']}")
                 for x in range(0, len(window_slice)-2):
                     logger.info(f"window_slice.iloc[x]['High']: {window_slice.iloc[x]['High']} window_slice.iloc[x+1]['High']: {window_slice.iloc[x+1]['High']}")
                     if window_slice.iloc[x]['High'] > window_slice.iloc[x+1]['High']:
                         logger.info(f"NOT A SWING POINT. x: {x}")
-                        consequetive_highs = False
-                        break
-                if consequetive_highs == True:
+                        count_consequetive += 1
+                if count_consequetive == reversal_days:
                     # The subsequent day(s) have had higher highs than on Day 0.
                     # Down trend ended on Day 0.
                     if low_day_0 > last_low_reference:
@@ -653,7 +651,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                             current_trend_seq_count = 1
                         if last_swing_point == 'LH':
                             current_trend_seq_count += 1
-                    uptrend_in_progress = True  # Now trend is downward.
+                    uptrend_in_progress = True  # Now trend is upward.
                     last_low_reference = low_day_0
                     swing_point_occured = True
         if swing_point_occured == True:
