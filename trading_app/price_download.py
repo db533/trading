@@ -580,10 +580,11 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 last_swing_point = 'LH'
             last_high_reference = df.iloc[0]['High']
             last_low_reference = df.iloc[0]['Low']
-
+            candle_count_since_last_swing_point = 0
         index_label = df.index[i]
         window_slice = df.iloc[i:i + reversal_days + 1]
         swing_point_occured = False
+        candle_count_since_last_swing_point += 1
         if uptrend_in_progress:
             # First check if a new high was not achieved (but only if this is not the first record).
             high_day_0 = df.iloc[i]['High']
@@ -663,6 +664,8 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
         if swing_point_occured == True:
             df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
             df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
+            df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
+            candle_count_since_last_swing_point = 0
             final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
             if current_trend_seq_count > 2:
                 # This data point is part of a swing trend.
