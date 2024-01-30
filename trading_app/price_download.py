@@ -584,57 +584,74 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
         window_slice = df.iloc[i:i + reversal_days]
         swing_point_occured = False
         if uptrend_in_progress:
-            # Look for reversal to downtrend
-            # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
-            low_day_0 = df.iloc[i]['Low']
-            max_low = window_slice['Low'].max()
+            # First check if a new high was not achieved (but only if this is not the first record).
             high_day_0 = df.iloc[i]['High']
-            if low_day_0 == max_low:
-                # The subsequent day(s) have had lows lower than on Day 0.
-                # Up trend ended on Day 0.
-                if high_day_0 > last_high_reference:
-                    # This high is higher than the previous high so this is a HH.
-                    df.at[index_label, 'swing_point_label'] = "HH"
-                    if last_swing_point == 'HL':
-                        current_trend_seq_count += 1
-                    if last_swing_point == 'LL':
-                        current_trend_seq_count = 1
-                else:
-                    df.at[index_label, 'swing_point_label'] = "LH"
-                    if last_swing_point == 'HL':
-                        current_trend_seq_count = 1
-                    if last_swing_point == 'LL':
-                        current_trend_seq_count += 1
-                uptrend_in_progress = False  # Now trend is downward.
-                last_high_reference = high_day_0
-
-
-                swing_point_occured = True
+            if i>0:
+                yesterday_high = df.iloc[i-1]['High']
+                if high_day_0 < yesterday_high:
+                    # High today has not sustained an up trend. Check for reversal in subsequent candles.
+                    # Look for reversal to downtrend
+                    # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
+                    # Assume the consequetive lows will be lower and test each to check they are indeed.
+                    # If they are not, then this is not a swing point.
+                    consequetive_lows = True
+                    for x in range(0:len(window_slice)-2):
+                        if window_slice[x]['Low'] < window_slice[x+1]['Low']:
+                            consequetive_lows = False
+                            break
+                    if consequetive_lows == True:
+                        # The subsequent day(s) have had lows lower than on Day 0.
+                        # Up trend ended on Day 0.
+                        if high_day_0 > last_high_reference:
+                            # This high is higher than the previous high so this is a HH.
+                            df.at[index_label, 'swing_point_label'] = "HH"
+                            if last_swing_point == 'HL':
+                                current_trend_seq_count += 1
+                            if last_swing_point == 'LL':
+                                current_trend_seq_count = 1
+                        else:
+                            df.at[index_label, 'swing_point_label'] = "LH"
+                            if last_swing_point == 'HL':
+                                current_trend_seq_count = 1
+                            if last_swing_point == 'LL':
+                                current_trend_seq_count += 1
+                        uptrend_in_progress = False  # Now trend is downward.
+                        last_high_reference = high_day_0
+                        swing_point_occured = True
         else:
-            # Look for reversal to uptrend
-            # Down trend continues until high is higher on next 2 days.
-            high_day_0 = df.iloc[i]['High']
-            min_high = window_slice['High'].min()
+            # Down trend in progress
             low_day_0 = df.iloc[i]['Low']
-            if high_day_0 == min_high:
-                # The subsequent day(s) have had higher highs than on Day 0.
-                # Down trend ended on Day 0.
-                if low_day_0 > last_low_reference:
-                    # This low is higher than the previous high so this is a HH.
-                    df.at[index_label, 'swing_point_label'] = "HL"
-                    if last_swing_point == 'HH':
-                        current_trend_seq_count += 1
-                    if last_swing_point == 'LH':
-                        current_trend_seq_count = 1
-                else:
-                    df.at[index_label, 'swing_point_label'] = "LL"
-                    if last_swing_point == 'HH':
-                        current_trend_seq_count = 1
-                    if last_swing_point == 'LH':
-                        current_trend_seq_count += 1
-                uptrend_in_progress = True  # Now trend is downward.
-                last_low_reference = low_day_0
-                swing_point_occured = True
+            if i>0:
+                yesterday_low = df.iloc[i-1]['Low']
+                if low_day_0 > yesterday_low:
+                    # Today's low is no longer lower, so look for reversal to uptrend
+                    # Down trend continues until high is higher on next 2 days.
+                    # Assume the consequetive highs will be higher and test each to check they are indeed.
+                    # If they are not, then this is not a swing point.
+                    consequetive_highs = True
+                    for x in range(0:len(window_slice)-2):
+                        if window_slice[x]['High'] > window_slice[x+1]['High']:
+                            consequetive_highs = False
+                            break
+                    if consequetive_highs == True:
+                        # The subsequent day(s) have had higher highs than on Day 0.
+                        # Down trend ended on Day 0.
+                        if low_day_0 > last_low_reference:
+                            # This low is higher than the previous high so this is a HH.
+                            df.at[index_label, 'swing_point_label'] = "HL"
+                            if last_swing_point == 'HH':
+                                current_trend_seq_count += 1
+                            if last_swing_point == 'LH':
+                                current_trend_seq_count = 1
+                        else:
+                            df.at[index_label, 'swing_point_label'] = "LL"
+                            if last_swing_point == 'HH':
+                                current_trend_seq_count = 1
+                            if last_swing_point == 'LH':
+                                current_trend_seq_count += 1
+                        uptrend_in_progress = True  # Now trend is downward.
+                        last_low_reference = low_day_0
+                        swing_point_occured = True
         if swing_point_occured == True:
             df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
             df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
