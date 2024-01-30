@@ -954,10 +954,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 14')
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
-                    if ticker.symbol == 'NNOX':
-                        price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=2, price_move_percent=1.5)
-                    else:
-                        price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
+                    #if ticker.symbol == 'NNOX':
+                    price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=2, price_move_percent=1.5)
+                    #else:
+                    #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
                     #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                     #print('Step 15')
