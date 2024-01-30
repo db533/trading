@@ -595,7 +595,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     # Assume the consequetive lows will be lower and test each to check they are indeed.
                     # If they are not, then this is not a swing point.
                     consequetive_lows = True
-                    for x in range(0:len(window_slice)-2):
+                    for x in range(0, len(window_slice)-2):
                         if window_slice[x]['Low'] < window_slice[x+1]['Low']:
                             consequetive_lows = False
                             break
@@ -629,7 +629,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     # Assume the consequetive highs will be higher and test each to check they are indeed.
                     # If they are not, then this is not a swing point.
                     consequetive_highs = True
-                    for x in range(0:len(window_slice)-2):
+                    for x in range(0, len(window_slice)-2):
                         if window_slice[x]['High'] > window_slice[x+1]['High']:
                             consequetive_highs = False
                             break
