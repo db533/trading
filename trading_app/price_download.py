@@ -595,7 +595,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 # Assume the consequetive lows will be lower and test each to check they are indeed.
                 # If they are not, then this is not a swing point.
                 count_consequetive = 0
-                for x in range(0, reversal_days + 1):
+                for x in range(0, reversal_days):
                     if window_slice.iloc[x]['Low'] > window_slice.iloc[x+1]['Low']:
                         count_consequetive += 1
                 print(index_label,' count_consequetive:',count_consequetive)
@@ -633,7 +633,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 count_consequetive = 0
                 #logger.info(f"len(window_slice): {len(window_slice)}")
                 #logger.info(f"window_slice['High']: {window_slice['High']}")
-                for x in range(0, reversal_days + 1):
+                for x in range(0, reversal_days):
                     #logger.info(f"window_slice.iloc[x]['High']: {window_slice.iloc[x]['High']} window_slice.iloc[x+1]['High']: {window_slice.iloc[x+1]['High']}")
                     if window_slice.iloc[x]['High'] < window_slice.iloc[x+1]['High']:
                         #logger.info(f"NOT A SWING POINT. x: {x}")
