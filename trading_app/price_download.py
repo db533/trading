@@ -582,7 +582,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
             last_low_reference = df.iloc[0]['Low']
 
         index_label = df.index[i]
-        window_slice = df.iloc[i:i + reversal_days]
+        window_slice = df.iloc[i:i + reversal_days + 1]
         swing_point_occured = False
         if uptrend_in_progress:
             # First check if a new high was not achieved (but only if this is not the first record).
