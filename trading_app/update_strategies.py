@@ -203,8 +203,8 @@ class GannPointFive(BaseStrategy):
                 latest_T = instance_difference_count(swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
-                if (swing_point.swing_point_label == 'LH' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'HL' and existing_downtrend = False):
+                if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'HL' and existing_downtrend == False):
                     # Swing point is a high on the down trend.
                     # Save the number of days that that it took to reach this swing point.
                     logger.error(
@@ -213,8 +213,8 @@ class GannPointFive(BaseStrategy):
                     most_recent_swing_label = swing_point.swing_point_label
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
 
-                elif (swing_point.swing_point_label == 'LL' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'HH' and existing_downtrend = False):
+                elif (swing_point.swing_point_label == 'LL' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'HH' and existing_downtrend == False):
                     logger.error(f'Found a prior {swing_point.swing_point_label}.')
                     if ((swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH') or
                         (swing_point.swing_point_label == 'HH' and most_recent_swing_label == 'HL')):
@@ -222,8 +222,8 @@ class GannPointFive(BaseStrategy):
                         most_recent_swing_label = swing_point.swing_point_label
                         if T_most_recent is None:
                             T_most_recent = most_recent_duration
-                elif (swing_point.swing_point_label == 'HH' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'LL' and existing_downtrend = False):
+                elif (swing_point.swing_point_label == 'HH' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'LL' and existing_downtrend == False):
                     # This must be the start of the prior down / up trend.
                     # Stop checking further swing points.
                     logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
@@ -277,8 +277,8 @@ class GannPointThree(BaseStrategy):
                 latest_T = instance_difference_count(swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
-                if (swing_point.swing_point_label == 'LH' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'HL' and existing_downtrend = False):
+                if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'HL' and existing_downtrend == False):
                     # Swing point is a high on the down trend.
                     # Save the number of days that that it took to reach this swing point.
                     logger.error(
@@ -287,8 +287,8 @@ class GannPointThree(BaseStrategy):
                     most_recent_swing_label = swing_point.swing_point_label
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
 
-                elif (swing_point.swing_point_label == 'LL' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'HH' and existing_downtrend = False):
+                elif (swing_point.swing_point_label == 'LL' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'HH' and existing_downtrend == False):
                     logger.error(f'Found a prior {swing_point.swing_point_label}.')
                     if ((swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH') or
                         (swing_point.swing_point_label == 'HH' and most_recent_swing_label == 'HL')):
@@ -296,8 +296,8 @@ class GannPointThree(BaseStrategy):
                         most_recent_swing_label = swing_point.swing_point_label
                         if T_most_recent is None:
                             T_most_recent = most_recent_duration
-                elif (swing_point.swing_point_label == 'HH' and existing_downtrend = True) or (
-                        swing_point.swing_point_label == 'LL' and existing_downtrend = False):
+                elif (swing_point.swing_point_label == 'HH' and existing_downtrend == True) or (
+                        swing_point.swing_point_label == 'LL' and existing_downtrend == False):
                     # This must be the start of the prior down / up trend.
                     # Stop checking further swing points.
                     logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
