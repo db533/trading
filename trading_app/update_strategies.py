@@ -120,7 +120,7 @@ class GannPointFour(BaseStrategy):
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__isnull=False).only('datetime', 'swing_point_label',
                                                                                                 'candle_count_since_last_swing_point').order_by('-datetime')
-        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         strategy_valid = True
         existing_downtrend = None
@@ -128,19 +128,19 @@ class GannPointFour(BaseStrategy):
         latest_T = 0
         for swing_point in swing_point_query:
             # Check first is a LL or HH
-            logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+            logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
             if swing_point_counter == 1:
                 if swing_point.swing_point_label == 'LL':
                     existing_downtrend = True
                     action_buy = True
-                    logger.info(f'Detected first swingpoint. LL')
+                    logger.error(f'Detected first swingpoint. LL')
                 elif swing_point.swing_point_label == 'HH':
-                    logger.info(f'Detected first swingpoint. HH')
+                    logger.error(f'Detected first swingpoint. HH')
                     existing_downtrend = False
                     action_buy = False
                 else:
                     # This strategy cannot be true. End review of swing points.
-                    logger.info(f'First swingpoint not HH or LL. Stratey not valid.')
+                    logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
                     strategy_valid = False
                     break
                 # Now need to determine the elapsed days since this LL or HH.
@@ -150,14 +150,14 @@ class GannPointFour(BaseStrategy):
                 if swing_point.swing_point_label == 'LH':
                     # Swing point is a high on the down trend.
                     # Sve the number of days that that it took to reach this swing point.
-                    logger.info(f'Found a prior LH.')
+                    logger.error(f'Found a prior LH.')
                     T_prev.append(swing_point.candle_count_since_last_swing_point)
                 elif swing_point.swing_point_label == 'LL':
-                    logger.info(f'Found a prior LL.')
+                    logger.error(f'Found a prior LL.')
                 elif swing_point.swing_point_label == 'HH':
                     # This must be the start of the prior down trend.
                     # Stop checking further swing points.
-                    logger.info(f'Found a prior HH. So downtrend started here.')
+                    logger.error(f'Found a prior HH. So downtrend started here.')
                     break
                 swing_point_counter += 1
         #if strategy_valid == True and len(T_prev) > 0:
