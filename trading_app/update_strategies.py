@@ -153,12 +153,15 @@ class GannPointFour(BaseStrategy):
                     # Stop checking further swing points.
                     break
         #if strategy_valid == True and len(T_prev) > 0:
-            max_T = max(T_prev)
-            if latest_T <= max_T:
-                strategy_valid = False
+        if strategy_valid == True:
+            if len(T_prev) > 0:
+                max_T = max(T_prev)
+                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
             else:
-                data = {'latest_T' : str(latest_T), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
-        data = {'latest_T': str(latest_T), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
+                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
+            #if latest_T <= max_T:
+            #    strategy_valid = False
+
         return action_buy, data
 
 from django.utils import timezone
