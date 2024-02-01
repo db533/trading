@@ -169,7 +169,7 @@ class GannPointFour(BaseStrategy):
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
             #if latest_T <= max_T:
             #    strategy_valid = False
-
+        logger.error(f'........')
         return action_buy, data
 
 from django.utils import timezone
