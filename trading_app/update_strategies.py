@@ -122,7 +122,6 @@ class GannPointFour(BaseStrategy):
                                                                                                 'candle_count_since_last_swing_point').order_by('-datetime')
         #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
-        strategy_valid = True
         existing_downtrend = None
         T_prev = []
         latest_T = 0
@@ -141,34 +140,32 @@ class GannPointFour(BaseStrategy):
                 else:
                     # This strategy cannot be true. End review of swing points.
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
-                    strategy_valid = False
                     break
                 # Now need to determine the elapsed days since this LL or HH.
                 latest_T = instance_difference_count(swing_point)
                 swing_point_counter += 1
             elif swing_point_counter >1:
-                if swing_point.swing_point_label == 'LH':
+                if (swing_point.swing_point_label == 'LH' and existing_downtrend = True) or (swing_point.swing_point_label == 'HL' and existing_downtrend = False):
                     # Swing point is a high on the down trend.
-                    # Sve the number of days that that it took to reach this swing point.
-                    logger.error(f'Found a prior LH.')
+                    # Save the number of days that that it took to reach this swing point.
+                    logger.error(f'Found a prior {swing_point.swing_point_label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
                     T_prev.append(swing_point.candle_count_since_last_swing_point)
-                elif swing_point.swing_point_label == 'LL':
-                    logger.error(f'Found a prior LL.')
-                elif swing_point.swing_point_label == 'HH':
-                    # This must be the start of the prior down trend.
+                elif (swing_point.swing_point_label == 'LL'and existing_downtrend = True) or (swing_point.swing_point_label == 'HH'and existing_downtrend = False):
+                    logger.error(f'Found a prior {swing_point.swing_point_label}.')
+                elif (swing_point.swing_point_label == 'HH' and existing_downtrend = True) or (swing_point.swing_point_label == 'LL' and existing_downtrend = False):
+                    # This must be the start of the prior down / up trend.
                     # Stop checking further swing points.
-                    logger.error(f'Found a prior HH. So downtrend started here.')
+                    logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
                     break
                 swing_point_counter += 1
-        #if strategy_valid == True and len(T_prev) > 0:
-        if strategy_valid == True:
-            if len(T_prev) > 0:
-                max_T = max(T_prev)
-                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
-            else:
-                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
-            #if latest_T <= max_T:
-            #    strategy_valid = False
+        if len(T_prev) > 0:
+            max_T = max(T_prev)
+            data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
+            logger.error(f'Max T during prior series of swings: {max_T}.')
+        else:
+            data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
+            action_buy = None
+        logger.error(f'Latest T: {latest_T}.')
         logger.error(f'........')
         return action_buy, data
 
