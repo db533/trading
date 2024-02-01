@@ -125,6 +125,7 @@ class GannPointFour(BaseStrategy):
         strategy_valid = True
         existing_downtrend = None
         T_prev = []
+        latest_T = 0
         for swing_point in swing_point_query:
             # Check first is a LL or HH
             if swing_point_counter == 1:
