@@ -108,7 +108,7 @@ def instance_difference_count(earlier_candle):
     # Given datetime index (ensure it's timezone-aware if your model uses timezone-aware datetimes)
     earlier_dt = earlier_candle.datetime
     # Count instances of DailyPrice where the date is greater than the given datetime
-    count = DailyPrice.objects.filter(date__gt=given_datetime).count()
+    count = DailyPrice.objects.filter(date__gt=earlier_dt).count()
     return count
 
 class GannPointFour(BaseStrategy):
