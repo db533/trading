@@ -169,6 +169,154 @@ class GannPointFour(BaseStrategy):
         logger.error(f'........')
         return action_buy, data
 
+class GannPointFive(BaseStrategy):
+    name="Gann's Buying / Selling point #5"
+
+    def check_criteria(self):
+        data = {}
+        action_buy = None
+        # Access the latest DailyPrice (or other relevant price model) for the ticker
+        swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
+                                                                                                'candle_count_since_last_swing_point').order_by('-datetime')
+        swing_point_counter = 1
+        existing_downtrend = None
+        T_most_recent = None
+        latest_T = 0
+        section_count = 0
+        for swing_point in swing_point_query:
+            # Check first is a LL or HH
+            logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+            if swing_point_counter == 1:
+                if swing_point.swing_point_label == 'LL':
+                    existing_downtrend = True
+                    action_buy = True
+                    logger.error(f'Detected first swingpoint. LL')
+                elif swing_point.swing_point_label == 'HH':
+                    logger.error(f'Detected first swingpoint. HH')
+                    existing_downtrend = False
+                    action_buy = False
+                else:
+                    # This strategy cannot be true. End review of swing points.
+                    logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
+                    break
+                    # Now need to determine the elapsed days since this LL or HH.
+                latest_T = instance_difference_count(swing_point)
+                swing_point_counter += 1
+            elif swing_point_counter > 1:
+                if (swing_point.swing_point_label == 'LH' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'HL' and existing_downtrend = False):
+                    # Swing point is a high on the down trend.
+                    # Save the number of days that that it took to reach this swing point.
+                    logger.error(
+                        f'Found a prior {swing_point.swing_point_label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
+                    # Only save the most recent elapsed time.
+                    most_recent_swing_label = swing_point.swing_point_label
+                    most_recent_duration = swing_point.candle_count_since_last_swing_point
+
+                elif (swing_point.swing_point_label == 'LL' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'HH' and existing_downtrend = False):
+                    logger.error(f'Found a prior {swing_point.swing_point_label}.')
+                    if ((swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH') or
+                        (swing_point.swing_point_label == 'HH' and most_recent_swing_label == 'HL')):
+                        section_count += 1
+                        most_recent_swing_label = swing_point.swing_point_label
+                        if T_most_recent is None:
+                            T_most_recent = most_recent_duration
+                elif (swing_point.swing_point_label == 'HH' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'LL' and existing_downtrend = False):
+                    # This must be the start of the prior down / up trend.
+                    # Stop checking further swing points.
+                    logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
+                    break
+                swing_point_counter += 1
+
+            if T_most_recent is not None:
+                data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
+                        'section_count': str(len(section_count)), }
+                logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
+                if T_most_recent > latest_T:
+                    action_buy = None
+            else:
+                data = {'latest_T': str(latest_T),'section_count': str(len(section_count)),}
+                action_buy = None
+            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'........')
+            return action_buy, data
+
+class GannPointThree(BaseStrategy):
+    name="Gann's Buying / Selling point #3"
+
+    def check_criteria(self):
+        data = {}
+        action_buy = None
+        # Access the latest DailyPrice (or other relevant price model) for the ticker
+        swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
+                                                                                                'candle_count_since_last_swing_point').order_by('-datetime')
+        swing_point_counter = 1
+        existing_downtrend = None
+        T_most_recent = None
+        latest_T = 0
+        section_count = 0
+        for swing_point in swing_point_query:
+            # Check first is a LL or HH
+            logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+            if swing_point_counter == 1:
+                if swing_point.swing_point_label == 'LL':
+                    existing_downtrend = True
+                    action_buy = True
+                    logger.error(f'Detected first swingpoint. LL')
+                elif swing_point.swing_point_label == 'HH':
+                    logger.error(f'Detected first swingpoint. HH')
+                    existing_downtrend = False
+                    action_buy = False
+                else:
+                    # This strategy cannot be true. End review of swing points.
+                    logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
+                    break
+                    # Now need to determine the elapsed days since this LL or HH.
+                latest_T = instance_difference_count(swing_point)
+                swing_point_counter += 1
+            elif swing_point_counter > 1:
+                if (swing_point.swing_point_label == 'LH' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'HL' and existing_downtrend = False):
+                    # Swing point is a high on the down trend.
+                    # Save the number of days that that it took to reach this swing point.
+                    logger.error(
+                        f'Found a prior {swing_point.swing_point_label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
+                    # Only save the most recent elapsed time.
+                    most_recent_swing_label = swing_point.swing_point_label
+                    most_recent_duration = swing_point.candle_count_since_last_swing_point
+
+                elif (swing_point.swing_point_label == 'LL' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'HH' and existing_downtrend = False):
+                    logger.error(f'Found a prior {swing_point.swing_point_label}.')
+                    if ((swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH') or
+                        (swing_point.swing_point_label == 'HH' and most_recent_swing_label == 'HL')):
+                        section_count += 1
+                        most_recent_swing_label = swing_point.swing_point_label
+                        if T_most_recent is None:
+                            T_most_recent = most_recent_duration
+                elif (swing_point.swing_point_label == 'HH' and existing_downtrend = True) or (
+                        swing_point.swing_point_label == 'LL' and existing_downtrend = False):
+                    # This must be the start of the prior down / up trend.
+                    # Stop checking further swing points.
+                    logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
+                    break
+                swing_point_counter += 1
+
+            if T_most_recent is not None:
+                data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
+                        'section_count': str(len(section_count)), }
+                logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
+                if T_most_recent > latest_T:
+                    action_buy = None
+            else:
+                data = {'latest_T': str(latest_T),'section_count': str(len(section_count)),}
+                action_buy = None
+            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'........')
+            return action_buy, data
+
 from django.utils import timezone
 
 def process_trading_opportunities():
@@ -176,7 +324,7 @@ def process_trading_opportunities():
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
-    strategies = [GannPointFour]  # List of strategy classes
+    strategies = [GannPointFour, GannPointFive]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
