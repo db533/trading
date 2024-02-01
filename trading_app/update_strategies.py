@@ -178,14 +178,14 @@ def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
-    strategies = [TAEStrategy, GannPointFour]  # List of strategy classes
+    strategies = [GannPointFour]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
-            #logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
+            logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             action_buy, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
             existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
