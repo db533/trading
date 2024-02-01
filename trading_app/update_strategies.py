@@ -102,19 +102,69 @@ class DoubleSevens(BaseStrategy):
                 elif latest_close_price >= seven_day_max:
                     action_buy = False
                     data = {'latest_close_price': str(latest_close_price), 'seven_day_max': str(seven_day_max), }
-        if action_buy is not None:
-            #data = {'cumulative_two_period_two_day_rsi': str(cumulative_two_period_two_day_rsi),}
-            return action_buy, data
         return action_buy, data
 
+def instance_difference_count(earlier_candle):
+    # Given datetime index (ensure it's timezone-aware if your model uses timezone-aware datetimes)
+    earlier_dt = earlier_candle.datetime
+    # Count instances of DailyPrice where the date is greater than the given datetime
+    count = DailyPrice.objects.filter(date__gt=given_datetime).count()
+    return count
 
+class GannPointFour(BaseStrategy):
+    name="Gann's Buying / Selling point #4"
+
+    def check_criteria(self):
+        data = {}
+        action_buy = None
+        # Access the latest DailyPrice (or other relevant price model) for the ticker
+        swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__isnull=False).only('datetime', 'swing_point_label',
+                                                                                                'candle_count_since_last_swing_point').order_by('-datetime').first()
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        swing_point_counter = 1
+        strategy_valid = True
+        existing_downtrend = None
+        T_prev = []
+        for swing_point in swing_point_query:
+            # Check first is a LL or HH
+            if swing_point_counter == 1:
+                if swing_point.swing_point_label == 'LL':
+                    existing_downtrend = True
+                    action_buy = True
+                elif swing_point.swing_point_label == 'HH':
+                    existing_downtrend = False
+                    action_buy = False
+                else:
+                    # This strategy cannot be true. End review of swing points.
+                    strategy_valid = False
+                    break
+                # Now need to determine the elapsed days since this LL or HH.
+                latest_T = instance_difference_count(swing_point)
+                swing_point_counter += 1
+            elif swing_point_counter >1:
+                if swing_point.swing_point_label == 'LH':
+                    # Swing point is a high on the down trend.
+                    # Sve the number of days that that it took to reach this swing point.
+                    T_prev.append(swing_point.candle_count_since_last_swing_point)
+                    swing_point_counter += 2
+                elif swing_point.swing_point_label == 'HH':
+                    # This must be the start of the prior down trend.
+                    # Stop checking further swing points.
+                    break
+        if strategy_valid == True and len(T_prev) > 0:
+            max_T = max(T_prev)
+            if latest_T <= max_T:
+                strategy_valid = False
+            else:
+                data = {'latest_T' : str(latest_T), 'max_T': str(max_T), 'count_T_prev': str(len(T_prev)), }
+        return action_buy, data
 
 from django.utils import timezone
 
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
-    strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
+    strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
