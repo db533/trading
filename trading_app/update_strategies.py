@@ -151,12 +151,13 @@ class GannPointFour(BaseStrategy):
                     # This must be the start of the prior down trend.
                     # Stop checking further swing points.
                     break
-        if strategy_valid == True and len(T_prev) > 0:
+        #if strategy_valid == True and len(T_prev) > 0:
             max_T = max(T_prev)
             if latest_T <= max_T:
                 strategy_valid = False
             else:
-                data = {'latest_T' : str(latest_T), 'max_T': str(max_T), 'count_T_prev': str(len(T_prev)), }
+                data = {'latest_T' : str(latest_T), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
+        data = {'latest_T': str(latest_T), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
         return action_buy, data
 
 from django.utils import timezone
@@ -164,14 +165,15 @@ from django.utils import timezone
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
-    strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
+    #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
+    strategies = [TAEStrategy, GannPointFour]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
-            logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
+            #logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             action_buy, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
             existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
@@ -181,7 +183,7 @@ def process_trading_opportunities():
                 existing_tradingopp = None
             if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
-                logger.error(f'Strategy criteria met for "{str(ticker.symbol)}"...')
+                logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
                 #ticker_id_in_strategy.append(ticker.id)
                 if existing_tradingopp is not None:
                     # This Ticker / strategy exists as an active record. Increment the count.
