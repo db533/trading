@@ -598,7 +598,8 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 # If they are not, then this is not a swing point.
                 count_consequetive = 0
                 for x in range(0, reversal_days):
-                    if window_slice.iloc[x]['Low'] > window_slice.iloc[x+1]['Low']:
+                    #if window_slice.iloc[x]['Low'] > window_slice.iloc[x + 1]['Low']:
+                    if window_slice.iloc[0]['Low'] > window_slice.iloc[x+1]['Low']:
                         count_consequetive += 1
                 print(index_label,' count_consequetive:',count_consequetive)
                 if count_consequetive == reversal_days:
@@ -637,7 +638,8 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 #logger.info(f"window_slice['High']: {window_slice['High']}")
                 for x in range(0, reversal_days):
                     #logger.info(f"window_slice.iloc[x]['High']: {window_slice.iloc[x]['High']} window_slice.iloc[x+1]['High']: {window_slice.iloc[x+1]['High']}")
-                    if window_slice.iloc[x]['High'] < window_slice.iloc[x+1]['High']:
+                    #if window_slice.iloc[x]['High'] < window_slice.iloc[x + 1]['High']:
+                    if window_slice.iloc[0]['High'] < window_slice.iloc[x+1]['High']:
                         #logger.info(f"NOT A SWING POINT. x: {x}")
                         count_consequetive += 1
                 print(index_label, ' count_consequetive:', count_consequetive)
@@ -955,7 +957,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=1, price_move_percent=1.5)
+                    price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=2, price_move_percent=1.5)
                     #else:
                     #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
