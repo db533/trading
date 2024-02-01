@@ -600,7 +600,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 for x in range(0, reversal_days):
                     if window_slice.iloc[x]['Low'] > window_slice.iloc[x+1]['Low']:
                         count_consequetive += 1
-                print(index_label,' count_consequetive:',count_consequetive)
+                #print(index_label,' count_consequetive:',count_consequetive)
                 if count_consequetive == reversal_days:
                     # The subsequent day(s) have had lows lower than on Day 0.
                     # Up trend ended on Day 0.
