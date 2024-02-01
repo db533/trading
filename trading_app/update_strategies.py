@@ -177,6 +177,7 @@ from django.utils import timezone
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
+    tickers = Ticker.objects.filter(symbol="FUBO")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
     strategies = [GannPointFour]  # List of strategy classes
     #ticker_id_in_strategy = []
