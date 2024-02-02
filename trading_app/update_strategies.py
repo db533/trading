@@ -389,7 +389,8 @@ class GannPointEightBuy(BaseStrategy):
         swing_point_counter = 1
         latest_T = 0
         max_top = None
-        max_variance_percent = 2
+        max_variance_percent = 0.5  # A bottom must be within this many % of the last low price to count as a bottom.
+        peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom
         bottoms = 0
 
         for swing_point in swing_point_query:
@@ -433,9 +434,10 @@ class GannPointEightBuy(BaseStrategy):
                             f'Low is outside threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
                         break
                 swing_point_counter += 1
-
-        if bottoms > 1:
-            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), }
+        # Check we have at least a double bottom and the peaks are at least significantly above the low
+        if bottoms > 1 and max_top/last_low > (1 + (peak_percent_above_bottom/100)):
+            bottom_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration)}
             logger.error(f'Multiple bottoms detected: {bottoms}.')
             # Temporarily set any double bottoms to be defined as a buy.
             action_buy = True
