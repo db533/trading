@@ -104,11 +104,11 @@ class DoubleSevens(BaseStrategy):
                     data = {'latest_close_price': str(latest_close_price), 'seven_day_max': str(seven_day_max), }
         return action_buy, data
 
-def instance_difference_count(earlier_candle):
+def instance_difference_count(ticker, earlier_candle):
     # Given datetime index (ensure it's timezone-aware if your model uses timezone-aware datetimes)
     earlier_dt = earlier_candle.datetime
     # Count instances of DailyPrice where the date is greater than the given datetime
-    count = DailyPrice.objects.filter(ticker=self.ticker).filter(datetime__gt=earlier_dt).count()
+    count = DailyPrice.objects.filter(ticker=ticker).filter(datetime__gt=earlier_dt).count()
     return count
 
 class GannPointFour(BaseStrategy):
@@ -142,7 +142,7 @@ class GannPointFour(BaseStrategy):
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
                     break
                 # Now need to determine the elapsed days since this LL or HH.
-                latest_T = instance_difference_count(swing_point)
+                latest_T = instance_difference_count(self.ticker, swing_point)
                 swing_point_counter += 1
             elif swing_point_counter >1:
                 if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (swing_point.swing_point_label == 'HL' and existing_downtrend == False):
