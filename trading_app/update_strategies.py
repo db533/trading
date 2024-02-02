@@ -389,7 +389,7 @@ def process_trading_opportunities():
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
-    strategies = [GannPointFourBuy, GannPointFourSell, GannPointFive]  # List of strategy classes
+    strategies = [GannPointFourBuy, GannPointFourSell]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
