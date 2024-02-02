@@ -200,7 +200,7 @@ class GannPointFive(BaseStrategy):
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
                     break
                     # Now need to determine the elapsed days since this LL or HH.
-                latest_T = instance_difference_count(swing_point)
+                latest_T = instance_difference_count(self.ticker, swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
                 if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (
@@ -274,7 +274,7 @@ class GannPointThree(BaseStrategy):
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
                     break
                     # Now need to determine the elapsed days since this LL or HH.
-                latest_T = instance_difference_count(swing_point)
+                latest_T = instance_difference_count(self.ticker, swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
                 if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (
