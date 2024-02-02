@@ -533,9 +533,9 @@ def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
-    #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
+    #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
     #strategies = [GannPointFourBuy, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell]  # List of strategy classes
-    strategies = [GannPointEightBuy, GannPointEightSell]  # List of strategy classes
+    strategies = [GannPointFourBuy, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
