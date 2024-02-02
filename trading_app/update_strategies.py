@@ -388,9 +388,9 @@ class GannPointEightBuy(BaseStrategy):
                                                                                                 'candle_count_since_last_swing_point', 'low_price', 'high_price').order_by('-datetime')
         swing_point_counter = 1
         latest_T = 0
-        section_count = 0
         max_top = None
         max_variance_percent = 2
+        bottoms = 0
 
         for swing_point in swing_point_query:
             # Check first is a LL or HH
@@ -434,20 +434,20 @@ class GannPointEightBuy(BaseStrategy):
                         break
                 swing_point_counter += 1
 
-            if bottoms > 1:
-                data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), }
-                logger.error(f'Multiple bottoms detected: {bottoms}.')
-                # Temporarily set any double bottoms to be defined as a buy.
+        if bottoms > 1:
+            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), }
+            logger.error(f'Multiple bottoms detected: {bottoms}.')
+            # Temporarily set any double bottoms to be defined as a buy.
+            action_buy = True
+            if latest_price.close_price > max_top:
+                logger.error(f'Latest close ({latest_price.close_price}) is above max_top ({max_top}).')
                 action_buy = True
-                if latest_price.close_price > max_top:
-                    logger.error(f'Latest close ({latest_price.close_price}) is above max_top ({max_top}).')
-                    action_buy = True
-            else:
-                data = {}
-                action_buy = None
-            logger.error(f'Latest T: {latest_T}.')
-            logger.error(f'........')
-            return action_buy, data
+        else:
+            data = {}
+            action_buy = None
+        logger.error(f'Latest T: {latest_T}.')
+        logger.error(f'........')
+        return action_buy, data
 
 from django.utils import timezone
 
