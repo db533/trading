@@ -156,13 +156,15 @@ class GannPointFourBuy(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T >= latest_T:
-                #The most recent upward rally is shorter than the longest upward rally during the down trend.
-                logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
-                action_buy = None
-            else:
+            if max_T <>=> latest_T and len(T_prev) > 1:
+                # The most recent upward rally is longer than the longest upward rally during the down trend.
+                # And we have had at least 2 sections of upward movement during the down trend.
                 logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
                 action_buy = True
+            else:
+                # The most recent upward rally is shorter than the longest upward rally during the down trend.
+                logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
+                action_buy = None
             data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
             logger.error(f'Max T during prior series of swings: {max_T}.')
         else:
@@ -217,13 +219,15 @@ class GannPointFourSell(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T >= latest_T:
-                #The most recent downward rally is shorter than the longest downward rally during the down trend.
-                logger.error(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
-                action_buy = None
-            else:
+            if max_T < latest_T and len(T_prev) > 1:
+                # The most recent downward rally is longer than the longest downward rally during the down trend.
+                # And we have at least 2 sections of downward movement during the most recent upward trend.
                 logger.error(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
                 action_buy = True
+            else:
+                # The most recent downward rally is shorter than the longest downward rally during the down trend.
+                logger.error(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
+                action_buy = None
             data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)), }
             logger.error(f'Max T during prior series of swings: {max_T}.')
         else:
