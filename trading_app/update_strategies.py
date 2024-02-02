@@ -230,18 +230,18 @@ class GannPointFive(BaseStrategy):
                     break
                 swing_point_counter += 1
 
-            if T_most_recent is not None:
-                data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
-                        'section_count': str(len(section_count)), }
-                logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
-                if T_most_recent > latest_T:
-                    action_buy = None
-            else:
-                data = {'latest_T': str(latest_T),'section_count': str(len(section_count)),}
+        if T_most_recent is not None:
+            data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
+                    'section_count': str(len(section_count)), }
+            logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
+            if T_most_recent > latest_T:
                 action_buy = None
-            logger.error(f'Latest T: {latest_T}.')
-            logger.error(f'........')
-            return action_buy, data
+        else:
+            data = {'latest_T': str(latest_T),'section_count': str(len(section_count)),}
+            action_buy = None
+        logger.error(f'Latest T: {latest_T}.')
+        logger.error(f'........')
+        return action_buy, data
 
 class GannPointThree(BaseStrategy):
     name="Gann's Buying / Selling point #3"
