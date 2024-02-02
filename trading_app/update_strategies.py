@@ -232,12 +232,12 @@ class GannPointFive(BaseStrategy):
 
         if T_most_recent is not None:
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
-                    'section_count': str(len(section_count)), }
+                    'section_count': str(section_count), }
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent > latest_T:
                 action_buy = None
         else:
-            data = {'latest_T': str(latest_T),'section_count': str(len(section_count)),}
+            data = {'latest_T': str(latest_T),'section_count': str(section_count),}
             action_buy = None
         logger.error(f'Latest T: {latest_T}.')
         logger.error(f'........')
