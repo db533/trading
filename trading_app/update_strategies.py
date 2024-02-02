@@ -304,7 +304,7 @@ class GannPointFiveBuy(BaseStrategy):
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration)}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
-            if T_most_recent < latest_T:
+            if T_most_recent < latest_T and section_count > 1:
                 action_buy = True
         else:
             data = {'latest_T': str(latest_T),'section_count': str(section_count),}
