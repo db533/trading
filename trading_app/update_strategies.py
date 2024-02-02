@@ -440,7 +440,7 @@ class GannPointEightBuy(BaseStrategy):
             data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration)}
             logger.error(f'Multiple bottoms detected: {bottoms}.')
             # Temporarily set any double bottoms to be defined as a buy.
-            action_buy = True
+            #action_buy = True
             if latest_price.close_price > max_top:
                 logger.error(f'Latest close ({latest_price.close_price}) is above max_top ({max_top}).')
                 action_buy = True
@@ -451,6 +451,82 @@ class GannPointEightBuy(BaseStrategy):
         logger.error(f'........')
         return action_buy, data
 
+class GannPointEightSell(BaseStrategy):
+    name="Gann's Selling point #8"
+
+    def check_criteria(self):
+        data = {}
+        action_buy = None
+        # Access the latest DailyPrice (or other relevant price model) for the ticker
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
+                                                                                                'candle_count_since_last_swing_point', 'low_price', 'high_price').order_by('-datetime')
+        swing_point_counter = 1
+        latest_T = 0
+        min_bottom = None
+        max_variance_percent = 0.5  # A bottom must be within this many % of the last low price to count as a bottom.
+        peak_percent_below_top = 3   # The peak must be at least this many % above the bottom
+        tops = 0
+
+        for swing_point in swing_point_query:
+            # Check first is a LL or HH
+            logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+            if swing_point_counter == 1:
+                if swing_point.swing_point_label == 'HH':
+                    logger.error(f'Detected first swingpoint. HH')
+                    last_candle = swing_point
+                    last_high = swing_point.high_price
+                else:
+                    # This strategy cannot be true. End review of swing points.
+                    logger.error(f'First swingpoint not HH. Strategy not valid.')
+                    break
+                    # Now need to determine the elapsed days since this LL or HH.
+                latest_T = instance_difference_count(self.ticker, swing_point)
+                tops = 1
+                swing_point_counter += 1
+            elif swing_point_counter > 1:
+                if swing_point.swing_point_label == 'LL'  or swing_point.swing_point_label == 'HL':
+                    # This is an lower swing point.
+                    # If this is a new low below the top, save the low value.
+                    if min_bottom is None or swing_point.low_price < min_bottom:
+                        min_bottom = swing_point.low_price
+                    if swing_point_counter == 2:
+                        # This is the final peak. Save the High value.
+                        last_low = swing_point.low_price
+                    logger.error(
+                        f'Found a prior {swing_point.swing_point_label}.')
+                elif swing_point.swing_point_label == 'LH' or swing_point.swing_point_label == 'HH':
+                    # This is potentially another top.
+                    logger.error(f'Found a prior {swing_point.swing_point_label}.')
+                    # Test if the top is within the threshold to be considered at the same level as the last high.
+                    high_price_percent_variance = abs(swing_point.high_price - last_high)*100/last_high
+                    if high_price_percent_variance < max_variance_percent:
+                        logger.error(f'Low is within threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
+                        tops += 1
+                        first_candle = swing_point
+                    else:
+                        logger.error(
+                            f'Low is outside threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
+                        break
+                swing_point_counter += 1
+        # Check we have at least a double top and the peaks are at least significantly above the low
+        if tops > 1 and min_bottom/last_high < (1 - (peak_percent_below_top/100)):
+            top_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration' : str(top_duration)}
+            logger.error(f'Multiple tops detected: {tops}.')
+            # Temporarily set any double bottoms to be defined as a buy.
+            #action_buy = True
+            if latest_price.close_price < min_bottom>:
+                logger.error(f'Latest close ({latest_price.close_price}) is above max_top ({min_bottom}).')
+                action_buy = False
+        else:
+            data = {}
+            action_buy = None
+        logger.error(f'Latest T: {latest_T}.')
+        logger.error(f'........')
+        return action_buy, data
+
+
 from django.utils import timezone
 
 def process_trading_opportunities():
@@ -459,7 +535,7 @@ def process_trading_opportunities():
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens, GannPointFour]  # List of strategy classes
     #strategies = [GannPointFourBuy, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell]  # List of strategy classes
-    strategies = [GannPointEightBuy]  # List of strategy classes
+    strategies = [GannPointEightBuy, GannPointEightSell]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
