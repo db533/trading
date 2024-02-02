@@ -628,7 +628,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
             low_day_0 = df.iloc[i]['Low']
             tomorrow_low = df.iloc[i+1]['Low']
             if low_day_0 < tomorrow_low:
-                # Today's low is no longer lower, so look for reversal to uptrend
+                # Today's low is lower than tomorrow's, so look for reversal to uptrend
                 # Down trend continues until high is higher on next 2 days.
                 # Assume the consequetive highs will be higher and test each to check they are indeed.
                 # If they are not, then this is not a swing point.
@@ -647,7 +647,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                     # The subsequent day(s) have had higher highs than on Day 0.
                     # Down trend ended on Day 0.
                     if low_day_0 > last_low_reference:
-                        # This low is higher than the previous high so this is a HH.
+                        # This low is higher than the previous high so this is a HL.
                         df.at[index_label, 'swing_point_label'] = "HL"
                         if last_swing_point == 'HH':
                             current_trend_seq_count += 1
