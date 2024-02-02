@@ -516,7 +516,7 @@ class GannPointEightSell(BaseStrategy):
             logger.error(f'Multiple tops detected: {tops}.')
             # Temporarily set any double bottoms to be defined as a buy.
             #action_buy = True
-            if latest_price.close_price < min_bottom>:
+            if latest_price.close_price < min_bottom:
                 logger.error(f'Latest close ({latest_price.close_price}) is above max_top ({min_bottom}).')
                 action_buy = False
         else:
