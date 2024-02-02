@@ -267,13 +267,8 @@ class GannPointFiveBuy(BaseStrategy):
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
             if swing_point_counter == 1:
                 if swing_point.swing_point_label == 'LL':
-                    existing_downtrend = True
-                    action_buy = True
                     logger.error(f'Detected first swingpoint. LL')
-                elif swing_point.swing_point_label == 'HH':
-                    logger.error(f'Detected first swingpoint. HH')
-                    existing_downtrend = False
-                    action_buy = False
+                    last_candle = swing_point
                 else:
                     # This strategy cannot be true. End review of swing points.
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
@@ -282,8 +277,7 @@ class GannPointFiveBuy(BaseStrategy):
                 latest_T = instance_difference_count(self.ticker, swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
-                if (swing_point.swing_point_label == 'LH' and existing_downtrend == True) or (
-                        swing_point.swing_point_label == 'HL' and existing_downtrend == False):
+                if swing_point.swing_point_label == 'LH':
                     # Swing point is a high on the down trend.
                     # Save the number of days that that it took to reach this swing point.
                     logger.error(
@@ -291,30 +285,27 @@ class GannPointFiveBuy(BaseStrategy):
                     # Only save the most recent elapsed time.
                     most_recent_swing_label = swing_point.swing_point_label
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
-
-                elif (swing_point.swing_point_label == 'LL' and existing_downtrend == True) or (
-                        swing_point.swing_point_label == 'HH' and existing_downtrend == False):
+                elif swing_point.swing_point_label == 'LL':
                     logger.error(f'Found a prior {swing_point.swing_point_label}.')
-                    if ((swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH') or
-                        (swing_point.swing_point_label == 'HH' and most_recent_swing_label == 'HL')):
+                    if swing_point.swing_point_label == 'LL' and most_recent_swing_label == 'LH':
                         section_count += 1
                         most_recent_swing_label = swing_point.swing_point_label
                         if T_most_recent is None:
                             T_most_recent = most_recent_duration
-                elif (swing_point.swing_point_label == 'HH' and existing_downtrend == True) or (
-                        swing_point.swing_point_label == 'LL' and existing_downtrend == False):
+                elif swing_point.swing_point_label == 'HH' or swing_point.swing_point_label == 'HL':
                     # This must be the start of the prior down / up trend.
                     # Stop checking further swing points.
                     logger.error(f'Found a prior {swing_point.swing_point_label}. So downtrend / uptrend started here.')
+                    first_candle = swing_point
                     break
                 swing_point_counter += 1
-
         if T_most_recent is not None:
+            prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
-                    'section_count': str(section_count), }
+                    'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration)}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
-            if T_most_recent > latest_T:
-                action_buy = None
+            if T_most_recent < latest_T:
+                action_buy = True
         else:
             data = {'latest_T': str(latest_T),'section_count': str(section_count),}
             action_buy = None
