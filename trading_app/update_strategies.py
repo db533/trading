@@ -156,7 +156,7 @@ class GannPointFourBuy(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T <>=> latest_T and len(T_prev) > 1:
+            if max_T < latest_T and len(T_prev) > 1:
                 # The most recent upward rally is longer than the longest upward rally during the down trend.
                 # And we have had at least 2 sections of upward movement during the down trend.
                 logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
@@ -237,9 +237,8 @@ class GannPointFourSell(BaseStrategy):
         logger.error(f'........')
         return action_buy, data
 
-
-class GannPointFive(BaseStrategy):
-    name="Gann's Buying / Selling point #5"
+class GannPointFiveBuy(BaseStrategy):
+    name="Gann's Buying point #5"
 
     def check_criteria(self):
         data = {}
@@ -248,12 +247,11 @@ class GannPointFive(BaseStrategy):
         swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
                                                                                                 'candle_count_since_last_swing_point').order_by('-datetime')
         swing_point_counter = 1
-        existing_downtrend = None
         T_most_recent = None
         latest_T = 0
         section_count = 0
         for swing_point in swing_point_query:
-            # Check first is a LL or HH
+            # Check first is a LL
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.datetime)}". swing_point_label:"{str(swing_point.swing_point_label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
             if swing_point_counter == 1:
                 if swing_point.swing_point_label == 'LL':
