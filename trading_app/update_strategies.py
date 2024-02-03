@@ -338,6 +338,7 @@ class GannPointFiveSell(BaseStrategy):
                     logger.error(f'First swingpoint not HH. Strategy not valid.')
                     break
                     # Now need to determine the elapsed days since this LL or HH.
+                most_recent_swing_point_label = 'HH'
                 latest_T = instance_difference_count(self.ticker, swing_point)
                 swing_point_counter += 1
             elif swing_point_counter > 1:
@@ -348,9 +349,10 @@ class GannPointFiveSell(BaseStrategy):
                         f'Found a prior {swing_point.swing_point_label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
                     # Only save the most recent elapsed time.
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
+                    most_recent_swing_point_label = 'HL'
                 elif swing_point.swing_point_label == 'HH':
                     logger.error(f'Found a prior {swing_point.swing_point_label}.')
-                    if swing_point.swing_point_label == 'HH':
+                    if swing_point.swing_point_label == 'HH' and most_recent_swing_point_label == 'HL':
                         section_count += 1
                         if T_most_recent is None:
                             T_most_recent = most_recent_duration
