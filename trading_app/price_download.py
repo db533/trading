@@ -599,7 +599,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 count_consequetive = 0
                 for x in range(0, reversal_days):
                     #if window_slice.iloc[x]['Low'] > window_slice.iloc[x + 1]['Low']:
-                    if window_slice.iloc[0]['Low'] > window_slice.iloc[x+1]['Low']:
+                    if window_slice.iloc[0]['Low'] > window_slice.iloc[x+1]['Low'] and window_slice.iloc[0]['High'] > window_slice.iloc[x+1]['High']:
                         count_consequetive += 1
                 #print(index_label,' count_consequetive:',count_consequetive)
                 if count_consequetive == reversal_days:
@@ -639,7 +639,7 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                 for x in range(0, reversal_days):
                     #logger.info(f"window_slice.iloc[x]['High']: {window_slice.iloc[x]['High']} window_slice.iloc[x+1]['High']: {window_slice.iloc[x+1]['High']}")
                     #if window_slice.iloc[x]['High'] < window_slice.iloc[x + 1]['High']:
-                    if window_slice.iloc[0]['High'] < window_slice.iloc[x+1]['High']:
+                    if window_slice.iloc[0]['High'] < window_slice.iloc[x+1]['High'] and window_slice.iloc[0]['Low'] < window_slice.iloc[x+1]['Low']:
                         #logger.info(f"NOT A SWING POINT. x: {x}")
                         count_consequetive += 1
                 #print(index_label, ' count_consequetive:', count_consequetive)
