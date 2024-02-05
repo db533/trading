@@ -3,6 +3,8 @@ import ast
 from decimal import Decimal
 import datetime
 from decimal import Decimal
+import logging
+logger = logging.getLogger('django')
 
 
 class TickerCategory(models.Model):
@@ -120,7 +122,10 @@ class TradingOpp(models.Model):
         # Use ast.literal_eval to safely evaluate the string
         try:
             string_representation = self.recent_swing_points[0]
+            logger.error(f'TradingOpp id: "{str(self.id)}"')
+            logger.error(f'string_representation: "{str(string_representation)}"')
             points = ast.literal_eval(string_representation)
+            logger.error(f'points: "{str(points)}"')
         except (ValueError, SyntaxError):
             # Handle the error or return an empty list if there's a problem with the data
             return []
