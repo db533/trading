@@ -618,14 +618,20 @@ def process_trading_opportunities():
                     existing_tradingopp.count += 1
                     existing_tradingopp.save()
                 else:
-                    # This Ticker / strategy is new. Create a new TradingOpp instance.
+                    # This Ticker / strategy is new.
+                    # Check to see if there are recent_swing_points in data
+                    if 'recent_swing_points' in data:
+                        recent_swing_points = data['recent_swing_points']
+                    # Create a new TradingOpp instance.
+
                     TradingOpp.objects.create(
                         ticker=ticker,
                         strategy=strategy_instance,
                         datetime_identified=timezone.now(),
                         metrics_snapshot=data, # Capture relevant metrics
                         count = 1,
-                        action_buy = action_buy
+                        action_buy = action_buy,
+                        recent_swing_points = [recent_swing_points]
                     )
             else:
                 # The strategy is not valid for the ticker.
