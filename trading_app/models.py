@@ -1,4 +1,8 @@
 from django.db import models
+import json
+import datetime
+from decimal import Decimal
+
 
 class TickerCategory(models.Model):
     name = models.CharField(max_length=255)
@@ -106,6 +110,21 @@ class TradingOpp(models.Model):
     count = models.IntegerField(default=1)
     action_buy = models.BooleanField(default=True)
     recent_swing_points = models.JSONField(default=list) # date, price, label
+
+    def get_swing_points_as_tuples(self):
+        # Convert the JSON string into Python objects
+        # Assuming recent_swing_points is stored as a JSON string representation of the list
+        try:
+            points = json.loads(self.recent_swing_points)
+            # Convert string representations to proper datetime and Decimal objects
+            processed_points = [
+                (datetime.datetime.strptime(point[0], '%Y-%m-%d %H:%M:%S%z'), Decimal(point[1]), point[2])
+                for point in points
+            ]
+            return processed_points
+        except ValueError:
+            # Handle errors or return an empty list if the data is corrupted
+            return []
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"

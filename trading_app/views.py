@@ -802,38 +802,33 @@ def trading_opps_view(request):
 
     return render(request, 'trading_opp_list.html', context)
 
-import matplotlib.pyplot as plt
-import io
 from django.http import HttpResponse
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt
+import io
 
-def generate_swing_point_graph(swing_points):
-    # Assuming swing_points is a list of (time, price) tuples
-    times = [point[0] for point in swing_points]
+def generate_swing_point_graph_view(request, opp_id):
+    # Fetch the TradingOpp instance by ID
+    opp = TradingOpp.objects.get(id=opp_id)
+    swing_points = opp.get_swing_points_as_tuples()
+
+    # Convert swing points to a suitable format for plotting
+    dates = [point[0] for point in swing_points]
     prices = [point[1] for point in swing_points]
 
-    fig, ax = plt.subplots(figsize=(1, 0.7))  # Size in inches; adjust as needed
-    ax.plot(times, prices, marker='o', linestyle='-')
-    ax.set_xticks([])  # Hide x-axis labels
-    ax.set_yticks([])  # Hide y-axis labels
+    # Plotting logic (ensure this matches your data structure)
+    fig, ax = plt.subplots(figsize=(2, 1))  # Adjust size as needed
+    ax.plot(dates, prices, marker='o', linestyle='-')
+    ax.set_xticks([])  # Hide x-axis labels if desired
+    ax.set_yticks([])  # Hide y-axis labels if desired
 
-    # Save to a bytes buffer
+    # Save to a BytesIO buffer
     buffer = io.BytesIO()
     canvas = FigureCanvas(fig)
     canvas.print_png(buffer)
-    plt.close(fig)  # Close the figure to free memory
+    plt.close(fig)  # Close the figure to release memory
 
-    # Return the buffer
-    return buffer
-
-def swing_point_view(request, group_id):
-    # Retrieve your swing points based on the group_id
-    swing_points = ... # Your logic to get swing points
-
-    # Generate the graph
-    image_buffer = generate_swing_point_graph(swing_points)
-
-    # Set the content type to the response
-    response = HttpResponse(image_buffer.getvalue(), content_type='image/png')
+    # Serve the image
+    response = HttpResponse(buffer.getvalue(), content_type='image/png')
     response['Content-Length'] = str(len(response.content))
     return response

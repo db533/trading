@@ -13,8 +13,8 @@
             <li>
                 <strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong> Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }} <br>
                 Metrics: {{ opp.metrics_snapshot }}<br>
-                Recent swing points: {{opp.recent_swing_points }}
-                Opp: {{ opp }}
+                Recent swing points: {{opp.recent_swing_points }}<br>
+                <img src="{% url 'generate_swing_point_graph_view' opp_id=opp.id %}" alt="Swing Points Graph">
             </li>
         {% endfor %}
         </ul>
