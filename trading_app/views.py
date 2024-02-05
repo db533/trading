@@ -811,10 +811,13 @@ def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
     swing_points = opp.get_swing_points_as_tuples()
+    logger.error(f'TradingOpp id: "{str(opp_id)}"')
 
     # Convert swing points to a suitable format for plotting
     dates = [point[0] for point in swing_points]  # Ensure these are datetime objects
     prices = [float(point[1]) for point in swing_points]  # Convert Decimal to float
+    logger.error(f'dates: "{str(dates)}"')
+    logger.error(f'prices: "{str(prices)}"')
 
     # Plotting logic (ensure this matches your data structure)
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)  # Adjust figsize and dpi as needed
@@ -823,6 +826,7 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.set_yticks([])  # Hide y-axis labels if desired
     ax.autoscale(True)
     ax.grid(True)
+    ax.set_facecolor('white')  # Ensure the plot background is visible
     fig.patch.set_facecolor('lightgray')  # Change figure background to see its extent
 
     # Save to a BytesIO buffer
@@ -830,6 +834,9 @@ def generate_swing_point_graph_view(request, opp_id):
     canvas = FigureCanvas(fig)
     canvas.print_png(buffer)
     plt.close(fig)  # Close the figure to release memory
+
+    # IMPORTANT: Reset buffer position to the start
+    buffer.seek(0)  # Reset the buffer's position to the start
 
     # Serve the image
     response = HttpResponse(buffer.getvalue(), content_type='image/png')
