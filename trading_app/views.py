@@ -812,6 +812,7 @@ def generate_swing_point_graph_view(request, opp_id):
     opp = TradingOpp.objects.get(id=opp_id)
     swing_points = opp.get_swing_points_as_tuples()
     logger.error(f'TradingOpp id: "{str(opp_id)}"')
+    logger.error(f'swing_points: "{str(swing_points)}"')
 
     # Convert swing points to a suitable format for plotting
     dates = [point[0] for point in swing_points]  # Ensure these are datetime objects
