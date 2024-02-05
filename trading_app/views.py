@@ -801,3 +801,39 @@ def trading_opps_view(request):
     }
 
     return render(request, 'trading_opp_list.html', context)
+
+import matplotlib.pyplot as plt
+import io
+from django.http import HttpResponse
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+def generate_swing_point_graph(swing_points):
+    # Assuming swing_points is a list of (time, price) tuples
+    times = [point[0] for point in swing_points]
+    prices = [point[1] for point in swing_points]
+
+    fig, ax = plt.subplots(figsize=(1, 0.7))  # Size in inches; adjust as needed
+    ax.plot(times, prices, marker='o', linestyle='-')
+    ax.set_xticks([])  # Hide x-axis labels
+    ax.set_yticks([])  # Hide y-axis labels
+
+    # Save to a bytes buffer
+    buffer = io.BytesIO()
+    canvas = FigureCanvas(fig)
+    canvas.print_png(buffer)
+    plt.close(fig)  # Close the figure to free memory
+
+    # Return the buffer
+    return buffer
+
+def swing_point_view(request, group_id):
+    # Retrieve your swing points based on the group_id
+    swing_points = ... # Your logic to get swing points
+
+    # Generate the graph
+    image_buffer = generate_swing_point_graph(swing_points)
+
+    # Set the content type to the response
+    response = HttpResponse(image_buffer.getvalue(), content_type='image/png')
+    response['Content-Length'] = str(len(response.content))
+    return response
