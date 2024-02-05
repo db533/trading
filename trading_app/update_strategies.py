@@ -622,6 +622,7 @@ def process_trading_opportunities():
                     # Check to see if there are recent_swing_points in data
                     if 'recent_swing_points' in data:
                         recent_swing_points = data['recent_swing_points']
+                        del data['recent_swing_points']
                     # Create a new TradingOpp instance.
 
                     TradingOpp.objects.create(
