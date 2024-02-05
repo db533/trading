@@ -105,7 +105,7 @@ class TradingOpp(models.Model):
     is_active = models.BooleanField(default=True)
     count = models.IntegerField(default=1)
     action_buy = models.BooleanField(default=True)
-    recent_swing_points = JSONField(default=list) # date, price, label
+    recent_swing_points = models.JSONField(default=list) # date, price, label
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
