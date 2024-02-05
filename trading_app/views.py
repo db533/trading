@@ -813,14 +813,17 @@ def generate_swing_point_graph_view(request, opp_id):
     swing_points = opp.get_swing_points_as_tuples()
 
     # Convert swing points to a suitable format for plotting
-    dates = [point[0] for point in swing_points]
-    prices = [point[1] for point in swing_points]
+    dates = [point[0] for point in swing_points]  # Ensure these are datetime objects
+    prices = [float(point[1]) for point in swing_points]  # Convert Decimal to float
 
     # Plotting logic (ensure this matches your data structure)
-    fig, ax = plt.subplots(figsize=(2, 1))  # Adjust size as needed
+    fig, ax = plt.subplots(figsize=(4, 2), dpi=100)  # Adjust figsize and dpi as needed
     ax.plot(dates, prices, marker='o', linestyle='-')
     ax.set_xticks([])  # Hide x-axis labels if desired
     ax.set_yticks([])  # Hide y-axis labels if desired
+    ax.autoscale(True)
+    ax.grid(True)
+    fig.patch.set_facecolor('lightgray')  # Change figure background to see its extent
 
     # Save to a BytesIO buffer
     buffer = io.BytesIO()
