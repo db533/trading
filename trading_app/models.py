@@ -112,19 +112,20 @@ class TradingOpp(models.Model):
     recent_swing_points = models.JSONField(default=list) # date, price, label
 
     def get_swing_points_as_tuples(self):
-        # Convert the JSON string into Python objects
-        # Assuming recent_swing_points is stored as a JSON string representation of the list
-        try:
-            points = json.loads(self.recent_swing_points)
-            # Convert string representations to proper datetime and Decimal objects
-            processed_points = [
-                (datetime.datetime.strptime(point[0], '%Y-%m-%d %H:%M:%S%z'), Decimal(point[1]), point[2])
-                for point in points
-            ]
-            return processed_points
-        except ValueError:
-            # Handle errors or return an empty list if the data is corrupted
-            return []
+        # The recent_swing_points field is already a Python list after being deserialized by Django.
+        # Directly process this list to convert its contents to the correct types.
+        processed_points = []
+        for point in self.recent_swing_points:
+            # Parse the datetime string to a datetime object.
+            # Note: Adjust the datetime format if necessary to match your actual data format.
+            dt = datetime.datetime.strptime(point[0], "%Y-%m-%d %H:%M:%S%z")
+            # Ensure the price is a Decimal.
+            price = Decimal(point[1])
+            # The label is already a string, so just include it as is.
+            label = point[2]
+            processed_points.append((dt, price, label))
+
+        return processed_points
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
