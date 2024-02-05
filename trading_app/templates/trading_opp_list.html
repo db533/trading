@@ -12,8 +12,8 @@
         {% for opp in opps %}
             <li>
                 <strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong> Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }} <br>
-                Metrics: {{ opp.metrics_snapshot }}
-                Recent swing points: {{opp.data.recent_swing_points }}
+                Metrics: {{ opp.metrics_snapshot }}<br>
+                Recent swing points: {{opp.recent_swing_points }}
             </li>
         {% endfor %}
         </ul>
