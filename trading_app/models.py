@@ -117,8 +117,8 @@ class SwingPoint(models.Model):
 
     # Fields for linking to a Price model instance
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={
-        'model__in': ('dailyprice', 'fifteenminprice', 'fiveminprice', 'oneminprice')})
-    object_id = models.PositiveIntegerField()
+        'model__in': ('dailyprice', 'fifteenminprice', 'fiveminprice', 'oneminprice')}, default='dailyprice')
+    object_id = models.PositiveIntegerField(default=1)
     price_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
