@@ -108,7 +108,7 @@ class TradingStrategy(models.Model):
 
 class SwingPoint(models.Model):
     ticker = models.ForeignKey('Ticker', on_delete=models.CASCADE, related_name='swing_points')
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(default=None)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     label = models.CharField(max_length=2)
 
