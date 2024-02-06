@@ -682,6 +682,12 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                 df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
 
                 # Create a new swing point record for this swing point.
+
+                # Assuming you have a DailyPrice instance you want to link
+                daily_price_instance = DailyPrice.objects.get(id=daily_price_id)  # or however you get this instance
+
+                # Get the ContentType for the DailyPrice model
+                content_type = ContentType.objects.get_for_model(daily_price_instance)
                 new_swing_point = SwingPoint.objects.create(
                                                                     ticker=ticker,
                                                                     date = last_swing_point_date,
@@ -1063,7 +1069,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 content_type = ContentType.objects.get_for_model(price_instance)
                 swing_point_instance.content_type=content_type
                 swing_point_instance.object_id=price_instance.id
-                swing_point_instance.save*()
+                swing_point_instance.save()
 
             print('new_record_count:',new_record_count)
             logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
