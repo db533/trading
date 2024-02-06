@@ -684,7 +684,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                 # Create a new swing point record for this swing point.
 
                 # Assuming you have a DailyPrice instance you want to link
-                daily_price_instance = DailyPrice.objects.get(id=daily_price_id)  # or however you get this instance
+                daily_price_instance = DailyPrice.objects.get(datetime=index_label)  # or however you get this instance
 
                 # Get the ContentType for the DailyPrice model
                 content_type = ContentType.objects.get_for_model(daily_price_instance)
