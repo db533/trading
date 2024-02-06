@@ -632,7 +632,7 @@ def process_trading_opportunities():
                         metrics_snapshot=data, # Capture relevant metrics
                         count = 1,
                         action_buy = action_buy,
-                        recent_swing_points = [recent_swing_points]
+                        recent_swing_points = recent_swing_points
                     )
             else:
                 # The strategy is not valid for the ticker.
