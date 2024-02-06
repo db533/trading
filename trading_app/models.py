@@ -106,30 +106,14 @@ class TradingStrategy(models.Model):
         return self.name
 
 
-def parse_swing_points(swing_points_str):
-    # Manually split the string into tuple components
-    # This approach avoids complex regex patterns and directly extracts the needed parts
-    tuple_strs = swing_points_str.strip("[]").split("), (")
+class SwingPoint(models.Model):
+    ticker = models.ForeignKey('Ticker', on_delete=models.CASCADE, related_name='swing_points')
+    date = models.DateTimeField(default=timezone.now)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    label = models.CharField(max_length=2)
 
-    parsed_tuples = []
-    for tuple_str in tuple_strs:
-        # Correctly format the tuple string for safe evaluation
-        formatted_tuple_str = '(' + tuple_str.strip("()") + ')'
-
-        # Attempt to safely evaluate the non-datetime, non-Decimal parts
-        try:
-            eval_tuple = ast.literal_eval(formatted_tuple_str)
-
-            # Parse the datetime and Decimal parts correctly
-            datetime_obj = datetime.strptime(eval_tuple[0], "%Y, %m, %d, %H, %M, tzinfo=datetime.timezone.utc")
-            decimal_obj = Decimal(eval_tuple[1])
-            label = eval_tuple[2]
-
-            parsed_tuples.append((datetime_obj, decimal_obj, label))
-        except (ValueError, SyntaxError) as e:
-            print(f"Error parsing tuple {tuple_str}: {e}")
-
-    return parsed_tuples
+    def __str__(self):
+        return f"{self.ticker.symbol} - {self.date} - {self.label}"
 
 
 class TradingOpp(models.Model):
@@ -140,16 +124,8 @@ class TradingOpp(models.Model):
     is_active = models.BooleanField(default=True)
     count = models.IntegerField(default=1)
     action_buy = models.BooleanField(default=True)
-    recent_swing_points = models.JSONField(default=list) # date, price, label
-
-    def get_swing_points_as_tuples(self):
-        if self.recent_swing_points:
-            try:
-                swing_points_str = self.recent_swing_points[0]  # Assuming it's wrapped in a list
-                return parse_swing_points(swing_points_str)
-            except Exception as e:
-                print(f"Error parsing swing points: {e}")
-        return []
+    swing_points = models.ManyToManyField('SwingPoint', related_name='trading_opps', blank=True)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
+
