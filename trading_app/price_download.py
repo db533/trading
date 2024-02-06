@@ -1041,22 +1041,23 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             daily_price.healthy_bearish_count = row['healthy_bearish_candle']
                             daily_price.candle_count_since_last_swing_point = row['candle_count_since_last_swing_point']
                         daily_price.save()
+                        if len(row['swing_point_label']) > 0:
+                            # This was noted to be a swing point
+                            # Get the ContentType for the DailyPrice model
+                            content_type = ContentType.objects.get_for_model(daily_price)
+                            new_swing_point = SwingPoint.objects.create(
+                                ticker=ticker,
+                                date=row['Datetime_TZ'],
+                                price=row['swing_point_price'],
+                                label=row['swing_point_label'],
+                                candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
+                                content_type=content_type,
+                                object_id=daily_price.id
+                            )
+
                 else:
                     print('Insufficient data.')
 
-                if len(row['swing_point_label']) > 0:
-                    # This was noted to be a swing point
-                    # Get the ContentType for the DailyPrice model
-                    content_type = ContentType.objects.get_for_model(daily_price)
-                    new_swing_point = SwingPoint.objects.create(
-                        ticker=ticker,
-                        date=row['Datetime_TZ'],
-                        price=row['swing_point_price'],
-                        label=row['swing_point_label'],
-                        candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
-                        content_type = content_type,
-                        object_id = daily_price.id
-                    )
             print('new_record_count:',new_record_count)
             logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
             end_time = display_local_time()  # record the end time of the loop
