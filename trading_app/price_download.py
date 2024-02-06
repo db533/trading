@@ -682,13 +682,13 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                 df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
 
                 # Create a new swing point record for this swing point.
-                new_swing_point = SwingPoint.objects.update_or_create(
-                                                                    ticker=ticker,
-                                                                    date = last_swing_point_date,
-                                                                    price = last_swing_point_price,
-                                                                    label = last_swing_point,
-                                                                    candle_count_since_last_swing_point = candle_count_since_last_swing_point
-                )
+                #new_swing_point = SwingPoint.objects.update_or_create(
+                #                                                    ticker=ticker,
+                #                                                    date = last_swing_point_date,
+                #                                                    price = last_swing_point_price,
+                #                                                    label = last_swing_point,
+                #                                                    candle_count_since_last_swing_point = candle_count_since_last_swing_point
+                #)
                 #swing_point_id_list.append(new_swing_point.id)
                 candle_count_since_last_swing_point = 0
                 final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
