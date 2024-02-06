@@ -124,6 +124,7 @@ class GannPointFourBuy(BaseStrategy):
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
                                                                                                 'candle_count_since_last_swing_point').order_by('-datetime')
+        swing_point_instance_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
         #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_prev = []

@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 import pytz
 import logging
 logger = logging.getLogger('django')
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class TickerCategory(models.Model):
@@ -112,6 +114,12 @@ class SwingPoint(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     label = models.CharField(max_length=2)
     candle_count_since_last_swing_point = models.IntegerField(default=None)
+
+    # Fields for linking to a Price model instance
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={
+        'model__in': ('dailyprice', 'fifteenminprice', 'fiveminprice', 'oneminprice')})
+    object_id = models.PositiveIntegerField()
+    price_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.date} - {self.label}"

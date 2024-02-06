@@ -16,6 +16,7 @@ from django.utils import timezone
 import logging
 from decimal import Decimal
 import math
+from django.contrib.contenttypes.models import ContentType
 
 logger = logging.getLogger('django')
 
@@ -544,6 +545,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
 
     # Delete existing swing points for the ticker as new ones will be determined.
     SwingPoint.objects.filter(ticker=ticker).delete()
+    swing_point_id_list = []
 
     healthy_bullish_count = 0
     healthy_bearish_count = 0
@@ -677,13 +679,14 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
             df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
 
             # Create a new swing point record for this swing point.
-            SwingPoint.objects.update_or_create(
-                ticker=ticker,
-                date = last_swing_point_date,
-                price = last_swing_point_price,
-                label = last_swing_point,
-                candle_count_since_last_swing_point = candle_count_since_last_swing_point
+            new_swing_point = SwingPoint.objects.update_or_create(
+                                                                ticker=ticker,
+                                                                date = last_swing_point_date,
+                                                                price = last_swing_point_price,
+                                                                label = last_swing_point,
+                                                                candle_count_since_last_swing_point = candle_count_since_last_swing_point
             )
+            swing_point_id_list.append(new_swing_point.id)
             candle_count_since_last_swing_point = 0
             final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
             if current_trend_seq_count > 2:
@@ -699,7 +702,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
             df.at[index_label, 'healthy_bullish_candle'] = 0
             df.at[index_label, 'healthy_bearish_candle'] = 0
 
-    return df, final_swing_point_trend
+    return df, final_swing_point_trend, swing_point_id_list
 
 def identify_highs_lows2(df, window=20, price_move_percent=1.5):
     # Rewriting function to count number of healthy bullish / bearish candles.
@@ -973,7 +976,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
+                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
                     #else:
                     #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
@@ -1047,6 +1050,15 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                         daily_price.save()
                 else:
                     print('Insufficient data.')
+            # Now link the swing points to this price entries.
+            for swing_point_id in swing_point_id_list:
+                swing_point_instance = SwingPoint.objects.get(id=swing_point_id)
+                price_instance = DailyPrice.objects.get(datetime=swing_point_instance.date)
+                content_type = ContentType.objects.get_for_model(price_instance)
+                swing_point_instance.content_type=content_type
+                swing_point_instance.object_id=price_instance.id
+                swing_point_instance.save*()
+
             print('new_record_count:',new_record_count)
             logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
             end_time = display_local_time()  # record the end time of the loop
