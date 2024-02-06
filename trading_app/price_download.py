@@ -5,7 +5,7 @@ import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import yfinance as yf
 from time import sleep
-from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory
+from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, SwingPoint
 
 import pandas as pd
 import pytz
@@ -531,7 +531,7 @@ def identify_highs_lows(df, window=20):
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
 
-def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
+def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5):
     # New function to compute swing points using WD Gann logic.
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
@@ -541,6 +541,9 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
     df['candle_count_since_last_swing_point'] = 0
     # print('df.columns:',df.columns)
     print('len(df):', len(df))
+
+    # Delete existing swing points for the ticker as new ones will be determined.
+    SwingPoint.objects.filter(ticker=ticker).delete()
 
     healthy_bullish_count = 0
     healthy_bearish_count = 0
@@ -620,6 +623,8 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                         if last_swing_point == 'LL':
                             current_trend_seq_count += 1
                         last_swing_point = 'LH'
+                    last_swing_point_price = high_day_0
+                    last_swing_point_date = index_label
                     uptrend_in_progress = False  # Now trend is downward.
                     last_high_reference = high_day_0
                     swing_point_occured = True
@@ -662,12 +667,23 @@ def identify_highs_lows_gann(df, reversal_days=2, price_move_percent=1.5):
                             current_trend_seq_count += 1
                         last_swing_point = 'LL'
                     uptrend_in_progress = True  # Now trend is upward.
+                    last_swing_point_price = low_day_0
+                    last_swing_point_date = index_label
                     last_low_reference = low_day_0
                     swing_point_occured = True
         if swing_point_occured == True:
             df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
             df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
             df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
+
+            # Create a new swing point record for this swing point.
+            SwingPoint.objects.update_or_create(
+                ticker=ticker,
+                date = last_swing_point_date,
+                price = last_swing_point_price,
+                label = last_swing_point,
+                candle_count_since_last_swing_point = candle_count_since_last_swing_point
+            )
             candle_count_since_last_swing_point = 0
             final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
             if current_trend_seq_count > 2:
@@ -957,7 +973,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend = identify_highs_lows_gann(price_history, reversal_days=3, price_move_percent=1.5)
+                    price_history, swing_point_current_trend = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
                     #else:
                     #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 

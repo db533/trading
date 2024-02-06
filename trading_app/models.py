@@ -111,6 +111,7 @@ class SwingPoint(models.Model):
     date = models.DateTimeField(default=None)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     label = models.CharField(max_length=2)
+    candle_count_since_last_swing_point = models.IntegerField(default=None)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.date} - {self.label}"
