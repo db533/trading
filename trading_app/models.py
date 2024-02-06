@@ -1,8 +1,9 @@
 from django.db import models
+import re
 import ast
 from decimal import Decimal
-import datetime
-from decimal import Decimal
+from datetime import datetime, timezone
+import pytz
 import logging
 logger = logging.getLogger('django')
 
@@ -104,6 +105,36 @@ class TradingStrategy(models.Model):
     def __str__(self):
         return self.name
 
+
+def parse_swing_points(swing_points_str):
+    # Pattern to match the tuple structure in the string
+    tuple_pattern = re.compile(r"\((datetime\.datetime\([^)]+\), Decimal\('[^)]+'\), '[^']+'\)")
+
+    # Find all tuple strings
+    tuple_strings = tuple_pattern.findall(swing_points_str)
+
+    parsed_tuples = []
+    for tuple_str in tuple_strings:
+        # Parsing the datetime part
+        datetime_part = re.search(r"datetime\.datetime\(([^)]+)\)", tuple_str).group(1)
+        datetime_args = [int(arg) for arg in datetime_part.split(', ')[:6]]
+        # Adjusting for timezone if present
+        tzinfo_str = re.search(r"tzinfo=datetime\.timezone\.utc", tuple_str)
+        tzinfo = timezone.utc if tzinfo_str else None
+        datetime_obj = datetime(*datetime_args, tzinfo=tzinfo)
+
+        # Parsing the Decimal part
+        decimal_part = re.search(r"Decimal\('([^)]+)'\)", tuple_str).group(1)
+        decimal_obj = Decimal(decimal_part)
+
+        # Parsing the label
+        label = re.search(r", '([^']+)'\)", tuple_str).group(1)
+
+        parsed_tuples.append((datetime_obj, decimal_obj, label))
+
+    return parsed_tuples
+
+
 class TradingOpp(models.Model):
     ticker = models.ForeignKey(Ticker, on_delete=models.CASCADE)
     strategy = models.ForeignKey(TradingStrategy, on_delete=models.CASCADE)
@@ -115,30 +146,13 @@ class TradingOpp(models.Model):
     recent_swing_points = models.JSONField(default=list) # date, price, label
 
     def get_swing_points_as_tuples(self):
-        # Check if recent_swing_points contains the expected data
-        if not self.recent_swing_points or not isinstance(self.recent_swing_points[0], str):
-            return []
-
-        # Use ast.literal_eval to safely evaluate the string
-        try:
-            string_representation = self.recent_swing_points[0]
-            logger.error(f'TradingOpp id: "{str(self.id)}"')
-            logger.error(f'string_representation: "{str(string_representation)}"')
-            points = ast.literal_eval(string_representation)
-            logger.error(f'points: "{str(points)}"')
-        except (ValueError, SyntaxError):
-            # Handle the error or return an empty list if there's a problem with the data
-            return []
-
-        processed_points = []
-        for point in points:
-            # Extract and convert the datetime, Decimal, and label from each tuple
-            dt = point[0]
-            price = Decimal(point[1])
-            label = point[2]
-            processed_points.append((dt, price, label))
-
-        return processed_points
+        if self.recent_swing_points:
+            try:
+                swing_points_str = self.recent_swing_points[0]  # Assuming it's wrapped in a list
+                return parse_swing_points(swing_points_str)
+            except Exception as e:
+                print(f"Error parsing swing points: {e}")
+        return []
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
