@@ -538,6 +538,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
     logger.info(f'Detecting swing points according to Gann logic...')
     logger.info(f'reversal_days: {reversal_days}')
     df['swing_point_label'] = ''
+    df['swing_point_price'] = 0
     df['swing_point_current_trend'] = 0
     df['candle_count_since_last_swing_point'] = 0
     # print('df.columns:',df.columns)
@@ -546,8 +547,6 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
     # Delete existing swing points for the ticker as new ones will be determined.
     print('ticker:', ticker)
     try:
-        SwingPoint.objects.filter(ticker=ticker).delete()
-
         swing_point_id_list = []
 
         healthy_bullish_count = 0
@@ -628,8 +627,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                             if last_swing_point == 'LL':
                                 current_trend_seq_count += 1
                             last_swing_point = 'LH'
-                        last_swing_point_price = high_day_0
-                        last_swing_point_date = index_label
+                        df.at[index_label, 'swing_point_price'] = high_day_0
                         uptrend_in_progress = False  # Now trend is downward.
                         last_high_reference = high_day_0
                         swing_point_occured = True
@@ -672,30 +670,13 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                                 current_trend_seq_count += 1
                             last_swing_point = 'LL'
                         uptrend_in_progress = True  # Now trend is upward.
-                        last_swing_point_price = low_day_0
-                        last_swing_point_date = index_label
+                        df.at[index_label, 'swing_point_price']
                         last_low_reference = low_day_0
                         swing_point_occured = True
             if swing_point_occured == True:
                 df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
                 df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                 df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
-
-                # Create a new swing point record for this swing point.
-
-                # Assuming you have a DailyPrice instance you want to link
-                daily_price_instance = DailyPrice.objects.get(datetime=index_label)  # or however you get this instance
-
-                # Get the ContentType for the DailyPrice model
-                content_type = ContentType.objects.get_for_model(daily_price_instance)
-                new_swing_point = SwingPoint.objects.create(
-                                                                    ticker=ticker,
-                                                                    date = last_swing_point_date,
-                                                                    price = last_swing_point_price,
-                                                                    label = last_swing_point,
-                                                                    candle_count_since_last_swing_point = candle_count_since_last_swing_point
-                )
-                #swing_point_id_list.append(new_swing_point.id)
                 candle_count_since_last_swing_point = 0
                 final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
                 if current_trend_seq_count > 2:
@@ -1062,15 +1043,20 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                         daily_price.save()
                 else:
                     print('Insufficient data.')
-            # Now link the swing points to this price entries.
-            for swing_point_id in swing_point_id_list:
-                swing_point_instance = SwingPoint.objects.get(id=swing_point_id)
-                price_instance = DailyPrice.objects.get(datetime=swing_point_instance.date)
-                content_type = ContentType.objects.get_for_model(price_instance)
-                swing_point_instance.content_type=content_type
-                swing_point_instance.object_id=price_instance.id
-                swing_point_instance.save()
 
+                if len(row['swing_point_label']) > 0:
+                    # This was noted to be a swing point
+                    # Get the ContentType for the DailyPrice model
+                    content_type = ContentType.objects.get_for_model(daily_price)
+                    new_swing_point = SwingPoint.objects.create(
+                        ticker=ticker,
+                        date=row['Datetime_TZ'],
+                        price=row['swing_point_price'],
+                        label=row['swing_point_label'],
+                        candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
+                        content_type = content_type,
+                        object_id = daily_price.id
+                    )
             print('new_record_count:',new_record_count)
             logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
             end_time = display_local_time()  # record the end time of the loop
