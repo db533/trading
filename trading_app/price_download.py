@@ -689,7 +689,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                                                                     label = last_swing_point,
                                                                     candle_count_since_last_swing_point = candle_count_since_last_swing_point
                 )
-                swing_point_id_list.append(new_swing_point.id)
+                #swing_point_id_list.append(new_swing_point.id)
                 candle_count_since_last_swing_point = 0
                 final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
                 if current_trend_seq_count > 2:
