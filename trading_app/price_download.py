@@ -546,7 +546,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
     # Delete existing swing points for the ticker as new ones will be determined.
     print('ticker:', ticker)
     try:
-        SwingPoint.objects.filter(ticker=ticker).delete()
+        #SwingPoint.objects.filter(ticker=ticker).delete()
 
         swing_point_id_list = []
 
