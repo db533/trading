@@ -107,30 +107,27 @@ class TradingStrategy(models.Model):
 
 
 def parse_swing_points(swing_points_str):
-    # Pattern to match the tuple structure in the string
-    tuple_pattern = re.compile(r"\((datetime\.datetime\([^)]+\), Decimal\('[^)]+'\), '[^']+'\)")
-
-    # Find all tuple strings
-    tuple_strings = tuple_pattern.findall(swing_points_str)
+    # Manually split the string into tuple components
+    # This approach avoids complex regex patterns and directly extracts the needed parts
+    tuple_strs = swing_points_str.strip("[]").split("), (")
 
     parsed_tuples = []
-    for tuple_str in tuple_strings:
-        # Parsing the datetime part
-        datetime_part = re.search(r"datetime\.datetime\(([^)]+)\)", tuple_str).group(1)
-        datetime_args = [int(arg) for arg in datetime_part.split(', ')[:6]]
-        # Adjusting for timezone if present
-        tzinfo_str = re.search(r"tzinfo=datetime\.timezone\.utc", tuple_str)
-        tzinfo = timezone.utc if tzinfo_str else None
-        datetime_obj = datetime(*datetime_args, tzinfo=tzinfo)
+    for tuple_str in tuple_strs:
+        # Correctly format the tuple string for safe evaluation
+        formatted_tuple_str = '(' + tuple_str.strip("()") + ')'
 
-        # Parsing the Decimal part
-        decimal_part = re.search(r"Decimal\('([^)]+)'\)", tuple_str).group(1)
-        decimal_obj = Decimal(decimal_part)
+        # Attempt to safely evaluate the non-datetime, non-Decimal parts
+        try:
+            eval_tuple = ast.literal_eval(formatted_tuple_str)
 
-        # Parsing the label
-        label = re.search(r", '([^']+)'\)", tuple_str).group(1)
+            # Parse the datetime and Decimal parts correctly
+            datetime_obj = datetime.strptime(eval_tuple[0], "%Y, %m, %d, %H, %M, tzinfo=datetime.timezone.utc")
+            decimal_obj = Decimal(eval_tuple[1])
+            label = eval_tuple[2]
 
-        parsed_tuples.append((datetime_obj, decimal_obj, label))
+            parsed_tuples.append((datetime_obj, decimal_obj, label))
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing tuple {tuple_str}: {e}")
 
     return parsed_tuples
 
