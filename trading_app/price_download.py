@@ -539,6 +539,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
     logger.info(f'reversal_days: {reversal_days}')
     df['swing_point_label'] = ''
     df['swing_point_price'] = 0
+    df['swing_point_price'] = df['swing_point_price'].astype(float)
     df['swing_point_current_trend'] = 0
     df['candle_count_since_last_swing_point'] = 0
     # print('df.columns:',df.columns)
