@@ -203,11 +203,12 @@ class GannPointFourBuy2(BaseStrategy):
         data = {}
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
+        #strategy_instance = TradingStrategy.objects.get(name=name)
         swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
                                                                                                 'candle_count_since_last_swing_point').order_by('-datetime')
-        active_trading_opp = TradingOpp.objects.filter(ticker=self.ticker,strategy=strategy_instance, is_active=True)
+        #active_trading_opp = TradingOpp.objects.filter(ticker=self.ticker,strategy=strategy_instance, is_active=True)
         swing_point_instance_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
-        strategy_instance = TradingStrategy.objects.get(name=name)
+
         #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_prev = []
@@ -263,7 +264,7 @@ class GannPointFourBuy2(BaseStrategy):
             # Compute the days between the start and end of the down trend.
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
-                    'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : str(recent_swing_points) }
+                    'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points } # recent_swing_points not as a string as it gets removed and accessed if present.
             logger.error(f'Max T during prior series of swings: {max_T}.')
         else:
             data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
