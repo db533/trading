@@ -1045,15 +1045,19 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             # This was noted to be a swing point
                             # Get the ContentType for the DailyPrice model
                             content_type = ContentType.objects.get_for_model(daily_price)
-                            new_swing_point = SwingPoint.objects.create(
-                                ticker=ticker,
-                                date=row['Datetime_TZ'],
-                                price=row['swing_point_price'],
-                                label=row['swing_point_label'],
-                                candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
-                                content_type=content_type,
-                                object_id=daily_price.id
-                            )
+
+                            # First check if a swing point instance has already been created for this swing point.
+                            existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
+                            if not existing_swing_point_instance.exists():
+                                new_swing_point = SwingPoint.objects.create(
+                                    ticker=ticker,
+                                    date=row['Datetime_TZ'],
+                                    price=row['swing_point_price'],
+                                    label=row['swing_point_label'],
+                                    candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
+                                    content_type=content_type,
+                                    object_id=daily_price.id
+                                )
 
                 else:
                     print('Insufficient data.')
