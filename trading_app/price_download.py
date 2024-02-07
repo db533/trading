@@ -1048,8 +1048,12 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             content_type = ContentType.objects.get_for_model(daily_price)
 
                             # First check if a swing point instance has already been created for this swing point.
+                            logger.error(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
+                                         f"content_type: {str(content_type)}")
                             existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
+                            logger.error(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                             if not existing_swing_point_instance.exists():
+                                logger.error(f'SwingPoint does not exist.')
                                 new_swing_point = SwingPoint.objects.create(
                                     ticker=ticker,
                                     date=row['Datetime_TZ'],
