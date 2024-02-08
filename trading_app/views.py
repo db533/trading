@@ -818,6 +818,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         lh_swing_point = None
         for swing_point in swing_points:
             print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
+            print('type(swing_point.candle_count_since_last_swing_point):',type(swing_point.candle_count_since_last_swing_point))
             if swing_point.label == 'LH' and swing_point.candle_count_since_last_swing_point == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
