@@ -841,7 +841,7 @@ def generate_swing_point_graph_view(request, opp_id):
 
     # Determine the min and max for dates and prices, then add a buffer
     date_min = min(numeric_dates)
-    date_max = max(numeric_dates, most_recent_date)
+    date_max = max(numeric_dates, date2num(most_recent_date))
     price_min = min(prices, most_recent_price)
     price_max = max(prices, most_recent_price)
 
