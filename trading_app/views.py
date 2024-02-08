@@ -932,20 +932,20 @@ def generate_swing_point_graph_view(request, opp_id):
 
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
-    print('trading_strategy:',trading_strategy)
+    #print('trading_strategy:',trading_strategy)
     customizer = get_graph_customizer(trading_strategy)
-    print('customizer:', str(customizer))
+    #print('customizer:', str(customizer))
 
-    # Apply customizations
-    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date)
-
-    ax.set_xticks([])  # Optionally hide x-axis labels
+        ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
     ax.margins(x=0.1, y=0.4)  # Adds 5% padding to the x-axis and 10% to the y-axis
     #ax.grid(True)
     #ax.set_facecolor('white')
     #fig.patch.set_facecolor('lightgray')
+
+    # Apply customizations
+    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date)
 
     # Save to a BytesIO buffer
     buffer = io.BytesIO()
