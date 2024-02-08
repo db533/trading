@@ -671,7 +671,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
                                 current_trend_seq_count += 1
                             last_swing_point = 'LL'
                         uptrend_in_progress = True  # Now trend is upward.
-                        df.at[index_label, 'swing_point_price']
+                        df.at[index_label, 'swing_point_price'] = low_day_0
                         last_low_reference = low_day_0
                         swing_point_occured = True
             if swing_point_occured == True:
