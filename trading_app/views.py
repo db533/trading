@@ -835,6 +835,27 @@ def generate_swing_point_graph_view(request, opp_id):
     prices = [float(swing_point.price) for swing_point in swing_points]
     labels = [swing_point.label for swing_point in swing_points]
 
+    # Convert dates to numeric format for plotting and manipulation
+    numeric_dates = date2num(dates)
+
+    # Determine the min and max for dates and prices, then add a buffer
+    date_min = min(numeric_dates)
+    date_max = max(numeric_dates)
+    price_min = min(prices)
+    price_max = max(prices)
+
+    # Calculate buffer sizes as a fraction of the data range
+    date_range = date_max - date_min
+    price_range = price_max - price_min
+
+    date_buffer = date_range * 0.05  # 5% buffer on each side for dates
+    price_buffer = price_range * 0.05  # 5% buffer on each side for prices
+
+    # Set new axes limits with buffers
+    ax.set_xlim([date_min - date_buffer, date_max + date_buffer])
+    ax.set_ylim([price_min - price_buffer, price_max + price_buffer])
+
+
     # Plotting logic
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
