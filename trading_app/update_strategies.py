@@ -199,79 +199,81 @@ class GannPointFourBuy2(BaseStrategy):
     name="Gann's Buying point #4"
 
     def check_criteria(self):
-        name = "Gann's Buying point #4"
-        data = {}
-        action_buy = None
-        # Access the latest DailyPrice (or other relevant price model) for the ticker
-        #strategy_instance = TradingStrategy.objects.get(name=name)
-        #swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
-        #                                                                                        'candle_count_since_last_swing_point').order_by('-datetime')
-        #active_trading_opp = TradingOpp.objects.filter(ticker=self.ticker,strategy=strategy_instance, is_active=True)
-        swing_point_instance_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
-
-        #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_counter = 1
-        T_prev = []
-        latest_T = 0
-        recent_swing_points = []
-        for swing_point in swing_point_instance_query:
-            # Check first is a LL or HH
-            logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
-            if swing_point_counter == 1:
-                if swing_point.label == 'LL':
-                    logger.error(f'Detected first swingpoint. LL')
-                    last_candle = swing_point.price_object
-                    recent_swing_points.append(swing_point)
-                else:
-                    # This strategy cannot be true. End review of swing points.
-                    logger.error(f'First swingpoint not LL. Strategy not valid.')
-                    break
-                # Now need to determine the elapsed days since this LL or HH.
-                latest_T = instance_difference_count(self.ticker, swing_point.price_object)
-                most_recent_label = 'LL'
-                swing_point_counter += 1
-            elif swing_point_counter >1:
-                if swing_point.label == 'LH' and most_recent_label == 'LL':
-                    # Swing point is a high.
-                    # Save the number of days that that it took to reach this swing point.
-                    logger.error(f'Found a prior {swing_point.label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
-                    T_prev.append(swing_point.candle_count_since_last_swing_point)
-                    most_recent_label = 'LH'
-                    recent_swing_points.append(swing_point)
-                elif swing_point.label == 'LL':
-                    logger.error(f'Found a prior {swing_point.label}.')
-                    most_recent_label = 'LL'
-                    recent_swing_points.append(swing_point)
-                elif swing_point.label == 'HH' or swing_point.label == 'HL':
-                    # This must be the start of the prior up trend.
-                    # Stop checking further swing points.
-                    logger.error(f'Found a prior {swing_point.label}. So downtrend started here.')
-                    first_candle = swing_point.price_object
-                    recent_swing_points.append(swing_point)
-                    break
-                swing_point_counter += 1
-        if len(T_prev) > 0:
-            max_T = max(T_prev)
-            if max_T < latest_T and len(T_prev) > 1:
-                # The most recent upward rally is longer than the longest upward rally during the down trend.
-                # And we have had at least 2 sections of upward movement during the down trend.
-                logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
-                action_buy = True
-            else:
-                # The most recent upward rally is shorter than the longest upward rally during the down trend.
-                logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
-                action_buy = None
-            # Compute the days between the start and end of the down trend.
-            prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
-            data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
-                    'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points } # recent_swing_points not as a string as it gets removed and accessed if present.
-            logger.error(f'Max T during prior series of swings: {max_T}.')
-        else:
-            data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
+        try:
+            data = {}
             action_buy = None
-        logger.error(f'Latest T: {latest_T}.')
-        logger.error(f'........')
-        return action_buy, data
+            # Access the latest DailyPrice (or other relevant price model) for the ticker
+            #strategy_instance = TradingStrategy.objects.get(name=name)
+            #swing_point_query = DailyPrice.objects.filter(ticker=self.ticker, swing_point_label__gt="").only('datetime', 'swing_point_label',
+            #                                                                                        'candle_count_since_last_swing_point').order_by('-datetime')
+            #active_trading_opp = TradingOpp.objects.filter(ticker=self.ticker,strategy=strategy_instance, is_active=True)
+            swing_point_instance_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+
+            #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            swing_point_counter = 1
+            T_prev = []
+            latest_T = 0
+            recent_swing_points = []
+            for swing_point in swing_point_instance_query:
+                # Check first is a LL or HH
+                logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+                if swing_point_counter == 1:
+                    if swing_point.label == 'LL':
+                        logger.error(f'Detected first swingpoint. LL')
+                        last_candle = swing_point.price_object
+                        recent_swing_points.append(swing_point)
+                    else:
+                        # This strategy cannot be true. End review of swing points.
+                        logger.error(f'First swingpoint not LL. Strategy not valid.')
+                        break
+                    # Now need to determine the elapsed days since this LL or HH.
+                    latest_T = instance_difference_count(self.ticker, swing_point.price_object)
+                    most_recent_label = 'LL'
+                    swing_point_counter += 1
+                elif swing_point_counter >1:
+                    if swing_point.label == 'LH' and most_recent_label == 'LL':
+                        # Swing point is a high.
+                        # Save the number of days that that it took to reach this swing point.
+                        logger.error(f'Found a prior {swing_point.label}. Days to this point = {swing_point.candle_count_since_last_swing_point}')
+                        T_prev.append(swing_point.candle_count_since_last_swing_point)
+                        most_recent_label = 'LH'
+                        recent_swing_points.append(swing_point)
+                    elif swing_point.label == 'LL':
+                        logger.error(f'Found a prior {swing_point.label}.')
+                        most_recent_label = 'LL'
+                        recent_swing_points.append(swing_point)
+                    elif swing_point.label == 'HH' or swing_point.label == 'HL':
+                        # This must be the start of the prior up trend.
+                        # Stop checking further swing points.
+                        logger.error(f'Found a prior {swing_point.label}. So downtrend started here.')
+                        first_candle = swing_point.price_object
+                        recent_swing_points.append(swing_point)
+                        break
+                    swing_point_counter += 1
+            if len(T_prev) > 0:
+                max_T = max(T_prev)
+                if max_T < latest_T and len(T_prev) > 1:
+                    # The most recent upward rally is longer than the longest upward rally during the down trend.
+                    # And we have had at least 2 sections of upward movement during the down trend.
+                    logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
+                    action_buy = True
+                else:
+                    # The most recent upward rally is shorter than the longest upward rally during the down trend.
+                    logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
+                    action_buy = None
+                # Compute the days between the start and end of the down trend.
+                prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
+                        'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points } # recent_swing_points not as a string as it gets removed and accessed if present.
+                logger.error(f'Max T during prior series of swings: {max_T}.')
+            else:
+                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
+                action_buy = None
+            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'........')
+            return action_buy, data
+        except:
+            print(f"Error in Gann #4 Selling for {ticker.symbol}: {e}")
 
 class GannPointFourSell(BaseStrategy):
     name="Gann's Selling point #4"
