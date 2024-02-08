@@ -838,8 +838,8 @@ def generate_swing_point_graph_view(request, opp_id):
                 ha='center', va=va_align)  # Adjusted vertical alignment
 
     # Formatting date labels for better readability
-    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-    fig.autofmt_xdate()  # Auto-format date labels
+    #ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+    #fig.autofmt_xdate()  # Auto-format date labels
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
