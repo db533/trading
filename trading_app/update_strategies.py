@@ -235,7 +235,7 @@ class GannPointFourSell(BaseStrategy):
                     T_prev.append(swing_point.candle_count_since_last_swing_point)
                     most_recent_label = 'HL'
                     recent_swing_points.append(swing_point)
-                elif swing_point.swing_point_label == 'HH':
+                elif swing_point.label == 'HH':
                     logger.error(f'Found a prior {swing_point.label}.')
                     most_recent_label = 'HH'
                     recent_swing_points.append(swing_point)
