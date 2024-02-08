@@ -821,7 +821,8 @@ def generate_swing_point_graph_view(request, opp_id):
 
     # Plotting logic remains similar, adjust as necessary to handle your specific data format
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
-    ax.plot(dates, prices, marker='o', linestyle='-')    ax.set_xticks([])  # Hide x-axis labels if desired
+    ax.plot(dates, prices, marker='o', linestyle='-')
+    ax.set_xticks([])  # Hide x-axis labels if desired
     ax.set_yticks([])  # Hide y-axis labels if desired
     ax.autoscale(True)
     ax.grid(True)
