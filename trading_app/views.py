@@ -836,31 +836,9 @@ def generate_swing_point_graph_view(request, opp_id):
     prices = [float(swing_point.price) for swing_point in swing_points]
     labels = [swing_point.label for swing_point in swing_points]
 
-    # Convert dates to numeric format for plotting and manipulation
-    numeric_dates = date2num(dates)
-
-    prices_for_axes = prices
-    prices_for_axes.append(most_recent_price)
-    # Determine the min and max for dates and prices, then add a buffer
-    date_min = min(numeric_dates)
-    date_max = date2num(most_recent_date)
-    price_min = min(prices_for_axes)
-    price_max = max(prices_for_axes)
-
-    # Calculate buffer sizes as a fraction of the data range
-    date_range = date_max - date_min
-    price_range = price_max - price_min
-
-    date_buffer = date_range * 0.05  # 5% buffer on each side for dates
-    price_buffer = price_range * 0.05  # 5% buffer on each side for prices
-
     # Plotting logic
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
-
-    # Set new axes limits with buffers
-    ax.set_xlim([date_min - date_buffer, date_max + date_buffer])
-    ax.set_ylim([price_min - price_buffer, price_max + price_buffer])
 
     # Adding a line to the most recent close price.
     ax.plot([most_recent_date], [float(most_recent_price)], 'ro')  # Mark the most recent price with a red dot
@@ -898,7 +876,8 @@ def generate_swing_point_graph_view(request, opp_id):
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
-    #ax.autoscale(enable=True, axis='both', tight=None)
+    ax.margins(x=0.05, y=0.1)  # Adds 5% padding to the x-axis and 10% to the y-axis
+    ax.autoscale(enable=True, axis='both', tight=None)
     #ax.grid(True)
     #ax.set_facecolor('white')
     #fig.patch.set_facecolor('lightgray')
