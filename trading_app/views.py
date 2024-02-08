@@ -877,7 +877,7 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
-    ax.margins(x=0.1, y=0.3)  # Adds 5% padding to the x-axis and 10% to the y-axis
+    ax.margins(x=0.1, y=0.4)  # Adds 5% padding to the x-axis and 10% to the y-axis
     #ax.grid(True)
     #ax.set_facecolor('white')
     #fig.patch.set_facecolor('lightgray')
