@@ -8,17 +8,30 @@
     <h1>Active Trading Opportunities</h1>
     {% for ticker, opps in ticker_opps.items %}
         <h2><a href="{% url 'ticker_detail' ticker.id %}">{{ ticker.symbol }} - {{ ticker.company_name }}</a></h2>
-        <ul>
-        {% for opp in opps %}
-            <li>
-                <strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong> Strategy: {{ opp.strategy.name }} - Identified: {{ opp.datetime_identified }} <br>
-                Metrics: {{ opp.metrics_snapshot }}<br>
-                Recent swing points: {{opp.recent_swing_points }}<br>
-                <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph">
-            </li>
-        {% endfor %}
-        </ul>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Graph</th>
+                    <th>Strategy Name</th>
+                    <th>Date Identified</th>
+                    <th>Metrics</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for opp in opps %}
+                <tr>
+                    <td>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</td>
+                    <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 100px; height: auto;"></td>
+                    <td>{{ opp.strategy.name }}</td>
+                    <td>{{ opp.datetime_identified }}</td>
+                    <td>{{ opp.metrics_snapshot }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     {% empty %}
         <p>No active trading opportunities found.</p>
     {% endfor %}
-  {% endblock %}
+</body>
+{% endblock %}
