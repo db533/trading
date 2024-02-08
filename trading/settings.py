@@ -170,7 +170,7 @@ CRON_CLASSES = [
     'trading_app.cron.DailyUSPriceDownloadCronJob',
     'trading_app.cron.DailyTSEPriceDownloadCronJob',
     'trading_app.cron.DailyTradingOppCreationCronJob',
-    'trading_app.cron.test_cron_job',
+    'trading_app.cron.TestPriceDownloadCronJob',
     #'trading_app.cron.FifteenMinsPriceDownloadCronJob',
     #'trading_app.cron.FiveMinsPriceDownloadCronJob',
 
