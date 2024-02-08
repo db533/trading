@@ -217,7 +217,7 @@ class GannPointFourSell(BaseStrategy):
             if swing_point_counter == 1:
                 if swing_point.label == 'HH':
                     logger.error(f'Detected first swingpoint. HH')
-                    last_candle = swing_point
+                    last_candle = swing_point.price_object
                     recent_swing_points.append(swing_point)
                 else:
                     # This strategy cannot be true. End review of swing points.
