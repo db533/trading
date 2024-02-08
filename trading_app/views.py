@@ -807,27 +807,46 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import io
 
+
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
 
     # Directly access SwingPoints associated with this TradingOpp
-    swing_points = opp.swing_points.all()  # This will give you a queryset of SwingPoint instances
+    swing_points = opp.swing_points.all()
 
     # Prepare data for plotting
-    # Assuming each SwingPoint's date and price can directly map to the plot
     dates = [swing_point.date for swing_point in swing_points]
     prices = [float(swing_point.price) for swing_point in swing_points]
+    labels = [swing_point.label for swing_point in swing_points]
 
-    # Plotting logic remains similar, adjust as necessary to handle your specific data format
+    # Plotting logic
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
-    ax.set_xticks([])  # Hide x-axis labels if desired
-    ax.set_yticks([])  # Hide y-axis labels if desired
-    ax.autoscale(True)
+
+    # Annotate each point with its label and price, adjusting position based on label
+    for date, price, label in zip(dates, prices, labels):
+        # Determine vertical alignment based on the label ending
+        if label.endswith('H'):
+            va_align = 'bottom'  # Place text above the point for 'H' labels
+        elif label.endswith('L'):
+            va_align = 'top'  # Place text below the point for 'L' labels
+        else:
+            va_align = 'center'  # Default alignment if neither 'H' nor 'L'
+
+        ax.text(date, price, f"{label}\n{price:.2f}", fontsize=9,
+                ha='center', va=va_align)  # Adjusted vertical alignment
+
+    # Formatting date labels for better readability
+    ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
+    fig.autofmt_xdate()  # Auto-format date labels
+
+    ax.set_xticks([])  # Optionally hide x-axis labels
+    ax.set_yticks([])  # Optionally hide y-axis labels
+    ax.autoscale(enable=True, axis='both', tight=None)
     ax.grid(True)
-    ax.set_facecolor('white')  # Ensure the plot background is visible
-    fig.patch.set_facecolor('lightgray')  # Change figure background to see its extent
+    ax.set_facecolor('white')
+    fig.patch.set_facecolor('lightgray')
 
     # Save to a BytesIO buffer
     buffer = io.BytesIO()
