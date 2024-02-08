@@ -846,10 +846,12 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         ax.axvline(x=date, ymin=min_price, ymax=start_price, color='g', linestyle='--')
 # Add more customizers for other strategies
 def get_graph_customizer(trading_strategy):
+    print('About to select Customizer for strategy:'trading_strategy.name)
     customizers = {
         "Gann's Buying point #4": GannFourBuyCustomizer(),
         # Map more strategies to their customizers
     }
+    print(customizers.get(trading_strategy.name, BaseGraphCustomizer()))
     return customizers.get(trading_strategy.name, BaseGraphCustomizer())
 
 from django.http import HttpResponse
