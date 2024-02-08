@@ -811,14 +811,13 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
         print('Starting GannFourBuyCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
-        max_T = trading_opp.metrics_snapshot.get('max_T')
+        max_T = int(trading_opp.metrics_snapshot.get('max_T'))
         print('max_T:',max_T)
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
         for swing_point in swing_points:
             print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
-            print('type(swing_point.candle_count_since_last_swing_point):',type(swing_point.candle_count_since_last_swing_point))
             if swing_point.label == 'LH' and swing_point.candle_count_since_last_swing_point == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
