@@ -839,7 +839,8 @@ def generate_swing_point_graph_view(request, opp_id):
     # Convert dates to numeric format for plotting and manipulation
     numeric_dates = date2num(dates)
 
-    prices_for_axes = prices.append(most_recent_price)
+    prices_for_axes = prices
+    prices_for_axes.append(most_recent_price)
     # Determine the min and max for dates and prices, then add a buffer
     date_min = min(numeric_dates)
     date_max = date2num(most_recent_date)
