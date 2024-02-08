@@ -804,6 +804,7 @@ def trading_opps_view(request):
 
 from django.http import HttpResponse
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.dates import date2num
 import matplotlib.pyplot as plt
 import io
 
