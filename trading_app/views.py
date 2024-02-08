@@ -923,7 +923,9 @@ def generate_swing_point_graph_view(request, opp_id):
 
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
+    print('trading_strategy:',trading_strategy)
     customizer = get_graph_customizer(trading_strategy)
+    print('customizer:', str(customizer))
 
     # Apply customizations
     customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date)
