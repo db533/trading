@@ -936,7 +936,7 @@ def generate_swing_point_graph_view(request, opp_id):
     customizer = get_graph_customizer(trading_strategy)
     #print('customizer:', str(customizer))
 
-        ax.set_xticks([])  # Optionally hide x-axis labels
+    ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
     ax.margins(x=0.1, y=0.4)  # Adds 5% padding to the x-axis and 10% to the y-axis
