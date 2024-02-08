@@ -955,4 +955,9 @@ def generate_swing_point_graph_view(request, opp_id):
     # Serve the image
     response = HttpResponse(buffer.getvalue(), content_type='image/png')
     response['Content-Length'] = str(len(response.content))
+
+    # Set headers to prevent caching
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
     return response
