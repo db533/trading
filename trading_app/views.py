@@ -858,6 +858,17 @@ def generate_swing_point_graph_view(request, opp_id):
         ax.text(date, price, f"{label}\n{price:.2f}", fontsize=9,
                 ha='center', va=va_align)  # Adjusted vertical alignment
 
+    # Determine label placement based on comparison of the most recent price to the last swing point's price
+    last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
+    if float(most_recent_price) < last_swing_price:
+        va_align = 'top'
+    else:
+        va_align = 'bottom'
+
+    # Annotate the most recent price point with its price, adjusting placement
+    ax.text(most_recent_date, float(most_recent_price), f'{most_recent_price:.2f}',
+            fontsize=9, ha='center', va=va_align)
+
     # Formatting date labels for better readability
     #ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
     #fig.autofmt_xdate()  # Auto-format date labels
