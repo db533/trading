@@ -809,6 +809,7 @@ class BaseGraphCustomizer:
 
 class GannFourBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+        print('Starting GannFourBuyCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
         max_T = trading_opp.metrics_snapshot.get('max_T')
 
