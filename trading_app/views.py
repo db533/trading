@@ -877,8 +877,8 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
     ax.grid(True)
-    ax.set_facecolor('white')
-    fig.patch.set_facecolor('lightgray')
+    #ax.set_facecolor('white')
+    #fig.patch.set_facecolor('lightgray')
 
     # Save to a BytesIO buffer
     buffer = io.BytesIO()
