@@ -876,7 +876,7 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
-    ax.grid(True)
+    #ax.grid(True)
     #ax.set_facecolor('white')
     #fig.patch.set_facecolor('lightgray')
 
