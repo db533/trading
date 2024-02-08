@@ -812,12 +812,15 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         print('Starting GannFourBuyCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
         max_T = trading_opp.metrics_snapshot.get('max_T')
+        print('max_T:',max_T)
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
         for swing_point in swing_points:
+            print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
             if swing_point.label == 'LH' and swing_point.candle_count_since_last_swing_point == max_T:
                 lh_swing_point = swing_point
+                print('Found lh_swing_point.')
                 break
 
         if lh_swing_point:
@@ -826,9 +829,11 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             lh_index = list(swing_points).index(lh_swing_point)
             if lh_index > 0:
                 preceding_swing_point = swing_points[lh_index - 1]
+                print('Found preceding_swing_point.')
 
             # Find min price for drawing vertical lines
             min_price = min([swing_point.price for swing_point in swing_points])
+            print('min_price:', min_price)
 
             # Draw vertical lines
             if preceding_swing_point:
