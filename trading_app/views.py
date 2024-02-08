@@ -802,6 +802,55 @@ def trading_opps_view(request):
 
     return render(request, 'trading_opp_list.html', context)
 
+class BaseGraphCustomizer:
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+        # Base customization logic (if any)
+        pass
+
+class GannFourBuyCustomizer(BaseGraphCustomizer):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+        # Extract max_T from trading_opp's metrics_snapshot
+        max_T = trading_opp.metrics_snapshot.get('max_T')
+
+        # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
+        lh_swing_point = None
+        for swing_point in swing_points:
+            if swing_point.label == 'LH' and swing_point.candle_count_since_last_swing_point == max_T:
+                lh_swing_point = swing_point
+                break
+
+        if lh_swing_point:
+            # Find the preceding swing point (if exists)
+            preceding_swing_point = None
+            lh_index = list(swing_points).index(lh_swing_point)
+            if lh_index > 0:
+                preceding_swing_point = swing_points[lh_index - 1]
+
+            # Find min price for drawing vertical lines
+            min_price = min([swing_point.price for swing_point in swing_points])
+
+            # Draw vertical lines
+            if preceding_swing_point:
+                self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
+            self.draw_vertical_line(ax, lh_swing_point.date, lh_swing_point.price, min_price)
+
+            # Add text annotation
+            if preceding_swing_point:
+                mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
+                ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Convert date if necessary (e.g., to matplotlib date format)
+        # date_num = date2num(date)  # Uncomment if date conversion is needed
+        ax.axvline(x=date, ymin=min_price, ymax=start_price, color='g', linestyle='--')
+# Add more customizers for other strategies
+def get_graph_customizer(trading_strategy):
+    customizers = {
+        "Gann's Buying point #4": GannFourBuyCustomizer(),
+        # Map more strategies to their customizers
+    }
+    return customizers.get(trading_strategy.name, BaseGraphCustomizer())
+
 from django.http import HttpResponse
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.dates import date2num
@@ -870,9 +919,12 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.text(most_recent_date, float(most_recent_price), f'{most_recent_price:.2f}',
             fontsize=9, ha='center', va=va_align)
 
-    # Formatting date labels for better readability
-    #ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d'))
-    #fig.autofmt_xdate()  # Auto-format date labels
+    # Select the appropriate graph customizer based on the TradingStrategy
+    trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
+    customizer = get_graph_customizer(trading_strategy)
+
+    # Apply customizations
+    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date)
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
