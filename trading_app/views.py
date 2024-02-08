@@ -815,6 +815,21 @@ def generate_swing_point_graph_view(request, opp_id):
     # Directly access SwingPoints associated with this TradingOpp
     swing_points = opp.swing_points.all()
 
+    if swing_points.exists():
+        # Use the first swing point to determine the content_type
+        first_swing_point = swing_points.first()
+        content_type = first_swing_point.content_type
+
+        # Determine the Price model class based on the content_type
+        model = content_type.model_class()
+
+        # Fetch the most recent price for this Ticker from the determined Price model
+        most_recent_price_instance = model.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
+
+        if most_recent_price_instance:
+            most_recent_price = most_recent_price_instance.close_price
+            most_recent_date = most_recent_price_instance.datetime
+
     # Prepare data for plotting
     dates = [swing_point.date for swing_point in swing_points]
     prices = [float(swing_point.price) for swing_point in swing_points]
@@ -823,6 +838,12 @@ def generate_swing_point_graph_view(request, opp_id):
     # Plotting logic
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
+
+    # Adding a line to the most recent close price.
+    ax.plot([most_recent_date], [float(most_recent_price)], 'ro')  # Mark the most recent price with a red dot
+    # If there are previous points, draw a dotted line from the last swing point to the new point
+    if dates and prices:
+        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], 'r--')  # Dotted line
 
     # Annotate each point with its label and price, adjusting position based on label
     for date, price, label in zip(dates, prices, labels):
