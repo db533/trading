@@ -810,20 +810,18 @@ import io
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
-    swing_points = opp.get_swing_points_as_tuples()
-    logger.error(f'TradingOpp id: "{str(opp_id)}"')
-    logger.error(f'swing_points: "{str(swing_points)}"')
 
-    # Convert swing points to a suitable format for plotting
-    dates = [point[0] for point in swing_points]  # Ensure these are datetime objects
-    prices = [float(point[1]) for point in swing_points]  # Convert Decimal to float
-    logger.error(f'dates: "{str(dates)}"')
-    logger.error(f'prices: "{str(prices)}"')
+    # Directly access SwingPoints associated with this TradingOpp
+    swing_points = opp.swing_points.all()  # This will give you a queryset of SwingPoint instances
 
-    # Plotting logic (ensure this matches your data structure)
-    fig, ax = plt.subplots(figsize=(4, 2), dpi=100)  # Adjust figsize and dpi as needed
-    ax.plot(dates, prices, marker='o', linestyle='-')
-    ax.set_xticks([])  # Hide x-axis labels if desired
+    # Prepare data for plotting
+    # Assuming each SwingPoint's date and price can directly map to the plot
+    dates = [swing_point.date for swing_point in swing_points]
+    prices = [float(swing_point.price) for swing_point in swing_points]
+
+    # Plotting logic remains similar, adjust as necessary to handle your specific data format
+    fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
+    ax.plot(dates, prices, marker='o', linestyle='-')    ax.set_xticks([])  # Hide x-axis labels if desired
     ax.set_yticks([])  # Hide y-axis labels if desired
     ax.autoscale(True)
     ax.grid(True)
