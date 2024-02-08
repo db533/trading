@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th>Action</th>
-                    <th style="width: 24ch; ;">Graph</th>
+                    <th style="width: 24ch;">Graph</th>
                     <th>Strategy Name</th>
                     <th>Date Identified</th>
                     <th>Metrics</th>
@@ -20,7 +20,7 @@
             </thead>
             <tbody>
             {% for opp in opps %}
-                <tr>
+                <tr style="height: 12ch;">
                     <td>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</td>
                     <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 100px; height: auto;"></td>
                     <td>{{ opp.strategy.name }}</td>
