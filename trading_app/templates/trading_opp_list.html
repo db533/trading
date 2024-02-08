@@ -20,9 +20,9 @@
             </thead>
             <tbody>
             {% for opp in opps %}
-                <tr style="height: 12ch;">
+                <tr>
                     <td>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</td>
-                    <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 100px; height: auto;"></td>
+                    <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 250px; height: auto;"></td>
                     <td>{{ opp.strategy.name }}</td>
                     <td>{{ opp.datetime_identified }}</td>
                     <td>{{ opp.metrics_snapshot }}</td>
