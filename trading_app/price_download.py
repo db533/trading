@@ -1063,6 +1063,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                     content_type=content_type,
                                     object_id=daily_price.id
                                 )
+                            else:
+                                logger.error(f'SwingPoint does exists.')
 
                 else:
                     print('Insufficient data.')
