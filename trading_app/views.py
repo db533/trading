@@ -852,14 +852,13 @@ def generate_swing_point_graph_view(request, opp_id):
     date_buffer = date_range * 0.05  # 5% buffer on each side for dates
     price_buffer = price_range * 0.05  # 5% buffer on each side for prices
 
-    # Set new axes limits with buffers
-    ax.set_xlim([date_min - date_buffer, date_max + date_buffer])
-    ax.set_ylim([price_min - price_buffer, price_max + price_buffer])
-
-
     # Plotting logic
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
+
+    # Set new axes limits with buffers
+    ax.set_xlim([date_min - date_buffer, date_max + date_buffer])
+    ax.set_ylim([price_min - price_buffer, price_max + price_buffer])
 
     # Adding a line to the most recent close price.
     ax.plot([most_recent_date], [float(most_recent_price)], 'ro')  # Mark the most recent price with a red dot
