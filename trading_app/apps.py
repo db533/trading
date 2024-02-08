@@ -6,4 +6,4 @@ class TradingAppConfig(AppConfig):
     name = 'trading_app'
 
     def ready(self):
-        import .signals  # Import signals to ensure they are connected
+        from . import signals  # Import signals to ensure they are connected
