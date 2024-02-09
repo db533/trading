@@ -601,7 +601,7 @@ def update_metrics_view(request, ticker_symbol):
     update_ticker_metrics.update_ticker_metrics(ticker_symbol=ticker_symbol)
     return HttpResponseRedirect(reverse('ticker_config'))  # Redirect to admin dashboard or any other desired URL
 
-
+@login_required
 def ticker_detail(request, ticker_id):
     ticker = get_object_or_404(Ticker, id=ticker_id)
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
@@ -690,6 +690,7 @@ def ticker_detail(request, ticker_id):
 from django.shortcuts import redirect
 from django.http import HttpResponseNotFound
 
+@login_required
 def ticker_delete(request, ticker_id):
     try:
         ticker = Ticker.objects.get(id=ticker_id)
@@ -784,6 +785,7 @@ def delete_daily_price(request, symbol=None):
     else:
         raise Http404("Invalid request method")  # Prevent deletion on GET request
 
+@login_required
 def trading_opps_view(request):
     # Get all active TradingOpp instances
     active_trading_opps = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy')
@@ -825,8 +827,12 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
+        mid_date_current = None
         for swing_point in swing_points:
             print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
+            if mid_date_current is None:
+                # For most recent swing point, compute the location of the text label for the time after this swing point.
+                mid_date_current = most_recent_date + (swing_point.date - most_recent_date) / 2
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
@@ -848,11 +854,14 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             if preceding_swing_point:
                 self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
             self.draw_vertical_line(ax, lh_swing_point.date, lh_swing_point.price, min_price)
+            self.draw_vertical_line(ax, most_recent_date, most_recent_price, min_price)
 
             # Add text annotation
             if preceding_swing_point:
                 mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
                 ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
+            # Add text label for time since the last low to current candle.
+            ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Ensure date is in a format that can be plotted (if you're using date objects, they might need to be converted)
