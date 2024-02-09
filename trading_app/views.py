@@ -1066,7 +1066,6 @@ class GannEightCustomizer(BaseGraphCustomizer):
 
         # Find min / max price for drawing lines
         price_list = [swing_point.price for swing_point in swing_points]
-        price_list.append(most_recent_price)
         min_price = min(price_list)
         print('min_price:', min_price)
         max_price = max(price_list)
