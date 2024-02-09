@@ -886,13 +886,13 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
             mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
             print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',mid_date_current)
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
-                lh_swing_point = swing_point
+                hl_swing_point = swing_point
                 print('Found hl_swing_point.')
 
         if hl_swing_point:
             # Find the preceding swing point (if exists)
             preceding_swing_point = None
-            hl_index = list(swing_points).index(lh_swing_point)
+            hl_index = list(swing_points).index(hl_swing_point)
             if hl_index > 0:
                 preceding_swing_point = swing_points[hl_index - 1]
                 print('Found preceding_swing_point.')
