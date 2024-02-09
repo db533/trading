@@ -12,13 +12,6 @@ import json
 from django.shortcuts import render
 from .models import *
 from .forms import *
-from rest_framework import status
-from django.template.loader import get_template
-from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.models import User
-from django.db.models import Sum, Max, Count
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 from datetime import datetime, timedelta, timezone, date
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
@@ -861,7 +854,9 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
                 ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
             # Add text label for time since the last low to current candle.
-            ax.text(mid_date_current, min_price, f"t={strategy_data['latest_T']}", fontsize=9, ha='center', va='bottom')
+            latest_T = strategy_data['latest_T']
+            print('latest_T:',latest_T)
+            ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Ensure date is in a format that can be plotted (if you're using date objects, they might need to be converted)
@@ -869,7 +864,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         # datetime objects and your x-axis is appropriately configured to handle dates, you might not need to convert them.
 
         # Draw a line between (date, start_price) and (date, min_price)
-        ax.plot([date, date], [start_price, min_price], 'g--')  # 'g--' specifies a green dashed line
+        ax.plot([date, date], [start_price, min_price], 'orange--')
 
 class GannFourSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
@@ -919,8 +914,8 @@ def generate_swing_point_graph_view(request, opp_id):
     opp = TradingOpp.objects.get(id=opp_id)
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
-    print('metrics_snapshot:',metrics_snapshot)
-    print('type(metrics_snapshot):', type(metrics_snapshot))
+    #print('metrics_snapshot:',metrics_snapshot)
+    #print('type(metrics_snapshot):', type(metrics_snapshot))
 
     # Directly access SwingPoints associated with this TradingOpp
     swing_points = opp.swing_points.all()
@@ -928,6 +923,7 @@ def generate_swing_point_graph_view(request, opp_id):
     if swing_points.exists():
         # Use the first swing point to determine the content_type
         first_swing_point = swing_points.first()
+        last_swing_point = swing_points.last()
         content_type = first_swing_point.content_type
 
         # Determine the Price model class based on the content_type
@@ -953,7 +949,11 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.plot([most_recent_date], [float(most_recent_price)], 'ro')  # Mark the most recent price with a red dot
     # If there are previous points, draw a dotted line from the last swing point to the new point
     if dates and prices:
-        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], 'r--')  # Dotted line
+        if float(most_recent_price) > last_swing_point.price:
+            colour = 'g--'
+        else:
+            colour = 'r--'
+        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour)  # Dotted line
 
     # Annotate each point with its label and price, adjusting position based on label
     for date, price, label in zip(dates, prices, labels):
