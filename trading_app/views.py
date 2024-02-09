@@ -864,7 +864,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:',latest_T)
-                if latest_T > 3:
+                if int(latest_T) > 3:
                     ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
@@ -926,7 +926,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:',latest_T)
-                if latest_T > 3:
+                if int(latest_T) > 3:
                     ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
@@ -987,7 +987,7 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:', latest_T)
-                if latest_T > 3:
+                if int(latest_T) > 3:
                     ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
@@ -1050,7 +1050,7 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:', latest_T)
-                if latest_T > 3:
+                if int(latest_T) > 3:
                     ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
