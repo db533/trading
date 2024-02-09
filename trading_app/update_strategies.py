@@ -567,7 +567,7 @@ def process_trading_opportunities():
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
     #strategies = [GannPointFourBuy, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell]  # List of strategy classes
     #strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
-    strategies = [GannPointFourBuy2, GannPointFourSell]  # List of strategy classes
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
     #ticker_id_in_strategy = []
 
     for ticker in tickers:
