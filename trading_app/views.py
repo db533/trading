@@ -834,7 +834,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                     lh_swing_point = swing_point
                     print('Found lh_swing_point.')
                     break
-        except:
+        except Exception as e:
             print(f"Error finding mid_date_current: {e}")
 
         if lh_swing_point:
@@ -864,7 +864,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 latest_T = strategy_data['latest_T']
                 print('latest_T:',latest_T)
                 ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
-            except:
+            except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
