@@ -885,6 +885,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
             # Overwriting the prior value to leave just the last swingpoint value
             mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
             print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',mid_date_current)
+            last_swing_point = swing_point
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 hl_swing_point = swing_point
                 print('Found hl_swing_point.')
@@ -906,11 +907,11 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 if preceding_swing_point:
                     self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
                 self.draw_vertical_line(ax, hl_swing_point.date, hl_swing_point.price, min_price)
-                self.draw_vertical_line(ax, most_recent_date, most_recent_price, min_price)
+                self.draw_vertical_line(ax, last_swing_point.date, last_swing_point.price, min_price)
 
                 # Add text annotation
                 if preceding_swing_point:
-                    mid_date = hl_swing_point.date + (preceding_swing_point.date - hl_swing_point.date) / 2
+                    mid_date = preceding_swing_point.date + ( hl_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
