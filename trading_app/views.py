@@ -805,21 +805,21 @@ def trading_opps_view(request):
     return render(request, 'trading_opp_list.html', context)
 
 class BaseGraphCustomizer:
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         # Base customization logic (if any)
         pass
 
 
 class GannThreeBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannThreeSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannFourBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         print('Starting GannFourBuyCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
         max_T = int(trading_opp.metrics_snapshot.get('max_T'))
@@ -861,7 +861,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
                 ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
             # Add text label for time since the last low to current candle.
-            ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+            ax.text(mid_date_current, min_price, f"t={strategy_data['latest_T']}", fontsize=9, ha='center', va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Ensure date is in a format that can be plotted (if you're using date objects, they might need to be converted)
@@ -872,23 +872,23 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], 'g--')  # 'g--' specifies a green dashed line
 
 class GannFourSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannFiveBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannFiveSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannEightBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 class GannEightSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
         pass
 
 # Add more customizers for other strategies
@@ -917,6 +917,8 @@ import io
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
+    # Access the metrics_snapshot directly
+    metrics_snapshot = opp.metrics_snapshot
 
     # Directly access SwingPoints associated with this TradingOpp
     swing_points = opp.swing_points.all()
@@ -978,8 +980,14 @@ def generate_swing_point_graph_view(request, opp_id):
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
     customizer = get_graph_customizer(trading_strategy)
+
+    # Gather strategy-specific data for use in graphs.
+    strategy_data = {}
+    if trading_strategy.name == "Gann's Buying point #4" or trading_strategy.name == "Gann's Selling point #4":
+        strategy_data['latest_T'] = int(metrics_snapshot.get('latest_t'))
+
     # Apply customizations
-    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date)
+    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date,strategy_data)
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
