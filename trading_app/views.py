@@ -859,12 +859,8 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
-        # Ensure date is in a format that can be plotted (if you're using date objects, they might need to be converted)
-        # For matplotlib, dates often need to be converted to their numeric representation, but if you're already using
-        # datetime objects and your x-axis is appropriately configured to handle dates, you might not need to convert them.
-
         # Draw a line between (date, start_price) and (date, min_price)
-        ax.plot([date, date], [start_price, min_price], 'orange--')
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 class GannFourSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
