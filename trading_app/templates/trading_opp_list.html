@@ -21,7 +21,7 @@
             <tbody>
             {% for opp in opps %}
                 <tr>
-                    <td style="text-align:center; color: {% if opp.action_buy == 'BUY' %}green{% else %}red{% endif %};">{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</td>
+                    <td style="text-align:center; color: {% if opp.action_buy == 1 %}green{% else %}red{% endif %};">{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</td>
                     <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
                     <td>{{ opp.strategy.name }}</td>
                     <td>{{ opp.strategy.description }}</td>
