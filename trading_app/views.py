@@ -820,19 +820,22 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
-        mid_date_current = most_recent_date
-        print(f'Before loop: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
-        for swing_point in swing_points:
-            print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
-            print(f'Loop start: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
-            if mid_date_current == most_recent_date:
-                # For most recent swing point, compute the location of the text label for the time after this swing point.
-                mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
-                print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',mid_date_current)
-            if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
-                lh_swing_point = swing_point
-                print('Found lh_swing_point.')
-                break
+        try:
+            mid_date_current = most_recent_date
+            print(f'Before loop: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
+            for swing_point in swing_points:
+                print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
+                print(f'Loop start: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
+                if mid_date_current == most_recent_date:
+                    # For most recent swing point, compute the location of the text label for the time after this swing point.
+                    mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
+                    print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',mid_date_current)
+                if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
+                    lh_swing_point = swing_point
+                    print('Found lh_swing_point.')
+                    break
+        except:
+            print(f"Error finding mid_date_current: {e}")
 
         if lh_swing_point:
             # Find the preceding swing point (if exists)
