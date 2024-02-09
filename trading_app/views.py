@@ -858,7 +858,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and lh_swing_point.candle_count_since_last_swing_point > 3:
+                if preceding_swing_point and int(lh_swing_point.candle_count_since_last_swing_point) > 3:
                     mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
@@ -920,7 +920,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, most_recent_date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and hl_swing_point.candle_count_since_last_swing_point > 3:
+                if preceding_swing_point and int(hl_swing_point.candle_count_since_last_swing_point) > 3:
                     mid_date = preceding_swing_point.date + ( hl_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
@@ -981,7 +981,7 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and lh_swing_point.candle_count_since_last_swing_point > 3:
+                if preceding_swing_point and int(lh_swing_point.candle_count_since_last_swing_point) > 3:
                     mid_date = preceding_swing_point.date + ( lh_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={lh_swing_point.candle_count_since_last_swing_point}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
@@ -1043,7 +1043,7 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and hl_swing_point.candle_count_since_last_swing_point > 3:
+                if preceding_swing_point and int(hl_swing_point.candle_count_since_last_swing_point) > 3:
                     mid_date = preceding_swing_point.date + (hl_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={hl_swing_point.candle_count_since_last_swing_point}", fontsize=9,
                             ha='center', va='bottom')
