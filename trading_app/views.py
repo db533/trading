@@ -864,7 +864,8 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:',latest_T)
-                ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                if latest_T > 3:
+                    ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
 
@@ -925,7 +926,8 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:',latest_T)
-                ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                if latest_T > 3:
+                    ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
 
@@ -985,7 +987,8 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:', latest_T)
-                ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                if latest_T > 3:
+                    ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
 
@@ -1047,7 +1050,8 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
                 # Add text label for time since the last low to current candle.
                 latest_T = strategy_data['latest_T']
                 print('latest_T:', latest_T)
-                ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                if latest_T > 3:
+                    ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
             except Exception as e:
                 print(f"Error drawing lines and adding labels: {e}")
 
@@ -1058,7 +1062,32 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
 
 class GannEightBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
-        pass
+        print('Starting GannEightBuyCustomizer()...')
+
+        # Find min / max price for drawing lines
+        price_list = [swing_point.price for swing_point in swing_points]
+        price_list.append(most_recent_price)
+        min_price = min(price_list)
+        print('min_price:', min_price)
+        max_price = max(price_list)
+
+        # Find min / max date for drawing horizontal lines
+        date_list = [swing_point.date for swing_point in swing_points]
+        date_list.append(most_recent_date)
+        min_date = min(date_list)
+        print('min_date:', min_date)
+        max_date = max(date_list)
+
+        try:
+            # Draw horizontal lines
+            self.draw_vertical_line(ax, min_date, max_date, min_price)
+            self.draw_vertical_line(ax, min_date, max_date, max_price)
+        except Exception as e:
+            print(f"Error drawing lines: {e}")
+
+    def draw_horizontal_line(self, ax, date1, date2, price):
+        # Draw a line between (date1, price) and (date2, price)
+        ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannEightSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
