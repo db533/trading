@@ -832,6 +832,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
+            last_swing_point = swing_point
 
         if lh_swing_point:
             # Find the preceding swing point (if exists)
@@ -851,6 +852,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                     self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
                 self.draw_vertical_line(ax, lh_swing_point.date, lh_swing_point.price, min_price)
                 self.draw_vertical_line(ax, most_recent_date, most_recent_price, min_price)
+                self.draw_vertical_line(ax, last_swing_point.date, most_recent_price, min_price)
 
                 # Add text annotation
                 if preceding_swing_point:
@@ -908,6 +910,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                     self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
                 self.draw_vertical_line(ax, hl_swing_point.date, hl_swing_point.price, min_price)
                 self.draw_vertical_line(ax, last_swing_point.date, last_swing_point.price, min_price)
+                self.draw_vertical_line(ax, most_recent_date, last_swing_point.price, min_price)
 
                 # Add text annotation
                 if preceding_swing_point:
