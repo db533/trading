@@ -843,9 +843,11 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 print('Found preceding_swing_point.')
 
             # Find min price for drawing vertical lines
-            min_price = min([swing_point.price for swing_point in swing_points])
+            price_list = [swing_point.price for swing_point in swing_points]
+            price_list.append(most_recent_price)
+            min_price = min(price_list)
             print('min_price:', min_price)
-            max_price = max([swing_point.price for swing_point in swing_points])
+            max_price = max(price_list)
 
             try:
                 # Draw vertical lines
@@ -856,7 +858,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point:
+                if preceding_swing_point and lh_swing_point.candle_count_since_last_swing_point > 3:
                     mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
@@ -902,9 +904,11 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 print('Found preceding_swing_point.')
 
             # Find min price for drawing vertical lines
-            min_price = min([swing_point.price for swing_point in swing_points])
+            price_list = [swing_point.price for swing_point in swing_points]
+            price_list.append(most_recent_price)
+            min_price = min(price_list)
             print('min_price:', min_price)
-            max_price = max([swing_point.price for swing_point in swing_points])
+            max_price = max(price_list)
 
             try:
                 # Draw vertical lines
@@ -915,7 +919,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, most_recent_date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and hl_swing_point.candle_count_since_last_swing_point > 2:
+                if preceding_swing_point and hl_swing_point.candle_count_since_last_swing_point > 3:
                     mid_date = preceding_swing_point.date + ( hl_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
@@ -960,9 +964,11 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
                 print('Found preceding_swing_point.')
 
             # Find min price for drawing vertical lines
-            min_price = min([swing_point.price for swing_point in swing_points])
+            price_list = [swing_point.price for swing_point in swing_points]
+            price_list.append(most_recent_price)
+            min_price = min(price_list)
             print('min_price:', min_price)
-            max_price = max([swing_point.price for swing_point in swing_points])
+            max_price = max(price_list)
 
             try:
                 # Draw vertical lines
@@ -973,7 +979,7 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
                 self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
 
                 # Add text annotation
-                if preceding_swing_point and lh_swing_point.candle_count_since_last_swing_point > 2:
+                if preceding_swing_point and lh_swing_point.candle_count_since_last_swing_point > 3:
                     mid_date = preceding_swing_point.date + ( lh_swing_point.date - preceding_swing_point.date) / 2
                     ax.text(mid_date, min_price, f"t={lh_swing_point.candle_count_since_last_swing_point}", fontsize=9, ha='center', va='bottom')
                 # Add text label for time since the last low to current candle.
