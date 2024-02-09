@@ -832,7 +832,6 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
-                break
 
         if lh_swing_point:
             # Find the preceding swing point (if exists)
@@ -889,7 +888,6 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 lh_swing_point = swing_point
                 print('Found hl_swing_point.')
-                break
 
         if hl_swing_point:
             # Find the preceding swing point (if exists)
