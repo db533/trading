@@ -919,6 +919,8 @@ def generate_swing_point_graph_view(request, opp_id):
     opp = TradingOpp.objects.get(id=opp_id)
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
+    print('metrics_snapshot:',metrics_snapshot)
+    print('type(metrics_snapshot):', type(metrics_snapshot))
 
     # Directly access SwingPoints associated with this TradingOpp
     swing_points = opp.swing_points.all()
