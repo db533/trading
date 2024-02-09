@@ -917,6 +917,8 @@ import io
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
+    ticker = TradingOpp.ticker
+    print('Creating graph for ticker',ticker.symbol)
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
     #print('metrics_snapshot:',metrics_snapshot)
