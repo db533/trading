@@ -825,7 +825,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             print('swing_point.label:',swing_point.label, ' swing_point.candle_count_since_last_swing_point:',swing_point.candle_count_since_last_swing_point )
             if mid_date_current is None:
                 # For most recent swing point, compute the location of the text label for the time after this swing point.
-                mid_date_current = most_recent_date + (swing_point.date - most_recent_date) / 2
+                mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
             if swing_point.label == 'LH' and int(swing_point.candle_count_since_last_swing_point) == max_T:
                 lh_swing_point = swing_point
                 print('Found lh_swing_point.')
