@@ -1060,9 +1060,9 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 
-class GannEightBuyCustomizer(BaseGraphCustomizer):
+class GannEightCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
-        print('Starting GannEightBuyCustomizer()...')
+        print('Starting GannEightCustomizer()...')
 
         # Find min / max price for drawing lines
         price_list = [swing_point.price for swing_point in swing_points]
@@ -1080,18 +1080,14 @@ class GannEightBuyCustomizer(BaseGraphCustomizer):
 
         try:
             # Draw horizontal lines
-            self.draw_vertical_line(ax, min_date, max_date, min_price)
-            self.draw_vertical_line(ax, min_date, max_date, max_price)
+            self.draw_horizontal_line(ax, min_date, max_date, min_price)
+            self.draw_horizontal_line(ax, min_date, max_date, max_price)
         except Exception as e:
             print(f"Error drawing lines: {e}")
 
     def draw_horizontal_line(self, ax, date1, date2, price):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
-
-class GannEightSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
-        pass
 
 # Add more customizers for other strategies
 def get_graph_customizer(trading_strategy):
@@ -1101,8 +1097,8 @@ def get_graph_customizer(trading_strategy):
         "Gann's Selling point #4": GannFourSellCustomizer(),
         "Gann's Buying point #5": GannFiveBuyCustomizer(),
         "Gann's Selling point #5": GannFiveSellCustomizer(),
-        "Gann's Buying point #8": GannEightBuyCustomizer(),
-        "Gann's Selling point #8": GannEightSellCustomizer(),
+        "Gann's Buying point #8": GannEightCustomizer(),
+        "Gann's Selling point #8": GannEightCustomizer(),
         "Gann's Buying point #3": GannThreeBuyCustomizer(),
         "Gann's Selling point #3": GannThreeSellCustomizer(),
         # Map more strategies to their customizers
@@ -1114,7 +1110,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.dates import date2num
 import matplotlib.pyplot as plt
 import io
-
 
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
@@ -1189,7 +1184,7 @@ def generate_swing_point_graph_view(request, opp_id):
             fontsize=9, ha='center', va=va_align)
 
     # Select the appropriate graph customizer based on the TradingStrategy
-    trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
+    trading_strategy = opp.strategy
     customizer = get_graph_customizer(trading_strategy)
 
     # Apply customizations
@@ -1198,7 +1193,7 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
     ax.autoscale(enable=True, axis='both', tight=None)
-    ax.margins(x=0.1, y=0.4)  # Adds 5% padding to the x-axis and 10% to the y-axis
+    ax.margins(x=0.1, y=0.4)
 
     # Save to a BytesIO buffer
     buffer = io.BytesIO()
