@@ -950,7 +950,7 @@ def generate_swing_point_graph_view(request, opp_id):
             colour = 'green'
         else:
             colour = 'red'
-        ax.plot([most_recent_date], [float(most_recent_price)], , marker='o', color=colour, linestyle='None')  # Mark the most recent price with a red dot
+        ax.plot([most_recent_date], [float(most_recent_price)], marker='o', color=colour, linestyle='None')  # Mark the most recent price with a red dot
         # If there are previous points, draw a dotted line from the last swing point to the new point
         ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour, linestyle='--')  # Dotted line
 
