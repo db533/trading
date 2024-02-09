@@ -983,13 +983,8 @@ def generate_swing_point_graph_view(request, opp_id):
     trading_strategy = opp.strategy  # Assuming TradingOpp has a 'strategy' field pointing to a TradingStrategy instance
     customizer = get_graph_customizer(trading_strategy)
 
-    # Gather strategy-specific data for use in graphs.
-    strategy_data = {}
-    if trading_strategy.name == "Gann's Buying point #4" or trading_strategy.name == "Gann's Selling point #4":
-        strategy_data['latest_T'] = int(metrics_snapshot.get('latest_t'))
-
     # Apply customizations
-    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date,strategy_data)
+    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date,metrics_snapshot)
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
