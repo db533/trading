@@ -102,6 +102,7 @@ class OneMinPrice(BasePrice):
 
 class TradingStrategy(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
     # You can add more fields here to define strategy-specific parameters
 
     def __str__(self):
