@@ -843,20 +843,23 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
             min_price = min([swing_point.price for swing_point in swing_points])
             print('min_price:', min_price)
 
-            # Draw vertical lines
-            if preceding_swing_point:
-                self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
-            self.draw_vertical_line(ax, lh_swing_point.date, lh_swing_point.price, min_price)
-            self.draw_vertical_line(ax, most_recent_date, most_recent_price, min_price)
+            try:
+                # Draw vertical lines
+                if preceding_swing_point:
+                    self.draw_vertical_line(ax, preceding_swing_point.date, preceding_swing_point.price, min_price)
+                self.draw_vertical_line(ax, lh_swing_point.date, lh_swing_point.price, min_price)
+                self.draw_vertical_line(ax, most_recent_date, most_recent_price, min_price)
 
-            # Add text annotation
-            if preceding_swing_point:
-                mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
-                ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
-            # Add text label for time since the last low to current candle.
-            latest_T = strategy_data['latest_T']
-            print('latest_T:',latest_T)
-            ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                # Add text annotation
+                if preceding_swing_point:
+                    mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
+                    ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
+                # Add text label for time since the last low to current candle.
+                latest_T = strategy_data['latest_T']
+                print('latest_T:',latest_T)
+                ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+            except:
+                print(f"Error drawing lines and adding labels: {e}")
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Draw a line between (date, start_price) and (date, min_price)
@@ -942,14 +945,14 @@ def generate_swing_point_graph_view(request, opp_id):
     ax.plot(dates, prices, marker='o', linestyle='-')
 
     # Adding a line to the most recent close price.
-    ax.plot([most_recent_date], [float(most_recent_price)], 'ro')  # Mark the most recent price with a red dot
-    # If there are previous points, draw a dotted line from the last swing point to the new point
     if dates and prices:
         if float(most_recent_price) > last_swing_point.price:
-            colour = 'g--'
+            colour = 'green'
         else:
-            colour = 'r--'
-        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour)  # Dotted line
+            colour = 'red'
+        ax.plot([most_recent_date], [float(most_recent_price)], , marker='o', color=colour, linestyle='None')  # Mark the most recent price with a red dot
+        # If there are previous points, draw a dotted line from the last swing point to the new point
+        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour, linestyle='--')  # Dotted line
 
     # Annotate each point with its label and price, adjusting position based on label
     for date, price, label in zip(dates, prices, labels):
