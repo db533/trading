@@ -125,7 +125,7 @@ class GannPointFourBuy2(BaseStrategy):
             # Access the latest DailyPrice (or other relevant price model) for the ticker
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
-            #latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1
             T_prev = []
             latest_T = 0
@@ -168,7 +168,7 @@ class GannPointFourBuy2(BaseStrategy):
                     swing_point_counter += 1
             if len(T_prev) > 0:
                 max_T = max(T_prev)
-                if max_T < latest_T and len(T_prev) > 1:
+                if max_T < latest_T and len(T_prev) > 1 and latest_price.close_price > swing_point.price:
                     # The most recent upward rally is longer than the longest upward rally during the down trend.
                     # And we have had at least 2 sections of upward movement during the down trend.
                     logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
@@ -198,7 +198,7 @@ class GannPointFourSell(BaseStrategy):
         data = {}
         action_buy = None
         swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
-
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         existing_downtrend = None
         T_prev = []
@@ -242,7 +242,7 @@ class GannPointFourSell(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T < latest_T and len(T_prev) > 1:
+            if max_T < latest_T and len(T_prev) > 1 and latest_price.close_price > swing_point.price:
                 # The most recent downward rally is longer than the longest downward rally during the down trend.
                 # And we have at least 2 sections of downward movement during the most recent upward trend.
                 logger.error(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
@@ -272,6 +272,7 @@ class GannPointFiveBuy(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_most_recent = None
         latest_T = 0
@@ -317,7 +318,7 @@ class GannPointFiveBuy(BaseStrategy):
                     recent_swing_points.append(swing_point)
                     break
                 swing_point_counter += 1
-        if T_most_recent is not None:
+        if T_most_recent is not None and latest_price.close_price > swing_point.price:
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points}
@@ -339,6 +340,7 @@ class GannPointFiveSell(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_most_recent = None
         latest_T = 0
@@ -385,7 +387,7 @@ class GannPointFiveSell(BaseStrategy):
                     recent_swing_points.append(swing_point)
                     break
                 swing_point_counter += 1
-        if T_most_recent is not None:
+        if T_most_recent is not None and latest_price.close_price < swing_point.price:
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points}
