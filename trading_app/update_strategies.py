@@ -585,66 +585,67 @@ def process_trading_opportunities():
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
     #ticker_id_in_strategy = []
 
-    for ticker in tickers:
-        for StrategyClass in strategies:
-            strategy = StrategyClass(ticker)
-            #print('strategy:', strategy)
-            logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
-            action_buy, data = strategy.check_criteria()
-            strategy_instance = TradingStrategy.objects.get(name=strategy.name)
-            existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
-            if len(existing_tradingopp) > 0:
-                existing_tradingopp = existing_tradingopp[0]
-            else:
-                existing_tradingopp = None
-            if action_buy is not None:
-                #print('Strategy criteria met for', ticker.symbol)
-                logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
-                #ticker_id_in_strategy.append(ticker.id)
-                if existing_tradingopp is not None:
-                    logger.error(f'Existing TradingOpp being updated...')
-                    # This Ticker / strategy exists as an active record. Increment the count.
-                    existing_tradingopp.count += 1
-                    # Prepare list of dates for swing_points and add to data
-                    swing_point_dates = []
-                    for swing_point in recent_swing_points:
-                        trading_opp.swing_points.add(swing_point)
-                        swing_point_dates.append(swing_point.date)
-                    data['swing_point_dates'] = swing_point_dates
-                    existing_tradingopp.metrics_snapshot = data
-                    existing_tradingopp.save()
+    try:
+        for ticker in tickers:
+            for StrategyClass in strategies:
+                strategy = StrategyClass(ticker)
+                #print('strategy:', strategy)
+                logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
+                action_buy, data = strategy.check_criteria()
+                strategy_instance = TradingStrategy.objects.get(name=strategy.name)
+                existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
+                if len(existing_tradingopp) > 0:
+                    existing_tradingopp = existing_tradingopp[0]
                 else:
-                    # This Ticker / strategy is new.
-                    logger.error(f'Creating new TradingOpp...')
-                    # Check to see if there are recent_swing_points in data
-                    if 'recent_swing_points' in data:
-                        recent_swing_points = data['recent_swing_points']
-                        del data['recent_swing_points']
-                    # Create a new TradingOpp instance.
+                    existing_tradingopp = None
+                if action_buy is not None:
+                    #print('Strategy criteria met for', ticker.symbol)
+                    logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
+                    #ticker_id_in_strategy.append(ticker.id)
+                    if existing_tradingopp is not None:
+                        logger.error(f'Existing TradingOpp being updated...')
+                        # This Ticker / strategy exists as an active record. Increment the count.
+                        existing_tradingopp.count += 1
+                        # Prepare list of dates for swing_points and add to data
+                        swing_point_dates = []
+                        for swing_point in recent_swing_points:
+                            trading_opp.swing_points.add(swing_point)
+                            swing_point_dates.append(swing_point.date)
+                        data['swing_point_dates'] = swing_point_dates
+                        existing_tradingopp.metrics_snapshot = data
+                        existing_tradingopp.save()
+                    else:
+                        # This Ticker / strategy is new.
+                        logger.error(f'Creating new TradingOpp...')
+                        # Check to see if there are recent_swing_points in data
+                        if 'recent_swing_points' in data:
+                            recent_swing_points = data['recent_swing_points']
+                            del data['recent_swing_points']
+                        # Create a new TradingOpp instance.
 
-                    trading_opp = TradingOpp.objects.create(
-                        ticker=ticker,
-                        strategy=strategy_instance,
-                        datetime_identified=timezone.now(),
-                        metrics_snapshot=data, # Capture relevant metrics
-                        count = 1,
-                        action_buy = action_buy,
-                    )
-                    # Assuming recent_swing_points is a list of SwingPoint instances
-                    swing_point_dates = []
-                    for swing_point in recent_swing_points:
-                        trading_opp.swing_points.add(swing_point)
-                        swing_point_dates.append(swing_point.date)
-                    data['swing_point_dates'] = swing_point_dates
-                    trading_opp.metrics_snapshot = data
-                    trading_opp.save()
-            else:
-                # The strategy is not valid for the ticker.
-                # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
-                if existing_tradingopp is not None:
-                    existing_tradingopp.is_active = False
-                    existing_tradingopp.save()
-    logger.error(f'Finished process_trading_opportunities().')
+                        trading_opp = TradingOpp.objects.create(
+                            ticker=ticker,
+                            strategy=strategy_instance,
+                            datetime_identified=timezone.now(),
+                            metrics_snapshot=data, # Capture relevant metrics
+                            count = 1,
+                            action_buy = action_buy,
+                        )
+                        # Assuming recent_swing_points is a list of SwingPoint instances
+                        swing_point_dates = []
+                        for swing_point in recent_swing_points:
+                            trading_opp.swing_points.add(swing_point)
+                            swing_point_dates.append(swing_point.date)
+                        data['swing_point_dates'] = swing_point_dates
+                        trading_opp.metrics_snapshot = data
+                        trading_opp.save()
+                else:
+                    # The strategy is not valid for the ticker.
+                    # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
+                    if existing_tradingopp is not None:
+                        existing_tradingopp.is_active = False
+                        existing_tradingopp.save()
+        logger.error(f'Finished process_trading_opportunities().')
+    except Exception as e:
+        print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
 
-# Call this function daily after metrics update
-#process_trading_opportunities()
