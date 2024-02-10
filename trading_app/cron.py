@@ -105,7 +105,8 @@ class TestCronJob(CronJobBase):
 
     def do(self):
         # Run the update_ticker_metrics function
-        test_cron_job()
+        #test_cron_job()
+        pass
 
 class DailyTradingOppCreationCronJob(CronJobBase):
     schedule = Schedule(run_every_mins=1)  # Run once a day

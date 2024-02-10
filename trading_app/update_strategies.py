@@ -597,6 +597,7 @@ def process_trading_opportunities():
                 logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
                 #ticker_id_in_strategy.append(ticker.id)
                 if existing_tradingopp is not None:
+                    logger.error(f'Existing TradingOpp being updated...')
                     # This Ticker / strategy exists as an active record. Increment the count.
                     existing_tradingopp.count += 1
                     # Prepare list of dates for swing_points and add to data
@@ -609,6 +610,7 @@ def process_trading_opportunities():
                     existing_tradingopp.save()
                 else:
                     # This Ticker / strategy is new.
+                    logger.error(f'Creating new TradingOpp...')
                     # Check to see if there are recent_swing_points in data
                     if 'recent_swing_points' in data:
                         recent_swing_points = data['recent_swing_points']
