@@ -409,7 +409,6 @@ class GannPointFiveSell(BaseStrategy):
         logger.error(f'........')
         return action_buy, data
 
-
 class GannPointEightBuy(BaseStrategy):
     name="Gann's Buying point #8"
 
@@ -444,8 +443,9 @@ class GannPointEightBuy(BaseStrategy):
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
                 bottoms = 1
                 swing_point_counter += 1
+                most_recent_label = 'LL'
             elif swing_point_counter > 1:
-                if swing_point.label == 'LH'  or swing_point.label == 'HH':
+                if swing_point.label == 'LH'  or swing_point.label == 'HH' and (most_recent_label == 'LL' or most_recent_label == 'HL'):
                     # This is an upper swing point.
                     # If this is a new high above the bottom, save the high value.
                     if max_top is None or swing_point.price_object.high_price > max_top:
@@ -454,14 +454,16 @@ class GannPointEightBuy(BaseStrategy):
                         # This is the final peak. Save the High value.
                         last_high = swing_point.price_object.high_price
                         recent_swing_points.append(swing_point)
+                    most_recent_label = swing_point.label
                     logger.error(
                         f'Found a prior {swing_point.label}.')
-                elif swing_point.label == 'LL' or swing_point.label == 'HL':
+                elif swing_point.label == 'LL' or swing_point.label == 'HL' and (most_recent_label == 'LH' or most_recent_label == 'HH'):
                     # This is potentially another bottom.
                     logger.error(f'Found a prior {swing_point.label}.')
                     # Test if the bottom is within the threshold to be considered at the same level as the last low.
                     low_price_percent_variance = abs(swing_point.price_object.low_price - last_low)*100/last_low
                     recent_swing_points.append(swing_point)
+                    most_recent_label = swing_point.label
                     if low_price_percent_variance < max_variance_percent:
                         logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
                         bottoms += 1
@@ -519,11 +521,12 @@ class GannPointEightSell(BaseStrategy):
                     logger.error(f'First swingpoint not HH. Strategy not valid.')
                     break
                     # Now need to determine the elapsed days since this LL or HH.
+                most_recent_label = 'HH'
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
                 tops = 1
                 swing_point_counter += 1
             elif swing_point_counter > 1:
-                if swing_point.label == 'LL'  or swing_point.label == 'HL':
+                if swing_point.label == 'LL'  or swing_point.label == 'HL' and (most_recent_label == 'HH' or most_recent_label == 'LH'):
                     # This is an lower swing point.
                     # If this is a new low below the top, save the low value.
                     if min_bottom is None or swing_point.price_object.low_price < min_bottom:
@@ -532,13 +535,15 @@ class GannPointEightSell(BaseStrategy):
                         # This is the final peak. Save the High value.
                         last_low = swing_point.price_object.low_price
                         recent_swing_points.append(swing_point)
+                    most_recent_label = swing_point.label
                     logger.error(
                         f'Found a prior {swing_point.label}.')
-                elif swing_point.label == 'LH' or swing_point.label == 'HH':
+                elif swing_point.label == 'LH' or swing_point.label == 'HH' and (most_recent_label == 'LL' or most_recent_label == 'HL'):
                     # This is potentially another top.
                     logger.error(f'Found a prior {swing_point.label}.')
                     # Test if the top is within the threshold to be considered at the same level as the last high.
                     high_price_percent_variance = abs(swing_point.price_object.high_price - last_high)*100/last_high
+                    most_recent_label = swing_point.label
                     if high_price_percent_variance < max_variance_percent:
                         logger.error(f'Low is within threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
                         tops += 1
