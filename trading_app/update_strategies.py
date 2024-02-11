@@ -614,7 +614,7 @@ def process_trading_opportunities():
                             # Prepare list of dates for swing_points and add to data
                             swing_point_dates = []
                             for swing_point in recent_swing_points:
-                                trading_opp.swing_points.add(swing_point)
+                                existing_tradingopp.swing_points.add(swing_point)
                                 swing_point_dates.append(swing_point.date)
                             data['swing_point_dates'] = swing_point_dates
                         existing_tradingopp.metrics_snapshot = data
