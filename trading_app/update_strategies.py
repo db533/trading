@@ -182,7 +182,7 @@ class GannPointFourBuy2(BaseStrategy):
                 final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'final_upswing_size' : final_upswing_size} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'final_upswing_size' : str(final_upswing_size)} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_T}.')
             else:
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
