@@ -606,15 +606,17 @@ def process_trading_opportunities():
                         recent_swing_points = data['recent_swing_points']
                         #del data['recent_swing_points']
                         # Prepare list of dates for swing_points and add to data
-                        swing_point_dates = []
-                        for swing_point in recent_swing_points:
-                            trading_opp.swing_points.add(swing_point)
-                            swing_point_dates.append(swing_point.date)
-                        data['swing_point_dates'] = swing_point_dates
                     if existing_tradingopp is not None:
                         logger.error(f'Existing TradingOpp being updated...')
                         # This Ticker / strategy exists as an active record. Increment the count.
                         existing_tradingopp.count += 1
+                        if 'recent_swing_points' in data:
+                            # Prepare list of dates for swing_points and add to data
+                            swing_point_dates = []
+                            for swing_point in recent_swing_points:
+                                trading_opp.swing_points.add(swing_point)
+                                swing_point_dates.append(swing_point.date)
+                            data['swing_point_dates'] = swing_point_dates
                         existing_tradingopp.metrics_snapshot = data
                         existing_tradingopp.save()
                     else:
