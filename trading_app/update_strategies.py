@@ -613,13 +613,6 @@ def process_trading_opportunities():
                         logger.error(f'Existing TradingOpp being updated...')
                         # This Ticker / strategy exists as an active record. Increment the count.
                         existing_tradingopp.count += 1
-                        if recent_swing_points_exist == True:
-                            # Prepare list of dates for swing_points and add to data
-                            swing_point_dates = []
-                            for swing_point in recent_swing_points:
-                                existing_tradingopp.swing_points.add(swing_point)
-                                swing_point_dates.append(swing_point.date)
-                            data['swing_point_dates'] = swing_point_dates
                         existing_tradingopp.metrics_snapshot = data
                         existing_tradingopp.save()
                     else:
@@ -634,13 +627,6 @@ def process_trading_opportunities():
                             count = 1,
                             action_buy = action_buy,
                         )
-                        # Assuming recent_swing_points is a list of SwingPoint instances
-                        if recent_swing_points_exist == True:
-                            for swing_point in recent_swing_points:
-                                trading_opp.swing_points.add(swing_point)
-                                swing_point_dates.append(swing_point.date)
-                            data['swing_point_dates'] = swing_point_dates
-                            trading_opp.metrics_snapshot = data
                         trading_opp.save()
                 else:
                     # The strategy is not valid for the ticker.
