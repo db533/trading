@@ -556,7 +556,7 @@ class GannPointEightSell(BaseStrategy):
                     if (most_recent_label == 'HH' or most_recent_label == 'LH'):
                         # This is an lower swing point.
                         # If this is a new low below the top, save the low value.
-                        if min_bottom is None or swing_point.price_object.low_price <>> min_bottom:
+                        if min_bottom is None or swing_point.price_object.low_price < min_bottom:
                             min_bottom = swing_point.price_object.low_price
                         recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
@@ -592,7 +592,7 @@ class GannPointEightSell(BaseStrategy):
         # Check we have at least a double top and the bottoms are at least significantly below the tops
         if tops > 1 and min_bottom / last_high > (1 - (peak_percent_below_top / 100)):
             top_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
-            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'top_duration': str(top_duration),
+            data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration': str(top_duration),
                     'recent_swing_points': recent_swing_points}
             logger.error(f'Multiple tops detected: {tops}.')
             if latest_price.close_price < min_bottom:
