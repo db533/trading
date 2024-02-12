@@ -425,7 +425,7 @@ class GannPointEightBuy(BaseStrategy):
         peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom
         bottoms = 0
         recent_swing_points = []
-        if latest_price.exists():
+        if latest_price is not None:
             latest_close_price = latest_price.close_price
         else:
             # We have no price data for this ticker, so strategy cannot be detected.
