@@ -457,7 +457,8 @@ class GannPointEightBuy(BaseStrategy):
                             recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
                         logger.error(
-                            f'Found a prior {swing_point.label}.')
+                            f'Found a prior {swing_point.label} before a {most_recent_label}. Found a bottom.')
+                        bottoms += 1
                     else:
                         logger.error(
                             f'Successive highs. Not creating / continuing valid bottoms pattern.')
@@ -472,7 +473,7 @@ class GannPointEightBuy(BaseStrategy):
                         most_recent_label = swing_point.label
                         if low_price_percent_variance < max_variance_percent:
                             logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
-                            bottoms += 1
+
                             first_candle = swing_point.price_object
                         else:
                             logger.error(
