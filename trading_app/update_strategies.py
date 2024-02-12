@@ -580,10 +580,8 @@ def process_trading_opportunities():
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
-    #strategies = [GannPointFourBuy, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell]  # List of strategy classes
-    #strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell]  # List of strategy classes
-    #ticker_id_in_strategy = []
+
 
     try:
         for ticker in tickers:
@@ -608,11 +606,11 @@ def process_trading_opportunities():
                         del data['recent_swing_points']
                     else:
                         recent_swing_points_exist = False
-                        # Prepare list of dates for swing_points and add to data
                     if existing_tradingopp is not None:
                         logger.error(f'Existing TradingOpp being updated...')
                         # This Ticker / strategy exists as an active record. Increment the count.
                         existing_tradingopp.count += 1
+                        # Update the metrics with the latest data e.g. current latest_T.
                         existing_tradingopp.metrics_snapshot = data
                         existing_tradingopp.save()
                     else:
@@ -627,6 +625,9 @@ def process_trading_opportunities():
                             count = 1,
                             action_buy = action_buy,
                         )
+                        if recent_swing_points_exist == True:
+                            for swing_point in recent_swing_points:
+                                trading_opp.swing_points.add(swing_point)
                         trading_opp.save()
                 else:
                     # The strategy is not valid for the ticker.
