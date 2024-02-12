@@ -445,32 +445,42 @@ class GannPointEightBuy(BaseStrategy):
                 swing_point_counter += 1
                 most_recent_label = 'LL'
             elif swing_point_counter > 1:
-                if swing_point.label == 'LH'  or swing_point.label == 'HH' and (most_recent_label == 'LL' or most_recent_label == 'HL'):
-                    # This is an upper swing point.
-                    # If this is a new high above the bottom, save the high value.
-                    if max_top is None or swing_point.price_object.high_price > max_top:
-                        max_top = swing_point.price_object.high_price
-                    if swing_point_counter == 2:
-                        # This is the final peak. Save the High value.
-                        last_high = swing_point.price_object.high_price
-                        recent_swing_points.append(swing_point)
-                    most_recent_label = swing_point.label
-                    logger.error(
-                        f'Found a prior {swing_point.label}.')
-                elif swing_point.label == 'LL' or swing_point.label == 'HL' and (most_recent_label == 'LH' or most_recent_label == 'HH'):
-                    # This is potentially another bottom.
-                    logger.error(f'Found a prior {swing_point.label}.')
-                    # Test if the bottom is within the threshold to be considered at the same level as the last low.
-                    low_price_percent_variance = abs(swing_point.price_object.low_price - last_low)*100/last_low
-                    recent_swing_points.append(swing_point)
-                    most_recent_label = swing_point.label
-                    if low_price_percent_variance < max_variance_percent:
-                        logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
-                        bottoms += 1
-                        first_candle = swing_point.price_object
+                if swing_point.label == 'LH'  or swing_point.label == 'HH':
+                    if (most_recent_label == 'LL' or most_recent_label == 'HL'):
+                        # This is an upper swing point.
+                        # If this is a new high above the bottom, save the high value.
+                        if max_top is None or swing_point.price_object.high_price > max_top:
+                            max_top = swing_point.price_object.high_price
+                        if swing_point_counter == 2:
+                            # This is the final peak. Save the High value.
+                            last_high = swing_point.price_object.high_price
+                            recent_swing_points.append(swing_point)
+                        most_recent_label = swing_point.label
+                        logger.error(
+                            f'Found a prior {swing_point.label}.')
                     else:
                         logger.error(
-                            f'Low is outside threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
+                            f'Successive highs. Not creating / continuing valid bottoms pattern.')
+                        break
+                elif swing_point.label == 'LL' or swing_point.label == 'HL':
+                    if (most_recent_label == 'LH' or most_recent_label == 'HH'):
+                        # This is potentially another bottom.
+                        logger.error(f'Found a prior {swing_point.label}.')
+                        # Test if the bottom is within the threshold to be considered at the same level as the last low.
+                        low_price_percent_variance = abs(swing_point.price_object.low_price - last_low)*100/last_low
+                        recent_swing_points.append(swing_point)
+                        most_recent_label = swing_point.label
+                        if low_price_percent_variance < max_variance_percent:
+                            logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
+                            bottoms += 1
+                            first_candle = swing_point.price_object
+                        else:
+                            logger.error(
+                                f'Low is outside threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
+                            break
+                    else:
+                        logger.error(
+                            f'Successive lows. Not creating / continuing valid bottoms pattern.')
                         break
                 swing_point_counter += 1
         # Check we have at least a double bottom and the peaks are at least significantly above the low
