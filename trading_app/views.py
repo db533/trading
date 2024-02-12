@@ -1180,12 +1180,13 @@ def generate_swing_point_graph_view(request, opp_id):
     last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
     if float(most_recent_price) < last_swing_price:
         va_align = 'top'
+        y_pos = price + offset_down  # Move the label down
     else:
         va_align = 'bottom'
+        y_pos = price + offset_up  # Move the label up
 
     # Annotate the most recent price point with its price, adjusting placement
-    ax.text(most_recent_date, float(most_recent_price), f'{most_recent_price:.2f}',
-            fontsize=9, ha='center', va=va_align)
+    ax.text(most_recent_date, y_pos, f"{most_recent_price:.2f}", fontsize=9, ha='center', va=va_align)
 
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy
