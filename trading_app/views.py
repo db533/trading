@@ -1158,18 +1158,23 @@ def generate_swing_point_graph_view(request, opp_id):
         # If there are previous points, draw a dotted line from the last swing point to the new point
         ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour, linestyle='--')  # Dotted line
 
-    # Annotate each point with its label and price, adjusting position based on label
-    for date, price, label in zip(dates, prices, labels):
-        # Determine vertical alignment based on the label ending
-        if label.endswith('H'):
-            va_align = 'bottom'  # Place text above the point for 'H' labels
-        elif label.endswith('L'):
-            va_align = 'top'  # Place text below the point for 'L' labels
-        else:
-            va_align = 'center'  # Default alignment if neither 'H' nor 'L'
+    # Calculate an offset as a function of the price range. This is a simple example; adjust the factor as needed.
+    price_range = max(prices) - min(prices)
+    offset_up = price_range * 0.05  # 5% of price range for labels above
+    offset_down = price_range * -0.05  # 5% of price range for labels below
 
-        ax.text(date, price, f"{label}\n{price:.2f}", fontsize=9,
-                ha='center', va=va_align)  # Adjusted vertical alignment
+    for date, price, label in zip(dates, prices, labels):
+        if label.endswith('H'):
+            va_align = 'bottom'
+            y_pos = price + offset_up  # Move the label up
+        elif label.endswith('L'):
+            va_align = 'top'
+            y_pos = price + offset_down  # Move the label down
+        else:
+            va_align = 'center'
+            y_pos = price  # Keep the label at its current position
+
+        ax.text(date, y_pos, f"{label}\n{price:.2f}", fontsize=9, ha='center', va=va_align)
 
     # Determine label placement based on comparison of the most recent price to the last swing point's price
     last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
