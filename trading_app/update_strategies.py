@@ -423,6 +423,7 @@ class GannPointEightBuy(BaseStrategy):
         max_top = None
         max_variance_percent = 0.5  # A bottom must be within this many % of the last low price to count as a bottom.
         peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom
+        latest_close_price = latest_price.close_price
         bottoms = 0
         recent_swing_points = []
 
@@ -430,8 +431,8 @@ class GannPointEightBuy(BaseStrategy):
             # Check first is a LL or HH
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
             if swing_point_counter == 1:
-                if swing_point.label == 'LL':
-                    logger.error(f'Detected first swingpoint. LL')
+                if swing_point.label == 'LL' and latest_close_price > swing_point.price:
+                    logger.error(f'Detected first swingpoint is LL and latest close price is higher.')
                     last_candle = swing_point.price_object
                     last_low = swing_point.price_object.low_price
                     recent_swing_points.append(swing_point)
@@ -441,7 +442,6 @@ class GannPointEightBuy(BaseStrategy):
                     break
                     # Now need to determine the elapsed days since this LL or HH.
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
-                bottoms = 1
                 swing_point_counter += 1
                 most_recent_label = 'LL'
             elif swing_point_counter > 1:
@@ -473,7 +473,6 @@ class GannPointEightBuy(BaseStrategy):
                         most_recent_label = swing_point.label
                         if low_price_percent_variance < max_variance_percent:
                             logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
-
                             first_candle = swing_point.price_object
                         else:
                             logger.error(
