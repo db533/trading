@@ -423,10 +423,17 @@ class GannPointEightBuy(BaseStrategy):
         max_top = None
         max_variance_percent = 0.5  # A bottom must be within this many % of the last low price to count as a bottom.
         peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom
-        latest_close_price = latest_price.close_price
         bottoms = 0
         recent_swing_points = []
-
+        if latest_price.exists():
+            latest_close_price = latest_price.close_price
+        else:
+            # We have no price data for this ticker, so strategy cannot be detected.
+            data = {}
+            action_buy = None
+            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'........')
+            return action_buy, data
         for swing_point in swing_point_query:
             # Check first is a LL or HH
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
