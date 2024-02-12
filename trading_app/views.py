@@ -1117,9 +1117,6 @@ def generate_swing_point_graph_view(request, opp_id):
     print('Creating graph for ticker',ticker.symbol)
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
-    #print('metrics_snapshot:',metrics_snapshot)
-    #print('type(metrics_snapshot):', type(metrics_snapshot))
-
     # Directly access SwingPoints associated with this TradingOpp
     swing_points = opp.swing_points.all()
 
@@ -1160,8 +1157,10 @@ def generate_swing_point_graph_view(request, opp_id):
 
     # Calculate an offset as a function of the price range. This is a simple example; adjust the factor as needed.
     price_range = max(prices) - min(prices)
-    offset_up = price_range * 0.05  # 5% of price range for labels above
-    offset_down = price_range * -0.05  # 5% of price range for labels below
+    label_offset_up = 0.05 # 5% upwards for labels above the datapoint
+    label_offset_down = 0.10  # 10% downwards for labels above the datapoint
+    offset_up = price_range * label_offset_up
+    offset_down = price_range * -label_offset_down
 
     for date, price, label in zip(dates, prices, labels):
         if label.endswith('H'):
