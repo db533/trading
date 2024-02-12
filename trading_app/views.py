@@ -817,39 +817,29 @@ STRATEGY_METRICS_LABELS = {
     },
     "Gann's Buying point #5": {
       'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous upswings',
-      'count_T_prev': 'Count of upswings',
-      'max_T': 'Duration of longest upswing',
+      'T_most_recent': 'Duration of most recent upswing',
+      'section_count': 'Number of sections in prior downtrend',
       'prior_trend_duration': 'Duration of downtrend',
       'final_upswing_size': '% up from low',
 
     },
     "Gann's Selling point #5": {
       'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous downswings',
-      'count_T_prev': 'Count of downswings',
-      'max_T': 'Duration of longest downswing',
+      'T_most_recent': 'Duration of most recent downswing',
+      'section_count': 'Number of sections in prior uptrend',
       'prior_trend_duration': 'Duration of uptrend',
       'final_downswing_size': '% down from high',
 
     },
     "Gann's Buying point #8": {
       'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous upswings',
-      'count_T_prev': 'Count of upswings',
-      'max_T': 'Duration of longest upswing',
-      'prior_trend_duration': 'Duration of downtrend',
-      'final_upswing_size': '% up from low',
-
+      'bottoms': 'Number of thoughs',
+      'bottom_duration': 'Duration between first and last trough',
     },
     "Gann's Selling point #8": {
       'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous downswings',
-      'count_T_prev': 'Count of downswings',
-      'max_T': 'Duration of longest downswing',
-      'prior_trend_duration': 'Duration of uptrend',
-      'final_downswing_size': '% down from high',
-
+      'tops': 'Number of peaks',
+      'tops_duration': 'Duration between first and last peak',
     },
 }
 

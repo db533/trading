@@ -29,7 +29,6 @@
                         {% for label, value in opp.translated_metrics.items %}
                             <strong>{{ label }}:</strong> {{ value }}<br>
                         {% endfor %}
-                        {{ opp.metrics_snapshot }}<br>
                         Identified {{ opp.datetime_identified }}</td>
                 </tr>
             {% endfor %}
