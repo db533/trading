@@ -25,7 +25,11 @@
                     <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
                     <td>{{ opp.strategy.name }}</td>
                     <td>{{ opp.strategy.description }}</td>
-                    <td>{{ opp.metrics_snapshot }}<br>Identified {{ opp.datetime_identified }}</td>
+                    <td>
+                        {% for label, value in opp.translated_metrics.items %}
+                            <strong>{{ label }}:</strong> {{ value }}<br>
+                        {% endfor %}
+                    Identified {{ opp.datetime_identified }}</td>
                 </tr>
             {% endfor %}
             </tbody>

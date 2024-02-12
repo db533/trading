@@ -778,6 +778,90 @@ def delete_daily_price(request, symbol=None):
     else:
         raise Http404("Invalid request method")  # Prevent deletion on GET request
 
+STRATEGY_METRICS_LABELS = {
+    "Gann's Buying point #4": {
+        'latest_T': 'Time since last swing point',
+        'T_prev': 'Duration of previous upswings',
+        'count_T_prev' : 'Count of upswings',
+        'max_T' : 'Duration of longest upswing',
+        'prior_trend_duration' : 'Duration of downtrend',
+        'final_upswing_size' : '% up from low',
+
+    },
+    "Gann's Selling point #4": {
+        'latest_T': 'Time since last swing point',
+        'T_prev': 'Duration of previous downswings',
+        'count_T_prev' : 'Count of downswings',
+        'max_T' : 'Duration of longest downswing',
+        'prior_trend_duration' : 'Duration of uptrend',
+        'final_downswing_size' : '% down from high',
+
+    },
+    "Gann's Buying point #3": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous upswings',
+      'count_T_prev': 'Count of upswings',
+      'max_T': 'Duration of longest upswing',
+      'prior_trend_duration': 'Duration of downtrend',
+      'final_upswing_size': '% up from low',
+
+    },
+    "Gann's Selling point #3": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous downswings',
+      'count_T_prev': 'Count of downswings',
+      'max_T': 'Duration of longest downswing',
+      'prior_trend_duration': 'Duration of uptrend',
+      'final_downswing_size': '% down from high',
+
+    },
+    "Gann's Buying point #5": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous upswings',
+      'count_T_prev': 'Count of upswings',
+      'max_T': 'Duration of longest upswing',
+      'prior_trend_duration': 'Duration of downtrend',
+      'final_upswing_size': '% up from low',
+
+    },
+    "Gann's Selling point #5": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous downswings',
+      'count_T_prev': 'Count of downswings',
+      'max_T': 'Duration of longest downswing',
+      'prior_trend_duration': 'Duration of uptrend',
+      'final_downswing_size': '% down from high',
+
+    },
+    "Gann's Buying point #8": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous upswings',
+      'count_T_prev': 'Count of upswings',
+      'max_T': 'Duration of longest upswing',
+      'prior_trend_duration': 'Duration of downtrend',
+      'final_upswing_size': '% up from low',
+
+    },
+    "Gann's Selling point #8": {
+      'latest_T': 'Time since last swing point',
+      'T_prev': 'Duration of previous downswings',
+      'count_T_prev': 'Count of downswings',
+      'max_T': 'Duration of longest downswing',
+      'prior_trend_duration': 'Duration of uptrend',
+      'final_downswing_size': '% down from high',
+
+    },
+}
+
+def translate_metrics(opp):
+    strategy_name = opp.strategy.name  # Assuming `name` is the identifier for the strategy.
+    metrics_labels = STRATEGY_METRICS_LABELS.get(strategy_name, {})
+    translated_metrics = {
+        metrics_labels.get(key, key): value  # Fallback to the original key if no label is found.
+        for key, value in opp.metrics_snapshot.items()
+    }
+    return translated_metrics
+
 @login_required
 def trading_opps_view(request):
     # Get all active TradingOpp instances
@@ -787,6 +871,7 @@ def trading_opps_view(request):
     ticker_opps = {}
     for opp in active_trading_opps:
         ticker = opp.ticker
+        opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
         if ticker not in ticker_opps:
             ticker_opps[ticker] = []
         ticker_opps[ticker].append(opp)
@@ -996,7 +1081,6 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
         # Draw a line between (date, start_price) and (date, min_price)
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
-
 class GannFiveSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannFiveBuyCustomizer()...')
@@ -1058,7 +1142,6 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Draw a line between (date, start_price) and (date, min_price)
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
-
 
 class GannEightCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
