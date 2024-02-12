@@ -421,7 +421,7 @@ class GannPointEightBuy(BaseStrategy):
         swing_point_counter = 1
         latest_T = 0
         max_top = None
-        max_variance_percent = 0.5  # A bottom must be within this many % of the last low price to count as a bottom.
+        max_variance_percent = 1  # A bottom must be within this many % of the last low price to count as a bottom.
         peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom
         bottoms = 0
         recent_swing_points = []
@@ -443,6 +443,7 @@ class GannPointEightBuy(BaseStrategy):
                     last_candle = swing_point.price_object
                     last_low = swing_point.price_object.low_price
                     recent_swing_points.append(swing_point)
+                    most_recent_low_swing_point_candle = last_candle
                 else:
                     # This strategy cannot be true. End review of swing points.
                     logger.error(f'First swingpoint not HH or LL. Stratey not valid.')
@@ -458,11 +459,12 @@ class GannPointEightBuy(BaseStrategy):
                         # If this is a new high above the bottom, save the high value.
                         if max_top is None or swing_point.price_object.high_price > max_top:
                             max_top = swing_point.price_object.high_price
-                        if swing_point_counter == 2:
-                            # This is the final peak. Save the High value.
-                            last_high = swing_point.price_object.high_price
-                            recent_swing_points.append(swing_point)
+                        #if swing_point_counter == 2:
+                        #    # This is the final peak. Save the High value.
+                        #    last_high = swing_point.price_object.high_price
+                        recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
+                        first_candle = most_recent_low_swing_point_candle
                         logger.error(
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a bottom.')
                         bottoms += 1
@@ -473,14 +475,14 @@ class GannPointEightBuy(BaseStrategy):
                 elif swing_point.label == 'LL' or swing_point.label == 'HL':
                     if (most_recent_label == 'LH' or most_recent_label == 'HH'):
                         # This is potentially another bottom.
-                        logger.error(f'Found a prior {swing_point.label}.')
+                        logger.error(f'Found a prior {swing_point.label} after a {most_recent_label}.')
                         # Test if the bottom is within the threshold to be considered at the same level as the last low.
                         low_price_percent_variance = abs(swing_point.price_object.low_price - last_low)*100/last_low
                         recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
                         if low_price_percent_variance < max_variance_percent:
                             logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
-                            first_candle = swing_point.price_object
+                            most_recent_low_swing_point_candle = swing_point.price_object
                         else:
                             logger.error(
                                 f'Low is outside threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
