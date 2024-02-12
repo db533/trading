@@ -612,6 +612,9 @@ def process_trading_opportunities():
                         existing_tradingopp.count += 1
                         # Update the metrics with the latest data e.g. current latest_T.
                         existing_tradingopp.metrics_snapshot = data
+                        if recent_swing_points_exist == True:
+                            for swing_point in recent_swing_points:
+                                existing_tradingopp.swing_points.add(swing_point)
                         existing_tradingopp.save()
                     else:
                         # This Ticker / strategy is new.
