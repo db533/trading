@@ -855,11 +855,24 @@ def translate_metrics(opp):
 @login_required
 def trading_opps_view(request):
     # Get all active TradingOpp instances
-    active_trading_opps = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy')
+    query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy')
+
+    action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
+    category_param = request.GET.get('category', 'all')  # category ID or 'all'
+
+    # Filter by action_buy if applicable
+    if action_param.lower() == 'buy':
+        query = query.filter(action_buy=True)
+    elif action_param.lower() == 'sell':
+        query = query.filter(action_buy=False)
+
+    # Filter by TickerCategory if applicable
+    if category_param != 'all':
+        query = query.filter(ticker__categories__id=category_param)
 
     # Group by Ticker
     ticker_opps = {}
-    for opp in active_trading_opps:
+    for opp in query:
         ticker = opp.ticker
         opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
         if ticker not in ticker_opps:

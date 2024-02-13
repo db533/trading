@@ -34,7 +34,7 @@
                 <td style="text-align:center;"><a href="{% url 'trading-opps' %}?action=sell&category={{ category.id }}">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
-    </table>
+    </table><br>
     {% if sorted_active_trading_opps %}
         <table border="1">
             <thead>
@@ -43,7 +43,7 @@
                     <th style="text-align:center; width: 30ch;">Graph</th>
                     <th  style="text-align:center; width: 14ch;">Strategy Name</th>
                     <th  style="text-align:center; width: 30ch;">Strategy desciption</th>
-                    <th  style="text-align:center; width: 80ch;">Metrics</th>
+                    <th  style="text-align:center; width: 50ch;">Metrics</th>
                     <th  style="text-align:center; width: 8ch;">Identified</th>
                 </tr>
             </thead>
