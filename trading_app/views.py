@@ -880,7 +880,8 @@ def trading_opps_view(request):
         ticker_opps[ticker].append(opp)
 
     context = {
-        'ticker_opps': ticker_opps
+        'ticker_opps': ticker_opps,
+        'categories': TickerCategory.objects.all(),  # Assuming you want to list all categories for filtering
     }
 
     return render(request, 'trading_opp_list.html', context)
