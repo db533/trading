@@ -23,7 +23,7 @@
                 <tr>
                     <td style="text-align:center; color: {% if opp.action_buy == 1 %}green{% else %}red{% endif %};"><strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong></td>
                     <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
-                    <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }} - {{ opp.ticker.company_name }}</a></h2>
+                    <td><a href="{% url 'ticker_detail' opp.ticker.id %}"><strong>{{ opp.ticker.symbol }}</strong><br>{{ opp.ticker.company_name }}</a></h2>
                         <br>{{ opp.strategy.name }}</td>
                     <td>{{ opp.strategy.description }}</td>
                     <td>
