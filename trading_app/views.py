@@ -890,7 +890,7 @@ def trading_opps_sorted_view(request):
 
     # Filter by TickerCategory if applicable
     if category_param != 'all':
-        query = query.filter(ticker__category__id=category_param)
+        query = query.filter(ticker__categories__id=category_param)
 
     for opp in query:
         opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp

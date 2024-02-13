@@ -8,27 +8,30 @@
     <h1>Active Trading Opportunities</h1>
     <table>
         <tr>
-            <th>All</th>
+            <th>Action</th><th>All</th>
             {% for category in categories %}
                 <th>{{ category.name }}</th>
             {% endfor %}
         </tr>
         <tr>
-            <td><a href="{% url 'trading_opps_sorted' %}?action=all">All</a></td>
+            <td>Both</td>
+            <td><a href="{% url 'trading_opps_view' %}?action=all">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=all">By date</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">All</a></td>
+                <td><a href="{% url 'trading_opps_view' %}?action=all&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
         <tr>
+            <td>Buy</td>
             <td><a href="{% url 'trading_opps_sorted' %}?action=buy">Buy</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">Buy</a></td>
+                <td><a href="{% url 'trading_opps_view' %}?action=buy&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
         <tr>
+            <td>Sell</td>
             <td><a href="{% url 'trading_opps_sorted' %}?action=sell">Sell</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">Sell</a></td>
+                <td><a href="{% url 'trading_opps_view' %}?action=sell&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
     </table>
