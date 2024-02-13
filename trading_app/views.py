@@ -833,7 +833,7 @@ STRATEGY_METRICS_LABELS = {
     },
     "Gann's Buying point #8": {
       'latest_T': 'Time since last swing point',
-      'bottoms': 'Number of thoughs',
+      'bottoms': 'Number of troughs',
       'bottom_duration': 'Duration between first and last trough',
     },
     "Gann's Selling point #8": {
@@ -871,6 +871,20 @@ def trading_opps_view(request):
     }
 
     return render(request, 'trading_opp_list.html', context)
+
+@login_required
+def trading_opps_sorted_view(request):
+    # Get all active TradingOpp instances sorted by datetime_identified in descending order
+    sorted_active_trading_opps = TradingOpp.objects.filter(is_active=True).select_related('ticker','strategy').order_by('-datetime_identified')
+
+    for opp in sorted_active_trading_opps:
+        opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
+
+    context = {
+        'sorted_active_trading_opps': sorted_active_trading_opps
+    }
+
+    return render(request, 'trading_opp_sorted_list.html', context)
 
 class BaseGraphCustomizer:
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):

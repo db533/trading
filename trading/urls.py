@@ -28,6 +28,7 @@ urlpatterns = [
     path('delete_daily_price/', delete_daily_price, name='delete_daily_price'),
     path('delete_daily_price/<str:symbol>/', delete_daily_price, name='delete_daily_price_with_symbol'),
     path('trading-opps/', trading_opps_view, name='trading-opps'),
+    path('trading-opps-recent/', trading_opps_sorted_view, name='trading_opps_sorted'),
     path('swing_point_graph/<int:opp_id>/', generate_swing_point_graph_view, name='swing_point_graph'),
 ]
 

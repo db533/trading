@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Sorted Trading Opportunities</title>
+</head>
+<body>
+    <h1>Active Trading Opportunities</h1>
+    {% if sorted_active_trading_opps %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Graph</th>
+                    <th>Ticker and Strategy Name</th>
+                    <th>Strategy Description</th>
+                    <th>Metrics</th>
+                    <th>Identified</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for opp in sorted_active_trading_opps %}
+                <tr>
+                    <td style="text-align:center; color: {% if opp.action_buy == 1 %}green{% else %}red{% endif %};"><strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong></td>
+                    <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
+                    <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }} - {{ opp.ticker.company_name }}</a></h2>
+                        <br>{{ opp.strategy.name }}</td>
+                    <td>{{ opp.strategy.description }}</td>
+                    <td>
+                        {% for label, value in opp.translated_metrics.items %}
+                            <strong>{{ label }}:</strong> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>{{ opp.datetime_identified }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No active trading opportunities found.</p>
+    {% endif %}
+</body>
+{% endblock %}
