@@ -6,32 +6,32 @@
 </head>
 <body>
     <h1>Active Trading Opportunities</h1>
-    <table>
+    <table border="1">
         <tr>
-            <th>Action</th><th>All</th>
+            <th style="text-align:center;">Action</th><th>All</th>
             {% for category in categories %}
-                <th>{{ category.name }}</th>
+                <th  style="text-align:center;">{{ category.name }}</th>
             {% endfor %}
         </tr>
         <tr>
             <td>Both</td>
-            <td><a href="{% url 'trading-opps' %}?action=all">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=all">By date</a></td>
+            <td><a href="{% url 'trading-opps' %}?action=all">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=all">By date</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading-opps' %}?action=all&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">By date</a></td>
+                <td><a href="{% url 'trading-opps' %}?action=all&category={{ category.id }}">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
         <tr>
             <td>Buy</td>
-            <td><a href="{% url 'trading_opps_sorted' %}?action=buy">Buy</a></td>
+            <td><a href="{% url 'trading-opps' %}?action=buy">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=buy">By date</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading-opps' %}?action=buy&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">By date</a></td>
+                <td><a href="{% url 'trading-opps' %}?action=buy&category={{ category.id }}">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
         <tr>
             <td>Sell</td>
-            <td><a href="{% url 'trading_opps_sorted' %}?action=sell">Sell</a></td>
+            <td><a href="{% url 'trading-opps' %}?action=sell">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=sell">By date</a></td>
             {% for category in categories %}
-                <td><a href="{% url 'trading-opps' %}?action=sell&category={{ category.id }}">By Ticker</a><a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">By date</a></td>
+                <td><a href="{% url 'trading-opps' %}?action=sell&category={{ category.id }}">By Ticker</a> <a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">By date</a></td>
             {% endfor %}
         </tr>
     </table>
