@@ -817,7 +817,7 @@ class GannPointThreeSell(BaseStrategy):
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'HH' and most_recent_label == 'HL':
                         most_recent_label = 'HH'
-                        price_fall = swing_point_price_difference(self.ticker,latest_hl_sp, swing_point.price_object)
+                        price_fall = swing_point_price_difference(self.ticker,latest_hl_sp, swing_point)
                         logger.error(f'Found a prior {swing_point.label}. Price fall: {price_fall}')
                         P_prev.append(float(price_fall))
                         recent_swing_points.append(swing_point)
