@@ -714,9 +714,8 @@ class GannPointThreeBuy(BaseStrategy):
                         'downtrend_price_movement' : str(downtrend_price_movement), 'initial_upswing_percent_of_downtrend' : str(round(initial_upswing_size*100/downtrend_price_movement,1))} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_P}.')
             else:
-                data = {'latest_P': str(latest_P), 'P_prev': str(P_prev)}
+                data = {}
                 action_buy = None
-            logger.error(f'Latest P: {latest_P}.')
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
