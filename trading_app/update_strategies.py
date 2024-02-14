@@ -728,7 +728,7 @@ class GannPointThreeBuy(BaseStrategy):
                     swing_point_counter += 1
             if len(P_prev) > 0:
                 max_P = max(P_prev)
-                if max_P < latest_P and len(P_prev) > 2 and latest_price.close_price > pullback_sp.price:
+                if max_P < abs(latest_P) and len(P_prev) > 2 and latest_price.close_price > pullback_sp.price:
                     logger.error(f'Strategy valid.')
                     action_buy = True
                 else:
@@ -832,7 +832,7 @@ class GannPointThreeSell(BaseStrategy):
                     swing_point_counter += 1
             if len(P_prev) > 0:
                 max_P = max(P_prev)
-                if max_P < latest_P and len(P_prev) > 2 and latest_price.close_price < pullback_sp.price:
+                if max_P < abs(latest_P) and len(P_prev) > 2 and latest_price.close_price < pullback_sp.price:
                     logger.error(f'Strategy valid.')
                     action_buy = False
                 else:
