@@ -804,11 +804,7 @@ STRATEGY_METRICS_LABELS = {
         'downtrend_price_movement': 'Price fall during downtrend',
         'prior_trend_duration': 'Duration of downtrend',
         'latest_P': 'Price rise from low',
-        'initial_upswing_size': 'Price rise as % of LL price',
-        'initial_upswing_percent_of_downtrend': 'Initial price rise as % of downtrend movement',
         'retracement_P': 'Price fall during retracement',
-        'secondary_downswing_size': 'Retracement price fall as % of price rise from LL',
-        'percent_retracement': 'Retracement price fall as % of price rise from LL',
     },
     "Gann's Selling point #3": {
         'P_prev': 'Previous price falls during uptrend',
@@ -817,11 +813,7 @@ STRATEGY_METRICS_LABELS = {
         'uptrend_price_movement': 'Price rise during uptrend',
         'prior_trend_duration': 'Duration of uptrend',
         'latest_P': 'Price fall from high',
-        'initial_downswing_size': 'Initial downswing price change as % of HH price',
-        'initial_downswing_percent_of_uptrend': 'Initial price fall as % of uptrend movement',
         'retracement_P': 'Price rise during retracement',
-        'secondary_upswing_size': 'Retracement price change as % of price fall from HH',
-        'percent_retracement': 'Retracement price rise as % of price fall from HH',
     },
     "Gann's Buying point #5": {
       'latest_T': 'Time since last swing point',

@@ -736,14 +736,9 @@ class GannPointThreeBuy(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=lowpoint_sp.price_object)
-                secondary_upswing_size = round((latest_price.close_price - pullback_sp.price) / pullback_sp.price, 3) - 1
-                initial_upswing_size = round(
-                    (latest_hh_sp.price - lowpoint_sp.price) / lowpoint_sp.price, 3) - 1
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'secondary_upswing_size' : str(secondary_upswing_size), 'initial_upswing_size' : str(initial_upswing_size),
-                        'retracement_P' : str(retracement_P), 'percent_retracement' : str(round(retracement_P*100/latest_P,1)),
-                        'downtrend_price_movement' : str(downtrend_price_movement), 'initial_upswing_percent_of_downtrend' : str(round(initial_upswing_size*100/downtrend_price_movement,1))} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'retracement_P' : str(retracement_P), 'downtrend_price_movement' : str(downtrend_price_movement),} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_P}.')
             else:
                 data = {}
@@ -840,13 +835,9 @@ class GannPointThreeSell(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
-                secondary_upswing_size = round(((latest_price.close_price - pullback_sp.price )*100 / pullback_sp.price), 1)
-                initial_downswing_size = round(((highpoint_sp.price - latest_ll_sp.price)*100 / highpoint_sp.price), 1)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'secondary_upswing_size' : str(secondary_upswing_size), 'initial_downswing_size' : str(initial_downswing_size),
-                        'retracement_P' : str(retracement_P), 'percent_retracement' : str(round(retracement_P*100/latest_P,1)),
-                        'uptrend_price_movement' : str(uptrend_price_movement), 'initial_downswing_percent_of_uptrend' : str(round(initial_downswing_size*100/uptrend_price_movement,1))} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'retracement_P' : str(retracement_P), 'uptrend_price_movement' : str(uptrend_price_movement),} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max P during prior series of swings: {max_P}.')
             else:
                 data = {}
