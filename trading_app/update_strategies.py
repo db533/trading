@@ -820,9 +820,8 @@ class GannPointThreeSell(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=highpoint_candle)
-                secondary_upswing_size = round(1-((pullback_candle.high_price - latest_price.close_price)*100 / pullback_candle.high_price), 3)
-                initial_downswing_size = round(
-                    1-((highpoint_candle.high_price - latest_ll_candle.high_price) / highpoint_candle.high_price), 3)
+                secondary_upswing_size = round(((latest_price.close_price - pullback_candle.high_price )*100 / pullback_candle.high_price), 1)
+                initial_downswing_size = round(((highpoint_candle.high_price - latest_ll_candle.high_price)*100 / highpoint_candle.high_price), 1)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'secondary_upswing_size' : str(secondary_upswing_size), 'initial_downswing_size' : str(initial_downswing_size),
