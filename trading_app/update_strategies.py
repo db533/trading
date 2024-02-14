@@ -120,9 +120,13 @@ def instance_price_difference_upswing(ticker, earlier_candle, later_candle=None)
     if later_candle is not None:
         later_price = later_candle.high_price
         price_difference = later_price - earlier_price
+        logger.error(
+            f'instance_price_difference_upswing. earlier_price = {earlier_price}, later_price = {later_price}, price_difference = {price_difference}')
     else:
         most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         price_difference = most_recent_price.high_price - earlier_price
+        logger.error(
+            f'instance_price_difference_upswing. earlier_price = {earlier_price}, most_recent_price.high_price = {most_recent_price.high_price}, price_difference = {price_difference}')
     return price_difference
 
 def instance_price_difference_downswing(ticker, earlier_candle, later_candle=None):
@@ -130,9 +134,13 @@ def instance_price_difference_downswing(ticker, earlier_candle, later_candle=Non
     if later_candle is not None:
         later_price = later_candle.low_price
         price_difference = later_price - earlier_price
+        logger.error(
+            f'instance_price_difference_downswing. earlier_price = {earlier_price}, later_price = {later_price}, price_difference = {price_difference}')
     else:
         most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         price_difference = most_recent_price.low_price - earlier_price
+        logger.error(
+            f'instance_price_difference_downswing. earlier_price = {earlier_price}, most_recent_price.low_price = {most_recent_price.low_price}, price_difference = {price_difference}')
     return price_difference
 
 
