@@ -143,6 +143,20 @@ def instance_price_difference_downswing(ticker, earlier_candle, later_candle=Non
             f'instance_price_difference_downswing. earlier_price = {earlier_price}, most_recent_price.low_price = {most_recent_price.low_price}, price_difference = {price_difference}')
     return price_difference
 
+def swing_point_price_difference(ticker, earlier_sp, later_sp=None):
+    earlier_sp_price = earlier_sp.price
+    if later_sp is not None:
+        later_sp_price = later_sp.price
+        price_difference = later_sp_price - earlier_sp_price
+        logger.error(
+            f'swing_point_price_difference. earlier_sp_price = {earlier_sp_price}, later_sp_price = {later_sp_price}, price_difference = {price_difference}')
+    else:
+        most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        price_difference = most_recent_price.close_price - earlier_sp_price
+        logger.error(
+            f'swing_point_price_difference. earlier_sp_price = {earlier_sp_price}, most_recent_price.low_price = {most_recent_price.low_price}, price_difference = {price_difference}')
+    return price_difference
+
 
 class GannPointFourBuy2(BaseStrategy):
     name="Gann's Buying point #4"
@@ -655,7 +669,7 @@ class GannPointThreeBuy(BaseStrategy):
                 if swing_point_counter == 1:
                     if swing_point.label == 'HL':
                         logger.error(f'Detected first swingpoint. HL')
-                        pullback_candle = swing_point.price_object
+                        pullback_sp = swing_point
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
@@ -665,9 +679,8 @@ class GannPointThreeBuy(BaseStrategy):
                     swing_point_counter += 1
                 elif swing_point_counter == 2:
                     if swing_point.label == 'HH':
-                        latest_hh_candle = swing_point.price_object
-                        retracement_P = instance_price_difference_upswing(self.ticker, pullback_candle,
-                                                                          latest_hh_candle)
+                        latest_hh_sp = swing_point
+                        retracement_P = swing_point_price_difference(self.ticker, pullback_sp,latest_hh_sp)
                         recent_swing_points.append(swing_point)
                         logger.error(f'Detected second swingpoint. HH. retracement_P: {retracement_P}')
                     else:
@@ -679,8 +692,8 @@ class GannPointThreeBuy(BaseStrategy):
                     swing_point_counter += 1
                 elif swing_point_counter == 3:
                     if swing_point.label == 'LL':
-                        lowpoint_candle = swing_point.price_object
-                        latest_P = instance_price_difference_upswing(self.ticker, lowpoint_candle, latest_hh_candle)
+                        lowpoint_sp = swing_point
+                        latest_P = instance_price_difference_upswing(self.ticker, lowpoint_sp, latest_hh_sp)
                         recent_swing_points.append(swing_point)
                         logger.error(f'Detected third swingpoint. LL. latest_P: {latest_P}')
                     else:
@@ -695,37 +708,37 @@ class GannPointThreeBuy(BaseStrategy):
                         # Swing point is a high.
                         # Save the number of days that that it took to reach this swing point.
                         logger.error(f'Found a prior {swing_point.label}. ')
-                        latest_lh_candle = swing_point.price_object
+                        latest_lh_sp = swing_point
                         most_recent_label = 'LH'
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'LL' and most_recent_label == 'LH':
                         most_recent_label = 'LL'
-                        price_rise = instance_price_difference_upswing(self.ticker,swing_point.price_object, latest_lh_candle)
+                        price_rise = instance_price_difference_upswing(self.ticker,swing_point, latest_lh_sp)
                         P_prev.append(price_rise)
                         logger.error(f'Found a prior {swing_point.label}. price_rise: {price_rise}')
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'HH' or swing_point.label == 'HL':
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
-                        first_candle = swing_point.price_object
-                        downtrend_price_movement = instance_price_difference_upswing(self.ticker,lowpoint_candle, first_candle)
+                        first_sp = swing_point
+                        downtrend_price_movement = instance_price_difference_upswing(self.ticker,first_sp, lowpoint_sp)
                         logger.error(f'Found a prior {swing_point.label}. So downtrend started here. downtrend_price_movement: {downtrend_price_movement}')
                         recent_swing_points.append(swing_point)
                         break
                     swing_point_counter += 1
             if len(P_prev) > 0:
                 max_P = max(P_prev)
-                if max_P < latest_P and len(P_prev) > 2 and latest_price.close_price > pullback_candle.low_price:
+                if max_P < latest_P and len(P_prev) > 2 and latest_price.close_price > pullback_sp.price:
                     logger.error(f'Strategy valid.')
                     action_buy = True
                 else:
                     logger.error(f'Upswing price movement insufficient or 3+ sections not present in downswing. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
-                prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=lowpoint_candle)
-                secondary_upswing_size = round((latest_price.close_price - pullback_candle.low_price) / pullback_candle.low_price, 3) - 1
+                prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=lowpoint_sp.price_object)
+                secondary_upswing_size = round((latest_price.close_price - pullback_sp.price) / pullback_sp.price, 3) - 1
                 initial_upswing_size = round(
-                    (latest_hh_candle.high_price - lowpoint_candle.low_price) / lowpoint_candle.low_price, 3) - 1
+                    (latest_hh_sp.price - lowpoint_sp.price) / lowpoint_sp.price, 3) - 1
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'secondary_upswing_size' : str(secondary_upswing_size), 'initial_upswing_size' : str(initial_upswing_size),
@@ -772,8 +785,7 @@ class GannPointThreeSell(BaseStrategy):
                 elif swing_point_counter == 2:
                     if swing_point.label == 'LL':
                         latest_ll_candle = swing_point.price_object
-                        retracement_P = instance_price_difference_downswing(self.ticker, pullback_candle,
-                                                                            latest_ll_candle)
+                        retracement_P = instance_price_difference_downswing(self.ticker, latest_ll_candle, pullback_candle)
                         logger.error(f'Detected second swingpoint. LL. retracement_P: {retracement_P}')
                         recent_swing_points.append(swing_point)
                     else:
@@ -786,7 +798,7 @@ class GannPointThreeSell(BaseStrategy):
                 elif swing_point_counter == 3:
                     if swing_point.label == 'HH':
                         highpoint_candle = swing_point.price_object
-                        latest_P = instance_price_difference_downswing(self.ticker, latest_ll_candle, highpoint_candle)
+                        latest_P = instance_price_difference_downswing(self.ticker, highpoint_candle, latest_ll_candle)
                         logger.error(f'Detected third swingpoint. HH. Price fall before retracement: {latest_P}')
                         recent_swing_points.append(swing_point)
                     else:
@@ -807,7 +819,7 @@ class GannPointThreeSell(BaseStrategy):
                         most_recent_label = 'HH'
                         price_fall = instance_price_difference_downswing(self.ticker,latest_hl_candle, swing_point.price_object)
                         logger.error(f'Found a prior {swing_point.label}. Price fall: {price_fall}')
-                        P_prev.append(price_fall)
+                        P_prev.append(float(price_fall))
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'LL' or swing_point.label == 'LH':
                         # This must be the start of the prior down trend.
