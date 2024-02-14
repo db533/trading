@@ -707,16 +707,16 @@ class GannPointThreeBuy(BaseStrategy):
                 secondary_upswing_size = round((latest_price.close_price - pullback_candle.low_price) / pullback_candle.low_price, 3) - 1
                 initial_upswing_size = round(
                     (latest_hh_candle.high_price - lowpoint_candle.low_price) / lowpoint_candle.low_price, 3) - 1
-                data = {'latest_P': str(latest_P), 'P_prev': str(T_prev), 'max_P': str(max(T_prev)), 'sections': str(len(P_prev)),
+                data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'secondary_upswing_size' : str(secondary_upswing_size), 'initial_upswing_size' : str(initial_upswing_size),
                         'retracement_P' : str(retracement_P), 'percent_retracement' : str(round(retracement_P*100/latest_P,1)),
                         'downtrend_price_movement' : str(downtrend_price_movement), 'initial_upswing_percent_of_downtrend' : str(round(initial_upswing_size*100/downtrend_price_movement,1))} # recent_swing_points not as a string as it gets removed and accessed if present.
-                logger.error(f'Max T during prior series of swings: {max_T}.')
+                logger.error(f'Max T during prior series of swings: {max_P}.')
             else:
-                data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
+                data = {'latest_P': str(latest_P), 'P_prev': str(P_prev)}
                 action_buy = None
-            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'Latest P: {latest_P}.')
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
