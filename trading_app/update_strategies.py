@@ -732,7 +732,7 @@ class GannPointThreeBuy(BaseStrategy):
         except Exception as e:
             print(f"Error in Gann #3 Buying for {self.ticker.symbol}: {e}")
 
-class GannPointThreeBuy(BaseStrategy):
+class GannPointThreeSell(BaseStrategy):
     name="Gann's Selling point #3"
 
     def check_criteria(self):
@@ -844,7 +844,7 @@ def process_trading_opportunities():
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
-    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell, GannPointThreeBuy]  # List of strategy classes
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell, GannPointThreeBuy, GannPointThreeSell]  # List of strategy classes
 
 
     try:
