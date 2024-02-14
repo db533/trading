@@ -719,7 +719,7 @@ class GannPointThreeBuy(BaseStrategy):
             logger.error(f'Latest T: {latest_T}.')
             logger.error(f'........')
             return action_buy, data
-        except:
+        except Exception as e:
             print(f"Error in Gann #3 Selling for {self.ticker.symbol}: {e}")
 
 
