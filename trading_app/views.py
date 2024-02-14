@@ -798,21 +798,31 @@ STRATEGY_METRICS_LABELS = {
 
     },
     "Gann's Buying point #3": {
-      'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous upswings',
-      'count_T_prev': 'Count of upswings',
-      'max_T': 'Duration of longest upswing',
-      'prior_trend_duration': 'Duration of downtrend',
-      'final_upswing_size': '% up from low',
+        'latest_P': 'Price rise from low',
+        'P_prev': 'Previous price rises during downtrend',
+        'max_P': 'Largest price rise during downtrend',
+        'sections': 'Number of sections in downtrend',
+        'prior_trend_duration': 'Duration of downtrend',
+        'secondary_upswing_size': 'secondary_upswing_size',
+        'initial_downswing_size': 'initial_downswing_size',
+        'retracement_P': 'Price fall during retracement',
+        'percent_retracement': 'Retracement price fall as % of price rise from LL',
+        'downtrend_price_movement': 'Price fall during downtrend',
+        'initial_downswing_percent_of_uptrend': 'Initial price rise as % of downtrend movement',
 
     },
     "Gann's Selling point #3": {
-      'latest_T': 'Time since last swing point',
-      'T_prev': 'Duration of previous downswings',
-      'count_T_prev': 'Count of downswings',
-      'max_T': 'Duration of longest downswing',
-      'prior_trend_duration': 'Duration of uptrend',
-      'final_downswing_size': '% down from high',
+        'latest_P': 'Price fall from high',
+        'P_prev': 'Previous price falls during uptrend',
+        'max_P': 'Largest price rise during uptrend',
+        'sections': 'Number of sections in uptrend',
+        'prior_trend_duration': 'Duration of uptrend',
+        'secondary_downswing_size': 'secondary_downswing_size',
+        'initial_upswing_size': 'initial_upswing_size',
+        'retracement_P': 'Price rise during retracement',
+        'percent_retracement': 'Retracement price rise as % of price fall from HH',
+        'uptrend_price_movement': 'Price rise during uptrend',
+        'initial_upswing_percent_of_downtrend': 'Initial price fall as % of uptrend movement',
 
     },
     "Gann's Buying point #5": {
@@ -841,6 +851,7 @@ STRATEGY_METRICS_LABELS = {
       'tops': 'Number of peaks',
       'tops_duration': 'Duration between first and last peak',
     },
+
 }
 
 def translate_metrics(opp):

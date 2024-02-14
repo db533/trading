@@ -814,7 +814,7 @@ class GannPointThreeBuy(BaseStrategy):
                 max_P = max(P_prev)
                 if max_P < latest_P and len(P_prev) > 2 and latest_price.close_price < pullback_candle.high_price:
                     logger.error(f'Strategy valid.')
-                    action_buy = True
+                    action_buy = False
                 else:
                     logger.error(f'Downswing price movement insufficient or 3+ sections not present in upswing. Strategy not valid.')
                     action_buy = None
