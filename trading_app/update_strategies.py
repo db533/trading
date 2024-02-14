@@ -720,7 +720,7 @@ class GannPointThreeBuy(BaseStrategy):
             logger.error(f'........')
             return action_buy, data
         except:
-            print(f"Error in Gann #4 Selling for {ticker.symbol}: {e}")
+            print(f"Error in Gann #3 Selling for {self.ticker.symbol}: {e}")
 
 
 from django.utils import timezone
