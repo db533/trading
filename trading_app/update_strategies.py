@@ -799,7 +799,7 @@ class GannPointThreeBuy(BaseStrategy):
                         most_recent_label = 'HH'
                         price_fall = instance_price_difference_downswing(self.ticker,latest_hl_candle, swing_point.price_object)
                         logger.error(f'Found a prior {swing_point.label}. Price fall: {price_fall}')
-                        P_prev.append(price_rise)
+                        P_prev.append(price_fall)
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'LL' or swing_point.label == 'LH':
                         # This must be the start of the prior down trend.
