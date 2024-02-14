@@ -151,7 +151,7 @@ def swing_point_price_difference(ticker, earlier_sp, later_sp=None):
         logger.error(
             f'swing_point_price_difference. earlier_sp_price = {earlier_sp_price}, later_sp_price = {later_sp_price}, price_difference = {price_difference}')
     else:
-        most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        most_recent_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         price_difference = most_recent_price.close_price - earlier_sp_price
         logger.error(
             f'swing_point_price_difference. earlier_sp_price = {earlier_sp_price}, most_recent_price.low_price = {most_recent_price.low_price}, price_difference = {price_difference}')
