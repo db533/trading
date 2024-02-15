@@ -176,24 +176,25 @@ class GannPointOneBuy(BaseStrategy):
                 logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
                 if swing_point_counter == 1:
                     if swing_point.label == 'HL':
-                        logger.error(f'Detected first swingpoint. HL')
                         last_sp = swing_point
+                        last_sp_price = last_sp.price
+                        logger.error(f'Detected first HL swingpoint. Price: {last_sp_price}. Latest close price: {latest_price.close_price}')
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
                         logger.error(f'First swingpoint not HL. Strategy not valid.')
                         break
                     # Now need to determine the elapsed days since this LL or HH.
-                    last_sp_price = last_sp.price
+
                     most_recent_label = 'HL'
                     swing_point_counter += 1
                 elif swing_point_counter == 2:
                     if swing_point.label == 'HH' and most_recent_label == 'HL':
                         # Swing point is a HH.
-                        logger.error(f'Found a prior {swing_point.label}.')
                         most_recent_label = 'HH'
                         peak_sp = swing_point
                         peak_sp_price = peak_sp.price
+                        logger.error(f'Found a prior HH. Price: {peak_sp_price}.')
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
@@ -202,11 +203,11 @@ class GannPointOneBuy(BaseStrategy):
                 elif swing_point_counter == 3:
                     if swing_point.label == 'HL' and most_recent_label == 'HH':
                         # Swing point is a previous HL.
-                        logger.error(f'Found a prior {swing_point.label}. So swing points match the strategy.')
                         most_recent_label = 'HL'
                         prior_hl_sp = swing_point
                         recent_swing_points.append(swing_point)
                         prior_hl_price = prior_hl_sp.price
+                        logger.error(f'Found a prior HL. prior_hl_price: {prior_hl_price}. So swing points match the strategy.')
                     else:
                         logger.error(f'Third swingpoint not HL. Strategy not valid.')
                         break
