@@ -923,8 +923,63 @@ class BaseGraphCustomizer:
 
 
 class GannThreeBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
-        pass
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+        print('Starting GannThreeBuyCustomizer()...')
+        # Extract min_P from trading_opp's metrics_snapshot
+        max_P = float(trading_opp.metrics_snapshot.get('max_P'))
+        print('max_P:', max_P)
+        #label_offset_multiplier = 0.5 # Multiplier of min value to offset price change label below the orange lines
+
+        swing_point_price_list = []
+        swing_point_date_list = []
+        swing_point_counter = 0
+        for swing_point in swing_points:
+            print('swing_point.label:', swing_point.label, ' swing_point.price:',swing_point.price)
+            swing_point_price_list.append(float(swing_point.price))
+            swing_point_date_list.append(swing_point.date)
+            if swing_point.label == 'LH':
+                prior_price_trend = swing_point_price_list[-2]
+                new_price_trend = float(swing_point.price)
+                price_change = new_price_trend - prior_price_trend
+                if abs(abs(price_change) - abs(max_P))< 0.01:
+                    # This is the largest price change in the prior upswing. Add lines.
+                    prior_date_trend = swing_point_date_list[-2]
+                    new_date_trend = swing_point.date
+                    self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, prior_price_trend)
+                    self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, new_price_trend)
+
+                    # Locate label for price movement:
+                    # Place label at x% lower than the low price vs the overall price movement.
+                    #label_price = min(prior_price_trend,new_price_trend) * (1 - label_offset_multiplier)
+                    label_price = prior_price_trend #+ (prior_price_trend- new_price_trend) /2
+                    label_date = prior_date_trend + (new_date_trend - prior_date_trend) / 2
+                    ax.text(label_date, label_price, f"{round(price_change,2)}", fontsize=9, ha='center', va='bottom')
+
+                print('Found lh_swing_point. new_price_trend:',new_price_trend,'prior_price_trend:',prior_price_trend,'price_change:',price_change)
+            #last_swing_point = swing_point
+
+        # Now loop back from the end of the list of swing points to add lines for the recent price movement.
+        prior_price_primary = swing_point_price_list[-3]
+        next_price_primary = swing_point_price_list[-2]
+        prior_date_primary = swing_point_date_list[-3]
+        new_date_primary = swing_point_date_list[-2]
+        self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, prior_price_primary)
+        self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, next_price_primary)
+
+        # Locate label for price movement:
+        # Place label at x% lower than the low price vs the overall price movement.
+        #label_price = min(prior_price_primary, next_price_primary) * (1 - label_offset_multiplier)
+        label_price = prior_price_primary #+ (prior_price_primary - next_price_primary) / 2
+        label_date = prior_date_primary + (new_date_primary - prior_date_primary) / 2
+        ax.text(label_date, label_price, f"{round(next_price_primary-prior_price_primary, 2)}", fontsize=9, ha='center', va='bottom')
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
+
+    def draw_horizontal_line(self, ax, date1, date2, price):
+        # Draw a line between (date1, price) and (date2, price)
+        ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannThreeSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
