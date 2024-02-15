@@ -961,7 +961,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, prior_price_trend)
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, new_price_trend)
                 #hh_swing_point = swing_point
-                print('Found hl_swing_point. price_change:',price_change)
+                print('Found hl_swing_point. new_price_trend:',new_price_trend,'prior_price_trend:',prior_price_trend,'price_change:',price_change)
             #last_swing_point = swing_point
 
         # Now loop back from the end of the list of swing points to add lines for the recent price movement.
