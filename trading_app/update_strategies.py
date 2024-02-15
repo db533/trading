@@ -168,6 +168,8 @@ class GannPointOneBuy(BaseStrategy):
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            if last_price is not None:
+                latest_price = latest_price[0].close_price
             swing_point_counter = 1
             prior_hl_sp = None
             recent_swing_points = []
@@ -184,7 +186,7 @@ class GannPointOneBuy(BaseStrategy):
                         logger.error(f'First swingpoint not HL. Strategy not valid.')
                         break
                     # Now need to determine the elapsed days since this LL or HH.
-                    last_sp_price = last_sp.price_object.price
+                    last_sp_price = last_sp.price
                     most_recent_label = 'HL'
                     swing_point_counter += 1
                 elif swing_point_counter == 2:
@@ -193,7 +195,7 @@ class GannPointOneBuy(BaseStrategy):
                         logger.error(f'Found a prior {swing_point.label}.')
                         most_recent_label = 'HH'
                         peak_sp = swing_point
-                        peak_sp_price = peak_sp.price_object.price
+                        peak_sp_price = peak_sp.price
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
@@ -206,12 +208,12 @@ class GannPointOneBuy(BaseStrategy):
                         most_recent_label = 'HL'
                         prior_hl_sp = swing_point
                         recent_swing_points.append(swing_point)
-                        prior_hl_price = prior_hl_sp.price_object.price
+                        prior_hl_price = prior_hl_sp.price
                     else:
                         logger.error(f'Third swingpoint not HL. Strategy not valid.')
                         break
                 swing_point_counter += 1
-            if prior_hl_sp is not None:
+            if prior_hl_sp is not None and latest_price > last_sp_price:
                 action_buy = True
                 elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp, later_candle=last_sp)
                 sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
