@@ -187,7 +187,6 @@ class GannPointOneBuy(BaseStrategy):
                     # Now need to determine the elapsed days since this LL or HH.
 
                     most_recent_label = 'HL'
-                    swing_point_counter += 1
                 elif swing_point_counter == 2:
                     logger.error(f'swing_point_counter == 2. most_recent_label: {most_recent_label}.')
                     if swing_point.label == 'HH' and most_recent_label == 'HL':
@@ -197,7 +196,6 @@ class GannPointOneBuy(BaseStrategy):
                         peak_sp_price = peak_sp.price
                         logger.error(f'Found a prior HH. Price: {peak_sp_price}.')
                         recent_swing_points.append(swing_point)
-                        swing_point_counter += 1
                     else:
                         # This strategy cannot be true. End review of swing points.
                         logger.error(f'Second swingpoint not HH. Strategy not valid.')
