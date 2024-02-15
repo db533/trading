@@ -168,8 +168,6 @@ class GannPointOneBuy(BaseStrategy):
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-            if latest_price is not None:
-                latest_price = latest_price[0].close_price
             swing_point_counter = 1
             prior_hl_sp = None
             recent_swing_points = []
@@ -213,14 +211,17 @@ class GannPointOneBuy(BaseStrategy):
                         logger.error(f'Third swingpoint not HL. Strategy not valid.')
                         break
                 swing_point_counter += 1
-            if prior_hl_sp is not None and latest_price > last_sp_price:
+            if prior_hl_sp is not None and latest_price.close_price > last_sp_price:
                 action_buy = True
                 elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp, later_candle=last_sp)
                 sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
                 price_retracement = peak_sp_price - last_sp_price
                 retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
+                rise_after_retracement = latest_price.close_price - last_sp_price
+                rise_after_retracement_percent_of_retracement = rise_after_retracement * 100 / price_retracement
                 data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
-                        'retracement_as_percent': str(retracement_as_percent), 'elapsed__duration': str(elapsed__duration),} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'retracement_as_percent': str(retracement_as_percent), 'elapsed__duration': str(elapsed__duration),
+                        'rise_after_retracement' : rise_after_retracement, 'rise_after_retracement_percent_of_retracement' : rise_after_retracement_percent_of_retracement } # recent_swing_points not as a string as it gets removed and accessed if present.
                 action_buy = True
             else:
                 # Strategy is not valid
