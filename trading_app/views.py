@@ -965,7 +965,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
                     # Locate label for price movement:
                     # Place label at x% lower than the low price vs the overall price movement.
                     #label_price = min(prior_price_trend,new_price_trend) * (1 - label_offset_multiplier)
-                    label_price = new_price_trend + (prior_price_trend- new_price_trend) /2
+                    label_price = new_price_trend #+ (prior_price_trend- new_price_trend) /2
                     label_date = prior_date_trend + (new_date_trend - prior_date_trend) / 2
                     ax.text(label_date, label_price, f"{round(price_change,2)}", fontsize=9, ha='center', va='bottom')
 
@@ -984,7 +984,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
         # Locate label for price movement:
         # Place label at x% lower than the low price vs the overall price movement.
         #label_price = min(prior_price_primary, next_price_primary) * (1 - label_offset_multiplier)
-        label_price = next_price_primary + (prior_price_primary - next_price_primary) / 2
+        label_price = next_price_primary #+ (prior_price_primary - next_price_primary) / 2
         label_date = prior_date_primary + (new_date_primary - prior_date_primary) / 2
         ax.text(label_date, label_price, f"{round(next_price_primary-prior_price_primary, 2)}", fontsize=9, ha='center', va='bottom')
 
