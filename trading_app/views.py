@@ -940,8 +940,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
         swing_point_date_list = []
         swing_point_counter = 0
         for swing_point in swing_points:
-            print('swing_point.label:', swing_point.label, ' swing_point.candle_count_since_last_swing_point:',
-                  swing_point.candle_count_since_last_swing_point)
+            print('swing_point.label:', swing_point.label, ' swing_point.price:',swing_point.price)
             # print(f'Loop start: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
 
             # For most recent swing point, compute the location of the text label for the time after this swing point.
@@ -949,13 +948,13 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
             #mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
             #print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',
             #      mid_date_current)
-            swing_point_price_list.append(swing_point.price)
+            swing_point_price_list.append(float(swing_point.price))
             swing_point_date_list.append(swing_point.date)
             if swing_point.label == 'HL':
                 prior_price_trend = swing_point_price_list[-1]
-                new_price_trend = swing_point.price
-                price_change = float(new_price_trend - prior_price_trend)
-                if abs(price_change - max_P)< 0.01:
+                new_price_trend = float(swing_point.price)
+                price_change = new_price_trend - prior_price_trend
+                if abs(price_change) - abs(max_P)< 0.01:
                     # This is the largest price change in the prior upswing. Add lines.
                     prior_date_trend = swing_point_date_list[-1]
                     new_date_trend = swing_point.date
