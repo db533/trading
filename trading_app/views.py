@@ -930,7 +930,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannThreeSellCustomizer()...')
         # Extract max_P from trading_opp's metrics_snapshot
-        max_P = int(trading_opp.metrics_snapshot.get('max_P'))
+        max_P = float(trading_opp.metrics_snapshot.get('max_P'))
         print('max_P:', max_P)
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
