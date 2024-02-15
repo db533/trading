@@ -162,6 +162,7 @@ class GannPointOneBuy(BaseStrategy):
 
     def check_criteria(self):
         try:
+            data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
