@@ -173,7 +173,7 @@ class GannPointOneBuy(BaseStrategy):
             recent_swing_points = []
             for swing_point in swing_point_query:
                 # Check first is a HL
-                logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+                logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". swing_point_counter:"{swing_point_counter}"')
                 if swing_point_counter == 1:
                     if swing_point.label == 'HL':
                         last_sp = swing_point
@@ -189,6 +189,7 @@ class GannPointOneBuy(BaseStrategy):
                     most_recent_label = 'HL'
                     swing_point_counter += 1
                 elif swing_point_counter == 2:
+                    logger.error(f'swing_point_counter == 2. most_recent_label: {most_recent_label}.')
                     if swing_point.label == 'HH' and most_recent_label == 'HL':
                         # Swing point is a HH.
                         most_recent_label = 'HH'
