@@ -168,7 +168,7 @@ class GannPointOneBuy(BaseStrategy):
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-            if last_price is not None:
+            if latest_price is not None:
                 latest_price = latest_price[0].close_price
             swing_point_counter = 1
             prior_hl_sp = None
