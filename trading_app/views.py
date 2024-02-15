@@ -927,8 +927,98 @@ class GannThreeBuyCustomizer(BaseGraphCustomizer):
         pass
 
 class GannThreeSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
-        pass
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+        print('Starting GannThreeSellCustomizer()...')
+        # Extract max_P from trading_opp's metrics_snapshot
+        max_P = int(trading_opp.metrics_snapshot.get('max_P'))
+        print('max_P:', max_P)
+
+        # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
+        hh_swing_point = None
+        # print(f'Before loop: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
+        swing_point_price_list = []
+        swing_point_date_list = []
+        swing_point_counter = 0
+        for swing_point in swing_points:
+            print('swing_point.label:', swing_point.label, ' swing_point.candle_count_since_last_swing_point:',
+                  swing_point.candle_count_since_last_swing_point)
+            # print(f'Loop start: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
+
+            # For most recent swing point, compute the location of the text label for the time after this swing point.
+            # Overwriting the prior value to leave just the last swingpoint value
+            #mid_date_current = swing_point.date + (most_recent_date - swing_point.date) / 2
+            #print('swing_point.date:', swing_point.date, 'most_recent_date:', most_recent_date, 'mid_date_current:',
+            #      mid_date_current)
+            swing_point_price_list.append(swing_point.price)
+            swing_point_date_list.append(swing_point.date)
+            if swing_point.label == 'HL':
+                prior_price_trend = swing_point_price_list[-1]
+                new_price_trend = swing_point.price
+                price_change = new_price_trend - prior_price_trend
+                if abs(price_change - max_P)< 0.01:
+                    # This is the largest price change in the prior upswing. Add lines.
+                    prior_date_trend = swing_point_date_list[-1]
+                    new_date_trend = swing_point.date
+                    self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, prior_price_trend)
+                    self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, new_price_trend)
+                #hh_swing_point = swing_point
+                print('Found hl_swing_point.')
+            #last_swing_point = swing_point
+
+        # Now loop back from the end of the list of swing points to add lines for the recent price movement.
+        prior_price_primary = swing_point_price_list[-3]
+        next_price_primary = swing_point_price_list[-2]
+        prior_date_primary = swing_point_date_list[-3]
+        new_date_primary = swing_point_date_list[-2]
+        self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, prior_price_primary)
+        self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, next_price_primary)
+
+        if False:
+
+            if lh_swing_point:
+                # Find the preceding swing point (if exists)
+                preceding_swing_point = None
+                lh_index = list(swing_points).index(lh_swing_point)
+                if lh_index > 0:
+                    preceding_swing_point = swing_points[lh_index - 1]
+                    print('Found preceding_swing_point.')
+
+                # Find min price for drawing vertical lines
+                price_list = [swing_point.price for swing_point in swing_points]
+                price_list.append(most_recent_price)
+                min_price = min(price_list)
+                print('min_price:', min_price)
+                max_price = max(price_list)
+
+                try:
+                    # Draw vertical lines
+                    if preceding_swing_point:
+                        self.draw_vertical_line(ax, preceding_swing_point.date, max_price, min_price)
+                    self.draw_vertical_line(ax, lh_swing_point.date, max_price, min_price)
+                    self.draw_vertical_line(ax, most_recent_date, max_price, min_price)
+                    self.draw_vertical_line(ax, last_swing_point.date, max_price, min_price)
+
+                    # Add text annotation
+                    if preceding_swing_point and int(lh_swing_point.candle_count_since_last_swing_point) > 3:
+                        mid_date = lh_swing_point.date + (preceding_swing_point.date - lh_swing_point.date) / 2
+                        ax.text(mid_date, min_price, f"t={max_T}", fontsize=9, ha='center', va='bottom')
+                    # Add text label for time since the last low to current candle.
+                    latest_T = strategy_data['latest_T']
+                    print('latest_T:', latest_T)
+                    if int(latest_T) > 3:
+                        ax.text(mid_date_current, min_price, f"t={latest_T}", fontsize=9, ha='center', va='bottom')
+                except Exception as e:
+                    print(f"Error drawing lines and adding labels: {e}")
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
+
+    def draw_horizontal_line(self, ax, date1, date2, price):
+        # Draw a line between (date1, price) and (date2, price)
+        ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
+
+
 
 class GannFourBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
