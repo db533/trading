@@ -157,6 +157,76 @@ def swing_point_price_difference(ticker, earlier_sp, later_sp=None):
             f'swing_point_price_difference. earlier_sp_price = {earlier_sp_price}, most_recent_price.close_price = {most_recent_price.close_price}, price_difference = {price_difference}')
     return price_difference
 
+class GannPointOneBuy(BaseStrategy):
+    name="Gann's Buying point #1"
+
+    def check_criteria(self):
+        try:
+            action_buy = None
+            # Access the latest DailyPrice (or other relevant price model) for the ticker
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+
+            latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            swing_point_counter = 1
+            prior_hl_sp = None
+            recent_swing_points = []
+            for swing_point in swing_point_query:
+                # Check first is a HL
+                logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
+                if swing_point_counter == 1:
+                    if swing_point.label == 'HL':
+                        logger.error(f'Detected first swingpoint. HL')
+                        last_sp = swing_point
+                        recent_swing_points.append(swing_point)
+                    else:
+                        # This strategy cannot be true. End review of swing points.
+                        logger.error(f'First swingpoint not HL. Strategy not valid.')
+                        break
+                    # Now need to determine the elapsed days since this LL or HH.
+                    last_sp_price = last_sp.price_object.price
+                    most_recent_label = 'HL'
+                    swing_point_counter += 1
+                elif swing_point_counter == 2:
+                    if swing_point.label == 'HH' and most_recent_label == 'HL':
+                        # Swing point is a HH.
+                        logger.error(f'Found a prior {swing_point.label}.')
+                        most_recent_label = 'HH'
+                        peak_sp = swing_point
+                        peak_sp_price = peak_sp.price_object.price
+                        recent_swing_points.append(swing_point)
+                    else:
+                        # This strategy cannot be true. End review of swing points.
+                        logger.error(f'Second swingpoint not HH. Strategy not valid.')
+                        break
+                elif swing_point_counter == 3:
+                    if swing_point.label == 'HL' and most_recent_label == 'HH':
+                        # Swing point is a previous HL.
+                        logger.error(f'Found a prior {swing_point.label}. So swing points match the strategy.')
+                        most_recent_label = 'HL'
+                        prior_hl_sp = swing_point
+                        recent_swing_points.append(swing_point)
+                        prior_hl_price = prior_hl_sp.price_object.price
+                    else:
+                        logger.error(f'Third swingpoint not HL. Strategy not valid.')
+                        break
+                swing_point_counter += 1
+            if prior_hl_sp is not None:
+                action_buy = True
+                elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp, later_candle=last_sp)
+                sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
+                price_retracement = peak_sp_price - last_sp_price
+                retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
+                data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
+                        'retracement_as_percent': str(retracement_as_percent), 'elapsed__duration': str(elapsed__duration),} # recent_swing_points not as a string as it gets removed and accessed if present.
+                action_buy = True
+            else:
+                # Strategy is not valid
+                action_buy = None
+            logger.error(f'........')
+            return action_buy, data
+        except:
+            print(f"Error in Gann #1 Buying for {ticker.symbol}: {e}")
+
 
 class GannPointFourBuy2(BaseStrategy):
     name="Gann's Buying point #4"
@@ -854,7 +924,7 @@ def process_trading_opportunities():
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
-    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell, GannPointThreeBuy, GannPointThreeSell]  # List of strategy classes
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell, GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy]  # List of strategy classes
 
 
     try:

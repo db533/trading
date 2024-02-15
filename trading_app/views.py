@@ -981,6 +981,10 @@ class GannThreeBuyCustomizer(BaseGraphCustomizer):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
+class GannOneBuyCustomizer(BaseGraphCustomizer):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+            pass
+
 class GannThreeSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannThreeSellCustomizer()...')
@@ -1050,8 +1054,6 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
     def draw_horizontal_line(self, ax, date1, date2, price):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
-
-
 
 class GannFourBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
@@ -1340,6 +1342,7 @@ def get_graph_customizer(trading_strategy):
         "Gann's Selling point #8": GannEightCustomizer(),
         "Gann's Buying point #3": GannThreeBuyCustomizer(),
         "Gann's Selling point #3": GannThreeSellCustomizer(),
+        "Gann's Buying point #1": GannOneBuyCustomizer(),
         # Map more strategies to their customizers
     }
     return customizers.get(trading_strategy.name, BaseGraphCustomizer())
