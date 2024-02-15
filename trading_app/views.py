@@ -951,12 +951,12 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
             swing_point_price_list.append(float(swing_point.price))
             swing_point_date_list.append(swing_point.date)
             if swing_point.label == 'HL':
-                prior_price_trend = swing_point_price_list[-1]
+                prior_price_trend = swing_point_price_list[-2]
                 new_price_trend = float(swing_point.price)
                 price_change = new_price_trend - prior_price_trend
                 if abs(price_change) - abs(max_P)< 0.01:
                     # This is the largest price change in the prior upswing. Add lines.
-                    prior_date_trend = swing_point_date_list[-1]
+                    prior_date_trend = swing_point_date_list[-2]
                     new_date_trend = swing_point.date
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, prior_price_trend)
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, new_price_trend)
