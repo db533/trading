@@ -812,7 +812,7 @@ class GannPointThreeSell(BaseStrategy):
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'HH' and most_recent_label == 'HL':
                         most_recent_label = 'HH'
-                        price_fall = swing_point_price_difference(self.ticker,latest_hl_sp, swing_point)
+                        price_fall = swing_point_price_difference(self.ticker,swing_point,latest_hl_sp )
                         logger.error(f'Found a prior {swing_point.label}. Price fall: {price_fall}')
                         P_prev.append(float(price_fall))
                         recent_swing_points.append(swing_point)
@@ -826,8 +826,8 @@ class GannPointThreeSell(BaseStrategy):
                         break
                     swing_point_counter += 1
             if len(P_prev) > 0:
-                max_P = max(P_prev)
-                if max_P < abs(latest_P) and len(P_prev) > 2 and latest_price.close_price < pullback_sp.price:
+                min_P = min(P_prev)
+                if min_P < latest_P and len(P_prev) > 2 and latest_price.close_price < pullback_sp.price:
                     logger.error(f'Strategy valid.')
                     action_buy = False
                 else:
@@ -835,10 +835,10 @@ class GannPointThreeSell(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
-                data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
+                data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'min_P': str(min_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'retracement_P' : str(retracement_P), 'uptrend_price_movement' : str(uptrend_price_movement),} # recent_swing_points not as a string as it gets removed and accessed if present.
-                logger.error(f'Max P during prior series of swings: {max_P}.')
+                logger.error(f'Min P during prior series of swings: {min_P}.')
             else:
                 data = {}
                 action_buy = None

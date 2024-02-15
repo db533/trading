@@ -808,7 +808,7 @@ STRATEGY_METRICS_LABELS = {
     },
     "Gann's Selling point #3": {
         'P_prev': 'Previous price falls during uptrend',
-        'max_P': 'Largest price rise during uptrend',
+        'min_P': 'Largest price fall during uptrend',
         'sections': 'Number of sections in uptrend',
         'uptrend_price_movement': 'Price rise during uptrend',
         'prior_trend_duration': 'Duration of uptrend',
@@ -929,9 +929,9 @@ class GannThreeBuyCustomizer(BaseGraphCustomizer):
 class GannThreeSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannThreeSellCustomizer()...')
-        # Extract max_P from trading_opp's metrics_snapshot
-        max_P = float(trading_opp.metrics_snapshot.get('max_P'))
-        print('max_P:', max_P)
+        # Extract min_P from trading_opp's metrics_snapshot
+        min_P = float(trading_opp.metrics_snapshot.get('min_P'))
+        print('min_P:', min_P)
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         hh_swing_point = None
@@ -960,6 +960,13 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
                     new_date_trend = swing_point.date
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, prior_price_trend)
                     self.draw_horizontal_line(ax, prior_date_trend, new_date_trend, new_price_trend)
+
+                    # Locate label for price movement:
+                    # Place label at x% lower than the low price vs the overall price movement.
+                    label_price = min(prior_price_trend,new_price_trend) - 0.1*(max(prior_price_trend,new_price_trend)-min(prior_price_trend,new_price_trend))
+                    label_date = prior_date_trend + (new_date_trend - prior_date_trend) / 2
+                    ax.text(label_date, label_price, f"p={round(price_change,2)}", fontsize=9, ha='center', va='bottom')
+
                 #hh_swing_point = swing_point
                 print('Found hl_swing_point. new_price_trend:',new_price_trend,'prior_price_trend:',prior_price_trend,'price_change:',price_change)
             #last_swing_point = swing_point
@@ -971,6 +978,13 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
         new_date_primary = swing_point_date_list[-2]
         self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, prior_price_primary)
         self.draw_horizontal_line(ax, prior_date_primary, new_date_primary, next_price_primary)
+
+        # Locate label for price movement:
+        # Place label at x% lower than the low price vs the overall price movement.
+        label_price = min(prior_price_primary, next_price_primary) - 0.1 * (
+                    max(prior_price_primary, next_price_primary) - min(prior_price_primary, next_price_primary))
+        label_date = prior_date_primary + (new_date_primary - prior_date_primary) / 2
+        ax.text(label_date, label_price, f"p={round(min_P, 2)}", fontsize=9, ha='center', va='bottom')
 
         if False:
 
