@@ -932,6 +932,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
         # Extract min_P from trading_opp's metrics_snapshot
         min_P = float(trading_opp.metrics_snapshot.get('min_P'))
         print('min_P:', min_P)
+        label_offset_multiplier = 0.1 # Multiplier of min value to offset price change label below the orange lines
 
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         hh_swing_point = None
@@ -963,7 +964,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
 
                     # Locate label for price movement:
                     # Place label at x% lower than the low price vs the overall price movement.
-                    label_price = min(prior_price_trend,new_price_trend) - 0.1*(max(prior_price_trend,new_price_trend)-min(prior_price_trend,new_price_trend))
+                    label_price = min(prior_price_trend,new_price_trend) * (1 - label_offset_multiplier)
                     label_date = prior_date_trend + (new_date_trend - prior_date_trend) / 2
                     ax.text(label_date, label_price, f"p={round(price_change,2)}", fontsize=9, ha='center', va='bottom')
 
@@ -981,8 +982,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
 
         # Locate label for price movement:
         # Place label at x% lower than the low price vs the overall price movement.
-        label_price = min(prior_price_primary, next_price_primary) - 0.2 * (
-                    max(prior_price_primary, next_price_primary) - min(prior_price_primary, next_price_primary))
+        label_price = min(prior_price_primary, next_price_primary) * (1 - label_offset_multiplier)
         label_date = prior_date_primary + (new_date_primary - prior_date_primary) / 2
         ax.text(label_date, label_price, f"p={round(next_price_primary-prior_price_primary, 2)}", fontsize=9, ha='center', va='bottom')
 
