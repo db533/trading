@@ -196,6 +196,7 @@ class GannPointOneBuy(BaseStrategy):
                         peak_sp_price = peak_sp.price
                         logger.error(f'Found a prior HH. Price: {peak_sp_price}.')
                         recent_swing_points.append(swing_point)
+                        swing_point_counter += 1
                     else:
                         # This strategy cannot be true. End review of swing points.
                         logger.error(f'Second swingpoint not HH. Strategy not valid.')
