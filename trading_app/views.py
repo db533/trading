@@ -954,7 +954,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
             if swing_point.label == 'HL':
                 prior_price_trend = swing_point_price_list[-1]
                 new_price_trend = swing_point.price
-                price_change = new_price_trend - prior_price_trend
+                price_change = float(new_price_trend - prior_price_trend)
                 if abs(price_change - max_P)< 0.01:
                     # This is the largest price change in the prior upswing. Add lines.
                     prior_date_trend = swing_point_date_list[-1]
