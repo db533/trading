@@ -997,6 +997,10 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         print('sp_price_diff_vs_prior_high:', sp_price_diff_vs_prior_high)
         price_retracement = float(trading_opp.metrics_snapshot.get('price_retracement'))
         print('price_retracement:', price_retracement)
+        elapsed__duration = float(trading_opp.metrics_snapshot.get('elapsed__duration'))
+        print('elapsed__duration:', elapsed__duration)
+        rise_after_retracement = float(trading_opp.metrics_snapshot.get('rise_after_retracement'))
+        print('rise_after_retracement:', rise_after_retracement)
         swing_point_price_list = []
         swing_point_date_list = []
         swing_point_counter = 0
@@ -1018,6 +1022,19 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         label_date = swing_point_date_list[-1]
         ax.text(label_date, label_price, f"{round(price_retracement, 2)}", fontsize=9, ha='center',
                 va='bottom')
+
+        # Draw vertical line from retracement sp
+        self.draw_vertical_line(self, ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3])
+        label_price = swing_point_price_list[-3]
+        label_date = swing_point_date_list[-3] + (swing_point_date_list[-1] - swing_point_date_list[-3])/2
+        ax.text(label_date, label_price, f"t={elapsed__duration}", fontsize=9, ha='center',
+                va='bottom')
+
+        label_price = swing_point_price_list[-3]
+        label_date = swing_point_date_list[-1] + elapsed__duration / 2
+        ax.text(label_date, label_price, f"+{rise_after_retracement}", fontsize=9, ha='center',
+                va='bottom')
+
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Draw a line between (date, start_price) and (date, min_price)
