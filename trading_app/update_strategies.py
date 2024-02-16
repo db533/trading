@@ -186,7 +186,7 @@ class GannPointOneBuy(BaseStrategy):
                 swing_point_counter += 1
             if prior_hl_sp is not None and latest_price.close_price > last_sp_price:
                 action_buy = True
-                elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp, later_candle=last_sp)
+                elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp.price_object, later_candle=last_sp.price_object)
                 sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
                 price_retracement = peak_sp_price - last_sp_price
                 retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
