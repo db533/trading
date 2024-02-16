@@ -991,6 +991,45 @@ class GannThreeBuyCustomizer(BaseGraphCustomizer):
 
 class GannOneBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+        print('Starting GannOneBuyCustomizer()...')
+        # Extract min_P from trading_opp's metrics_snapshot
+        sp_price_diff_vs_prior_high = float(trading_opp.metrics_snapshot.get('sp_price_diff_vs_prior_high'))
+        print('sp_price_diff_vs_prior_high:', sp_price_diff_vs_prior_high)
+        price_retracement = float(trading_opp.metrics_snapshot.get('price_retracement'))
+        print('price_retracement:', price_retracement)
+        swing_point_price_list = []
+        swing_point_date_list = []
+        swing_point_counter = 0
+        # Get all swing_points into lists
+        for swing_point in swing_points:
+            print('swing_point.label:', swing_point.label, ' swing_point.price:', swing_point.price)
+            swing_point_price_list.append(float(swing_point.price))
+            swing_point_date_list.append(swing_point.date)
+
+        # Draw horizontal line to left of retracement sp
+        self.draw_horizontal_line(ax, swing_point_price_list[-1], swing_point_date_list[-3], swing_point_date_list[-1])
+        label_price = swing_point_price_list[-3]  + (swing_point_price_list[-1]- swing_point_price_list[-3]) /2
+        label_date = swing_point_date_list[-3]
+        ax.text(label_date, label_price, f"{round(sp_price_diff_vs_prior_high, 2)}", fontsize=9, ha='center', va='bottom')
+
+        # Draw horizontal line to right of peak sp
+        self.draw_horizontal_line(ax, swing_point_price_list[-2], swing_point_date_list[-2], swing_point_date_list[-1])
+        label_price = swing_point_price_list[-1] + (swing_point_price_list[-2] - swing_point_price_list[-1]) / 2
+        label_date = swing_point_date_list[-1]
+        ax.text(label_date, label_price, f"{round(price_retracement, 2)}", fontsize=9, ha='center',
+                va='bottom')
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
+
+    def draw_horizontal_line(self, ax, date1, date2, price):
+        # Draw a line between (date1, price) and (date2, price)
+        ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
+
+
+class GannOneSellCustomizer(BaseGraphCustomizer):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
             pass
 
 class GannThreeSellCustomizer(BaseGraphCustomizer):
