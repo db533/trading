@@ -194,8 +194,8 @@ class GannPointOneBuy(BaseStrategy):
                 rise_after_retracement_percent_of_retracement = rise_after_retracement * 100 / price_retracement
                 data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
                         'retracement_as_percent': str(retracement_as_percent), 'elapsed__duration': str(elapsed__duration),
-                        'rise_after_retracement' : rise_after_retracement, 'recent_swing_points' : recent_swing_points,
-                        'rise_after_retracement_percent_of_retracement' : rise_after_retracement_percent_of_retracement } # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
+                        'rise_after_retracement_percent_of_retracement' : str(rise_after_retracement_percent_of_retracement) } # recent_swing_points not as a string as it gets removed and accessed if present.
                 action_buy = True
             else:
                 # Strategy is not valid
