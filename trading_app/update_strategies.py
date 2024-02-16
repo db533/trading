@@ -115,34 +115,6 @@ def instance_difference_count(ticker, earlier_candle, later_candle=None):
         count = DailyPrice.objects.filter(ticker=ticker).filter(datetime__gt=earlier_dt).count()
     return count
 
-def instance_price_difference_upswing(ticker, earlier_candle, later_candle=None):
-    earlier_price = earlier_candle.low_price
-    if later_candle is not None:
-        later_price = later_candle.high_price
-        price_difference = later_price - earlier_price
-        logger.error(
-            f'instance_price_difference_upswing. earlier_price = {earlier_price}, later_price = {later_price}, price_difference = {price_difference}')
-    else:
-        most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-        price_difference = most_recent_price.high_price - earlier_price
-        logger.error(
-            f'instance_price_difference_upswing. earlier_price = {earlier_price}, most_recent_price.high_price = {most_recent_price.high_price}, price_difference = {price_difference}')
-    return price_difference
-
-def instance_price_difference_downswing(ticker, earlier_candle, later_candle=None):
-    earlier_price = earlier_candle.high_price
-    if later_candle is not None:
-        later_price = later_candle.low_price
-        price_difference = later_price - earlier_price
-        logger.error(
-            f'instance_price_difference_downswing. earlier_price = {earlier_price}, later_price = {later_price}, price_difference = {price_difference}')
-    else:
-        most_recent_price = latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-        price_difference = most_recent_price.low_price - earlier_price
-        logger.error(
-            f'instance_price_difference_downswing. earlier_price = {earlier_price}, most_recent_price.low_price = {most_recent_price.low_price}, price_difference = {price_difference}')
-    return price_difference
-
 def swing_point_price_difference(ticker, earlier_sp, later_sp=None):
     earlier_sp_price = earlier_sp.price
     if later_sp is not None:
@@ -222,7 +194,8 @@ class GannPointOneBuy(BaseStrategy):
                 rise_after_retracement_percent_of_retracement = rise_after_retracement * 100 / price_retracement
                 data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
                         'retracement_as_percent': str(retracement_as_percent), 'elapsed__duration': str(elapsed__duration),
-                        'rise_after_retracement' : rise_after_retracement, 'rise_after_retracement_percent_of_retracement' : rise_after_retracement_percent_of_retracement } # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'rise_after_retracement' : rise_after_retracement, 'recent_swing_points' : recent_swing_points,
+                        'rise_after_retracement_percent_of_retracement' : rise_after_retracement_percent_of_retracement } # recent_swing_points not as a string as it gets removed and accessed if present.
                 action_buy = True
             else:
                 # Strategy is not valid
