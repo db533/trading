@@ -1024,7 +1024,7 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
                 va='bottom')
 
         # Draw vertical line from retracement sp
-        self.draw_vertical_line(self, ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3])
+        self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3])
         label_price = swing_point_price_list[-3]
         label_date = swing_point_date_list[-3] + (swing_point_date_list[-1] - swing_point_date_list[-3])/2
         ax.text(label_date, label_price, f"t={elapsed__duration}", fontsize=9, ha='center',
