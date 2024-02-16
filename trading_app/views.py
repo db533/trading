@@ -1030,12 +1030,6 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         ax.text(label_date, label_price, f"t={elapsed__duration}", fontsize=9, ha='center',
                 va='bottom')
 
-        label_price = swing_point_price_list[-3]
-        label_date = swing_point_date_list[-1] + elapsed__duration / 2
-        ax.text(label_date, label_price, f"+{rise_after_retracement}", fontsize=9, ha='center',
-                va='bottom')
-
-
     def draw_vertical_line(self, ax, date, start_price, min_price):
         # Draw a line between (date, start_price) and (date, min_price)
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
