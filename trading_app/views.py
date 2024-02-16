@@ -1007,13 +1007,13 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
             swing_point_date_list.append(swing_point.date)
 
         # Draw horizontal line to left of retracement sp
-        self.draw_horizontal_line(ax, swing_point_price_list[-1], swing_point_date_list[-3], swing_point_date_list[-1])
+        self.draw_horizontal_line(ax, swing_point_date_list[-3], swing_point_date_list[-1], swing_point_price_list[-1])
         label_price = swing_point_price_list[-3]  + (swing_point_price_list[-1]- swing_point_price_list[-3]) /2
         label_date = swing_point_date_list[-3]
         ax.text(label_date, label_price, f"{round(sp_price_diff_vs_prior_high, 2)}", fontsize=9, ha='center', va='bottom')
 
         # Draw horizontal line to right of peak sp
-        self.draw_horizontal_line(ax, swing_point_price_list[-2], swing_point_date_list[-2], swing_point_date_list[-1])
+        self.draw_horizontal_line(ax, swing_point_date_list[-2], swing_point_date_list[-1], swing_point_price_list[-2])
         label_price = swing_point_price_list[-1] + (swing_point_price_list[-2] - swing_point_price_list[-1]) / 2
         label_date = swing_point_date_list[-1]
         ax.text(label_date, label_price, f"{round(price_retracement, 2)}", fontsize=9, ha='center',
