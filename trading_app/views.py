@@ -841,6 +841,14 @@ STRATEGY_METRICS_LABELS = {
       'tops': 'Number of peaks',
       'tops_duration': 'Duration between first and last peak',
     },
+    "Gann's Buying point #1" : {
+        'sp_price_diff_vs_prior_high' : 'Price difference between pullback and prior HL',
+        'price_retracement' : 'Price retracement from HH',
+        'retracement_as_percent' : 'Retracement as % of rise to HH',
+        'elapsed__duration' : 'Duration between prior HL and recent swingpoint',
+        'rise_after_retracement' : 'Price rise after retracement swingpoint',
+        'rise_after_retracement_percent_of_retracement' : 'Rise after retracement as % of retracement',
+    }
 
 }
 
