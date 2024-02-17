@@ -265,7 +265,7 @@ class GannPointOneSell(BaseStrategy):
                 elapsed__duration = instance_difference_count(self.ticker, prior_lh_sp.price_object, later_candle=last_sp.price_object)
                 sp_price_diff_vs_prior_low =  last_sp_price-prior_lh_price
                 price_retracement = last_sp_price - trough_sp_price
-                retracement_as_percent = price_retracement * 100 / (trough_sp_price - prior_lh_price)
+                retracement_as_percent = price_retracement * 100 / (prior_lh_price - trough_sp_price)
                 fall_after_retracement = latest_price.close_price - last_sp_price
                 fall_after_retracement_percent_of_retracement = fall_after_retracement * 100 / (-price_retracement)
                 data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_low), 'price_retracement': str(price_retracement),
