@@ -1030,6 +1030,7 @@ class GannPointNineBuy(BaseStrategy):
             latest_T = 0
             recent_swing_points = []
             sections = 0
+            pattern_detected = False
             most_recent_hh_price = None
             for swing_point in swing_point_query:
                 # Check first is a HL
@@ -1085,7 +1086,6 @@ class GannPointNineBuy(BaseStrategy):
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 peak_before_two_day_retracement = None
                 low_after_two_day_retracement = None
-                pattern_detected = False
                 for price in prices:
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
                         # price has closed above the previous HH swingpoint.
@@ -1161,6 +1161,7 @@ class GannPointNineSell(BaseStrategy):
             #latest_T = 0
             recent_swing_points = []
             sections = 0
+            pattern_detected = False
             most_recent_ll_price = None
             for swing_point in swing_point_query:
                 # Check first is a LH
@@ -1216,7 +1217,6 @@ class GannPointNineSell(BaseStrategy):
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 trough_before_two_day_retracement = None
                 high_after_two_day_retracement = None
-                pattern_detected = False
                 for price in prices:
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
                         # price has closed above the previous HH swingpoint.
