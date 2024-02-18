@@ -1090,6 +1090,7 @@ class GannPointNineBuy(BaseStrategy):
                 for price in prices:
                     #print('price.close_price:', price.close_price, 'type(price.close_price):',
                     #      type(price.close_price))
+                    print('most_recent_hh_price:', most_recent_hh_price, 'price.close_price:', price.close_price)
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
                         # price has closed above the previous HH swingpoint.
                         hh_price_exceeded = True
@@ -1099,6 +1100,8 @@ class GannPointNineBuy(BaseStrategy):
                     else:
                         # Price exceeded the prior HH. Start looking for the pattern.
                         #if price.high_price > prev_high_price: and price.low_price > prev_low_price:
+                        print('prev_low_price:', prev_low_price, 'price.low_price:',
+                              price.low_price)
                         if prev_low_price is None or price.low_price > prev_low_price:
                             # Higher candle
                             if len(pattern) == 0:
@@ -1109,6 +1112,7 @@ class GannPointNineBuy(BaseStrategy):
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous H still true...")
                                 pattern_detected = True
+                            prev_low_price = price.low_price
                         elif price.low_price < prev_low_price:
                             # Lower candle
                             if (len(pattern) == 1 and pattern[0] == 'higher') or (len(pattern) == 2 and pattern[1] == 'lower'):
@@ -1122,6 +1126,7 @@ class GannPointNineBuy(BaseStrategy):
                                 peak_before_two_day_retracement = None
                                 low_after_two_day_retracement = None
                                 pattern = []
+                            prev_low_price = price.low_price
                         else:
                             # Either high or low not matching expected pattern.
                             pattern_detected = False
@@ -1129,6 +1134,7 @@ class GannPointNineBuy(BaseStrategy):
                             peak_before_two_day_retracement = None
                             low_after_two_day_retracement = None
                             pattern = []
+                            prev_low_price = price.low_price
 
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
@@ -1221,6 +1227,7 @@ class GannPointNineSell(BaseStrategy):
                 trough_before_two_day_retracement = None
                 high_after_two_day_retracement = None
                 for price in prices:
+                    print('most_recent_ll_price:', most_recent_ll_price, 'price.low_price:',price.low_price )
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
                         # price has closed above the previous HH swingpoint.
                         ll_price_exceeded = True
@@ -1229,6 +1236,7 @@ class GannPointNineSell(BaseStrategy):
                         logger.error(f'Price is below the previous LL. Checking individual price candles.')
                     else:
                         # Price went below prior LL. Start looking for the pattern.
+                        print('prev_high_price:', prev_high_price, 'price.high_price:', price.high_price)
                         if prev_high_price is None or price.high_price < prev_high_price:
                             # Lower candle
                             if len(pattern) == 0:
@@ -1239,6 +1247,7 @@ class GannPointNineSell(BaseStrategy):
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous L still true...")
                                 pattern_detected = True
+                            prev_high_price = price.high_price
                         elif price.high_price > prev_high_price:
                             # Higher candle
                             if (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher'):
@@ -1252,6 +1261,7 @@ class GannPointNineSell(BaseStrategy):
                                 trough_before_two_day_retracement = None
                                 high_after_two_day_retracement = None
                                 pattern = []
+                            prev_high_price = price.high_price
                         else:
                             # Either high or low not matching expected pattern.
                             pattern_detected = False
@@ -1259,6 +1269,7 @@ class GannPointNineSell(BaseStrategy):
                             peak_before_two_day_retracement = None
                             low_after_two_day_retracement = None
                             pattern = []
+                            prev_high_price = price.high_price
 
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
@@ -1313,6 +1324,12 @@ def process_trading_opportunities():
                         del data['recent_swing_points']
                     else:
                         recent_swing_points_exist = False
+                    if 'peak_before_two_day_retracement' in date:
+                        peak_before_two_day_retracement = data['peak_before_two_day_retracement']
+                        low_after_two_day_retracement = data['low_after_two_day_retracement']
+                        del data['peak_before_two_day_retracement']
+                        del data['low_after_two_day_retracement']
+
                     if existing_tradingopp is not None:
                         logger.error(f'Existing TradingOpp being updated...')
                         # This Ticker / strategy exists as an active record. Increment the count.
