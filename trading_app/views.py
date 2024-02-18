@@ -1095,11 +1095,6 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
-
-class GannOneSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
-            pass
-
 class GannThreeSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannThreeSellCustomizer()...')
