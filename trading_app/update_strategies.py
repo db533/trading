@@ -1094,7 +1094,7 @@ class GannPointNineBuy(BaseStrategy):
                         prev_low_price = price.low_price
                         prev_high_price = price.high_price
                         logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
-                    else:
+                    elif hh_price_exceeded == True:
                         # Price exceeded the prior HH. Start looking for the pattern.
                         #if price.high_price > prev_high_price: and price.low_price > prev_low_price:
                         print(price.datetime, 'prev_low_price:', prev_low_price, 'price.low_price:',
@@ -1231,7 +1231,7 @@ class GannPointNineSell(BaseStrategy):
                         prev_low_price = price.low_price
                         prev_high_price = price.high_price
                         logger.error(f'Price is below the previous LL. Checking individual price candles.')
-                    else:
+                    elif ll_price_exceeded == True:
                         # Price went below prior LL. Start looking for the pattern.
                         print(price.datetime, 'prev_high_price:', prev_high_price, 'price.high_price:', price.high_price)
                         if prev_high_price is None or price.high_price < prev_high_price:
