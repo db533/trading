@@ -1140,7 +1140,6 @@ class GannPointNineBuy(BaseStrategy):
             else:
                 data = {}
                 action_buy = None
-            logger.error(f'Latest T: {latest_T}.')
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
@@ -1271,7 +1270,6 @@ class GannPointNineSell(BaseStrategy):
             else:
                 data = {}
                 action_buy = None
-            logger.error(f'Latest T: {latest_T}.')
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
