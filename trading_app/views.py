@@ -1445,6 +1445,9 @@ class GannEightCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         print('Starting GannEightCustomizer()...')
 
+        duration_after_latest_sp = int(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
+        print('duration_after_latest_sp:', duration_after_latest_sp)
+
         # Find min / max price for drawing lines
         price_list = [swing_point.price for swing_point in swing_points]
         min_price = min(price_list)
@@ -1464,6 +1467,19 @@ class GannEightCustomizer(BaseGraphCustomizer):
             self.draw_horizontal_line(ax, min_date, max_date, max_price)
         except Exception as e:
             print(f"Error drawing lines: {e}")
+
+
+        # Draw a line from most recent sp up to HH level. Add time to most recent price.
+        if float(most_recent_price) > price_list[-1] :
+            # Buy strategy.
+            self.draw_vertical_line(ax, date_list[-1], price_list[-1],float(most_recent_price))
+            self.draw_vertical_line(ax, most_recent_date, float(most_recent_price),price_list[-1])
+            label_price = price_list[-1] + offset_up
+            label_date = date_list[-1] + (most_recent_date - date_list[-1]) / 2
+            ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
+                    va='bottom')
+
+
 
     def draw_horizontal_line(self, ax, date1, date2, price):
         # Draw a line between (date1, price) and (date2, price)
