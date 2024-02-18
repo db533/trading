@@ -1015,6 +1015,8 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         print('elapsed__duration:', elapsed__duration)
         rise_after_retracement = float(trading_opp.metrics_snapshot.get('rise_after_retracement'))
         print('rise_after_retracement:', rise_after_retracement)
+        duration_after_latest_sp = int(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
+        print('duration_after_latest_sp:', duration_after_latest_sp)
         swing_point_price_list = []
         swing_point_date_list = []
         swing_point_counter = 0
@@ -1072,7 +1074,7 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
         print('elapsed__duration:', elapsed__duration)
         fall_after_retracement = float(trading_opp.metrics_snapshot.get('fall_after_retracement'))
         print('fall_after_retracement:', fall_after_retracement)
-        duration_after_latest_sp = int(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
+        duration_after_latest_sp = float(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
         print('duration_after_latest_sp:', duration_after_latest_sp)
 
         swing_point_price_list = []
@@ -1109,7 +1111,7 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
                             min(swing_point_price_list[-1] + offset_up, swing_point_price_list[-1]))
         label_price = most_recent_price + offset_down
         label_date = swing_point_date_list[-1] + (most_recent_date - swing_point_date_list[-1]) / 2
-        ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
+        ax.text(label_date, label_price, f"t={duration_after_latest_sp}", fontsize=9, ha='center',
                 va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):

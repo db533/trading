@@ -203,6 +203,7 @@ class GannPointOneBuy(BaseStrategy):
                     action_buy = True
                 else:
                     # Strategy is not valid
+                    logger.error(f'Time since last SP > 5. Strategy not valid.')
                     action_buy = None
             else:
                 # Strategy is not valid
@@ -286,6 +287,7 @@ class GannPointOneSell(BaseStrategy):
                             'duration_after_latest_sp' : str(duration_after_latest_sp)}
                 else:
                     # Strategy is not valid
+                    logger.error(f'Time since last SP > 5. Strategy not valid.')
                     action_buy = None
 
             else:
