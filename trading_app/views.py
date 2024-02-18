@@ -1091,16 +1091,16 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
                 va='bottom')
 
         # Draw vertical line from retracement sp
-        self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3])
+        self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3] + offset_up)
         label_price = swing_point_price_list[-3] + offset_down
         label_date = swing_point_date_list[-3] + (swing_point_date_list[-1] - swing_point_date_list[-3])/2
         ax.text(label_date, label_price, f"t={round(elapsed__duration,0)}", fontsize=9, ha='center',
                 va='bottom')
 
         # Draw a line from most recent sp down to LL level. Add time to most recent price.
-        self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1] * 0.9,
-                            min(swing_point_price_list[-1] * 1.1, swing_point_price_list[-1]))
-        label_price = swing_point_price_list[-2] + offset_down
+        self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1] + offset_down,
+                            min(swing_point_price_list[-1] + offset_up, swing_point_price_list[-1]))
+        label_price = most_recent_price + offset_down
         label_date = swing_point_date_list[-1] + (most_recent_date - swing_point_date_list[-1]) / 2
         ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
                 va='bottom')
