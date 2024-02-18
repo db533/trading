@@ -1144,7 +1144,7 @@ class GannPointNineBuy(BaseStrategy):
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
-            print(f"Error in Gann #9 Buying for {ticker.symbol}: {e}")
+            print(f"Error in Gann #9 Buying for {self.ticker.symbol}: {e}")
 
 class GannPointNineSell(BaseStrategy):
     name="Gann's Selling point #9"
@@ -1275,7 +1275,7 @@ class GannPointNineSell(BaseStrategy):
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
-            print(f"Error in Gann #9 Sellining for {ticker.symbol}: {e}")
+            print(f"Error in Gann #9 Sellining for {self.ticker.symbol}: {e}")
 
 
 from django.utils import timezone
