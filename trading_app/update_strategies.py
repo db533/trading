@@ -1086,7 +1086,10 @@ class GannPointNineBuy(BaseStrategy):
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 peak_before_two_day_retracement = None
                 low_after_two_day_retracement = None
+                #print('most_recent_hh_price:', most_recent_hh_price, 'type(most_recent_hh_price):', type(most_recent_hh_price))
                 for price in prices:
+                    #print('price.close_price:', price.close_price, 'type(price.close_price):',
+                    #      type(price.close_price))
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
                         # price has closed above the previous HH swingpoint.
                         hh_price_exceeded = True
@@ -1096,7 +1099,7 @@ class GannPointNineBuy(BaseStrategy):
                     else:
                         # Price exceeded the prior HH. Start looking for the pattern.
                         #if price.high_price > prev_high_price: and price.low_price > prev_low_price:
-                        if price.low_price > prev_low_price:
+                        if prev_low_price is None or price.low_price > prev_low_price:
                             # Higher candle
                             if len(pattern) == 0:
                                 pattern = ['higher']
@@ -1226,7 +1229,7 @@ class GannPointNineSell(BaseStrategy):
                         logger.error(f'Price is below the previous LL. Checking individual price candles.')
                     else:
                         # Price went below prior LL. Start looking for the pattern.
-                        if price.high_price < prev_high_price:
+                        if prev_high_price is None or price.high_price < prev_high_price:
                             # Lower candle
                             if len(pattern) == 0:
                                 pattern = ['lower']
