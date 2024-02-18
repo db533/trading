@@ -1470,6 +1470,7 @@ class GannEightCustomizer(BaseGraphCustomizer):
 
 
         # Draw a line from most recent sp up to HH level. Add time to most recent price.
+        print('date_list[-1]:', date_list[-1], 'date_list[-2]:', date_list[-2])
         self.draw_vertical_line(ax, date_list[-2], price_list[-1], float(most_recent_price))
         self.draw_vertical_line(ax, most_recent_date, float(most_recent_price), price_list[-1])
         label_price = float(price_list[-1]) + offset_up
