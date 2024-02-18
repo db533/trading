@@ -1092,7 +1092,6 @@ class GannPointNineBuy(BaseStrategy):
                         # price has closed above the previous HH swingpoint.
                         hh_price_exceeded = True
                         prev_low_price = price.low_price
-                        prev_high_price = price.high_price
                         logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
                     elif hh_price_exceeded == True:
                         # Price exceeded the prior HH. Start looking for the pattern.
@@ -1101,14 +1100,21 @@ class GannPointNineBuy(BaseStrategy):
                               price.low_price)
                         if prev_low_price is None or price.low_price > prev_low_price:
                             # Higher candle
+                            if len(pattern) == 3:
+                                logger.error(f"Continuous H still true...")
+                                pattern_detected = True
+                            elif len(pattern) < 3:
+                                # Expected a lower candle, got a higher.
+                                pattern_detected = False
+                                logger.error(f"Got Higher, expected a lower. Restarting search for pattern.")
+                                peak_before_two_day_retracement = None
+                                low_after_two_day_retracement = None
+                                pattern = []
                             if len(pattern) == 0:
                                 pattern = ['higher']
                                 logger.error(f'First H found... pattern: {pattern}')
                                 # Save current candle as the peak in case the pattern is found
                                 peak_before_two_day_retracement = price
-                            elif len(pattern) == 3:
-                                logger.error(f"Continuous H still true...")
-                                pattern_detected = True
                             prev_low_price = price.low_price
                         elif price.low_price < prev_low_price:
                             # Lower candle
@@ -1236,14 +1242,21 @@ class GannPointNineSell(BaseStrategy):
                         print(price.datetime, 'prev_high_price:', prev_high_price, 'price.high_price:', price.high_price)
                         if prev_high_price is None or price.high_price < prev_high_price:
                             # Lower candle
+                            if len(pattern) < 3:
+                                logger.error(f"Expected a higher, got a lower price.")
+                                pattern_detected = False
+                                trough_before_two_day_retracement = None
+                                high_after_two_day_retracement = None
+                                pattern = []
+                            elif len(pattern) == 3:
+                                logger.error(f"Continuous L still true...")
+                                pattern_detected = True
                             if len(pattern) == 0:
                                 pattern = ['lower']
                                 logger.error(f'First L found... pattern: {pattern}')
                                 # Save current candle as the peak in case the pattern is found
                                 trough_before_two_day_retracement = price
-                            elif len(pattern) == 3:
-                                logger.error(f"Continuous L still true...")
-                                pattern_detected = True
+
                             prev_high_price = price.high_price
                         elif price.high_price > prev_high_price:
                             # Higher candle
