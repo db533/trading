@@ -1095,7 +1095,8 @@ class GannPointNineBuy(BaseStrategy):
                         logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
                     else:
                         # Price exceeded the prior HH. Start looking for the pattern.
-                        if price.high_price > prev_high_price and price.low_price > prev_low_price:
+                        #if price.high_price > prev_high_price: and price.low_price > prev_low_price:
+                        if price.low_price > prev_low_price:
                             # Higher candle
                             if len(pattern) == 0:
                                 pattern = ['higher']
@@ -1105,7 +1106,7 @@ class GannPointNineBuy(BaseStrategy):
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous H still true...")
                                 pattern_detected = True
-                        elif price.high_price < prev_high_price and price.low_price < prev_low_price:
+                        elif price.low_price < prev_low_price:
                             # Lower candle
                             if (len(pattern) == 1 and pattern[0] == 'higher') or (len(pattern) == 2 and pattern[1] == 'lower'):
                                 pattern.append('lower')
@@ -1121,7 +1122,7 @@ class GannPointNineBuy(BaseStrategy):
                         else:
                             # Either high or low not matching expected pattern.
                             pattern_detected = False
-                            logger.error(f"Either both high and low are not higher or are not lower. Pattern broken.")
+                            logger.error(f"Either low is unchanged. Pattern broken.")
                             peak_before_two_day_retracement = None
                             low_after_two_day_retracement = None
                             pattern = []
@@ -1145,6 +1146,138 @@ class GannPointNineBuy(BaseStrategy):
         except Exception as e:
             print(f"Error in Gann #9 Buying for {ticker.symbol}: {e}")
 
+class GannPointNineSell(BaseStrategy):
+    name="Gann's Selling point #9"
+
+    def check_criteria(self):
+        try:
+            data = {}
+            action_buy = None
+            # Access the latest DailyPrice (or other relevant price model) for the ticker
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+
+            latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            swing_point_counter = 1
+            T_prev = []
+            #latest_T = 0
+            recent_swing_points = []
+            sections = 0
+            most_recent_ll_price = None
+            for swing_point in swing_point_query:
+                # Check first is a LH
+                logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
+                if swing_point_counter == 1:
+                    if swing_point.label == 'LH':
+                        logger.error(f'Detected first swingpoint. LH')
+                        last_sp = swing_point
+                        recent_swing_points.append(swing_point)
+                    else:
+                        # This strategy cannot be true. End review of swing points.
+                        logger.error(f'First swingpoint not LH. Strategy not valid.')
+                        break
+                    # Now need to determine the elapsed days since this LL or HH.
+                    #latest_T = instance_difference_count(self.ticker, swing_point.price_object)
+                    most_recent_label = 'LH'
+                    swing_point_counter += 1
+                elif swing_point_counter >1:
+                    if swing_point.label == 'LL' and most_recent_label == 'LH':
+                        # Swing point is a low.
+                        # Save the number of days that that it took to reach this swing point.
+                        logger.error(f'Found a prior {swing_point.label}.')
+                        #T_prev.append(swing_point.candle_count_since_last_swing_point)
+                        most_recent_label = 'LL'
+                        recent_swing_points.append(swing_point)
+                        sections += 1
+                        if most_recent_ll_price is None:
+                            most_recent_ll_price = swing_point.price
+                    elif swing_point.label == 'LH' and most_recent_label == 'LL':
+                        logger.error(f'Found a prior {swing_point.label}. Another trough in the sequence.')
+                        most_recent_label = 'LL'
+                        recent_swing_points.append(swing_point)
+                    else :
+                        # This must be the start of the prior up trend.
+                        # Stop checking further swing points.
+                        logger.error(f'Found a prior {swing_point.label}. Sections: {sections}.')
+                        first_sp = swing_point
+                        recent_swing_points.append(swing_point)
+                        break
+                    swing_point_counter += 1
+            if sections > 1:
+                # At least 2 sections in most recent trend. So should analyse price movements from most recent swingpoint to most recent price
+                # Does the most recent HH get broken?
+                # Yes, then do we have 2 down candles followed by up candle.
+                # Then check we have no close with a lower low.
+                logger.error(f'Found sufficient sections to analyse recent price action.')
+                # Get the candles to be analysed.
+                prices = DailyPrice.objects.filter(ticker=self.ticker, datetime__gt=last_sp.price_object.datetime).order_by('datetime')
+                ll_price_exceeded = False
+                # Initialize variables
+                prev_high_price = None
+                prev_low_price = None
+                pattern = []  # To track the pattern (higher, lower, lower, higher)
+                trough_before_two_day_retracement = None
+                high_after_two_day_retracement = None
+                pattern_detected = False
+                for price in prices:
+                    if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
+                        # price has closed above the previous HH swingpoint.
+                        ll_price_exceeded = True
+                        prev_low_price = price.low_price
+                        prev_high_price = price.high_price
+                        logger.error(f'Price is below the previous LL. Checking individual price candles.')
+                    else:
+                        # Price went below prior LL. Start looking for the pattern.
+                        if price.high_price < prev_high_price:
+                            # Lower candle
+                            if len(pattern) == 0:
+                                pattern = ['lower']
+                                logger.error(f'First L found... pattern: {pattern}')
+                                # Save current candle as the peak in case the pattern is found
+                                trough_before_two_day_retracement = price
+                            elif len(pattern) == 3:
+                                logger.error(f"Continuous L still true...")
+                                pattern_detected = True
+                        elif price.high_price > prev_high_price:
+                            # Higher candle
+                            if (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher'):
+                                pattern.append('higher')
+                                logger.error(f'H found... pattern: {pattern}')
+                                # Save current candle as might be the 2-day retracement candle.
+                                high_after_two_day_retracement = price
+                            elif pattern_detected:
+                                pattern_detected = False
+                                logger.error(f"Found H when expecting continuous L's. Pattern broken.")
+                                trough_before_two_day_retracement = None
+                                high_after_two_day_retracement = None
+                                pattern = []
+                        else:
+                            # Either high or low not matching expected pattern.
+                            pattern_detected = False
+                            logger.error(f"High is unchanged. Pattern broken.")
+                            peak_before_two_day_retracement = None
+                            low_after_two_day_retracement = None
+                            pattern = []
+
+            if sections > 1 and pattern_detected == True:
+                logger.error(f'Strategy confirmed to be valid.')
+                action_buy = True
+
+                #prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+                #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
+                #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                #                                                     later_candle=latest_price)
+                data = {'peak_before_two_day_retracement': peak_before_two_day_retracement, 'low_after_two_day_retracement': low_after_two_day_retracement,
+                        'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
+            else:
+                data = {}
+                action_buy = None
+            logger.error(f'Latest T: {latest_T}.')
+            logger.error(f'........')
+            return action_buy, data
+        except Exception as e:
+            print(f"Error in Gann #9 Sellining for {ticker.symbol}: {e}")
+
+
 from django.utils import timezone
 
 def process_trading_opportunities():
@@ -1153,7 +1286,7 @@ def process_trading_opportunities():
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy, GannPointEightSell,
-                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy]  # List of strategy classes
+                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy, GannPointNineSell]  # List of strategy classes
 
 
     try:
