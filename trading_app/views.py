@@ -1049,7 +1049,7 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         # Draw a line from most recent sp up to HH level. Add time to most recent price.
         self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1],swing_point_price_list[-2] + offset_up)
         self.draw_vertical_line(ax, most_recent_date, float(most_recent_price),swing_point_price_list[-3] + offset_down)
-        label_price = swing_point_price_list[-3] + offset_down
+        label_price = swing_point_price_list[-3] + (offset_down * 2)
         label_date = swing_point_date_list[-1] + (most_recent_date - swing_point_date_list[-1]) / 2
         ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
                 va='bottom')
