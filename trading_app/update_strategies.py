@@ -1058,14 +1058,14 @@ class GannPointNineBuy(BaseStrategy):
                         sections += 1
                         if most_recent_hh_price is None:
                             most_recent_hh_price = swing_point.price
-                    elif swing_point.label == 'HH' and most_recent_label == 'HL':
-                        logger.error(f'Found a prior {swing_point.label}.')
+                    elif swing_point.label == 'HL' and most_recent_label == 'HH':
+                        logger.error(f'Found a prior {swing_point.label}. Another peak in the sequence.')
                         most_recent_label = 'HH'
                         recent_swing_points.append(swing_point)
-                    elif swing_point.label == 'LL' or swing_point.label == 'LH':
+                    else :
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
-                        logger.error(f'Found a prior {swing_point.label}. So uptrend started here.')
+                        logger.error(f'Found a prior {swing_point.label}. Sections: {sections}.')
                         first_sp = swing_point
                         recent_swing_points.append(swing_point)
                         break
@@ -1075,7 +1075,7 @@ class GannPointNineBuy(BaseStrategy):
                 # Does the most recent HH get broken?
                 # Yes, then do we have 2 down candles followed by up candle.
                 # Then check we have no close with a lower low.
-
+                logger.error(f'Found sufficient sections to analyse recent price action.')
                 # Get the candles to be analysed.
                 prices = DailyPrice.objects.filter(ticker=self.ticker, datetime__gt=last_sp.price_object.datetime).order_by('datetime')
                 hh_price_exceeded = False
