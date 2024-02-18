@@ -1470,15 +1470,22 @@ class GannEightCustomizer(BaseGraphCustomizer):
 
 
         # Draw a line from most recent sp up to HH level. Add time to most recent price.
+        self.draw_vertical_line(ax, date_list[-1], price_list[-1], float(most_recent_price))
+        self.draw_vertical_line(ax, most_recent_date, float(most_recent_price), price_list[-1])
+        label_price = price_list[-1] + offset_up
+        label_date = date_list[-1] + (most_recent_date - date_list[-1]) / 2
+        ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
+                va='bottom')
         if float(most_recent_price) > price_list[-1] :
             # Buy strategy.
-            self.draw_vertical_line(ax, date_list[-1], price_list[-1],float(most_recent_price))
-            self.draw_vertical_line(ax, most_recent_date, float(most_recent_price),price_list[-1])
-            label_price = price_list[-1] + offset_up
-            label_date = date_list[-1] + (most_recent_date - date_list[-1]) / 2
-            ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
-                    va='bottom')
+            pass
+        else:
+            # Sell strategy.
+            pass
 
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 
     def draw_horizontal_line(self, ax, date1, date2, price):
