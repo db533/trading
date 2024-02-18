@@ -939,13 +939,13 @@ def trading_opps_sorted_view(request):
 
     return render(request, 'trading_opp_sorted_list.html', context)
 class BaseGraphCustomizer:
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         # Base customization logic (if any)
         pass
 
 
 class GannThreeBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannThreeBuyCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         max_P = float(trading_opp.metrics_snapshot.get('max_P'))
@@ -1004,7 +1004,7 @@ class GannThreeBuyCustomizer(BaseGraphCustomizer):
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannOneBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannOneBuyCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         sp_price_diff_vs_prior_high = float(trading_opp.metrics_snapshot.get('sp_price_diff_vs_prior_high'))
@@ -1053,7 +1053,7 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannOneSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannOneSellCustomizer()...')
 
         # Get metrics from trading_opp's metrics_snapshot
@@ -1092,7 +1092,7 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
 
         # Draw vertical line from retracement sp
         self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1], swing_point_price_list[-3])
-        label_price = swing_point_price_list[-3]
+        label_price = swing_point_price_list[-3] + offset_down
         label_date = swing_point_date_list[-3] + (swing_point_date_list[-1] - swing_point_date_list[-3])/2
         ax.text(label_date, label_price, f"t={round(elapsed__duration,0)}", fontsize=9, ha='center',
                 va='bottom')
@@ -1100,7 +1100,7 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
         # Draw a line from most recent sp down to LL level. Add time to most recent price.
         self.draw_vertical_line(ax, swing_point_date_list[-1], swing_point_price_list[-1] * 0.9,
                             min(swing_point_price_list[-1] * 1.1, swing_point_price_list[-1]))
-        label_price = swing_point_price_list[-2]
+        label_price = swing_point_price_list[-2] + offset_down
         label_date = swing_point_date_list[-1] + (most_recent_date - swing_point_date_list[-1]) / 2
         ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
                 va='bottom')
@@ -1114,7 +1114,7 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannThreeSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannThreeSellCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         min_P = float(trading_opp.metrics_snapshot.get('min_P'))
@@ -1184,7 +1184,7 @@ class GannThreeSellCustomizer(BaseGraphCustomizer):
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
 class GannFourBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         print('Starting GannFourBuyCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
         max_T = int(trading_opp.metrics_snapshot.get('max_T'))
@@ -1246,7 +1246,7 @@ class GannFourBuyCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 class GannFourSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         print('Starting GannFourSellCustomizer()...')
         # Extract max_T from trading_opp's metrics_snapshot
         max_T = int(trading_opp.metrics_snapshot.get('max_T'))
@@ -1308,7 +1308,7 @@ class GannFourSellCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 class GannFiveBuyCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         print('Starting GannFiveBuyCustomizer()...')
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
@@ -1369,7 +1369,7 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 class GannFiveSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannFiveBuyCustomizer()...')
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         hl_swing_point = None
@@ -1431,7 +1431,7 @@ class GannFiveSellCustomizer(BaseGraphCustomizer):
         ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 class GannEightCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         print('Starting GannEightCustomizer()...')
 
         # Find min / max price for drawing lines
@@ -1564,7 +1564,7 @@ def generate_swing_point_graph_view(request, opp_id):
     customizer = get_graph_customizer(trading_strategy)
 
     # Apply customizations
-    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date,metrics_snapshot)
+    customizer.customize_graph(ax, opp, swing_points, most_recent_price, most_recent_date,metrics_snapshot, offset_up, offset_down)
 
     ax.set_xticks([])  # Optionally hide x-axis labels
     ax.set_yticks([])  # Optionally hide y-axis labels
