@@ -1127,7 +1127,7 @@ class GannPointNineBuy(BaseStrategy):
                             low_after_two_day_retracement = None
                             pattern = []
 
-            if sections > 1 and pattern_detected == True:
+            if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
                 action_buy = True
 
@@ -1257,7 +1257,7 @@ class GannPointNineSell(BaseStrategy):
                             low_after_two_day_retracement = None
                             pattern = []
 
-            if sections > 1 and pattern_detected == True:
+            if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
                 action_buy = True
 
