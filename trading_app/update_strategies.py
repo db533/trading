@@ -187,6 +187,8 @@ class GannPointOneBuy(BaseStrategy):
             if prior_hl_sp is not None and latest_price.close_price > last_sp_price:
                 action_buy = True
                 elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp.price_object, later_candle=last_sp.price_object)
+                duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                     later_candle=latest_price)
                 sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
                 price_retracement = last_sp_price - peak_sp_price
                 retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
@@ -195,7 +197,8 @@ class GannPointOneBuy(BaseStrategy):
                 data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
                         'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
                         'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
-                        'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)) } # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)),
+                        'duration_after_latest_sp' : str(duration_after_latest_sp)} # recent_swing_points not as a string as it gets removed and accessed if present.
                 action_buy = True
             else:
                 # Strategy is not valid
@@ -305,6 +308,7 @@ class GannPointFourBuy2(BaseStrategy):
                     if swing_point.label == 'LL':
                         logger.error(f'Detected first swingpoint. LL')
                         last_candle = swing_point.price_object
+                        last_sp = swing_point
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
@@ -348,9 +352,11 @@ class GannPointFourBuy2(BaseStrategy):
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
                 final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
+                duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                     later_candle=latest_price)
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'final_upswing_size' : str(final_upswing_size)} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp)} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_T}.')
             else:
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
@@ -381,6 +387,7 @@ class GannPointFourSell(BaseStrategy):
                 if swing_point.label == 'HH':
                     logger.error(f'Detected first swingpoint. HH')
                     last_candle = swing_point.price_object
+                    last_sp = swing_point
                     recent_swing_points.append(swing_point)
                 else:
                     # This strategy cannot be true. End review of swing points.
@@ -422,12 +429,15 @@ class GannPointFourSell(BaseStrategy):
                 logger.error(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
                 action_buy = None
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                 later_candle=latest_price)
             final_downswing_size = round((swing_point.price - latest_price.close_price) / swing_point.price, 3)
             data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)),
                     'count_T_prev': str(len(T_prev)),
                     'prior_trend_duration': str(prior_trend_duration),
                     'recent_swing_points': recent_swing_points,  # recent_swing_points not as a string as it gets removed and accessed if present.
-                    'final_downswing_size': str(final_downswing_size)
+                    'final_downswing_size': str(final_downswing_size),
+                    'duration_after_latest_sp' : str(duration_after_latest_sp)
                     }
             logger.error(f'Max T during prior series of swings: {max_T}.')
         else:
@@ -458,6 +468,7 @@ class GannPointFiveBuy(BaseStrategy):
                 if swing_point.label == 'LL':
                     logger.error(f'Detected first swingpoint. LL')
                     last_candle = swing_point.price_object
+                    last_sp = swing_point
                     recent_swing_points.append(swing_point)
                 else:
                     # This strategy cannot be true. End review of swing points.
@@ -493,10 +504,12 @@ class GannPointFiveBuy(BaseStrategy):
                 swing_point_counter += 1
         if T_most_recent is not None and latest_price.close_price > swing_point.price:
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                 later_candle=latest_price)
             final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                    'final_upswing_size' : str(final_upswing_size)}
+                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
                 action_buy = True
@@ -528,6 +541,7 @@ class GannPointFiveSell(BaseStrategy):
                 if swing_point.label == 'HH':
                     logger.error(f'Detected first swingpoint. HH')
                     last_candle = swing_point.price_object
+                    last_sp = swing_point
                     recent_swing_points.append(swing_point)
                 else:
                     # This strategy cannot be true. End review of swing points.
@@ -565,8 +579,11 @@ class GannPointFiveSell(BaseStrategy):
         if T_most_recent is not None and latest_price.close_price < swing_point.price:
             final_downswing_size = round((swing_point.price - latest_price.close_price) / swing_point.price,3)
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                 later_candle=latest_price)
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration),
-                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size)}
+                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size),
+                    'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
                 action_buy = False
@@ -608,7 +625,8 @@ class GannPointEightBuy(BaseStrategy):
                 if swing_point.label == 'LL' and latest_close_price > swing_point.price:
                     logger.error(f'Detected first swingpoint is LL and latest close price is higher.')
                     last_candle = swing_point.price_object
-                    last_low = swing_point.price_object.low_price
+                    last_low = last_candle.low_price
+                    last_sp = swing_point
                     recent_swing_points.append(swing_point)
                     most_recent_low_swing_point_candle = last_candle
                 else:
@@ -662,7 +680,10 @@ class GannPointEightBuy(BaseStrategy):
         # Check we have at least a double bottom and the peaks are at least significantly above the low
         if bottoms > 1 and max_top/last_low > (1 + (peak_percent_above_bottom/100)):
             bottom_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
-            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration), 'recent_swing_points' : recent_swing_points}
+            duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                 later_candle=latest_price)
+            data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration), 'recent_swing_points' : recent_swing_points,
+                    'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.error(f'Multiple bottoms detected: {bottoms}.')
             # Temporarily set any double bottoms to be defined as a buy.
             #action_buy = True
@@ -708,7 +729,8 @@ class GannPointEightSell(BaseStrategy):
                 if swing_point.label == 'HH' and latest_close_price < swing_point.price:
                     logger.error(f'Detected first swingpoint is HH and latest close price is lower.')
                     last_candle = swing_point.price_object
-                    last_high = swing_point.price_object.high_price
+                    last_high = last_candle.high_price
+                    last_sp = swing_point
                     recent_swing_points.append(swing_point)
                     most_recent_low_swing_point_candle = last_candle
                 else:
@@ -760,8 +782,10 @@ class GannPointEightSell(BaseStrategy):
         # Check we have at least a double top and the bottoms are at least significantly below the tops
         if tops > 1 and min_bottom / last_high > (1 - (peak_percent_below_top / 100)):
             top_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
+            duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
+                                                                 later_candle=latest_price)
             data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration': str(top_duration),
-                    'recent_swing_points': recent_swing_points}
+                    'recent_swing_points': recent_swing_points, 'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.error(f'Multiple tops detected: {tops}.')
             if latest_price.close_price < min_bottom:
                 logger.error(f'Latest close ({latest_price.close_price}) is below min_bottom ({min_bottom}).')
@@ -861,9 +885,12 @@ class GannPointThreeBuy(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=lowpoint_sp.price_object)
+                duration_after_latest_sp = instance_difference_count(self.ticker, pullback_sp.price_object,
+                                                                     later_candle=latest_price)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'max_P': str(max_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'retracement_P' : str(retracement_P), 'downtrend_price_movement' : str(downtrend_price_movement),} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'retracement_P' : str(retracement_P), 'downtrend_price_movement' : str(downtrend_price_movement),
+                        'duration_after_latest_sp' : str(duration_after_latest_sp)} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_P}.')
             else:
                 data = {}
@@ -960,9 +987,12 @@ class GannPointThreeSell(BaseStrategy):
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
+                duration_after_latest_sp = instance_difference_count(self.ticker, pullback_sp.price_object,
+                                                                     later_candle=latest_price)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'min_P': str(min_P), 'sections': str(len(P_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                        'retracement_P' : str(retracement_P), 'uptrend_price_movement' : str(uptrend_price_movement),} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'retracement_P' : str(retracement_P), 'uptrend_price_movement' : str(uptrend_price_movement),
+                        'duration_after_latest_sp' : str(duration_after_latest_sp)} # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Min P during prior series of swings: {min_P}.')
             else:
                 data = {}

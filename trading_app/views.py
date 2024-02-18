@@ -786,7 +786,7 @@ STRATEGY_METRICS_LABELS = {
         'max_T' : 'Duration of longest upswing',
         'prior_trend_duration' : 'Duration of downtrend',
         'final_upswing_size' : '% up from low',
-
+        'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Selling point #4": {
         'latest_T': 'Time since last swing point',
@@ -795,7 +795,7 @@ STRATEGY_METRICS_LABELS = {
         'max_T' : 'Duration of longest downswing',
         'prior_trend_duration' : 'Duration of uptrend',
         'final_downswing_size' : '% down from high',
-
+        'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Buying point #3": {
         'P_prev': 'Previous price rises during downtrend',
@@ -805,6 +805,7 @@ STRATEGY_METRICS_LABELS = {
         'prior_trend_duration': 'Duration of downtrend',
         'latest_P': 'Price rise from low',
         'retracement_P': 'Price fall during retracement',
+        'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Selling point #3": {
         'P_prev': 'Previous price falls during uptrend',
@@ -814,6 +815,7 @@ STRATEGY_METRICS_LABELS = {
         'prior_trend_duration': 'Duration of uptrend',
         'latest_P': 'Price fall from high',
         'retracement_P': 'Price rise during retracement',
+        'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Buying point #5": {
       'latest_T': 'Time since last swing point',
@@ -821,7 +823,7 @@ STRATEGY_METRICS_LABELS = {
       'section_count': 'Number of sections in prior downtrend',
       'prior_trend_duration': 'Duration of downtrend',
       'final_upswing_size': '% up from low',
-
+      'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Selling point #5": {
       'latest_T': 'Time since last swing point',
@@ -829,17 +831,19 @@ STRATEGY_METRICS_LABELS = {
       'section_count': 'Number of sections in prior uptrend',
       'prior_trend_duration': 'Duration of uptrend',
       'final_downswing_size': '% down from high',
-
+      'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Buying point #8": {
       'latest_T': 'Time since last swing point',
       'bottoms': 'Number of troughs',
       'bottom_duration': 'Duration between first and last trough',
+      'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Selling point #8": {
       'latest_T': 'Time since last swing point',
       'tops': 'Number of peaks',
       'tops_duration': 'Duration between first and last peak',
+      'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Buying point #1" : {
         'sp_price_diff_vs_prior_high' : 'Price difference between pullback and prior HL',
@@ -848,6 +852,7 @@ STRATEGY_METRICS_LABELS = {
         'elapsed__duration' : 'Duration between prior HL and recent swingpoint',
         'rise_after_retracement' : 'Price rise after retracement swingpoint',
         'rise_after_retracement_percent_of_retracement' : 'Rise after retracement as % of retracement',
+        'duration_after_latest_sp' : 'Duration since last SP',
     },
     "Gann's Selling point #1": {
         'sp_price_diff_vs_prior_low': 'Price difference between pullback and prior LH',
@@ -856,6 +861,7 @@ STRATEGY_METRICS_LABELS = {
         'elapsed__duration': 'Duration between prior LH and recent swingpoint',
         'fall_after_retracement': 'Price fall after retracement swingpoint',
         'fall_after_retracement_percent_of_retracement': 'Fall after retracement as % of retracement',
+        'duration_after_latest_sp' : 'Duration since last SP',
     }
 
 }
@@ -1049,7 +1055,8 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
 class GannOneSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data):
         print('Starting GannOneSellCustomizer()...')
-        # Extract min_P from trading_opp's metrics_snapshot
+
+        # Get metrics from trading_opp's metrics_snapshot
         sp_price_diff_vs_prior_low = float(trading_opp.metrics_snapshot.get('sp_price_diff_vs_prior_low'))
         print('sp_price_diff_vs_prior_low:', sp_price_diff_vs_prior_low)
         price_retracement = float(trading_opp.metrics_snapshot.get('price_retracement'))
@@ -1058,6 +1065,9 @@ class GannOneSellCustomizer(BaseGraphCustomizer):
         print('elapsed__duration:', elapsed__duration)
         fall_after_retracement = float(trading_opp.metrics_snapshot.get('fall_after_retracement'))
         print('fall_after_retracement:', fall_after_retracement)
+        duration_after_latest_sp = int(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
+        print('duration_after_latest_sp:', duration_after_latest_sp)
+
         swing_point_price_list = []
         swing_point_date_list = []
         swing_point_counter = 0
