@@ -268,7 +268,7 @@ class GannPointOneSell(BaseStrategy):
                 retracement_as_percent = price_retracement * 100 / (prior_lh_price - trough_sp_price)
                 fall_after_retracement = latest_price.close_price - last_sp_price
                 fall_after_retracement_percent_of_retracement = fall_after_retracement * 100 / (-price_retracement)
-                data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_low), 'price_retracement': str(price_retracement),
+                data = {'sp_price_diff_vs_prior_low': str(sp_price_diff_vs_prior_low), 'price_retracement': str(price_retracement),
                         'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
                         'fall_after_retracement' : str(fall_after_retracement), 'recent_swing_points' : recent_swing_points,
                         'fall_after_retracement_percent_of_retracement' : str(round(fall_after_retracement_percent_of_retracement,1)) } # recent_swing_points not as a string as it gets removed and accessed if present.
