@@ -1521,6 +1521,7 @@ def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
     ticker = opp.ticker
+    strategy = opp.strategy
     print('Creating graph for ticker',ticker.symbol)
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
@@ -1582,17 +1583,19 @@ def generate_swing_point_graph_view(request, opp_id):
 
         ax.text(date, y_pos, f"{label}\n{price:.2f}", fontsize=9, ha='center', va=va_align)
 
-    # Determine label placement based on comparison of the most recent price to the last swing point's price
-    last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
-    if float(most_recent_price) < last_swing_price:
-        va_align = 'top'
-        y_pos = float(most_recent_price) + offset_down  # Move the label down
-    else:
-        va_align = 'bottom'
-        y_pos = float(most_recent_price) + offset_up  # Move the label up
+    if strategy.name not in ["Gann's Buying point #9", "Gann's Selling point #9"]:
+        # Only add most recent price line and label for strategies that will not customize this.
+        # Determine label placement based on comparison of the most recent price to the last swing point's price
+        last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
+        if float(most_recent_price) < last_swing_price:
+            va_align = 'top'
+            y_pos = float(most_recent_price) + offset_down  # Move the label down
+        else:
+            va_align = 'bottom'
+            y_pos = float(most_recent_price) + offset_up  # Move the label up
 
-    # Annotate the most recent price point with its price, adjusting placement
-    ax.text(most_recent_date, y_pos, f"{most_recent_price:.2f}", fontsize=9, ha='center', va=va_align)
+        # Annotate the most recent price point with its price, adjusting placement
+        ax.text(most_recent_date, y_pos, f"{most_recent_price:.2f}", fontsize=9, ha='center', va=va_align)
 
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy
