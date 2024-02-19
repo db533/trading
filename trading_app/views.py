@@ -1498,6 +1498,7 @@ class GannNineCustomizer(BaseGraphCustomizer):
         print('Starting GannNineCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         start_candle = trading_opp.metrics_snapshot.get('start_candle')
+        print('type(start_candle):', type(start_candle))
         start_candle_datetime = datetime.fromisoformat(start_candle["datetime"])
         start_candle_low = float(start_candle["low_price"])
         start_candle_high = float(start_candle["high_price"])
