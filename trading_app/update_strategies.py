@@ -1102,7 +1102,7 @@ class GannPointNineBuy(BaseStrategy):
                             if len(pattern) == 3:
                                 logger.error(f"Continuous H still true...")
                                 pattern_detected = True
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime,
+                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
                                                                         'low_price': price.low_price, 'high_price': price.high_price}
                                 ind_candle_count += 1
                             elif len(pattern) < 3:
@@ -1118,7 +1118,7 @@ class GannPointNineBuy(BaseStrategy):
                                 logger.error(f'First H found... pattern: {pattern}')
                                 # Save current candle as the peak in case the pattern is found
                                 start_candle = new_start
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime,
+                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
                                                                         'low_price': price.low_price, 'high_price': price.high_price}
                                 ind_candle_count += 1
                             prev_low_price = price.low_price
@@ -1128,7 +1128,7 @@ class GannPointNineBuy(BaseStrategy):
                                 pattern.append('lower')
                                 logger.error(f'L found... pattern: {pattern}')
                                 # Save current candle as might be the 2-day retracement candle.
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime,
+                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
                                                                         'low_price': price.low_price, 'high_price': price.high_price}
                                 ind_candle_count += 1
                             elif pattern_detected:
@@ -1148,7 +1148,7 @@ class GannPointNineBuy(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_low_price = price.low_price
-                    new_start = {'datetime': price.datetime,
+                    new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': price.low_price, 'high_price': price.high_price}
 
             if sections > 0 and pattern_detected == True:
@@ -1263,13 +1263,13 @@ class GannPointNineSell(BaseStrategy):
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous L still true...")
                                 pattern_detected = True
-                                individual_candles[ind_candle_count] = {'datetime' : price.datetime, 'low_price': price.low_price, 'high_price' : price.high_price}
+                                individual_candles[ind_candle_count] = {'datetime' : price.datetime.isoformat(), 'low_price': price.low_price, 'high_price' : price.high_price}
                                 ind_candle_count += 1
                             if len(pattern) == 0:
                                 pattern = ['lower']
                                 logger.error(f'First L found... pattern: {pattern}')
                                 start_candle = new_start
-                                individual_candles[ind_candle_count] = {'datetime' : price.datetime, 'low_price': price.low_price, 'high_price' : price.high_price}
+                                individual_candles[ind_candle_count] = {'datetime' : price.datetime.isoformat(), 'low_price': price.low_price, 'high_price' : price.high_price}
                                 ind_candle_count = 1
                                 # Save current candle as the peak in case the pattern is found
                             prev_high_price = price.high_price
@@ -1279,7 +1279,7 @@ class GannPointNineSell(BaseStrategy):
                                 pattern.append('higher')
                                 logger.error(f'H found... pattern: {pattern}')
                                 # Save current candle as might be the 2-day retracement candle.
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime, 'low_price': price.low_price,'high_price': price.high_price}
+                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(), 'low_price': price.low_price,'high_price': price.high_price}
                                 ind_candle_count += 1
                             elif pattern_detected:
                                 pattern_detected = False
@@ -1298,7 +1298,7 @@ class GannPointNineSell(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_high_price = price.high_price
-                    new_start = {'datetime' : price.datetime, 'low_price': price.low_price, 'high_price' : price.high_price}
+                    new_start = {'datetime' : price.datetime.isoformat(), 'low_price': price.low_price, 'high_price' : price.high_price}
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
                 action_buy = True
