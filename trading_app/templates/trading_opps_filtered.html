@@ -22,7 +22,7 @@
                     <th  style="text-align:center; width: 14ch;">Strategy Name</th>
                     <th  style="text-align:center; width: 30ch;">Strategy desciption</th>
                     <th  style="text-align:center; width: 50ch;">Metrics</th>
-                    <th  style="text-align:center; width: 15ch;">Identified</th>
+                    <th  style="text-align:center; width: 15ch;">Dates</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,7 +38,8 @@
                             <strong>{{ label }}:</strong> {{ value }}<br>
                         {% endfor %}
                     </td>
-                    <td>{{ opp.datetime_identified }}</td>
+                    <td>Identified:<br>{{ opp.datetime_identified }}<br>
+                    Invalidated:<br>{{ opp.datetime_invalidated }}<br></td>
                 </tr>
             {% endfor %}
             </tbody>
