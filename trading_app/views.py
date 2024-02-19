@@ -1581,16 +1581,6 @@ def generate_swing_point_graph_view(request, opp_id):
     fig, ax = plt.subplots(figsize=(4, 2), dpi=100)
     ax.plot(dates, prices, marker='o', linestyle='-')
 
-    # Adding a line to the most recent close price.
-    if dates and prices:
-        if float(most_recent_price) > last_swing_point.price:
-            colour = 'green'
-        else:
-            colour = 'red'
-        ax.plot([most_recent_date], [float(most_recent_price)], marker='o', color=colour, linestyle='None')  # Mark the most recent price with a red dot
-        # If there are previous points, draw a dotted line from the last swing point to the new point
-        ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour, linestyle='--')  # Dotted line
-
     # Calculate an offset as a function of the price range. This is a simple example; adjust the factor as needed.
     price_range = max(prices) - min(prices)
     label_offset_up = 0.05 # 5% upwards for labels above the datapoint
@@ -1617,7 +1607,21 @@ def generate_swing_point_graph_view(request, opp_id):
         # Only add most recent price line and label for strategies that will not customize this.
         # Determine label placement based on comparison of the most recent price to the last swing point's price
         print(strategy.id,'is not in list [14, 15].')
+
+        # Adding a line to the most recent close price.
+        if dates and prices:
+            if float(most_recent_price) > last_swing_point.price:
+                colour = 'green'
+            else:
+                colour = 'red'
+            ax.plot([most_recent_date], [float(most_recent_price)], marker='o', color=colour,
+                    linestyle='None')  # Mark the most recent price with a red dot
+            # If there are previous points, draw a dotted line from the last swing point to the new point
+            ax.plot([dates[-1], most_recent_date], [prices[-1], float(most_recent_price)], colour,
+                    linestyle='--')  # Dotted line
+
         last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
+
         if float(most_recent_price) < last_swing_price:
             va_align = 'top'
             y_pos = float(most_recent_price) + offset_down  # Move the label down
