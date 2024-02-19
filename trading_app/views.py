@@ -1583,6 +1583,7 @@ def generate_swing_point_graph_view(request, opp_id):
 
         ax.text(date, y_pos, f"{label}\n{price:.2f}", fontsize=9, ha='center', va=va_align)
 
+    print('About to check if',strategy.name, ' is in the list to exclude line to latest price.')
     if strategy.name not in ["Gann's Buying point #9", "Gann's Selling point #9"]:
         # Only add most recent price line and label for strategies that will not customize this.
         # Determine label placement based on comparison of the most recent price to the last swing point's price
