@@ -1537,8 +1537,8 @@ class GannNineCustomizer(BaseGraphCustomizer):
             else:
                 candle_price_list.append(candle_low)
 
-        min_price = min(swing_point_price_list,candle_price_list)
-        max_price = max(swing_point_price_list, candle_price_list)
+        min_price = min(min(swing_point_price_list),min(candle_price_list))
+        max_price = max(max(swing_point_price_list), max(candle_price_list))
         # Add vertical lines to show elapsed time since last swingpoint
 
         self.draw_vertical_line(ax, swing_point_date_list[-1], min_price, max_price)
