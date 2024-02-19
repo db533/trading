@@ -1502,7 +1502,7 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
         start_candle_low = float(start_candle["low_price"])
         start_candle_high = float(start_candle["high_price"])
         start_candle_colour = start_candle["colour"]
-        if start_candle_colour == green:
+        if start_candle_colour == 'green':
             start_candle_price = start_candle_high
         else:
             start_candle_price = start_candle_low
