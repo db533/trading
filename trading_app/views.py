@@ -1524,6 +1524,7 @@ class GannNineCustomizer(BaseGraphCustomizer):
         # If there are previous points, draw a dotted line from the last swing point to the new point
         ax.plot([swing_point_date_list[-1], start_candle_datetime], [swing_point_price_list[-1], start_candle_price], start_candle_colour, linestyle='--')  # Dotted line
 
+        candle_price_list = []
         for candle in individual_candles:
             print('candle:',candle)
             candle_datetime = datetime.fromisoformat(candle["datetime"])
@@ -1531,10 +1532,25 @@ class GannNineCustomizer(BaseGraphCustomizer):
             candle_high = float(candle["high_price"])
             candle_colour = candle["colour"]
             self.draw_candle_line(ax, candle_datetime, candle_low, candle_high, candle_colour)
+            if start_candle_colour == 'green':
+                candle_price_list.append(candle_high)
+            else:
+                candle_price_list.append(candle_low)
 
-    def draw_candle_line(self, ax, date, low_price, high_price, colour):
+        min_price = min(swing_point_price_list,candle_price_list)
+        max_price = max(swing_point_price_list, candle_price_list)
+        # Add vertical lines to show elapsed time since last swingpoint
+
+        self.draw_vertical_line(ax, swing_point_date_list[-1], min_price, max_price)
+        self.draw_vertical_line(ax, start_candle_datetime, min_price, max_price)
+
+    def draw_vertical_line(self, ax, date, low_price, high_price, colour):
         # Draw a line for a candle between (date, low_price) and (date, high_price)
         ax.plot([date, date], [low_price, high_price], color=colour, linestyle='-')
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
 
 
 # Add more customizers for other strategies
