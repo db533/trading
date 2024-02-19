@@ -1088,11 +1088,11 @@ class GannPointNineBuy(BaseStrategy):
                 duration_to_start = 0
                 for price in prices:
                     print(price.datetime, 'most_recent_hh_price:', most_recent_hh_price, 'price.close_price:', price.close_price)
+                    duration_to_start += 1
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
                         # price has closed above the previous HH swingpoint.
                         hh_price_exceeded = True
                         prev_low_price = price.low_price
-                        duration_to_start += 1
                         logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
                     elif hh_price_exceeded == True:
                         # Price exceeded the prior HH. Start looking for the pattern.
@@ -1115,7 +1115,6 @@ class GannPointNineBuy(BaseStrategy):
                                 individual_candles = []
                                 ind_candle_count = 0
                                 pattern = []
-                                duration_to_start += 1
                             if len(pattern) == 0:
                                 pattern = ['higher']
                                 logger.error(f'First H found... pattern: {pattern}')
@@ -1140,7 +1139,6 @@ class GannPointNineBuy(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
-                                duration_to_start += 1
                                 pattern = []
                             prev_low_price = price.low_price
                         else:
@@ -1154,7 +1152,6 @@ class GannPointNineBuy(BaseStrategy):
                             prev_low_price = price.low_price
                     else:
                         # Candle has not yet exceed prior peak / trough
-                        duration_to_start +=1
                     new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
 
@@ -1166,7 +1163,7 @@ class GannPointNineBuy(BaseStrategy):
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
-                data = {'duration_to_start' : duration_to_start, 'ind_candle_count' : str(ind_candle_count - 3), 'start_candle': start_candle, 'individual_candles': individual_candles,
+                data = {'duration_to_start' : duration_to_start- ind_candle_count, 'ind_candle_count' : str(ind_candle_count - 3), 'start_candle': start_candle, 'individual_candles': individual_candles,
                         'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
@@ -1250,12 +1247,12 @@ class GannPointNineSell(BaseStrategy):
                 duration_to_start = 0
                 for price in prices:
                     print(price.datetime, 'most_recent_ll_price:', most_recent_ll_price, 'price.low_price:',price.low_price )
+                    duration_to_start += 1
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
                         # price has closed above the previous HH swingpoint.
                         ll_price_exceeded = True
                         prev_low_price = price.low_price
                         prev_high_price = price.high_price
-                        duration_to_start += 1
                         logger.error(f'Price is below the previous LL. Checking individual price candles.')
                     elif ll_price_exceeded == True:
                         # Price went below prior LL. Start looking for the pattern.
@@ -1268,7 +1265,6 @@ class GannPointNineSell(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
-                                duration_to_start += 1
                                 pattern = []
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous L still true...")
@@ -1298,7 +1294,6 @@ class GannPointNineSell(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
-                                duration_to_start += 1
                             prev_high_price = price.high_price
                         else:
                             # Either high or low not matching expected pattern.
@@ -1311,7 +1306,6 @@ class GannPointNineSell(BaseStrategy):
                             prev_high_price = price.high_price
                     else:
                         # Candle has not yet exceed prior peak / trough
-                        duration_to_start +=1
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
@@ -1321,7 +1315,7 @@ class GannPointNineSell(BaseStrategy):
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
-                data = {'duration_to_start' : duration_to_start, 'ind_candle_count' : str(ind_candle_count-3), 'start_candle': start_candle, 'individual_candles': individual_candles,
+                data = {'duration_to_start' : duration_to_start-ind_candle_count, 'ind_candle_count' : str(ind_candle_count-3), 'start_candle': start_candle, 'individual_candles': individual_candles,
                         'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
