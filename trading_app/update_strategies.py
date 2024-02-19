@@ -1150,8 +1150,6 @@ class GannPointNineBuy(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_low_price = price.low_price
-                    else:
-                        # Candle has not yet exceed prior peak / trough
                     new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
 
@@ -1304,8 +1302,6 @@ class GannPointNineSell(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_high_price = price.high_price
-                    else:
-                        # Candle has not yet exceed prior peak / trough
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
