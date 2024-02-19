@@ -1493,9 +1493,9 @@ class GannEightCustomizer(BaseGraphCustomizer):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
-class GannNineBuyCustomizer(BaseGraphCustomizer):
+class GannNineCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
-        print('Starting GannNineBuyCustomizer()...')
+        print('Starting GannNineCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         start_candle = trading_opp.metrics_snapshot.get('start_candle')
         start_candle_datetime = datetime.fromisoformat(start_candle["datetime"])
@@ -1531,15 +1531,9 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
             candle_colour = candle["colour"]
             self.draw_candle_line(ax, candle_datetime, candle_low, candle_high, candle_colour)
 
-
-
     def draw_candle_line(self, ax, date, low_price, high_price, colour):
         # Draw a line for a candle between (date, low_price) and (date, high_price)
         ax.plot([date, date], [low_price, high_price], color=colour, linestyle='-')
-
-class GannNineSellCustomizer(BaseGraphCustomizer):
-    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
-        pass
 
 
 # Add more customizers for other strategies
@@ -1556,8 +1550,8 @@ def get_graph_customizer(trading_strategy):
         "Gann's Selling point #3": GannThreeSellCustomizer(),
         "Gann's Buying point #1": GannOneBuyCustomizer(),
         "Gann's Selling point #1": GannOneSellCustomizer(),
-        "Gann's Buying point #9": GannNineBuyCustomizer(),
-        "Gann's Selling point #9": GannNineSellCustomizer(),
+        "Gann's Buying point #9": GannNineCustomizer(),
+        "Gann's Selling point #9": GannNineCustomizer(),
         # Map more strategies to their customizers
     }
     return customizers.get(trading_strategy.name, BaseGraphCustomizer())
