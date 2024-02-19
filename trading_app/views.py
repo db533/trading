@@ -1498,7 +1498,15 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
         print('Starting GannNineBuyCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         start_candle = trading_opp.metrics_snapshot.get('start_candle')
-        print('start_candle:', start_candle, 'start_candle["datetime"]:',start_candle["datetime"], 'type(start_candle["datetime"]):', type(start_candle["datetime"]))
+        start_candle_datetime = datetime.fromisoformat(start_candle["datetime"])
+        start_candle_low = float(start_candle["low_price"])
+        start_candle_high = float(start_candle["high_price"])
+        start_candle_colour = start_candle["colour"]
+        if start_candle_colour == green:
+            start_candle_price = start_candle_high
+        else:
+            start_candle_price = start_candle_low
+        print('start_candle:', start_candle)
         individual_candles = trading_opp.metrics_snapshot.get('individual_candles')
         print('individual_candles:', individual_candles)
 
@@ -1511,6 +1519,9 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
             swing_point_price_list.append(float(swing_point.price))
             swing_point_date_list.append(swing_point.date)
 
+        ax.plot([start_candle_datetime], [start_candle_price], marker='o', color=start_candle_colour, linestyle='None')  # Mark the most recent price with a red dot
+        # If there are previous points, draw a dotted line from the last swing point to the new point
+        ax.plot([swing_point_date_list[-1], start_candle_datetime], [swing_point_price_list[-1], start_candle_price], start_candle_colour, linestyle='--')  # Dotted line
 
 
 
