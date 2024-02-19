@@ -1497,9 +1497,9 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannNineBuyCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
-        start_candle = float(trading_opp.metrics_snapshot.get('start_candle'))
+        start_candle = trading_opp.metrics_snapshot.get('start_candle')
         print('start_candle:', start_candle)
-        individual_candles = float(trading_opp.metrics_snapshot.get('individual_candles'))
+        individual_candles = trading_opp.metrics_snapshot.get('individual_candles')
         print('individual_candles:', individual_candles)
 
         swing_point_price_list = []
