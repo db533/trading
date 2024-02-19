@@ -1523,7 +1523,18 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
         # If there are previous points, draw a dotted line from the last swing point to the new point
         ax.plot([swing_point_date_list[-1], start_candle_datetime], [swing_point_price_list[-1], start_candle_price], start_candle_colour, linestyle='--')  # Dotted line
 
+        for candle in individual_candles:
+            candle_datetime = datetime.fromisoformat(candle["datetime"])
+            candle_low = float(candle["low_price"])
+            candle_high = float(candle["high_price"])
+            candle_colour = candle["colour"]
+            self.draw_candle_line(ax, candle_datetime, candle_low, candle_high, candle_colour)
 
+
+
+    def draw_candle_line(self, ax, date, low_price, high_price, colour):
+        # Draw a line for a candle between (date, low_price) and (date, high_price)
+        ax.plot([date, date], [low_price, high_price], color=colour, linestyle='-')
 
 class GannNineSellCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
