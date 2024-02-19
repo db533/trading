@@ -1092,6 +1092,7 @@ class GannPointNineBuy(BaseStrategy):
                         # price has closed above the previous HH swingpoint.
                         hh_price_exceeded = True
                         prev_low_price = price.low_price
+                        duration_to_start += 1
                         logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
                     elif hh_price_exceeded == True:
                         # Price exceeded the prior HH. Start looking for the pattern.
@@ -1252,6 +1253,7 @@ class GannPointNineSell(BaseStrategy):
                         ll_price_exceeded = True
                         prev_low_price = price.low_price
                         prev_high_price = price.high_price
+                        duration_to_start += 1
                         logger.error(f'Price is below the previous LL. Checking individual price candles.')
                     elif ll_price_exceeded == True:
                         # Price went below prior LL. Start looking for the pattern.
