@@ -1743,11 +1743,10 @@ def trading_opps_filtered(request):
             ticker = Ticker.objects.filter(symbol__iexact=symbol).first()
             if ticker:
                 trading_opps = TradingOpp.objects.filter(ticker=ticker).all()
+                for opp in trading_opps:
+                    opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
             else:
                 trading_opps = []
-
-        for opp in trading_opps:
-            trading_opps.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
 
     return render(request, 'trading_opps_filtered.html', {
         'form': form,
