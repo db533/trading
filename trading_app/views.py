@@ -1720,3 +1720,23 @@ def generate_swing_point_graph_view(request, opp_id):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def trading_opps_filtered(request):
+    form = TickerSymbolForm()
+    trading_opps = None
+
+    if 'symbol' in request.GET:
+        form = TickerSymbolForm(request.GET)
+        if form.is_valid():
+            symbol = form.cleaned_data['symbol']
+            ticker = Ticker.objects.filter(symbol__iexact=symbol).first()
+            if ticker:
+                trading_opps = TradingOpp.objects.filter(ticker=ticker).all()
+            else:
+                trading_opps = []
+
+    return render(request, 'trading_opps_filtered.html', {
+        'form': form,
+        'trading_opps': trading_opps,
+        'ticker' : ticker
+    })

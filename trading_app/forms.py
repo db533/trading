@@ -30,3 +30,7 @@ class CategorySelectForm(forms.Form):
         self.fields['categories'].choices = [
                                                 self.NOT_DEFINED_CHOICE
                                             ] + [(cat.id, cat.name) for cat in TickerCategory.objects.all()]
+
+class TickerSymbolForm(forms.Form):
+    symbol = forms.CharField(max_length=10, label='Ticker Symbol')
+

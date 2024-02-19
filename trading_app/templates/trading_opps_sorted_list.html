@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Filtered Trading Opportunities</title>
+</head>
+<body>
+    <h1>Filtered Trading Opportunities</h1>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+    <br>
+
+    {% if trading_opps %}
+        <h2><a href="{% url 'ticker_detail' ticker.id %}">{{ ticker.symbol }} - {{ ticker.company_name }}</a></h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th style="text-align:center; width: 8ch;">Action</th>
+                    <th style="text-align:center; width: 30ch;">Graph</th>
+                    <th  style="text-align:center; width: 14ch;">Strategy Name</th>
+                    <th  style="text-align:center; width: 30ch;">Strategy desciption</th>
+                    <th  style="text-align:center; width: 50ch;">Metrics</th>
+                    <th  style="text-align:center; width: 15ch;">Identified</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for opp in trading_opps %}
+                <tr>
+                    <td style="text-align:center; color: {% if opp.action_buy == 1 %}green{% else %}red{% endif %};"><strong>{% if opp.action_buy %}BUY{% else %}SELL{% endif %}</strong><br>id: {{ opp.id }}</td>
+                    <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
+                    <td><a href="{% url 'ticker_detail' opp.ticker.id %}"><strong>{{ opp.ticker.symbol }}</strong><br>{{ opp.ticker.company_name }}</a></h2>
+                        <br>{{ opp.strategy.name }}</td>
+                    <td>{{ opp.strategy.description }}</td>
+                    <td>
+                        {% for label, value in opp.translated_metrics.items %}
+                            <strong>{{ label }}:</strong> {{ value }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>{{ opp.datetime_identified }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No trading opportunities found for the given ticker symbol.</p>
+    {% endif %}
+</body>
+{% endblock %}
