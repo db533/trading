@@ -1584,9 +1584,11 @@ def generate_swing_point_graph_view(request, opp_id):
         ax.text(date, y_pos, f"{label}\n{price:.2f}", fontsize=9, ha='center', va=va_align)
 
     print('About to check if',strategy.id, 'is in the list to exclude line to latest price.')
+    print("int(strategy.id) not in [14, 15]:",int(strategy.id) not in [14, 15])
     if int(strategy.id) not in [14, 15]:  # 14 = "Gann's Buying point #9", 15 = "Gann's Selling point #9"
         # Only add most recent price line and label for strategies that will not customize this.
         # Determine label placement based on comparison of the most recent price to the last swing point's price
+        print(strategy.id,'is not in list [14, 15].')
         last_swing_price = float(swing_points.last().price)  # Assuming swing_points is ordered by date
         if float(most_recent_price) < last_swing_price:
             va_align = 'top'
@@ -1597,6 +1599,8 @@ def generate_swing_point_graph_view(request, opp_id):
 
         # Annotate the most recent price point with its price, adjusting placement
         ax.text(most_recent_date, y_pos, f"{most_recent_price:.2f}", fontsize=9, ha='center', va=va_align)
+    else:
+        print(strategy.id, 'is present list [14, 15]. Excluding line to latest price.')
 
     # Select the appropriate graph customizer based on the TradingStrategy
     trading_strategy = opp.strategy
