@@ -1544,7 +1544,7 @@ class GannNineCustomizer(BaseGraphCustomizer):
         self.draw_vertical_line(ax, swing_point_date_list[-1], min_price, max_price)
         self.draw_vertical_line(ax, start_candle_datetime, min_price, max_price)
 
-    def draw_vertical_line(self, ax, date, low_price, high_price, colour):
+    def draw_candle_line(self, ax, date, low_price, high_price, colour):
         # Draw a line for a candle between (date, low_price) and (date, high_price)
         ax.plot([date, date], [low_price, high_price], color=colour, linestyle='-')
 
