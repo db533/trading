@@ -1393,6 +1393,7 @@ def process_trading_opportunities():
                     # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
                     if existing_tradingopp is not None:
                         existing_tradingopp.is_active = False
+                        existing_tradingopp.date_invalidated = timezone.now()
                         existing_tradingopp.save()
         logger.error(f'Finished process_trading_opportunities().')
     except Exception as e:
