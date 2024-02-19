@@ -1085,6 +1085,7 @@ class GannPointNineBuy(BaseStrategy):
                 prev_low_price = None
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 individual_candles = []
+                duration_to_start = 0
                 for price in prices:
                     print(price.datetime, 'most_recent_hh_price:', most_recent_hh_price, 'price.close_price:', price.close_price)
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
@@ -1148,6 +1149,9 @@ class GannPointNineBuy(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_low_price = price.low_price
+                    else:
+                        # Candle has not yet exceed prior peak / trough
+                        duration_to_start +=1
                     new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
 
@@ -1160,7 +1164,7 @@ class GannPointNineBuy(BaseStrategy):
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
                 data = {'start_candle': start_candle, 'individual_candles': individual_candles, 'ind_candle_count' : str(ind_candle_count),
-                        'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'duration_to_start' : duration_to_start, 'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
                 action_buy = None
@@ -1240,6 +1244,7 @@ class GannPointNineSell(BaseStrategy):
                 prev_low_price = None
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 individual_candles = []
+                duration_to_start = 0
                 for price in prices:
                     print(price.datetime, 'most_recent_ll_price:', most_recent_ll_price, 'price.low_price:',price.low_price )
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
@@ -1298,6 +1303,9 @@ class GannPointNineSell(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_high_price = price.high_price
+                    else:
+                        # Candle has not yet exceed prior peak / trough
+                        duration_to_start +=1
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
@@ -1308,7 +1316,7 @@ class GannPointNineSell(BaseStrategy):
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
                 data = {'start_candle': start_candle, 'individual_candles': individual_candles, 'ind_candle_count' : str(ind_candle_count),
-                        'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        'duration_to_start' : duration_to_start, 'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
                 action_buy = None
