@@ -1746,6 +1746,9 @@ def trading_opps_filtered(request):
             else:
                 trading_opps = []
 
+        for opp in trading_opps:
+            trading_opps.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
+
     return render(request, 'trading_opps_filtered.html', {
         'form': form,
         'trading_opps': trading_opps,
