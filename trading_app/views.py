@@ -1524,11 +1524,11 @@ class GannNineBuyCustomizer(BaseGraphCustomizer):
         ax.plot([swing_point_date_list[-1], start_candle_datetime], [swing_point_price_list[-1], start_candle_price], start_candle_colour, linestyle='--')  # Dotted line
 
         for candle in individual_candles:
-            for key in candle:
-                candle_datetime = datetime.fromisoformat(candle[key]["datetime"])
-                candle_low = float(candle[key]["low_price"])
-                candle_high = float(candle[key]["high_price"])
-                candle_colour = candle[key]["colour"]
+            print('candle:',candle)
+            candle_datetime = datetime.fromisoformat(candle["datetime"])
+            candle_low = float(candle["low_price"])
+            candle_high = float(candle["high_price"])
+            candle_colour = candle["colour"]
             self.draw_candle_line(ax, candle_datetime, candle_low, candle_high, candle_colour)
 
 

@@ -1084,7 +1084,7 @@ class GannPointNineBuy(BaseStrategy):
                 prev_high_price = None
                 prev_low_price = None
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
-                individual_candles = {}
+                individual_candles = []
                 for price in prices:
                     print(price.datetime, 'most_recent_hh_price:', most_recent_hh_price, 'price.close_price:', price.close_price)
                     if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
@@ -1102,15 +1102,15 @@ class GannPointNineBuy(BaseStrategy):
                             if len(pattern) == 3:
                                 logger.error(f"Continuous H still true...")
                                 pattern_detected = True
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
+                                individual_candles.append({'datetime': price.datetime.isoformat(),
+                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' })
                                 ind_candle_count += 1
                             elif len(pattern) < 3:
                                 # Expected a lower candle, got a higher.
                                 pattern_detected = False
                                 logger.error(f"Got Higher, expected a lower. Restarting search for pattern.")
                                 start_candle = {}
-                                individual_candles = {}
+                                individual_candles = []
                                 ind_candle_count = 0
                                 pattern = []
                             if len(pattern) == 0:
@@ -1118,8 +1118,8 @@ class GannPointNineBuy(BaseStrategy):
                                 logger.error(f'First H found... pattern: {pattern}')
                                 # Save current candle as the peak in case the pattern is found
                                 start_candle = new_start
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
+                                individual_candles.append({'datetime': price.datetime.isoformat(),
+                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' })
                                 ind_candle_count += 1
                             prev_low_price = price.low_price
                         elif price.low_price < prev_low_price:
@@ -1128,14 +1128,14 @@ class GannPointNineBuy(BaseStrategy):
                                 pattern.append('lower')
                                 logger.error(f'L found... pattern: {pattern}')
                                 # Save current candle as might be the 2-day retracement candle.
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'red' }
+                                individual_candles.append({'datetime': price.datetime.isoformat(),
+                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'red' })
                                 ind_candle_count += 1
                             elif pattern_detected:
                                 pattern_detected = False
                                 logger.error(f"Found L when expecting continuous H's. Pattern broken.")
                                 start_candle = {}
-                                individual_candles = {}
+                                individual_candles = []
                                 ind_candle_count = 0
                                 pattern = []
                             prev_low_price = price.low_price
@@ -1144,7 +1144,7 @@ class GannPointNineBuy(BaseStrategy):
                             pattern_detected = False
                             logger.error(f"Either low is unchanged. Pattern broken.")
                             start_candle = {}
-                            individual_candles = {}
+                            individual_candles = []
                             ind_candle_count = 0
                             pattern = []
                             prev_low_price = price.low_price
@@ -1159,7 +1159,7 @@ class GannPointNineBuy(BaseStrategy):
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
-                data = {'start_candle': start_candle, 'individual_candles': individual_candles,
+                data = {'start_candle': start_candle, 'individual_candles': individual_candles, 'ind_candle_count' : str(ind_candle_count)
                         'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
@@ -1239,7 +1239,7 @@ class GannPointNineSell(BaseStrategy):
                 prev_high_price = None
                 prev_low_price = None
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
-                individual_candles = {}
+                individual_candles = []
                 for price in prices:
                     print(price.datetime, 'most_recent_ll_price:', most_recent_ll_price, 'price.low_price:',price.low_price )
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
@@ -1257,19 +1257,19 @@ class GannPointNineSell(BaseStrategy):
                                 logger.error(f"Expected a higher, got a lower price.")
                                 pattern_detected = False
                                 start_candle = {}
-                                individual_candles = {}
+                                individual_candles = []
                                 ind_candle_count = 0
                                 pattern = []
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous L still true...")
                                 pattern_detected = True
-                                individual_candles[ind_candle_count] = {'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
+                                individual_candles.append({'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' })
                                 ind_candle_count += 1
                             if len(pattern) == 0:
                                 pattern = ['lower']
                                 logger.error(f'First L found... pattern: {pattern}')
                                 start_candle = new_start
-                                individual_candles[ind_candle_count] = {'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
+                                individual_candles.append({'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' })
                                 ind_candle_count = 1
                                 # Save current candle as the peak in case the pattern is found
                             prev_high_price = price.high_price
@@ -1279,14 +1279,14 @@ class GannPointNineSell(BaseStrategy):
                                 pattern.append('higher')
                                 logger.error(f'H found... pattern: {pattern}')
                                 # Save current candle as might be the 2-day retracement candle.
-                                individual_candles[ind_candle_count] = {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),'high_price': float(price.high_price), 'colour' : 'green' }
+                                individual_candles.append({'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),'high_price': float(price.high_price), 'colour' : 'green' })
                                 ind_candle_count += 1
                             elif pattern_detected:
                                 pattern_detected = False
                                 logger.error(f"Found H when expecting continuous L's. Pattern broken.")
                                 pattern = []
                                 start_candle = {}
-                                individual_candles = {}
+                                individual_candles = []
                                 ind_candle_count = 0
                             prev_high_price = price.high_price
                         else:
@@ -1294,7 +1294,7 @@ class GannPointNineSell(BaseStrategy):
                             pattern_detected = False
                             logger.error(f"High is unchanged. Pattern broken.")
                             start_candle = {}
-                            individual_candles = {}
+                            individual_candles = []
                             ind_candle_count = 0
                             pattern = []
                             prev_high_price = price.high_price
