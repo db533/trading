@@ -1115,6 +1115,7 @@ class GannPointNineBuy(BaseStrategy):
                                 individual_candles = []
                                 ind_candle_count = 0
                                 pattern = []
+                                duration_to_start += 1
                             if len(pattern) == 0:
                                 pattern = ['higher']
                                 logger.error(f'First H found... pattern: {pattern}')
@@ -1139,6 +1140,7 @@ class GannPointNineBuy(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
+                                duration_to_start += 1
                                 pattern = []
                             prev_low_price = price.low_price
                         else:
@@ -1266,6 +1268,7 @@ class GannPointNineSell(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
+                                duration_to_start += 1
                                 pattern = []
                             elif len(pattern) == 3:
                                 logger.error(f"Continuous L still true...")
@@ -1295,6 +1298,7 @@ class GannPointNineSell(BaseStrategy):
                                 start_candle = {}
                                 individual_candles = []
                                 ind_candle_count = 0
+                                duration_to_start += 1
                             prev_high_price = price.high_price
                         else:
                             # Either high or low not matching expected pattern.
