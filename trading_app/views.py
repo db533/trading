@@ -1600,6 +1600,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.dates import date2num
 import matplotlib.pyplot as plt
 import io
+from django.db.models import Q
 
 def generate_swing_point_graph_view(request, opp_id):
     # Fetch the TradingOpp instance by ID
@@ -1621,8 +1622,16 @@ def generate_swing_point_graph_view(request, opp_id):
         # Determine the Price model class based on the content_type
         model = content_type.model_class()
 
-        # Fetch the most recent price for this Ticker from the determined Price model
-        most_recent_price_instance = model.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
+        # Assuming 'opp' is your TradingOpp instance and 'model' is the model class you are querying
+        if opp.datetime_invalidated:
+            # If datetime_invalidated is not None, filter for datetime less than datetime_invalidated
+            most_recent_price_instance = model.objects.filter(
+                Q(ticker=opp.ticker),
+                Q(datetime__lt=opp.datetime_invalidated)
+            ).order_by('-datetime').first()
+        else:
+            # Fetch the most recent price for this Ticker from the determined Price model
+            most_recent_price_instance = model.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
 
         if most_recent_price_instance:
             most_recent_price = most_recent_price_instance.close_price
@@ -1721,6 +1730,7 @@ def generate_swing_point_graph_view(request, opp_id):
     response['Expires'] = '0'
     return response
 
+@login_required
 def trading_opps_filtered(request):
     form = TickerSymbolForm()
     trading_opps = None
