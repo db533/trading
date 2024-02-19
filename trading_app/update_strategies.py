@@ -1309,7 +1309,7 @@ class GannPointNineSell(BaseStrategy):
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
                 logger.error(f'Strategy confirmed to be valid.')
-                action_buy = True
+                action_buy = False
 
                 #prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
