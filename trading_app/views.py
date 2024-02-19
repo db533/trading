@@ -1724,6 +1724,7 @@ def generate_swing_point_graph_view(request, opp_id):
 def trading_opps_filtered(request):
     form = TickerSymbolForm()
     trading_opps = None
+    ticker = None
 
     if 'symbol' in request.GET:
         form = TickerSymbolForm(request.GET)
