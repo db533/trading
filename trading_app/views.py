@@ -1498,11 +1498,12 @@ class GannNineCustomizer(BaseGraphCustomizer):
         print('Starting GannNineCustomizer()...')
         # Extract min_P from trading_opp's metrics_snapshot
         start_candle = trading_opp.metrics_snapshot.get('start_candle')
-        print('type(start_candle):', type(start_candle))
         start_candle_datetime = datetime.fromisoformat(start_candle["datetime"])
         start_candle_low = float(start_candle["low_price"])
         start_candle_high = float(start_candle["high_price"])
         start_candle_colour = start_candle["colour"]
+        duration_to_start = int(trading_opp.metrics_snapshot.get('duration_to_start'))
+        print('duration_to_start:', duration_to_start)
         if start_candle_colour == 'green':
             start_candle_price = start_candle_high
         else:
@@ -1547,7 +1548,6 @@ class GannNineCustomizer(BaseGraphCustomizer):
         # Add text annotation
 
         label_date = swing_point_date_list[-1] + (start_candle_datetime - swing_point_date_list[-1]) / 2
-        duration_to_start = '?'
         if start_candle_colour == 'green':
             label_price = max_price
         else:
