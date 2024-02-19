@@ -862,6 +862,18 @@ STRATEGY_METRICS_LABELS = {
         'fall_after_retracement': 'Price fall after retracement swingpoint',
         'fall_after_retracement_percent_of_retracement': 'Fall after retracement as % of retracement',
         'duration_after_latest_sp' : 'Duration since last SP',
+    },
+    "Gann's Buying point #9": {
+        'start_candle': 'Candle prior to 2-day price action',
+        'individual_candles': 'Individual candles since 2-day price action',
+        'ind_candle_count': 'Duration of successive growth',
+        'duration_to_start': 'Duration till 2-day action',
+    },
+    "Gann's Selling point #9": {
+        'start_candle': 'Candle prior to 2-day price action',
+        'individual_candles': 'Individual candles since 2-day price action',
+        'ind_candle_count': 'Duration of successive falls',
+        'duration_to_start': 'Duration till 2-day action',
     }
 
 }

@@ -1163,8 +1163,8 @@ class GannPointNineBuy(BaseStrategy):
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
-                data = {'start_candle': start_candle, 'individual_candles': individual_candles, 'ind_candle_count' : str(ind_candle_count),
-                        'duration_to_start' : duration_to_start, 'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
+                data = {'duration_to_start' : duration_to_start, 'ind_candle_count' : str(ind_candle_count), 'start_candle': start_candle, 'individual_candles': individual_candles,
+                        'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
                 action_buy = None
@@ -1315,8 +1315,8 @@ class GannPointNineSell(BaseStrategy):
                 #final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
                 #duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                 #                                                     later_candle=latest_price)
-                data = {'start_candle': start_candle, 'individual_candles': individual_candles, 'ind_candle_count' : str(ind_candle_count),
-                        'duration_to_start' : duration_to_start, 'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
+                data = {'duration_to_start' : duration_to_start, 'ind_candle_count' : str(ind_candle_count), 'start_candle': start_candle, 'individual_candles': individual_candles,
+                        'recent_swing_points' : recent_swing_points,} # recent_swing_points not as a string as it gets removed and accessed if present.
             else:
                 data = {}
                 action_buy = None
