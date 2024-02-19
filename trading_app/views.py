@@ -865,14 +865,14 @@ STRATEGY_METRICS_LABELS = {
     },
     "Gann's Buying point #9": {
         'start_candle': 'Candle prior to 2-day price action',
-        'individual_candles': 'Individual candles since 2-day price action',
-        'ind_candle_count': 'Duration of successive growth',
+        'individual_candles': 'Individual candles',
+        'ind_candle_count': 'Duration of successive growth since 2-day price action',
         'duration_to_start': 'Duration till 2-day action',
     },
     "Gann's Selling point #9": {
         'start_candle': 'Candle prior to 2-day price action',
-        'individual_candles': 'Individual candles since 2-day price action',
-        'ind_candle_count': 'Duration of successive falls',
+        'individual_candles': 'Individual candles',
+        'ind_candle_count': 'Duration of successive falls since 2-day price action',
         'duration_to_start': 'Duration till 2-day action',
     }
 
