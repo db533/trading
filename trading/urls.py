@@ -32,7 +32,6 @@ urlpatterns = [
     path('swing_point_graph/<int:opp_id>/', generate_swing_point_graph_view, name='swing_point_graph'),
     path('trading-opps-filtered/', trading_opps_filtered, name='trading-opps-filtered'),
 ]
-]
 
 from django.conf import settings
 from django.conf.urls.static import static
