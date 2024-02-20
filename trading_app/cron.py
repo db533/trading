@@ -8,6 +8,7 @@ from .test_cron_job import test_cron_job
 from datetime import datetime, timedelta, timezone, date, time
 import pytz
 import logging
+import time
 
 logger = logging.getLogger('django')
 
@@ -25,6 +26,23 @@ def display_local_time():
     local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
+
+
+def format_elapsed_time(start_time, end_time):
+    """
+    Calculate elapsed time and format it as hours, minutes, and seconds.
+
+    Parameters:
+    - start_time: The start time (as returned by time.time()).
+    - end_time: The end time (as returned by time.time()).
+
+    Returns:
+    - A string formatted as "X hours, Y minutes, Z seconds".
+    """
+    elapsed_seconds = int(end_time - start_time)
+    hours, remainder = divmod(elapsed_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours} : {minutes}  : {seconds}"
 
 ###############################
 # Inactive cron jobs:
@@ -87,7 +105,13 @@ class DailyTradingOppCreationCronJob(CronJobBase):
     code = 'trading_app.trading_opp_creation_cron_job'
     def do(self):
         # Run the update_ticker_metrics function
+        start_time = time.time()  # Capture start time
         process_trading_opportunities()
+        end_time = time.time()  # Capture end time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'DailyTradingOppCreationCronJob completed in {elapsed_time_str}')
 
 ###############################
 # ACTIVE cron jobs:
@@ -104,9 +128,19 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
     code = 'trading_app.daily_tse_price_download_cron_job'
 
     def do(self):
+        start_time = time.time()  # Capture start time
+
         display_local_time()
         category_price_download('TSE stocks')
         display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'DailyTSEPriceDownloadCronJob completed in {elapsed_time_str}')
+
 
 # Download US prices. 612 prices.
 # Trust start time: 03:30
@@ -119,9 +153,18 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
     code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
+        start_time = time.time()  # Capture start time
         display_local_time()
         category_price_download('US stocks')
         display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'DailyUSPriceDownloadCronJob completed in {elapsed_time_str}')
+
 
 # Update metric scores for tickers
 # Trust start time: 07:00
@@ -135,8 +178,17 @@ class UpdateTickerMetricsCronJob(CronJobBase):
 
     def do(self):
         # Run the update_ticker_metrics function
+        start_time = time.time()  # Capture start time
+
         display_local_time()
         update_ticker_metrics()
         process_trading_opportunities()
         display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'UpdateTickerMetricsCronJob completed in {elapsed_time_str}')
 
