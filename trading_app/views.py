@@ -973,7 +973,7 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
             duration_after_latest_sp = int(duration_after_latest_sp)
             print('duration_after_latest_sp:', duration_after_latest_sp)
         else:
-            duration_after_latest_sp = '0'
+            duration_after_latest_sp = '?'
         swing_point_price_list = []
         swing_point_date_list = []
         swing_point_counter = 0
@@ -1008,7 +1008,7 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         self.draw_vertical_line(ax, most_recent_date, float(most_recent_price),swing_point_price_list[-3] + offset_down)
         label_price = swing_point_price_list[-3] + (offset_down * 2)
         label_date = swing_point_date_list[-1] + (most_recent_date - swing_point_date_list[-1]) / 2
-        ax.text(label_date, label_price, f"t={round(duration_after_latest_sp, 0)}", fontsize=9, ha='center',
+        ax.text(label_date, label_price, f"t={duration_after_latest_sp}", fontsize=9, ha='center',
                 va='bottom')
 
     def draw_vertical_line(self, ax, date, start_price, min_price):
