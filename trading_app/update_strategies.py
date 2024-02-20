@@ -707,6 +707,7 @@ class GannPointFiveBuy(BaseStrategy):
         latest_T = 0
         section_count = 0
         recent_swing_points = []
+        lh_prices = []
         for swing_point in swing_point_query:
             # Check first is a LL
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
@@ -731,6 +732,7 @@ class GannPointFiveBuy(BaseStrategy):
                     # Only save the most recent elapsed time.
                     #most_recent_swing_label = swing_point.label
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
+                    lh_prices.append(float(swing_point.price_object.high_price))
                     recent_swing_points.append(swing_point)
                 elif swing_point.label == 'LL':
                     logger.error(f'Found a prior {swing_point.label}.')
@@ -753,16 +755,17 @@ class GannPointFiveBuy(BaseStrategy):
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
             final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
-            if latest_price.close_price > swing_point.price:
+            max_lh_price = max(lh_prices)
+            if latest_price.close_price > max_lh_price:
                 confirmed = True
                 when_confirmed = ""
             else:
                 confirmed = False
-                when_confirmed = f'When price rises above {swing_point.price}.'
+                when_confirmed = f'When price rises above {max_lh_price}.'
 
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp),
+                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'max_lh_price' : max_lh_price
                     'confirmed': confirmed, 'when_confirmed': when_confirmed}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
@@ -788,6 +791,7 @@ class GannPointFiveSell(BaseStrategy):
         latest_T = 0
         section_count = 0
         recent_swing_points = []
+        hl_prices = []
         for swing_point in swing_point_query:
             # Check first is a LL
             logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
@@ -815,6 +819,7 @@ class GannPointFiveSell(BaseStrategy):
                     most_recent_duration = swing_point.candle_count_since_last_swing_point
                     most_recent_swing_point_label = 'HL'
                     recent_swing_points.append(swing_point)
+                    hl_prices.append(float(swing_point.price_object.low_price))
                 elif swing_point.label == 'HH':
                     logger.error(f'Found a prior {swing_point.label}.')
                     if swing_point.label == 'HH' and most_recent_swing_point_label == 'HL':
@@ -835,15 +840,16 @@ class GannPointFiveSell(BaseStrategy):
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
-            if latest_price.close_price < swing_point.price:
+            min_hl_price = min(hl_prices)
+            if latest_price.close_price < min_hl_price:
                 confirmed = True
                 when_confirmed = ""
             else:
                 confirmed = False
-                when_confirmed = f'When price falls below {swing_point.price}.'
+                when_confirmed = f'When price falls below {min_hl_price}.'
 
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration),
-                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size),
+                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size), 'min_hl_price' : min_hl_price,
                     'duration_after_latest_sp' : str(duration_after_latest_sp), 'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:

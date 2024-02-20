@@ -1336,6 +1336,8 @@ class GannFiveBuyCustomizer(BaseGraphCustomizer):
         # Filter swing points to find the one with 'LH' label and matching candle_count_since_last_swing_point
         lh_swing_point = None
         # print(f'Before loop: mid_date_current = {mid_date_current}, most_recent_date = {most_recent_date}')
+        max_lh_price = int(trading_opp.metrics_snapshot.get('max_lh_price'))
+        print('max_lh_price:', max_lh_price)
         for swing_point in swing_points:
             print('swing_point.label:', swing_point.label, ' swing_point.candle_count_since_last_swing_point:',
                   swing_point.candle_count_since_last_swing_point)
