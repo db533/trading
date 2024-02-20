@@ -866,6 +866,7 @@ class GannPointEightBuy(BaseStrategy):
         peak_percent_above_bottom = 3   # The peak must be at least this many % above the bottom to be coutned as a peak.
         bottoms = 0
         recent_swing_points = []
+        bottom_dates = []
         if latest_price is not None:
             latest_close_price = latest_price.close_price
         else:
@@ -893,6 +894,7 @@ class GannPointEightBuy(BaseStrategy):
                     # Now need to determine the elapsed days since this LL or HH.
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
                 swing_point_counter += 1
+                most_recent_date = swing_point.date
                 most_recent_label = 'LL'
             elif swing_point_counter > 1:
                 if swing_point.label == 'LH'  or swing_point.label == 'HH':
@@ -909,6 +911,7 @@ class GannPointEightBuy(BaseStrategy):
                         first_candle = most_recent_low_swing_point_candle
                         logger.error(
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a top.')
+                        bottom_dates.append(most_recent_date.isoformat())
                         bottoms += 1
                     else:
                         logger.error(
@@ -946,7 +949,8 @@ class GannPointEightBuy(BaseStrategy):
                 confirmed = False
                 when_confirmed = f'Confirmed when price exceeds {max_top}.'
             data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration), 'recent_swing_points' : recent_swing_points,
-                    'duration_after_latest_sp' : str(duration_after_latest_sp), 'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed}
+                    'duration_after_latest_sp' : str(duration_after_latest_sp), 'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed,
+                    'bottoms_dates' : str(bottom_dates)}
             logger.error(f'Multiple bottoms detected: {bottoms}.')
             # Temporarily set any double bottoms to be defined as a buy.
             #action_buy = True
@@ -974,6 +978,7 @@ class GannPointEightSell(BaseStrategy):
         max_variance_percent = 0.8  # A bottom must be within this many % of the last low price to count as a bottom.
         peak_percent_below_top = 3  # The peak must be at least this many % above the bottom to be coutned as a peak.
         tops = 0
+        tops_dates = []
         recent_swing_points = []
         if latest_price is not None:
             latest_close_price = latest_price.close_price
@@ -1003,6 +1008,7 @@ class GannPointEightSell(BaseStrategy):
                     # Now need to determine the elapsed days since this LL or HH.
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
                 swing_point_counter += 1
+                most_recent_date = swing_point.date
                 most_recent_label = 'HH'
             elif swing_point_counter > 1:
                 if swing_point.label == 'HL' or swing_point.label == 'LL':
@@ -1016,6 +1022,7 @@ class GannPointEightSell(BaseStrategy):
                         first_candle = most_recent_low_swing_point_candle
                         logger.error(
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a bottom.')
+                        tops_dates.append(most_recent_date.isoformat())
                         tops += 1
                     else:
                         logger.error(
@@ -1056,7 +1063,7 @@ class GannPointEightSell(BaseStrategy):
 
             data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration': str(top_duration),
                     'recent_swing_points': recent_swing_points, 'duration_after_latest_sp' : str(duration_after_latest_sp),
-                    'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed}
+                    'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed, 'tops_dates' : str(tops_dates)}
             logger.error(f'Multiple tops detected: {tops}.')
             if latest_price.close_price < min_bottom:
                 logger.error(f'Latest close ({latest_price.close_price}) is below min_bottom ({min_bottom}).')
