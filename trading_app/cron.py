@@ -26,7 +26,8 @@ def display_local_time():
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
-
+###############################
+# Inactive cron jobs:
 class DailyPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['00:01']  # Run at 1:00 AM local time
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
@@ -37,15 +38,6 @@ class DailyPriceDownloadCronJob(CronJobBase):
         # Run the update_ticker_metrics function
         download_prices(timeframe='Daily')
 
-class DailyUSPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['00:01']  # Run at 23:00 local time
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    #schedule = Schedule(run_every_mins=3)  # Run once a day
-    code = 'trading_app.daily_us_price_download_cron_job'
-
-    def do(self):
-        category_price_download('US stocks')
-
 class TestPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['00:01']  # Run at 23:00 local time
     #schedule = Schedule(run_at_times=RUN_AT_TIMES)
@@ -55,27 +47,6 @@ class TestPriceDownloadCronJob(CronJobBase):
     def do(self):
         category_price_download('Test tickers')
         process_trading_opportunities()
-
-
-class DailyTSEPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['21:00']  # Run at 20:00 AM local time
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    #schedule = Schedule(run_every_mins=3)  # Run once a day
-    code = 'trading_app.daily_tse_price_download_cron_job'
-
-    def do(self):
-        category_price_download('TSE stocks')
-
-
-class UpdateTickerMetricsCronJob(CronJobBase):
-    RUN_AT_TIMES = ['05:00']  # Run at 1:00 AM local time
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    # schedule = Schedule(run_every_mins=60*24)  # Run once a day
-    code = 'trading_app.update_ticker_metrics_cron_job'
-
-    def do(self):
-        # Run the update_ticker_metrics function
-        update_ticker_metrics()
 
 class FifteenMinsPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['{:02d}:{:02d}'.format(hour, minute) for hour in range(5, 14) for minute in [1, 16, 31, 46]]
@@ -108,6 +79,7 @@ class TestCronJob(CronJobBase):
         #test_cron_job()
         pass
 
+# Create new TradingOpps
 class DailyTradingOppCreationCronJob(CronJobBase):
     schedule = Schedule(run_every_mins=1)  # Run once a day
     RUN_AT_TIMES = ['06:00']  # Run at 1:00 AM local time
@@ -116,3 +88,49 @@ class DailyTradingOppCreationCronJob(CronJobBase):
     def do(self):
         # Run the update_ticker_metrics function
         process_trading_opportunities()
+
+###############################
+# ACTIVE cron jobs:
+# RUN_AT_TIMES actually execute 3 hours later than defined here.
+
+# Download TSE prices. 576 prices.
+# Trust start time: 00:03
+# Run time 3:12
+# Should complete by 03:15
+class DailyTSEPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['21:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=3)  # Run once a day
+    code = 'trading_app.daily_tse_price_download_cron_job'
+
+    def do(self):
+        category_price_download('TSE stocks')
+
+# Download US prices. 612 prices.
+# Trust start time: 03:30
+# Run time 3:25
+# Should complete by 06:55
+class DailyUSPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['00:28']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=3)  # Run once a day
+    code = 'trading_app.daily_us_price_download_cron_job'
+
+    def do(self):
+        category_price_download('US stocks')
+
+# Update metric scores for tickers
+# Trust start time: 07:00
+# Run time 0:20
+# Should complete by 07:20
+class UpdateTickerMetricsCronJob(CronJobBase):
+    RUN_AT_TIMES = ['04:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    # schedule = Schedule(run_every_mins=60*24)  # Run once a day
+    code = 'trading_app.update_ticker_metrics_cron_job'
+
+    def do(self):
+        # Run the update_ticker_metrics function
+        update_ticker_metrics()
+        process_trading_opportunities()
+
