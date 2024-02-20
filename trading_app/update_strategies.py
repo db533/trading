@@ -1361,7 +1361,12 @@ def process_trading_opportunities():
                         low_after_two_day_retracement = data['low_after_two_day_retracement']
                         del data['peak_before_two_day_retracement']
                         del data['low_after_two_day_retracement']
-
+                    if 'confirmed' in data:
+                        # Strategy has set the flag to indicate whether the Trading signal is confirmed or tentative.
+                        confirmed = data['confirmed']
+                        del data['confirmed']
+                    else:
+                        confirmed = True
                     if existing_tradingopp is not None:
                         logger.error(f'Existing TradingOpp being updated...')
                         # This Ticker / strategy exists as an active record. Increment the count.
@@ -1383,6 +1388,7 @@ def process_trading_opportunities():
                             metrics_snapshot=data, # Capture relevant metrics
                             count = 1,
                             action_buy = action_buy,
+                            confirmed = confirmed
                         )
                         if recent_swing_points_exist == True:
                             for swing_point in recent_swing_points:

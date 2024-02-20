@@ -136,6 +136,7 @@ class TradingOpp(models.Model):
     action_buy = models.BooleanField(default=True)
     swing_points = models.ManyToManyField('SwingPoint', related_name='trading_opps', blank=True)
     datetime_invalidated = models.DateTimeField(null=True, blank = True)
+    confirmed = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
