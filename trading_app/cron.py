@@ -104,7 +104,9 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
     code = 'trading_app.daily_tse_price_download_cron_job'
 
     def do(self):
+        display_local_time()
         category_price_download('TSE stocks')
+        display_local_time()
 
 # Download US prices. 612 prices.
 # Trust start time: 03:30
@@ -117,7 +119,9 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
     code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
+        display_local_time()
         category_price_download('US stocks')
+        display_local_time()
 
 # Update metric scores for tickers
 # Trust start time: 07:00
@@ -131,6 +135,8 @@ class UpdateTickerMetricsCronJob(CronJobBase):
 
     def do(self):
         # Run the update_ticker_metrics function
+        display_local_time()
         update_ticker_metrics()
         process_trading_opportunities()
+        display_local_time()
 
