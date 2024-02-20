@@ -572,18 +572,10 @@ class GannPointFourBuy2(BaseStrategy):
                     # And we have had at least 2 sections of upward movement during the down trend.
                     logger.error(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
                     action_buy = True
-                    if latest_price.close_price > swing_point.price:
-                        confirmed = True
-                        when_confirmed = ""
-                    else:
-                        confirmed = False
-                        when_confirmed = f'When price rises above {swing_point.price}.'
                 else:
                     # The most recent upward rally is shorter than the longest upward rally during the down trend.
                     logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
                     action_buy = None
-                    confirmed = False
-                    when_confirmed = ""
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
                 final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
@@ -592,7 +584,7 @@ class GannPointFourBuy2(BaseStrategy):
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev), 'max_T': str(max(T_prev)), 'count_T_prev': str(len(T_prev)),
                         'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp),
-                        'confirmed' : confirmed, 'when_confirmed' : when_confirmed} # recent_swing_points not as a string as it gets removed and accessed if present.
+                        } # recent_swing_points not as a string as it gets removed and accessed if present.
                 logger.error(f'Max T during prior series of swings: {max_T}.')
             else:
                 data = {'latest_T': str(latest_T), 'T_prev': str(T_prev)}
@@ -660,19 +652,11 @@ class GannPointFourSell(BaseStrategy):
                 # And we have at least 2 sections of downward movement during the most recent upward trend.
                 logger.error(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
                 action_buy = False
-                if latest_price.close_price < swing_point.price:
-                    confirmed = True
-                    when_confirmed = ""
-                else:
-                    confirmed = False
-                    when_confirmed = f'When price falls below {swing_point.price}.'
 
             else:
                 # The most recent downward rally is shorter than the longest downward rally during the down trend.
                 logger.error(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
                 action_buy = None
-                confirmed = False
-                when_confirmed = ""
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
@@ -683,7 +667,6 @@ class GannPointFourSell(BaseStrategy):
                     'recent_swing_points': recent_swing_points,  # recent_swing_points not as a string as it gets removed and accessed if present.
                     'final_downswing_size': str(final_downswing_size),
                     'duration_after_latest_sp' : str(duration_after_latest_sp),
-                    'confirmed': confirmed, 'when_confirmed': when_confirmed
                     }
             logger.error(f'Max T during prior series of swings: {max_T}.')
         else:
