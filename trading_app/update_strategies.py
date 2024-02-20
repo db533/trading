@@ -906,6 +906,7 @@ class GannPointEightBuy(BaseStrategy):
                 swing_point_counter += 1
                 most_recent_date = swing_point.date
                 most_recent_label = 'LL'
+                bottom_prices = []
             elif swing_point_counter > 1:
                 if swing_point.label == 'LH'  or swing_point.label == 'HH':
                     if (most_recent_label == 'LL' or most_recent_label == 'HL'):
@@ -923,6 +924,7 @@ class GannPointEightBuy(BaseStrategy):
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a top.')
                         bottom_dates.append(most_recent_date.isoformat())
                         bottoms += 1
+                        bottom_prices.append(most_recent_low)
                     else:
                         logger.error(
                             f'Successive highs. Not creating / continuing valid bottoms pattern.')
@@ -934,6 +936,7 @@ class GannPointEightBuy(BaseStrategy):
                         # Test if the bottom is within the threshold to be considered at the same level as the last low.
                         low_price_percent_variance = abs(swing_point.price_object.low_price - last_low)*100/last_low
                         recent_swing_points.append(swing_point)
+                        most_recent_low = float(swing_point.price_object.low_price)
                         most_recent_label = swing_point.label
                         if low_price_percent_variance < max_variance_percent:
                             logger.error(f'Low is within threshold {low_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
@@ -952,6 +955,7 @@ class GannPointEightBuy(BaseStrategy):
             bottom_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
+            bottom_price = min(bottom_prices)
             if latest_close_price > max_top:
                 confirmed = True
                 when_confirmed = ""
@@ -960,7 +964,7 @@ class GannPointEightBuy(BaseStrategy):
                 when_confirmed = f'Confirmed when price exceeds {max_top}.'
             data = {'latest_T': str(latest_T), 'bottoms': str(bottoms), 'bottom_duration' : str(bottom_duration), 'recent_swing_points' : recent_swing_points,
                     'duration_after_latest_sp' : str(duration_after_latest_sp), 'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed,
-                    'bottoms_dates' : str(bottom_dates)}
+                    'bottom_price' : bottom_price, 'bottoms_dates' : str(bottom_dates)}
             logger.error(f'Multiple bottoms detected: {bottoms}.')
             # Temporarily set any double bottoms to be defined as a buy.
             #action_buy = True
@@ -989,6 +993,7 @@ class GannPointEightSell(BaseStrategy):
         peak_percent_below_top = 3  # The peak must be at least this many % above the bottom to be coutned as a peak.
         tops = 0
         tops_dates = []
+        top_prices = []
         recent_swing_points = []
         if latest_price is not None:
             latest_close_price = latest_price.close_price
@@ -1033,6 +1038,7 @@ class GannPointEightSell(BaseStrategy):
                         logger.error(
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a bottom.')
                         tops_dates.append(most_recent_date.isoformat())
+                        top_prices.append(most_recent_price)
                         tops += 1
                     else:
                         logger.error(
@@ -1046,6 +1052,7 @@ class GannPointEightSell(BaseStrategy):
                         high_price_percent_variance = abs(swing_point.price_object.high_price - last_high) * 100 / last_high
                         recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
+                        most_recent_price = float(swing_point.price_object.high_price)
                         if high_price_percent_variance < max_variance_percent:
                             logger.error(
                                 f'Low is within threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
@@ -1064,6 +1071,7 @@ class GannPointEightSell(BaseStrategy):
             top_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
+            top_price = max(top_prices)
             if latest_close_price < min_bottom:
                 confirmed = True
                 when_confirmed = ""
@@ -1073,7 +1081,7 @@ class GannPointEightSell(BaseStrategy):
 
             data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration': str(top_duration),
                     'recent_swing_points': recent_swing_points, 'duration_after_latest_sp' : str(duration_after_latest_sp),
-                    'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed, 'tops_dates' : str(tops_dates)}
+                    'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed, 'tops_dates' : str(tops_dates), 'top_price' : str(top_price)}
             logger.error(f'Multiple tops detected: {tops}.')
             if latest_price.close_price < min_bottom:
                 logger.error(f'Latest close ({latest_price.close_price}) is below min_bottom ({min_bottom}).')

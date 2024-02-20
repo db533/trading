@@ -1475,6 +1475,13 @@ class GannEightCustomizer(BaseGraphCustomizer):
         print('min_date:', min_date)
         max_date = max(date_list)
 
+        bottom_price = trading_opp.metrics_snapshot.get('bottom_price')
+        top_price = trading_opp.metrics_snapshot.get('top_price')
+        if bottom_price is not None:
+            min_price = float(bottom_price)
+        if top_price is not None:
+            max_price = float(top_price)
+
         try:
             # Draw horizontal lines
             self.draw_horizontal_line(ax, min_date, max_date, min_price)
