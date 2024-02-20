@@ -582,6 +582,7 @@ class GannPointFourBuy2(BaseStrategy):
                     # The most recent upward rally is shorter than the longest upward rally during the down trend.
                     logger.error(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
                     action_buy = None
+                    confirmed = False
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
                 final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
@@ -669,6 +670,7 @@ class GannPointFourSell(BaseStrategy):
                 # The most recent downward rally is shorter than the longest downward rally during the down trend.
                 logger.error(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
                 action_buy = None
+                confirmed = False
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
