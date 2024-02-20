@@ -1394,6 +1394,7 @@ def process_trading_opportunities():
                     if existing_tradingopp is not None:
                         existing_tradingopp.is_active = False
                         existing_tradingopp.date_invalidated = timezone.now()
+                        existing_tradingopp.action_buy = action_buy
                         existing_tradingopp.save()
         logger.error(f'Finished process_trading_opportunities().')
     except Exception as e:
