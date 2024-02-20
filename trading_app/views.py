@@ -968,8 +968,12 @@ class GannOneBuyCustomizer(BaseGraphCustomizer):
         print('elapsed__duration:', elapsed__duration)
         rise_after_retracement = float(trading_opp.metrics_snapshot.get('rise_after_retracement'))
         print('rise_after_retracement:', rise_after_retracement)
-        duration_after_latest_sp = int(trading_opp.metrics_snapshot.get('duration_after_latest_sp'))
-        print('duration_after_latest_sp:', duration_after_latest_sp)
+        duration_after_latest_sp = trading_opp.metrics_snapshot.get('duration_after_latest_sp')
+        if duration_after_latest_sp is not None:
+            duration_after_latest_sp = int(duration_after_latest_sp)
+            print('duration_after_latest_sp:', duration_after_latest_sp)
+        else:
+            duration_after_latest_sp = '0'
         swing_point_price_list = []
         swing_point_date_list = []
         swing_point_counter = 0
