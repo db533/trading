@@ -897,6 +897,7 @@ class GannPointEightBuy(BaseStrategy):
                     last_sp = swing_point
                     recent_swing_points.append(swing_point)
                     most_recent_low_swing_point_candle = last_candle
+                    most_recent_low = float(swing_point.price_object.low_price)
                 else:
                     # This strategy cannot be true. End review of swing points.
                     logger.error(f'First swingpoint not LL. Strategy not valid.')
@@ -1016,6 +1017,7 @@ class GannPointEightSell(BaseStrategy):
                     last_sp = swing_point
                     recent_swing_points.append(swing_point)
                     most_recent_low_swing_point_candle = last_candle
+                    most_recent_price = float(swing_point.price_object.high_price)
                 else:
                     # This strategy cannot be true. End review of swing points.
                     logger.error(f'First swingpoint not HH. Strategy not valid.')
