@@ -765,7 +765,7 @@ class GannPointFiveBuy(BaseStrategy):
 
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'max_lh_price' : max_lh_price
+                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'max_lh_price' : max_lh_price,
                     'confirmed': confirmed, 'when_confirmed': when_confirmed}
             logger.error(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
