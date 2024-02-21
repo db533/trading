@@ -930,8 +930,7 @@ def trading_opps_sorted_view(request):
     category_param = request.GET.get('category', 'all')  # category ID or 'all'
 
     # Start with all active TradingOpps
-    query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by(
-        '-datetime_identified')
+    query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by('-datetime_identified')
 
     # Filter by action_buy if applicable
     if action_param.lower() == 'buy':
@@ -943,19 +942,20 @@ def trading_opps_sorted_view(request):
     if category_param != 'all':
         query = query.filter(ticker__categories__id=category_param)
 
-        # Group TradingOpps by date, ignoring time
-        grouped_trading_opps = defaultdict(list)
-        for opp in query:
-            opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
-            date_key = opp.datetime_identified.date()  # Extract date part
-            grouped_trading_opps[date_key].append(opp)
+    # Group TradingOpps by date, ignoring time
+    grouped_trading_opps = defaultdict(list)
+    for opp in query:
+        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+        date_key = opp.datetime_identified.date()  # Extract date part
+        grouped_trading_opps[date_key].append(opp)
 
-        context = {
-            'grouped_trading_opps': dict(grouped_trading_opps),
-            'categories': TickerCategory.objects.all(),
-        }
+    context = {
+        'grouped_trading_opps': dict(grouped_trading_opps),
+        'categories': TickerCategory.objects.all(),
+    }
 
-        return render(request, 'trading_opp_sorted_list.html', context)
+    # This return statement is now outside and at the end of the function, ensuring an HttpResponse is always returned
+    return render(request, 'trading_opp_sorted_list.html', context)
 
 class BaseGraphCustomizer:
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
