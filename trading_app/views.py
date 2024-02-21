@@ -921,6 +921,8 @@ def trading_opps_view(request):
 
     return render(request, 'trading_opp_list.html', context)
 
+from collections import defaultdict
+from datetime import datetime
 
 def trading_opps_sorted_view(request):
     # Fetch query parameters for filtering
@@ -954,6 +956,7 @@ def trading_opps_sorted_view(request):
         }
 
         return render(request, 'trading_opp_sorted_list.html', context)
+
 class BaseGraphCustomizer:
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         # Base customization logic (if any)
