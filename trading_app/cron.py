@@ -105,13 +105,7 @@ class DailyTradingOppCreationCronJob(CronJobBase):
     code = 'trading_app.trading_opp_creation_cron_job'
     def do(self):
         # Run the update_ticker_metrics function
-        start_time = time.time()  # Capture start time
         process_trading_opportunities()
-        end_time = time.time()  # Capture end time
-        elapsed_time_str = format_elapsed_time(start_time, end_time)
-
-        # Log or print the elapsed time. Here's an example of logging it:
-        logger.info(f'DailyTradingOppCreationCronJob completed in {elapsed_time_str}')
 
 ###############################
 # ACTIVE cron jobs:

@@ -17,9 +17,25 @@ import logging
 from decimal import Decimal
 import math
 from django.contrib.contenttypes.models import ContentType
+import time
 
 logger = logging.getLogger('django')
 
+def format_elapsed_time(start_time, end_time):
+    """
+    Calculate elapsed time and format it as hours, minutes, and seconds.
+
+    Parameters:
+    - start_time: The start time (as returned by time.time()).
+    - end_time: The end time (as returned by time.time()).
+
+    Returns:
+    - A string formatted as "X hours, Y minutes, Z seconds".
+    """
+    elapsed_seconds = int(end_time - start_time)
+    hours, remainder = divmod(elapsed_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours} : {minutes}  : {seconds}"
 
 def display_local_time():
     # Get the current datetime in UTC
@@ -1187,6 +1203,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 # Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
 def category_price_download(category_name):
     # Run the update_ticker_metrics function
+    start_time = time.time()  # Capture start time
     tickers_for_throtlling = 195
     logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
     tickers = Ticker.objects.filter(categories__name=category_name)
@@ -1215,3 +1232,8 @@ def category_price_download(category_name):
             logger.error(f'Rate throttling for {str(pause_duration)} secs...')
             sleep(pause_duration)
     logger.error(f'Completed price download. Tickers processed: {ticker_count}')
+    end_time = time.time()  # Capture end time
+    elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+    # Log or print the elapsed time. Here's an example of logging it:
+    logger.error(f'Completed in {elapsed_time_str}')

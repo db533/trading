@@ -4,6 +4,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, timezone, date
+import time
 
 def display_local_time():
     # Get the current datetime in UTC
@@ -290,6 +291,7 @@ def test_tae_strategy(ticker):
     return ticker
 
 def update_ticker_metrics(ticker_symbol="All"):
+    start_time = time.time()
     display_local_time()
 
     print('Updating metrics:')
@@ -329,3 +331,9 @@ def update_ticker_metrics(ticker_symbol="All"):
             ticker = test_tae_strategy(ticker)
 
             ticker.save()
+
+    end_time = time.time()  # Capture end time
+    elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+    # Log or print the elapsed time. Here's an example of logging it:
+    logger.error(f'Completed in {elapsed_time_str}')
