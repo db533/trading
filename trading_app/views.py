@@ -941,15 +941,19 @@ def trading_opps_sorted_view(request):
     if category_param != 'all':
         query = query.filter(ticker__categories__id=category_param)
 
-    for opp in query:
-        opp.translated_metrics = translate_metrics(opp)  # Assign translated metrics to each opp
+        # Group TradingOpps by date, ignoring time
+        grouped_trading_opps = defaultdict(list)
+        for opp in query:
+            opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+            date_key = opp.datetime_identified.date()  # Extract date part
+            grouped_trading_opps[date_key].append(opp)
 
-    context = {
-        'sorted_active_trading_opps': query,
-        'categories': TickerCategory.objects.all(),  # Assuming you want to list all categories for filtering
-    }
+        context = {
+            'grouped_trading_opps': dict(grouped_trading_opps),
+            'categories': TickerCategory.objects.all(),
+        }
 
-    return render(request, 'trading_opp_sorted_list.html', context)
+        return render(request, 'trading_opp_sorted_list.html', context)
 class BaseGraphCustomizer:
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date,strategy_data, offset_up, offset_down):
         # Base customization logic (if any)
