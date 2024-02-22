@@ -3,7 +3,7 @@ import logging
 from .models import Ticker, DailyPrice
 from datetime import datetime, timedelta, timezone, date
 import pytz
-from .price_download import download_prices
+from .price_download import download_prices, download_daily_ticker_price
 from time import sleep
 import time
 
@@ -83,7 +83,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             logger.error(f'No DailyPrice record found for ticker "{ticker_symbol}". Proceeding with download.')
 
         start_time = display_local_time()  # record the start time of the loop
-        download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
+        download_daily_ticker_price(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
 
         end_time = display_local_time()  # record the end time of the loop
         elapsed_time = end_time - start_time  # calculate elapsed time
