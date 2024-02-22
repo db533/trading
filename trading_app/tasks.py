@@ -43,6 +43,7 @@ def background_manual_category_download(category_name):
         # Iterate through all retrieved tickers and download prices.
         for ticker in tickers:
             background_manual_ticker_download(ticker.symbol, throttling)
+            logger.error(f'{str(ticker.symbol)} price download requested in background...')
         logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
         logger.error(
             f'=========================================================================================')
