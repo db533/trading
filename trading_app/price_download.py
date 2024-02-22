@@ -174,51 +174,53 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
     #print('start_day:',start_day,'timezone.make_naive(start_day):',timezone.make_naive(start_day))
     #print('finish_day:', finish_day, 'timezone.make_naive(finish_day):', timezone.make_naive(finish_day))
-    if interval == '1D':
-        existing_dates = DailyPrice.objects.filter(
-            ticker=ticker, datetime__range=(start_day, finish_day)
-        ).values_list('datetime', flat=True)
-        logger.error(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
+    try:
+        if interval == '1D':
+            existing_dates = DailyPrice.objects.filter(
+                ticker=ticker, datetime__range=(start_day, finish_day)
+            ).values_list('datetime', flat=True)
+            logger.error(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
 
-        # Ensure existing_dates is a list of timezone-naive or aware datetime objects
-        existing_dates = [timezone.make_naive(date) for date in existing_dates]
-        #print('existing_dates:', existing_dates[:3])
+            # Ensure existing_dates is a list of timezone-naive or aware datetime objects
+            existing_dates = [timezone.make_naive(date) for date in existing_dates]
+            #print('existing_dates:', existing_dates[:3])
 
-        # Ensure that start_day and finish_day have the time set to 4:00
-        start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
-        finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
+            # Ensure that start_day and finish_day have the time set to 4:00
+            start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
+            finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
 
-        all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
-        all_dates = all_dates.tz_localize(None)
+            all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
+            all_dates = all_dates.tz_localize(None)
 
-        # Ensure all_dates is a list of native python datetime objects
-        all_dates = [date.to_pydatetime() for date in all_dates]
+            # Ensure all_dates is a list of native python datetime objects
+            all_dates = [date.to_pydatetime() for date in all_dates]
 
-        #print('all_dates:', all_dates[:3])
+            #print('all_dates:', all_dates[:3])
 
-        missing_dates = [date for date in all_dates if date not in existing_dates]
+            missing_dates = [date for date in all_dates if date not in existing_dates]
 
-        #print('missing_dates:', missing_dates[:3])
-        #print('max(missing_dates):',max(missing_dates))
-    if interval == '15m':
-        existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
-                                                        datetime__range=(start_day, finish_day)).values_list(
-            'datetime', flat=True)
-        all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
-        all_dates.tz_localize(None)
-        missing_dates = [date for date in all_dates if date not in existing_dates]
-        # print('all_dates:',all_dates)
-    if interval == '5m':
-        existing_dates = FiveMinPrice.objects.filter(ticker=ticker,
-                                                     datetime__range=(start_day, finish_day)).values_list(
-            'datetime', flat=True)
-        all_dates = pd.date_range(start=start_day, end=finish_day, freq='5T')
-        all_dates.tz_localize(None)
-        missing_dates = [date for date in all_dates if date not in existing_dates]
-        # print('all_dates:',all_dates)
-        # print('missing_dates:',missing_dates)
-    return missing_dates
-
+            #print('missing_dates:', missing_dates[:3])
+            #print('max(missing_dates):',max(missing_dates))
+        if interval == '15m':
+            existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
+                                                            datetime__range=(start_day, finish_day)).values_list(
+                'datetime', flat=True)
+            all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
+            all_dates.tz_localize(None)
+            missing_dates = [date for date in all_dates if date not in existing_dates]
+            # print('all_dates:',all_dates)
+        if interval == '5m':
+            existing_dates = FiveMinPrice.objects.filter(ticker=ticker,
+                                                         datetime__range=(start_day, finish_day)).values_list(
+                'datetime', flat=True)
+            all_dates = pd.date_range(start=start_day, end=finish_day, freq='5T')
+            all_dates.tz_localize(None)
+            missing_dates = [date for date in all_dates if date not in existing_dates]
+            # print('all_dates:',all_dates)
+            # print('missing_dates:',missing_dates)
+        return missing_dates
+    except Exception as e:
+        logger.error(f'Error in get_missing_dates: {e}')
 
 def add_candle_data(price_history, candlestick_functions, column_names):
     for candlestick_func, column_name in zip(candlestick_functions, column_names):
