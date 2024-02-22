@@ -145,15 +145,16 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
 # Should complete by 06:55
 class DailyUSPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['00:28']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    #schedule = Schedule(run_every_mins=3)  # Run once a day
+    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
         start_time = time.time()  # Capture start time
         display_local_time()
         #category_price_download('US stocks')
-        background_manual_category_download('US stocks')
+        #background_manual_category_download('US stocks')
+        background_manual_category_download('Test tickers')
         display_local_time()
 
         end_time = time.time()  # Capture end time
