@@ -57,7 +57,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         logger.error(f'background_manual_ticker_download() starting for ticker "{str(ticker_symbol)}". throttling={str(throttling)}...')
         ticker = Ticker.objects.get(symbol=ticker_symbol)
         start_time = display_local_time()  # record the start time of the loop
-        download_prices(timeframe='Daily', ticker=ticker, trigger='User')
+        download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
 
         end_time = display_local_time()  # record the end time of the loop
         elapsed_time = end_time - start_time  # calculate elapsed time
