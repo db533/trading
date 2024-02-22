@@ -181,10 +181,12 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
             ).values_list('datetime', flat=True)
             logger.error(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
 
-            # Ensure existing_dates is a list of timezone-naive or aware datetime objects
-            existing_dates = [timezone.make_naive(date) for date in existing_dates]
-            logger.error(f'existing_dates: {existing_dates[:3]}')
-
+            try:
+                # Ensure existing_dates is a list of timezone-naive or aware datetime objects
+                existing_dates = [timezone.make_naive(date) for date in existing_dates]
+                logger.error(f'existing_dates: {existing_dates[:3]}')
+            except Exception as e:
+                logger.error(f'Failed to create existing_dates: {e}')
             # Ensure that start_day and finish_day have the time set to 4:00
             start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
             finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
@@ -210,7 +212,7 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
             all_dates = pd.date_range(start=start_day, end=finish_day, freq='15T')
             all_dates.tz_localize(None)
             missing_dates = [date for date in all_dates if date not in existing_dates]
-            # print('all_dates:',all_dates)
+            # print('all_dates:',all_dates)ķķ
         if interval == '5m':
             existing_dates = FiveMinPrice.objects.filter(ticker=ticker,
                                                          datetime__range=(start_day, finish_day)).values_list(
