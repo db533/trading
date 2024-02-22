@@ -927,24 +927,23 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         print('ticker_symbol:', ticker_symbol)
         logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
-        ticker_count = Ticker.objects.all().count()
+        #ticker_count = Ticker.objects.all().count()
         # Check if the 'TSE stocks' category exists
-        tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
-        if not tse_stocks_category:
+        #tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+        #if not tse_stocks_category:
             # 'TSE stocks' category doesn't exist, handle it as you wish (e.g., raise an exception or return an error response)
-            print('TSE stocks category does not exist!!')
+        #    print('TSE stocks category does not exist!!')
 
-        if ticker_symbol == 'All':
-            logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
-            ticker_group = Ticker.objects.all().order_by('symbol')
+        #if ticker_symbol == 'All':
+        #    logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
+        #    ticker_group = Ticker.objects.all().order_by('symbol')
+        #else:
+        #    ticker_group = Ticker.objects.filter(symbol=ticker_symbol)
+
+        ticker = Ticker.objects.get(symbol=ticker_symbol)
+        if ticker is None:
+            print('No Ticker instance found for this symbol')
         else:
-            ticker_group = Ticker.objects.filter(symbol=ticker_symbol)
-
-        for ticker in ticker_group:
-            if ticker_symbol == 'All':
-                print('Ticker:', ticker.symbol)
-                logger.error(f'ticker.symbol: {str(ticker.symbol)}')
-
             new_record_count=0
             if timeframe == 'Daily': # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
                 print('start_time:')
@@ -1095,11 +1094,11 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 elapsed_time = end_time - start_time  # calculate elapsed time
 
                 # Ensure at least 20 seconds before the next iteration
-                if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
-                    pause_duration = 20 - elapsed_time.total_seconds()
-                    print('Rate throttling for',pause_duration,'secs...')
-                    logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-                    sleep(pause_duration)
+                #if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
+                #    pause_duration = 20 - elapsed_time.total_seconds()
+                #    print('Rate throttling for',pause_duration,'secs...')
+                #    logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                #    sleep(pause_duration)
             if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
                 start_day = timezone.now() - timedelta(days=7)
                 finish_day = timezone.now()
