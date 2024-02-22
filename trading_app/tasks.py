@@ -29,7 +29,6 @@ def background_manual_category_download(category_name):
     try:
         tickers_for_throtlling = 195
         logger.error(f'background_manual_category_download() starting for stocks in category "{str(category_name)}"...')
-        logger.error('Test log message immediately following the first log statement.')
         logger.error(f'category: {str(category_name)}')
         category_name = category_name.replace('%20',' ')
         category_name = category_name.replace('%2520', ' ')

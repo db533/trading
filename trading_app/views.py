@@ -714,7 +714,9 @@ def manual_download(request, ticker_id, timeframe):
 
 def manual_category_download(request, category_name):
     try:
+        logger.error('About to call background_manual_category_download(category_name) ...')
         background_manual_category_download(category_name)
+        logger.error('Call made.')
     except Exception as e:
         logger.error(
             f'Error occured calling background_manual_category_download from manual_category_download(). "{e}"...')
