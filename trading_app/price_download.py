@@ -913,12 +913,13 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     logger.error(f'Running download_daily_ticker_price() for ticker_symbol: {str(ticker_symbol)}')
+
     logger.error(f'xxx---xxx')
 
 
-def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     local_time = display_local_time()
     print('Timeframe:', timeframe)
     print('ticker_symbol:', ticker_symbol)
@@ -940,9 +941,6 @@ def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigge
             print('start_time:')
             start_time = display_local_time()  # record the start time of the loop
             print('Downloading daily prices...')
-
-        else:
-            print('Timeframe is not daily.')
 
             # Query and delete the old prices
             start_day = timezone.now() - timedelta(days=365)
