@@ -929,10 +929,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 
         #ticker_count = Ticker.objects.all().count()
         # Check if the 'TSE stocks' category exists
-        #tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
-        #if not tse_stocks_category:
+        tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+        if not tse_stocks_category:
             # 'TSE stocks' category doesn't exist, handle it as you wish (e.g., raise an exception or return an error response)
-        #    print('TSE stocks category does not exist!!')
+            print('TSE stocks category does not exist!!')
 
         #if ticker_symbol == 'All':
         #    logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
@@ -943,6 +943,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         ticker = Ticker.objects.get(symbol=ticker_symbol)
         if ticker is None:
             print('No Ticker instance found for this symbol')
+            logger.error(f'No Ticker instance found for this symbol.')
         else:
             new_record_count=0
             if timeframe == 'Daily': # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
