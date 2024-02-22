@@ -4,6 +4,8 @@ from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
 from .price_download import download_prices, category_price_download
 from .update_strategies import process_trading_opportunities
+from .tasks import background_manual_category_download
+
 from .test_cron_job import test_cron_job
 from datetime import datetime, timedelta, timezone, date, time
 import pytz
@@ -125,7 +127,8 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
         start_time = time.time()  # Capture start time
 
         display_local_time()
-        category_price_download('TSE stocks')
+        #category_price_download('TSE stocks')
+        background_manual_category_download('TSE stocks')
         display_local_time()
 
         end_time = time.time()  # Capture end time
@@ -149,7 +152,8 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
     def do(self):
         start_time = time.time()  # Capture start time
         display_local_time()
-        category_price_download('US stocks')
+        #category_price_download('US stocks')
+        background_manual_category_download('US stocks')
         display_local_time()
 
         end_time = time.time()  # Capture end time
