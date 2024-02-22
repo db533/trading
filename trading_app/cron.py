@@ -153,8 +153,8 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
         start_time = time.time()  # Capture start time
         display_local_time()
         #category_price_download('US stocks')
-        #background_manual_category_download('US stocks')
-        background_manual_category_download('Test tickers')
+        background_manual_category_download('US stocks')
+        #background_manual_category_download('Test tickers')
         display_local_time()
 
         end_time = time.time()  # Capture end time
