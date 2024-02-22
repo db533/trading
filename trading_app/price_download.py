@@ -914,6 +914,9 @@ def add_ema_and_trend(price_history):
     return price_history
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+    logger.error(f'Running download_daily_ticker_price() for ticker_symbol: {str(ticker_symbol)}')
+
+def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     local_time = display_local_time()
     print('Timeframe:', timeframe)
     print('ticker_symbol:', ticker_symbol)
