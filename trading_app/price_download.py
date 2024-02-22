@@ -921,319 +921,325 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         # trigger = "User" means that the user has triggered the price download.
 
     print('Running download_prices()...')
-    local_time = display_local_time()
-    print('Timeframe:', timeframe)
-    print('ticker_symbol:', ticker_symbol)
-    logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
+    try:
+        local_time = display_local_time()
+        print('Timeframe:', timeframe)
+        print('ticker_symbol:', ticker_symbol)
+        logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
-    ticker_count = Ticker.objects.all().count()
-    # Check if the 'TSE stocks' category exists
-    tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
-    if not tse_stocks_category:
-        # 'TSE stocks' category doesn't exist, handle it as you wish (e.g., raise an exception or return an error response)
-        print('TSE stocks category does not exist!!')
+        ticker_count = Ticker.objects.all().count()
+        # Check if the 'TSE stocks' category exists
+        tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+        if not tse_stocks_category:
+            # 'TSE stocks' category doesn't exist, handle it as you wish (e.g., raise an exception or return an error response)
+            print('TSE stocks category does not exist!!')
 
-    if ticker_symbol == 'All':
-        logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
-
-    for ticker in Ticker.objects.all().order_by('symbol'):
         if ticker_symbol == 'All':
-            print('Ticker:', ticker.symbol)
-            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
+            logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
 
-        new_record_count=0
-        if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
-            print('start_time:')
-            start_time = display_local_time()  # record the start time of the loop
-            print('Downloading daily prices...')
-            start_day = timezone.now() - timedelta(days=365)
-            finish_day = timezone.now()
-            interval = '1D'
+        for ticker in Ticker.objects.all().order_by('symbol'):
+            if ticker_symbol == 'All':
+                print('Ticker:', ticker.symbol)
+                logger.error(f'ticker.symbol: {str(ticker.symbol)}')
 
-            # Query and delete the old prices
-            old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
-            deleted_count, _ = old_prices.delete()
-            print('Deleted', deleted_count, 'older DailyPrice records.')
-            logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
+            new_record_count=0
+            if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+                print('start_time:')
+                start_time = display_local_time()  # record the start time of the loop
+                print('Downloading daily prices...')
+                start_day = timezone.now() - timedelta(days=365)
+                finish_day = timezone.now()
+                interval = '1D'
 
-            # Check if the stock is marked as a TSE stock.
-            is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
-            if is_in_tse_stocks:
-                hour_offset = 15
-            else:
-                hour_offset = 4
-            logger.error(f'hour_offset = {str(hour_offset)}')
-            # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
+                # Query and delete the old prices
+                old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
+                deleted_count, _ = old_prices.delete()
+                print('Deleted', deleted_count, 'older DailyPrice records.')
+                logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
-            if missing_dates:
-                # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                start_day = min(missing_dates)
-                finish_day = max(missing_dates)
-                print('Retrieving data from ', start_day, ' to ', finish_day)
-                logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
+                # Check if the stock is marked as a TSE stock.
+                is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+                if is_in_tse_stocks:
+                    hour_offset = 15
+                else:
+                    hour_offset = 4
+                logger.error(f'hour_offset = {str(hour_offset)}')
+                # Get the list of missing dates
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
 
-                # Request price data for the entire missing date range
-                price_history = get_price_data(ticker, interval, start_day, finish_day)
-                if len(price_history) >= 3:
-                    #print('Step 11')
-                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                    #print('Step 12')
-                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                    #print('Step 13')
-                    count_patterns(price_history, pattern_types)
-                    #print('Step 14')
-                    sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
-                    #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
-                    #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
-                    #else:
-                    #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
+                if missing_dates:
+                    # Set start_day to the smallest date and finish_day to the largest date in missing_dates
+                    start_day = min(missing_dates)
+                    finish_day = max(missing_dates)
+                    print('Retrieving data from ', start_day, ' to ', finish_day)
+                    logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
-                    #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
-                    #print('Step 15')
-                    ticker.last_high_low = last_high_low_level
-                    ticker.swing_point_current_trend = swing_point_current_trend
-                    #print('Step 16')
-                    ticker.save()
-                    print('ticker.swing_point_current_trend:', ticker.swing_point_current_trend)
-                    price_history = add_levels_to_price_history(price_history, sr_levels, retests)
-                    #print('Step 17')
-                    price_history = add_ema_and_trend(price_history)
-                    #print('Step 18')
+                    # Request price data for the entire missing date range
+                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    if len(price_history) >= 3:
+                        #print('Step 11')
+                        price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                        #print('Step 12')
+                        price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                        #print('Step 13')
+                        count_patterns(price_history, pattern_types)
+                        #print('Step 14')
+                        sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
+                        #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
+                        #if ticker.symbol == 'NNOX':
+                        price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
+                        #else:
+                        #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
-                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                    for index, row in price_history.iterrows():
-                        if math.isnan(row['Close']):
-                            print(row)
-                        if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime_TZ']).exists():
-                            new_record_count += 1
-                            daily_price = DailyPrice(
-                                ticker=ticker,
-                                datetime=row['Datetime_TZ'],
-                                datetime_tz=row['Datetime_TZ'],
-                                open_price=row['Open'],
-                                high_price=row['High'],
-                                low_price=row['Low'],
-                                close_price=row['Close'],
-                                percent_change=row['PercentChange'],
-                                volume=row['Volume'],
-                                patterns_detected=row['patterns_detected'],
-                                bullish_detected=row['bullish'],
-                                bearish_detected=row['bearish'],
-                                reversal_detected=row['reversal'],
-                                bullish_reversal_detected=row['bullish_reversal'],
-                                bearish_reversal_detected=row['bearish_reversal'],
-                                level=row['level'],
-                                level_type=row['level_type'],
-                                level_strength=row['level_strength'],
-                                ema_200=row['EMA_200'],
-                                ema_50=row['EMA_50'],
-                                trend=row['Trend'],
-                                swing_point_label=row['swing_point_label'],
-                                swing_point_current_trend=row['swing_point_current_trend'],
-                                healthy_bullish_count = row['healthy_bullish_candle'],
-                                healthy_bearish_count=row['healthy_bearish_candle'],
-                                candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
-                            )
-                            logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
-                        else:
-                            daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
-                            daily_price.datetime_tz = daily_price.datetime
-                            daily_price.patterns_detected = row['patterns_detected']
-                            daily_price.bullish_detected = row['bullish']
-                            daily_price.bearish_detected = row['bearish']
-                            daily_price.reversal_detected = row['reversal']
-                            daily_price.bullish_reversal_detected = row['bullish_reversal']
-                            daily_price.bearish_reversal_detected = row['bearish_reversal']
-                            daily_price.level = row['level']
-                            daily_price.level_type = row['level_type']
-                            daily_price.level_strength = row['level_strength']
-                            daily_price.ema_200 = row['EMA_200']
-                            daily_price.ema_50 = row['EMA_50']
-                            daily_price.trend = row['Trend']
-                            daily_price.swing_point_label = row['swing_point_label']
-                            daily_price.swing_point_current_trend = row['swing_point_current_trend']
-                            daily_price.healthy_bullish_count = row['healthy_bullish_candle']
-                            daily_price.healthy_bearish_count = row['healthy_bearish_candle']
-                            daily_price.candle_count_since_last_swing_point = row['candle_count_since_last_swing_point']
-                        daily_price.save()
-                        if len(row['swing_point_label']) > 0:
-                            # This was noted to be a swing point
-                            # Get the ContentType for the DailyPrice model
-                            content_type = ContentType.objects.get_for_model(daily_price)
+                        #print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
+                        #print('Step 15')
+                        ticker.last_high_low = last_high_low_level
+                        ticker.swing_point_current_trend = swing_point_current_trend
+                        #print('Step 16')
+                        ticker.save()
+                        print('ticker.swing_point_current_trend:', ticker.swing_point_current_trend)
+                        price_history = add_levels_to_price_history(price_history, sr_levels, retests)
+                        #print('Step 17')
+                        price_history = add_ema_and_trend(price_history)
+                        #print('Step 18')
 
-                            # First check if a swing point instance has already been created for this swing point.
-                            logger.error(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
-                                         f"content_type: {str(content_type)}")
-                            existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
-                            logger.error(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
-                            if not existing_swing_point_instance.exists():
-                                logger.error(f'SwingPoint does not exist.')
-                                new_swing_point = SwingPoint.objects.create(
+                        # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                        for index, row in price_history.iterrows():
+                            if math.isnan(row['Close']):
+                                print(row)
+                            if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime_TZ']).exists():
+                                new_record_count += 1
+                                daily_price = DailyPrice(
                                     ticker=ticker,
-                                    date=row['Datetime_TZ'],
-                                    price=row['swing_point_price'],
-                                    label=row['swing_point_label'],
+                                    datetime=row['Datetime_TZ'],
+                                    datetime_tz=row['Datetime_TZ'],
+                                    open_price=row['Open'],
+                                    high_price=row['High'],
+                                    low_price=row['Low'],
+                                    close_price=row['Close'],
+                                    percent_change=row['PercentChange'],
+                                    volume=row['Volume'],
+                                    patterns_detected=row['patterns_detected'],
+                                    bullish_detected=row['bullish'],
+                                    bearish_detected=row['bearish'],
+                                    reversal_detected=row['reversal'],
+                                    bullish_reversal_detected=row['bullish_reversal'],
+                                    bearish_reversal_detected=row['bearish_reversal'],
+                                    level=row['level'],
+                                    level_type=row['level_type'],
+                                    level_strength=row['level_strength'],
+                                    ema_200=row['EMA_200'],
+                                    ema_50=row['EMA_50'],
+                                    trend=row['Trend'],
+                                    swing_point_label=row['swing_point_label'],
+                                    swing_point_current_trend=row['swing_point_current_trend'],
+                                    healthy_bullish_count = row['healthy_bullish_candle'],
+                                    healthy_bearish_count=row['healthy_bearish_candle'],
                                     candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
-                                    content_type=content_type,
-                                    object_id=daily_price.id
+                                )
+                                logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
+                            else:
+                                daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
+                                daily_price.datetime_tz = daily_price.datetime
+                                daily_price.patterns_detected = row['patterns_detected']
+                                daily_price.bullish_detected = row['bullish']
+                                daily_price.bearish_detected = row['bearish']
+                                daily_price.reversal_detected = row['reversal']
+                                daily_price.bullish_reversal_detected = row['bullish_reversal']
+                                daily_price.bearish_reversal_detected = row['bearish_reversal']
+                                daily_price.level = row['level']
+                                daily_price.level_type = row['level_type']
+                                daily_price.level_strength = row['level_strength']
+                                daily_price.ema_200 = row['EMA_200']
+                                daily_price.ema_50 = row['EMA_50']
+                                daily_price.trend = row['Trend']
+                                daily_price.swing_point_label = row['swing_point_label']
+                                daily_price.swing_point_current_trend = row['swing_point_current_trend']
+                                daily_price.healthy_bullish_count = row['healthy_bullish_candle']
+                                daily_price.healthy_bearish_count = row['healthy_bearish_candle']
+                                daily_price.candle_count_since_last_swing_point = row['candle_count_since_last_swing_point']
+                            daily_price.save()
+                            if len(row['swing_point_label']) > 0:
+                                # This was noted to be a swing point
+                                # Get the ContentType for the DailyPrice model
+                                content_type = ContentType.objects.get_for_model(daily_price)
+
+                                # First check if a swing point instance has already been created for this swing point.
+                                logger.error(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
+                                             f"content_type: {str(content_type)}")
+                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
+                                logger.error(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
+                                if not existing_swing_point_instance.exists():
+                                    logger.error(f'SwingPoint does not exist.')
+                                    new_swing_point = SwingPoint.objects.create(
+                                        ticker=ticker,
+                                        date=row['Datetime_TZ'],
+                                        price=row['swing_point_price'],
+                                        label=row['swing_point_label'],
+                                        candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
+                                        content_type=content_type,
+                                        object_id=daily_price.id
+                                    )
+                                else:
+                                    logger.error(f'SwingPoint does exist.')
+
+                    else:
+                        print('Insufficient data.')
+
+                print('new_record_count:',new_record_count)
+                logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
+                end_time = display_local_time()  # record the end time of the loop
+                elapsed_time = end_time - start_time  # calculate elapsed time
+
+                # Ensure at least 20 seconds before the next iteration
+                if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
+                    pause_duration = 20 - elapsed_time.total_seconds()
+                    print('Rate throttling for',pause_duration,'secs...')
+                    logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                    sleep(pause_duration)
+            if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
+                start_day = timezone.now() - timedelta(days=7)
+                finish_day = timezone.now()
+                interval = '15m'
+                print('Checking 15 min data for', ticker.symbol)
+
+                # Get the list of missing dates
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, 23)
+
+                if missing_dates:
+                    # Set start_day to the smallest date and finish_day to the largest date in missing_dates
+                    start_day = min(missing_dates)
+                    finish_day = max(missing_dates)
+                    print('Retrieving data from ', start_day, ' to ', finish_day)
+
+                    # Request price data for the entire missing date range
+                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    print('len(price_history):', len(price_history))
+                    if len(price_history) >= 3:
+                        price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                        price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                        count_patterns(price_history, pattern_types)
+
+                        # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                        for index, row in price_history.iterrows():
+                            if not FifteenMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                                fifteenmin_price = FifteenMinPrice(
+                                    ticker=ticker,
+                                    datetime=row['Datetime'],
+                                    open_price=row['Open'],
+                                    high_price=row['High'],
+                                    low_price=row['Low'],
+                                    close_price=row['Close'],
+                                    percent_change=row['PercentChange'],
+                                    volume=row['Volume'],
+                                    patterns_detected=row['patterns_detected'],
+                                    bullish_detected=row['bullish'],
+                                    bearish_detected=row['bearish'],
+                                    reversal_detected=row['reversal'],
+                                    bullish_reversal_detected=row['bullish_reversal'],
+                                    bearish_reversal_detected=row['bearish_reversal'],
                                 )
                             else:
-                                logger.error(f'SwingPoint does exist.')
+                                fifteenmin_price = FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                                fifteenmin_price.patterns_detected = row['patterns_detected']
+                                fifteenmin_price.bullish_detected = row['bullish']
+                                fifteenmin_price.bearish_detected = row['bearish']
+                                fifteenmin_price.reversal_detected = row['reversal']
+                                fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
+                                fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
+                            fifteenmin_price.save()
+                    else:
+                        print('Insufficient data.')
+            if timeframe == '5 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
+                start_day = timezone.now() - timedelta(days=5)
+                finish_day = timezone.now()
+                interval = '5m'
+                print('Checking 5 min data for', ticker.symbol)
+                # Get the list of missing dates
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day,23)
+                if missing_dates:
+                    # Set start_day to the smallest date and finish_day to the largest date in missing_dates
+                    start_day = min(missing_dates)
+                    finish_day = max(missing_dates)
+                    print('Retrieving data from ', start_day, ' to ', finish_day)
+                    # Request price data for the entire missing date range
+                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    print('len(price_history):', len(price_history))
+                    if len(price_history) >= 3:
+                        price_history = add_candle_data(price_history, candlestick_functions, column_names)
+                        price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
+                        count_patterns(price_history, pattern_types)
 
-                else:
-                    print('Insufficient data.')
-
-            print('new_record_count:',new_record_count)
-            logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
-            end_time = display_local_time()  # record the end time of the loop
-            elapsed_time = end_time - start_time  # calculate elapsed time
-
-            # Ensure at least 20 seconds before the next iteration
-            if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
-                pause_duration = 20 - elapsed_time.total_seconds()
-                print('Rate throttling for',pause_duration,'secs...')
-                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-                sleep(pause_duration)
-        if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
-            start_day = timezone.now() - timedelta(days=7)
-            finish_day = timezone.now()
-            interval = '15m'
-            print('Checking 15 min data for', ticker.symbol)
-
-            # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, 23)
-
-            if missing_dates:
-                # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                start_day = min(missing_dates)
-                finish_day = max(missing_dates)
-                print('Retrieving data from ', start_day, ' to ', finish_day)
-
-                # Request price data for the entire missing date range
-                price_history = get_price_data(ticker, interval, start_day, finish_day)
-                print('len(price_history):', len(price_history))
-                if len(price_history) >= 3:
-                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                    count_patterns(price_history, pattern_types)
-
-                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                    for index, row in price_history.iterrows():
-                        if not FifteenMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                            fifteenmin_price = FifteenMinPrice(
-                                ticker=ticker,
-                                datetime=row['Datetime'],
-                                open_price=row['Open'],
-                                high_price=row['High'],
-                                low_price=row['Low'],
-                                close_price=row['Close'],
-                                percent_change=row['PercentChange'],
-                                volume=row['Volume'],
-                                patterns_detected=row['patterns_detected'],
-                                bullish_detected=row['bullish'],
-                                bearish_detected=row['bearish'],
-                                reversal_detected=row['reversal'],
-                                bullish_reversal_detected=row['bullish_reversal'],
-                                bearish_reversal_detected=row['bearish_reversal'],
-                            )
-                        else:
-                            fifteenmin_price = FifteenMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                            fifteenmin_price.patterns_detected = row['patterns_detected']
-                            fifteenmin_price.bullish_detected = row['bullish']
-                            fifteenmin_price.bearish_detected = row['bearish']
-                            fifteenmin_price.reversal_detected = row['reversal']
-                            fifteenmin_price.bullish_reversal_detected = row['bullish_reversal']
-                            fifteenmin_price.bearish_reversal_detected = row['bearish_reversal']
-                        fifteenmin_price.save()
-                else:
-                    print('Insufficient data.')
-        if timeframe == '5 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
-            start_day = timezone.now() - timedelta(days=5)
-            finish_day = timezone.now()
-            interval = '5m'
-            print('Checking 5 min data for', ticker.symbol)
-            # Get the list of missing dates
-            missing_dates = get_missing_dates(ticker, interval, start_day, finish_day,23)
-            if missing_dates:
-                # Set start_day to the smallest date and finish_day to the largest date in missing_dates
-                start_day = min(missing_dates)
-                finish_day = max(missing_dates)
-                print('Retrieving data from ', start_day, ' to ', finish_day)
-                # Request price data for the entire missing date range
-                price_history = get_price_data(ticker, interval, start_day, finish_day)
-                print('len(price_history):', len(price_history))
-                if len(price_history) >= 3:
-                    price_history = add_candle_data(price_history, candlestick_functions, column_names)
-                    price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
-                    count_patterns(price_history, pattern_types)
-
-                    # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
-                    for index, row in price_history.iterrows():
-                        if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
-                            fivemin_price = FiveMinPrice(
-                                ticker=ticker,
-                                datetime=row['Datetime'],
-                                open_price=row['Open'],
-                                high_price=row['High'],
-                                low_price=row['Low'],
-                                close_price=row['Close'],
-                                percent_change=row['PercentChange'],
-                                volume=row['Volume'],
-                                patterns_detected=row['patterns_detected'],
-                                bullish_detected=row['bullish'],
-                                bearish_detected=row['bearish'],
-                                reversal_detected=row['reversal'],
-                                bullish_reversal_detected=row['bullish_reversal'],
-                                bearish_reversal_detected=row['bearish_reversal'],
-                            )
-                        else:
-                            fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
-                            fivemin_price.patterns_detected = row['patterns_detected']
-                            fivemin_price.bullish_detected = row['bullish']
-                            fivemin_price.bearish_detected = row['bearish']
-                            fivemin_price.reversal_detected = row['reversal']
-                            fivemin_price.bullish_reversal_detected = row['bullish_reversal']
-                            fivemin_price.bearish_reversal_detected = row['bearish_reversal']
-                        fivemin_price.save()
-                else:
-                    print('Insufficient data.')
+                        # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
+                        for index, row in price_history.iterrows():
+                            if not FiveMinPrice.objects.filter(ticker=ticker, datetime=row['Datetime']).exists():
+                                fivemin_price = FiveMinPrice(
+                                    ticker=ticker,
+                                    datetime=row['Datetime'],
+                                    open_price=row['Open'],
+                                    high_price=row['High'],
+                                    low_price=row['Low'],
+                                    close_price=row['Close'],
+                                    percent_change=row['PercentChange'],
+                                    volume=row['Volume'],
+                                    patterns_detected=row['patterns_detected'],
+                                    bullish_detected=row['bullish'],
+                                    bearish_detected=row['bearish'],
+                                    reversal_detected=row['reversal'],
+                                    bullish_reversal_detected=row['bullish_reversal'],
+                                    bearish_reversal_detected=row['bearish_reversal'],
+                                )
+                            else:
+                                fivemin_price = FiveMinPrice.objects.get(ticker=ticker, datetime=row['Datetime'])
+                                fivemin_price.patterns_detected = row['patterns_detected']
+                                fivemin_price.bullish_detected = row['bullish']
+                                fivemin_price.bearish_detected = row['bearish']
+                                fivemin_price.reversal_detected = row['reversal']
+                                fivemin_price.bullish_reversal_detected = row['bullish_reversal']
+                                fivemin_price.bearish_reversal_detected = row['bearish_reversal']
+                            fivemin_price.save()
+                    else:
+                        print('Insufficient data.')
+    except Exception as e:
+        print(f"Error in download_prices(): {e}")
 
 # Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
 def category_price_download(category_name):
     # Run the update_ticker_metrics function
-    start_time = time.time()  # Capture start time
-    tickers_for_throtlling = 195
-    logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
-    tickers = Ticker.objects.filter(categories__name=category_name)
-    ticker_count = Ticker.objects.filter(categories__name=category_name).count()
-    logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
-    if ticker_count > tickers_for_throtlling:
-        logger.error(f'Rate throttling will occur.')
-    else:
-        logger.error(f'No rate throttling needed.')
+    try:
+        start_time = time.time()  # Capture start time
+        tickers_for_throtlling = 195
+        logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
+        tickers = Ticker.objects.filter(categories__name=category_name)
+        ticker_count = Ticker.objects.filter(categories__name=category_name).count()
+        logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
+        if ticker_count > tickers_for_throtlling:
+            logger.error(f'Rate throttling will occur.')
+        else:
+            logger.error(f'No rate throttling needed.')
 
-    # Iterate through all retrieved tickers and download prices.
-    for ticker in tickers:
-        start_time = display_local_time()  # record the start time of the loop
-        logger.error(f'ticker.symbol: {str(ticker.symbol)}')
-        download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+        # Iterate through all retrieved tickers and download prices.
+        for ticker in tickers:
+            start_time = display_local_time()  # record the start time of the loop
+            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
+            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
 
-        end_time = display_local_time()  # record the end time of the loop
-        elapsed_time = end_time - start_time  # calculate elapsed time
-        logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
-        logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
-        logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
+            end_time = display_local_time()  # record the end time of the loop
+            elapsed_time = end_time - start_time  # calculate elapsed time
+            logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
+            logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
+            logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
 
-        if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
-            pause_duration = 20 - elapsed_time.total_seconds()
-            print('Rate throttling for',pause_duration,'secs...')
-            logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-            sleep(pause_duration)
-    logger.error(f'Completed price download. Tickers processed: {ticker_count}')
-    end_time = time.time()  # Capture end time
-    elapsed_time_str = format_elapsed_time(start_time, end_time)
+            if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
+                pause_duration = 20 - elapsed_time.total_seconds()
+                print('Rate throttling for',pause_duration,'secs...')
+                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                sleep(pause_duration)
+        logger.error(f'Completed price download. Tickers processed: {ticker_count}')
+        end_time = time.time()  # Capture end time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
 
-    # Log or print the elapsed time. Here's an example of logging it:
-    logger.error(f'Completed in {elapsed_time_str}')
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.error(f'Completed in {elapsed_time_str}')
+    except Exception as e:
+        print(f"Error in category_price_download: {e}")
