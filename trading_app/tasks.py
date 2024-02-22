@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone, date
 import pytz
 from .price_download import download_prices
 from time import sleep
+import time
 
 logger = logging.getLogger('django')
 
@@ -48,7 +49,7 @@ def background_manual_category_download(category_name):
         logger.error(
             f'=========================================================================================')
         #time.sleep(15)
-        logger.error(f'Waited 15 seconds.')
+        #logger.error(f'Waited 15 seconds.')
     except Exception as e:
         logger.error(f'Error occured in background_manual_category_download(). {e}')
 
@@ -62,25 +63,24 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         logger.error(f'background_manual_ticker_download() starting for ticker "{str(ticker_symbol)}". throttling={str(throttling)}...')
         ticker = Ticker.objects.get(symbol=ticker_symbol)
 
-        if False:
-            # Attempt to get the most recent DailyPrice instance for the Ticker
-            try:
-                latest_daily_price = DailyPrice.objects.filter(ticker=ticker).latest('datetime')
-                last_update_time = latest_daily_price.datetime
+        # Attempt to get the most recent DailyPrice instance for the Ticker
+        try:
+            latest_daily_price = DailyPrice.objects.filter(ticker=ticker).latest('datetime')
+            last_update_time = latest_daily_price.datetime
 
-                # Calculate the time difference between now and the last update
-                current_time = now()
-                time_difference = current_time - last_update_time
+            # Calculate the time difference between now and the last update
+            current_time = now()
+            time_difference = current_time - last_update_time
 
-                # Check if 18 hours have passed since the last update
-                if time_difference < timedelta(hours=18):
-                    logger.error(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
-                    return
-                else:
-                    logger.error(f'More than 18 hours since the last update. Scheduling price download for "{ticker_symbol}".')
-            except DailyPrice.DoesNotExist:
-                # If no DailyPrice exists, proceed with the download
-                logger.error(f'No DailyPrice record found for ticker "{ticker_symbol}". Proceeding with download.')
+            # Check if 18 hours have passed since the last update
+            if time_difference < timedelta(hours=18):
+                logger.error(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
+                return
+            else:
+                logger.error(f'More than 18 hours since the last update. Scheduling price download for "{ticker_symbol}".')
+        except DailyPrice.DoesNotExist:
+            # If no DailyPrice exists, proceed with the download
+            logger.error(f'No DailyPrice record found for ticker "{ticker_symbol}". Proceeding with download.')
 
         start_time = display_local_time()  # record the start time of the loop
         download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
