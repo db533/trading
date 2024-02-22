@@ -936,14 +936,17 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 
         if ticker_symbol == 'All':
             logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
+            ticker_group = Ticker.objects.all().order_by('symbol')
+        else:
+            ticker_group = Ticker.objects.filter(symbol=ticker_symbol)
 
-        for ticker in Ticker.objects.all().order_by('symbol'):
+        for ticker in ticker_group:
             if ticker_symbol == 'All':
                 print('Ticker:', ticker.symbol)
                 logger.error(f'ticker.symbol: {str(ticker.symbol)}')
 
             new_record_count=0
-            if timeframe == 'Daily' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
+            if timeframe == 'Daily': # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
                 print('start_time:')
                 start_time = display_local_time()  # record the start time of the loop
                 print('Downloading daily prices...')
