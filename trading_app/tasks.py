@@ -56,7 +56,7 @@ def background_manual_category_download(category_name):
 from django.utils.timezone import now
 from datetime import timedelta
 
-#@background(schedule=5)
+@background(schedule=5)
 def background_manual_ticker_download(ticker_symbol,throttling):
     # Retrieve a particular ticker price date and throttle if requested.
     try:
