@@ -47,7 +47,7 @@ def background_manual_category_download(category_name):
         logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
         logger.error(
             f'=========================================================================================')
-        time.sleep(15)
+        #time.sleep(15)
         logger.error(f'Waited 15 seconds.')
     except Exception as e:
         logger.error(f'Error occured in background_manual_category_download(). {e}')
