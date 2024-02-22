@@ -21,7 +21,6 @@ def display_local_time():
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
-@background(schedule=5)
 def background_manual_category_download(category_name):
     # Retrieve all tickers that are in the given category.
     try:
@@ -36,26 +35,37 @@ def background_manual_category_download(category_name):
         logger.error(f'ticker_count: {str(ticker_count)}')
         if ticker_count > tickers_for_throtlling:
             logger.error(f'Rate throttling will occur.')
+            throttling = True
         else:
             logger.error(f'No rate throttling needed.')
+            throttling = False
 
         # Iterate through all retrieved tickers and download prices.
         for ticker in tickers:
-            start_time = display_local_time()  # record the start time of the loop
-            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
-            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
-
-            end_time = display_local_time()  # record the end time of the loop
-            elapsed_time = end_time - start_time  # calculate elapsed time
-            logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
-            logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
-            logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
-
-            if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
-                pause_duration = 20 - elapsed_time.total_seconds()
-                print('Rate throttling for', pause_duration, 'secs...')
-                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-                sleep(pause_duration)
-        logger.error(f'background_manual_category_download() completed.')
+            background_manual_ticker_download(ticker.symbol, throttling)
+        logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
+        logger.error(
+            f'=========================================================================================')
     except Exception as e:
         logger.error(f'Error occured in background_manual_category_download(). {e}')
+
+@background(schedule=5)
+def background_manual_ticker_download(ticker_symbol,throttling):
+    # Retrieve a particular ticker price date and throttle if requested.
+    try:
+        logger.error(f'background_manual_ticker_download() starting for ticker "{str(ticker_symbol)}". throttling={str(throttling)}...')
+        ticker = Ticker.objects.get(symbol=ticker_symbol)
+        start_time = display_local_time()  # record the start time of the loop
+        download_prices(timeframe='Daily', ticker=ticker, trigger='User')
+
+        end_time = display_local_time()  # record the end time of the loop
+        elapsed_time = end_time - start_time  # calculate elapsed time
+        logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
+
+        if elapsed_time.total_seconds() < 20 and throttling == True:
+            pause_duration = 20 - elapsed_time.total_seconds()
+            logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+            sleep(pause_duration)
+        logger.error(f'background_manual_ticker_download() completed.')
+    except Exception as e:
+        logger.error(f'Error occured in background_manual_ticker_download(). {e}')
