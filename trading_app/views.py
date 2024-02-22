@@ -22,7 +22,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 from time import sleep
-from .tasks import background_manual_category_download
+from .tasks import background_manual_category_download, background_manual_ticker_download
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
@@ -713,14 +713,35 @@ def manual_download(request, ticker_id, timeframe):
     return redirect('ticker_config')
 
 def manual_category_download(request, category_name):
+    # Retrieve all tickers that are in the given category.
     try:
-        logger.error('About to call background_manual_category_download(category_name) ...')
-        background_manual_category_download(category_name)
-        logger.error('Call made.')
-    except Exception as e:
+        tickers_for_throtlling = 195
+        logger.error(f'background_manual_category_download() starting for stocks in category "{str(category_name)}"...')
+        logger.error(f'category: {str(category_name)}')
+        category_name = category_name.replace('%20',' ')
+        category_name = category_name.replace('%2520', ' ')
+        logger.error(f'Cleaned category: {str(category_name)}')
+        tickers = Ticker.objects.filter(categories__name=category_name)
+        ticker_count = Ticker.objects.filter(categories__name=category_name).count()
+        logger.error(f'ticker_count: {str(ticker_count)}')
+        if ticker_count > tickers_for_throtlling:
+            logger.error(f'Rate throttling will occur.')
+            throttling = True
+        else:
+            logger.error(f'No rate throttling needed.')
+            throttling = False
+
+        # Iterate through all retrieved tickers and download prices.
+        for ticker in tickers:
+            background_manual_ticker_download(ticker.symbol, throttling)
+            logger.error(f'{str(ticker.symbol)} price download requested in background...')
+        logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
         logger.error(
-            f'Error occured calling background_manual_category_download from manual_category_download(). "{e}"...')
-    logger.error(f'Called background_manual_category_download from manual_category_download(). category "{str(category_name)}"...')
+            f'=========================================================================================')
+        #time.sleep(15)
+        #logger.error(f'Waited 15 seconds.')
+    except Exception as e:
+        logger.error(f'Error occured in background_manual_category_download(). {e}')
     return redirect('ticker_config')
 
 # View to refresh price data for a specific ticker
