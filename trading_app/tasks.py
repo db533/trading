@@ -21,9 +21,7 @@ def display_local_time():
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
-
-
-@background(schedule=5)
+#@background(schedule=5)
 def background_manual_category_download(category_name):
     # Retrieve all tickers that are in the given category.
     try:
