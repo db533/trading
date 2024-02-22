@@ -713,7 +713,11 @@ def manual_download(request, ticker_id, timeframe):
     return redirect('ticker_config')
 
 def manual_category_download(request, category_name):
-    background_manual_category_download(category_name)
+    try:
+        background_manual_category_download(category_name)
+    except Exception as e:
+        logger.error(
+            f'Error occured calling background_manual_category_download from manual_category_download(). "{e}"...')
     logger.error(f'Called background_manual_category_download from manual_category_download(). category "{str(category_name)}"...')
     return redirect('ticker_config')
 
