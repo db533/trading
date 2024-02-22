@@ -67,10 +67,13 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         try:
             latest_daily_price = DailyPrice.objects.filter(ticker=ticker).latest('datetime')
             last_update_time = latest_daily_price.datetime
+            logger.error(f'last_update_time: "{str(last_update_time)}"')
 
             # Calculate the time difference between now and the last update
             current_time = now()
+            logger.error(f'current_time: "{str(current_time)}"')
             time_difference = current_time - last_update_time
+            logger.error(f'time_difference: "{str(time_difference)}"')
 
             # Check if 18 hours have passed since the last update
             if time_difference < timedelta(hours=18):
