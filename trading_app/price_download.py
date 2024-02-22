@@ -183,11 +183,12 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
 
             # Ensure existing_dates is a list of timezone-naive or aware datetime objects
             existing_dates = [timezone.make_naive(date) for date in existing_dates]
-            #print('existing_dates:', existing_dates[:3])
+            logger.error(f'existing_dates: {existing_dates[:3]}')
 
             # Ensure that start_day and finish_day have the time set to 4:00
             start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
             finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
+            logger.error(f'start_day_with_time: {start_day_with_time}')
 
             all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
             all_dates = all_dates.tz_localize(None)
@@ -195,11 +196,12 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
             # Ensure all_dates is a list of native python datetime objects
             all_dates = [date.to_pydatetime() for date in all_dates]
 
-            #print('all_dates:', all_dates[:3])
+            logger.error(f'all_dates: {all_dates[:3]}')
 
             missing_dates = [date for date in all_dates if date not in existing_dates]
 
             #print('missing_dates:', missing_dates[:3])
+            logger.error(f'missing_dates: {missing_dates}')
             #print('max(missing_dates):',max(missing_dates))
         if interval == '15m':
             existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
