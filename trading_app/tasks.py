@@ -6,6 +6,7 @@ import pytz
 from .price_download import download_prices, download_daily_ticker_price
 from time import sleep
 import time
+from .update_strategies import *
 
 logger = logging.getLogger('django')
 
@@ -59,6 +60,11 @@ from datetime import timedelta
 @background(schedule=5)
 def background_manual_ticker_download(ticker_symbol,throttling):
     # Retrieve a particular ticker price date and throttle if requested.
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
+                  GannPointEightSell,
+                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
+                  GannPointNineSell]
+
     try:
         logger.error(f'background_manual_ticker_download() starting for ticker "{str(ticker_symbol)}". throttling={str(throttling)}...')
         ticker = Ticker.objects.get(symbol=ticker_symbol)
@@ -86,7 +92,14 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             logger.error(f'No DailyPrice record found for ticker "{ticker_symbol}". Proceeding with download.')
 
         start_time = display_local_time()  # record the start time of the loop
+
+        # Download ticker prices
         download_daily_ticker_price(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
+
+        # Look for trading opportunities for this ticker
+        logger.error(f'About to start process_trading_opportunities_single_ticker() from background_manual_ticker_download() in tasks.py')
+        process_trading_opportunities_single_ticker(ticker.symbol, strategies)
+        logger.error(f'Finished process_trading_opportunities_single_ticker() from background_manual_ticker_download() in tasks.py')
 
         end_time = display_local_time()  # record the end time of the loop
         elapsed_time = end_time - start_time  # calculate elapsed time

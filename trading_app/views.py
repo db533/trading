@@ -716,7 +716,7 @@ def manual_category_download(request, category_name):
     # Retrieve all tickers that are in the given category.
     try:
         tickers_for_throtlling = 195
-        logger.error(f'background_manual_category_download() starting for stocks in category "{str(category_name)}"...')
+        logger.error(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
         logger.error(f'category: {str(category_name)}')
         category_name = category_name.replace('%20',' ')
         category_name = category_name.replace('%2520', ' ')
@@ -735,13 +735,13 @@ def manual_category_download(request, category_name):
         for ticker in tickers:
             background_manual_ticker_download(ticker.symbol, throttling)
             logger.error(f'{str(ticker.symbol)} price download requested in background...')
-        logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
+        logger.error(f'manual_category_download() completed. All price downloads created as background tasks.')
         logger.error(
             f'=========================================================================================')
         #time.sleep(15)
         #logger.error(f'Waited 15 seconds.')
     except Exception as e:
-        logger.error(f'Error occured in background_manual_category_download(). {e}')
+        logger.error(f'Error occured in manual_category_download(). {e}')
     return redirect('ticker_config')
 
 # View to refresh price data for a specific ticker
