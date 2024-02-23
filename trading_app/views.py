@@ -1800,3 +1800,12 @@ def trading_opps_filtered(request):
         'trading_opps': trading_opps,
         'ticker' : ticker
     })
+
+from django.shortcuts import render
+from background_task.models import Task
+
+@login_required()
+def task_queue_view(request):
+    tasks = Task.objects.all().values('id', 'task_name', 'task_params', 'run_at')
+    count = tasks.count()
+    return render(request, 'task_queue.html', {'tasks': tasks, 'count': count})
