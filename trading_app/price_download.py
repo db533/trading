@@ -1131,10 +1131,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 interval = '1D'
 
                 # Query and delete the old prices
-                old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
-                deleted_count, _ = old_prices.delete()
-                print('Deleted', deleted_count, 'older DailyPrice records.')
-                logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
+                #old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
+                #deleted_count, _ = old_prices.delete()
+                #print('Deleted', deleted_count, 'older DailyPrice records.')
+                #logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
                 # Check if the stock is marked as a TSE stock.
                 is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()

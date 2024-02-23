@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger('django')
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-
+import uuid
 
 class TickerCategory(models.Model):
     name = models.CharField(max_length=255)
@@ -142,3 +142,72 @@ class TradingOpp(models.Model):
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
 
+class WaveType(models.Model):
+    name = models.CharField(max_length=100)
+    rules = models.JSONField(default=list)  # Holds rule definitions for this wave type
+
+    def __str__(self):
+        return self.name
+
+class Wave(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    start_sp = models.ForeignKey(SwingPoint, on_delete=models.CASCADE, related_name='starting_waves', verbose_name="Start Swing Point")
+    end_sp = models.ForeignKey(SwingPoint, on_delete=models.CASCADE, related_name='ending_waves', verbose_name="End Swing Point")
+    wave_type = models.ForeignKey(WaveType, on_delete=models.CASCADE, related_name="waves")
+
+    def __str__(self):
+        return f"{self.wave_type.name} from {self.start_sp.date} to {self.end_sp.date}"
+
+    def evaluate_rules(self, previous_wave=None):
+        score = 0
+        for rule in self.wave_type.rules:  # Access rules from the wave_type
+            if rule['type'] == 'hard_rule':
+                if not self.evaluate_hard_rule(rule, previous_wave):
+                    return 0  # Failure to meet a hard rule
+            elif rule['type'] == 'guideline':
+                adherence = self.evaluate_guideline(rule)
+                score += adherence * rule['weighting']
+        return score
+
+    def evaluate_hard_rule(self, rule, previous_wave=None):
+        """
+        Evaluates a hard rule based on the rule definition and potentially the context
+        of a previous wave. If the rule cannot be evaluated due to lack of prior data,
+        it is assumed to be valid.
+
+        :param rule: A dictionary containing the rule definition.
+        :param previous_wave: An instance of Wave or None, representing the previous wave in the sequence.
+        :return: True if the rule is satisfied or cannot be evaluated due to lack of prior data, False otherwise.
+        """
+        # Example hard rule evaluation
+        if rule['description'] == "Wave 2 cannot retrace more than 100% of Wave 1":
+            # If there's no previous wave (e.g., this is the first wave), assume the rule is valid
+            if previous_wave is None:
+                return True
+            # Otherwise, evaluate the rule based on available data
+            # This assumes you have a mechanism to compare the relevant properties of the current and previous waves
+            return self.end_sp.price_object.price > previous_wave.start_sp.price_object.price
+        else:
+            # Default case for unrecognized rules or those without specific evaluation logic
+            return True  # Assume valid if the rule is not recognized or cannot be evaluated
+
+    def evaluate_guideline(self, rule):
+        # Implement logic to evaluate guideline adherence
+        # Return a value between 0 and 1 representing % adherence
+        pass
+
+class WavePattern(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    waves = models.ManyToManyField(Wave, through='WaveSequence')
+
+    def __str__(self):
+        return self.name
+
+class WaveSequence(models.Model):
+    wave_pattern = models.ForeignKey(WavePattern, on_delete=models.CASCADE)
+    wave = models.ForeignKey(Wave, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['order']
