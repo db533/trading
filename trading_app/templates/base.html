@@ -28,7 +28,8 @@
             <li><a href="{% url 'manual_category_download' 'TSE stocks'|urlencode %}">TSE price download</a></li>
             <li><a href="{% url 'manual_category_download' 'US stocks'|urlencode %}">US stocks price download</a></li>
             <li><a href="{% url 'manual_category_download' 'Swing trade opportunities'|urlencode %}">Swing opp price download</a></li>
-            <li><a href="{% url 'manual_category_download' 'Test tickers'|urlencode %}">Test tickers price download</a></li>
+            <li><a href="{% url 'manual_category_download' 'Test tickers'|urlencode %}">Test tickers price download</a></li><br>
+            <li><a href="{% url 'task_queue' %}">Task queue</a></li>
 
             <p><li><strong><a href="{% url 'logout' %}?next={{ request.path }}">Atslēgties</a></strong></li></p>
           {% else %}
