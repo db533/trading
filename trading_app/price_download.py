@@ -1,4 +1,5 @@
 import logging
+from .update_strategies import *
 
 logging.basicConfig(level=logging.INFO)
 import os
@@ -1395,6 +1396,10 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 # Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
 def category_price_download(category_name):
     # Run the update_ticker_metrics function
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
+                  GannPointEightSell,
+                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
+                  GannPointNineSell]
     try:
         start_time = time.time()  # Capture start time
         tickers_for_throtlling = 195
@@ -1412,6 +1417,7 @@ def category_price_download(category_name):
             start_time = display_local_time()  # record the start time of the loop
             logger.error(f'ticker.symbol: {str(ticker.symbol)}')
             download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+            process_trading_opportunities_single_ticker(ticker.symbol, strategies)
 
             end_time = display_local_time()  # record the end time of the loop
             elapsed_time = end_time - start_time  # calculate elapsed time

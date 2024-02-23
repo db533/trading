@@ -3,7 +3,7 @@
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
 from .price_download import download_prices, category_price_download
-from .update_strategies import process_trading_opportunities
+# from .update_strategies import process_trading_opportunities
 from .tasks import background_manual_category_download
 
 from .test_cron_job import test_cron_job
@@ -181,7 +181,7 @@ class UpdateTickerMetricsCronJob(CronJobBase):
 
         display_local_time()
         update_ticker_metrics()
-        process_trading_opportunities()
+        #process_trading_opportunities()
         display_local_time()
 
         end_time = time.time()  # Capture end time
