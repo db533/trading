@@ -1076,7 +1076,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 )
                             else:
                                 #logger.error(f'SwingPoint does exist.')
-
+                                pass
                 else:
                     print('Insufficient data.')
             except Exception as e:
