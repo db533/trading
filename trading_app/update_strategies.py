@@ -593,7 +593,7 @@ class GannPointFourBuy2(BaseStrategy):
             logger.error(f'........')
             return action_buy, data
         except Exception as e:
-            print(f"Error in Gann #4 Selling for {ticker.symbol}: {e}")
+            print(f"Error in Gann #4 Selling for {self.ticker.symbol}: {e}")
 
 class GannPointFourSell(BaseStrategy):
     name="Gann's Selling point #4"
@@ -1478,7 +1478,8 @@ def process_trading_opportunities():
 
     try:
         for ticker in tickers:
-            process_trading_opportunities_single_ticker(ticker_symbol, strategies)
+
+            process_trading_opportunities_single_ticker(ticker.symbol, strategies)
         logger.error(f'Finished process_trading_opportunities().')
     except Exception as e:
         print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
