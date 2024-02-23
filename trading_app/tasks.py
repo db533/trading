@@ -82,7 +82,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             logger.error(f'time_difference: "{str(time_difference)}"')
 
             # Check if 18 hours have passed since the last update
-            if time_difference < timedelta(hours=0): # Adding 10 hours for the time difference
+            if time_difference < timedelta(hours=28): # Adding 10 hours for the time difference
                 logger.error(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
                 return
             else:

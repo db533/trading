@@ -1464,9 +1464,9 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     if action_buy is not None:
                         existing_tradingopp.action_buy = action_buy
                     existing_tradingopp.save()
-        logger.error(f'Finished process_trading_opportunities().')
+        logger.error(f'Finished process_trading_opportunities_single_ticker().')
     except Exception as e:
-        print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
+        print(f"Error in process_trading_opportunities_single_ticker. Current ticker: {ticker.symbol}: {e}")
 
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')
