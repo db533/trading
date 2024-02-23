@@ -121,7 +121,7 @@ class SwingPoint(models.Model):
         'model__in': ('dailyprice', 'fifteenminprice', 'fiveminprice', 'oneminprice')})
     object_id = models.PositiveIntegerField()
     price_object = GenericForeignKey('content_type', 'object_id')
-    magnitude = models.IntegerField(max_digits=1, default=1)
+    magnitude = models.IntegerField(default=1)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.date} - {self.label}"
