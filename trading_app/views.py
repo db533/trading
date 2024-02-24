@@ -1788,25 +1788,34 @@ def generate_ticker_graph_view(request, ticker_symbol):
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
+    x_values = range(len(dates))  # Numeric x-axis values
 
     # Setting up the plot
     fig, ax = plt.subplots(figsize=(15, 8))  # Adjust the figsize to fit full screen as needed
     ax.set_title(f'Price Range for {ticker_symbol}')
 
-    # Plotting the lines for each day
-    for i in range(len(dates)):
-        ax.plot([dates[i], dates[i]], [lows[i], highs[i]], color='black', linewidth=1)
+    # Plotting the lines for each day using numeric x-axis
+    for i in x_values:
+        ax.plot([i, i], [lows[i], highs[i]], color='black', linewidth=1)
 
-    # Formatting the date axis
-    ax.xaxis.set_major_locator(mdates.MonthLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+    # Customizing the x-axis to display the start of each month
+    def custom_date_formatter(x, pos=None):
+        if int(x) < len(dates) and int(x) >= 0:
+            date = dates[int(x)]
+            if date.day == 1:  # Check if the date is the start of a month
+                return date.strftime('%Y-%m')
+            return ''  # Return empty string for other dates
+        return ''
 
-    # Rotate dates for better visibility
-    plt.xticks(rotation=45)
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(custom_date_formatter))
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Ensure x-ticks are integers
+
+    # Set labels and rotate them for better visibility
     ax.set_xlabel('Date')
     ax.set_ylabel('Price')
+    plt.xticks(rotation=45)
 
-    # Adjusting layout
+    # Adjusting layout and ensuring no gaps between x-ticks
     plt.tight_layout()
 
     # Save to a BytesIO buffer
@@ -1826,7 +1835,6 @@ def generate_ticker_graph_view(request, ticker_symbol):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
-
 
 @login_required
 def trading_opps_filtered(request):
