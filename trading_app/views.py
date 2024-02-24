@@ -1808,8 +1808,12 @@ def generate_ticker_graph_view(request, ticker_symbol):
             return ''  # Return empty string for other dates
         return ''
 
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(custom_date_formatter))
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))  # Ensure x-ticks are integers
+    # Explicitly set tick positions and labels
+    ax.set_xticks(x_values)  # Set x-ticks to match your data points
+
+    ax.xaxis.set_major_formatter(FuncFormatter(custom_date_formatter))
+    # Ensure that the locator is setting ticks at each integer (optional if you've set_xticks)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     # Set labels and rotate them for better visibility
     ax.set_xlabel('Date')
