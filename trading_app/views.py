@@ -1794,7 +1794,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     highs = [price.high_price for price in daily_prices]
     sp_dates = [sp.date for sp in swing_point_query]
     sp_price = [sp.price for sp in swing_point_query]
-    trading_opp_dates = [to.datetime_identified for to in trading_opp_query]
+    trading_opp_dates = [to.datetime_identified.date() for to in trading_opp_query]
     trading_opp_action_buy = [to.action_buy for to in trading_opp_query]
 
     # Convert daily_prices to a dictionary for easy lookup
@@ -1811,7 +1811,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
             previous_month = date.month
         if date in sp_dates:
             sp_indices.append(i)
-        if date in trading_opp_dates:
+        if date.date() in trading_opp_dates:
             # Get the index for the date in the list of trading_opps
             to_index = trading_opp_dates.index(date)
             to_action = trading_opp_action_buy[to_index]
