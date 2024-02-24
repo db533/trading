@@ -1786,13 +1786,16 @@ from .models import Ticker, DailyPrice
 def generate_ticker_graph_view(request, ticker_symbol):
     ticker = Ticker.objects.get(symbol=ticker_symbol)
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
-    swing_point_query = SwingPoint.objects.filter(ticker=ticker).order_by('-date')
+    swing_point_query = SwingPoint.objects.filter(ticker=ticker).order_by('date')
+    trading_opp_query = TradingOpp.objects.filter(ticker=ticker).order_by('-datetime_identified')
 
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
     sp_dates = [sp.date for sp in swing_point_query]
     sp_price = [sp.price for sp in swing_point_query]
+    trading_opp_dates = [to.datetime_identified for to in trading_opp_query]
+    trading_opp_action_buy = [to.action_buy for to in trading_opp_query]
 
     # Convert daily_prices to a dictionary for easy lookup
     date_to_price_map = {price.datetime: (price.low_price, price.high_price) for price in daily_prices}
@@ -1801,12 +1804,24 @@ def generate_ticker_graph_view(request, ticker_symbol):
     month_starts_indices = []
     previous_month = None
     sp_indices = []
+    bar_colours = []
     for i, date in enumerate(dates):
         if date.month != previous_month:
             month_starts_indices.append(i)
             previous_month = date.month
         if date in sp_dates:
             sp_indices.append(i)
+        if date in trading_opp_dates:
+            # Get the index for the date in the list of trading_opps
+            to_index = trading_opp_dates.index(date)
+            to_action = trading_opp_action_buy[to_index]
+            if to_action == False:
+                bar_colours.append('red')
+            elif to_action == True:
+                bar_colours.append('green')
+        else:
+            bar_colours.append('black')
+
 
     # Check if the first label is too close to the second label
     # Adjust this condition based on your specific requirements
@@ -1817,7 +1832,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     labels = [date.strftime('%Y-%m') for date in month_starts_dates]
 
     fig, ax = plt.subplots(figsize=(15, 8))
-    ax.set_title(f'Price Range for {ticker_symbol}')
+    ax.set_title(f'Price Range for {ticker.company_name} ({ticker_symbol})')
 
     # Adjust the swing points plotting logic
     sp_x_positions = []
@@ -1832,9 +1847,10 @@ def generate_ticker_graph_view(request, ticker_symbol):
                 sp_y_positions.append(low_price)
             sp_x_positions.append(dates.index(sp.date))
 
+
     # Plot adjustments and the rest of your plotting logic...
     for i, (low, high) in enumerate(zip(lows, highs)):
-        ax.plot([i, i], [low, high], color='black', linewidth=1)
+        ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=1)
 
     # Plot swing points with corrected y-positions
     ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue', linestyle='-')  # Example: red markers for visibility
