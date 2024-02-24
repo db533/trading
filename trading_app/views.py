@@ -1797,13 +1797,13 @@ def generate_ticker_graph_view(request, ticker_symbol):
     # Method to identify the first record of each month
     month_starts_indices = []
     previous_month = None
-    sp_indices =[]
+    sp_indices = []
     for i, date in enumerate(dates):
         if date.month != previous_month:
             month_starts_indices.append(i)
             previous_month = date.month
         if date in sp_dates:
-            sp_indices.append[i]
+            sp_indices.append(i)
 
     # Check if the first label is too close to the second label
     # Adjust this condition based on your specific requirements
