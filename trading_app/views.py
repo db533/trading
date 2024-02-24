@@ -1778,68 +1778,52 @@ def generate_swing_point_graph_view(request, opp_id):
     return response
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator, FuncFormatter
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import io
 from django.http import HttpResponse
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from .models import Ticker, DailyPrice
 
 def generate_ticker_graph_view(request, ticker_symbol):
-    # Fetch the ticker by symbol
     ticker = Ticker.objects.get(symbol=ticker_symbol)
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
 
-    # Prepare data for plotting
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
     x_values = range(len(dates))  # Numeric x-axis values
 
-    # Setting up the plot
-    fig, ax = plt.subplots(figsize=(15, 8))  # Adjust the figsize to fit full screen as needed
+    # Identify positions for the start of each month
+    month_starts = [i for i, date in enumerate(dates) if date.day == 1]
+
+    fig, ax = plt.subplots(figsize=(15, 8))
     ax.set_title(f'Price Range for {ticker_symbol}')
 
-    # Plotting the lines for each day using numeric x-axis
     for i in x_values:
         ax.plot([i, i], [lows[i], highs[i]], color='black', linewidth=1)
 
-    # Customizing the x-axis to display the start of each month
     def custom_date_formatter(x, pos=None):
-        if int(x) < len(dates) and int(x) >= 0:
-            date = dates[int(x)]
-            if date.day == 1:  # Check if the date is the start of a month
-                return date.strftime('%Y-%m')
-            return ''  # Return empty string for other dates
-        return ''
+        if int(x) in month_starts:  # Check if the position is marked for a label
+            return dates[int(x)].strftime('%Y-%m')
+        return ''  # Return empty string for positions not marked
 
-    # Explicitly set tick positions and labels
-    ax.set_xticks(x_values)  # Set x-ticks to match your data points
+    ax.xaxis.set_major_locator(plt.FixedLocator(month_starts))  # Set ticks at the start of each month
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(custom_date_formatter))
 
-    ax.xaxis.set_major_formatter(FuncFormatter(custom_date_formatter))
-    # Ensure that the locator is setting ticks at each integer (optional if you've set_xticks)
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
-
-    # Set labels and rotate them for better visibility
     ax.set_xlabel('Date')
     ax.set_ylabel('Price')
     plt.xticks(rotation=45)
 
-    # Adjusting layout and ensuring no gaps between x-ticks
     plt.tight_layout()
 
-    # Save to a BytesIO buffer
     buffer = io.BytesIO()
     canvas = FigureCanvas(fig)
     canvas.print_png(buffer)
-    plt.close(fig)  # Close the figure to release memory
+    plt.close(fig)
 
-    # Reset buffer position to the start
     buffer.seek(0)
 
-    # Serve the image
     response = HttpResponse(buffer.getvalue(), content_type='image/png')
     response['Content-Length'] = str(len(response.content))
-    # Set headers to prevent caching
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
