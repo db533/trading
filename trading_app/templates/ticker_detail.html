@@ -44,6 +44,7 @@
                 <li><a href="{% url 'manual_download' ticker.id '15mins' %}">Download 15 mins prices</a></li>
                 <li><a href="{% url 'manual_download' ticker.id '5mins' %}">Download 5 mins prices</a></li>
                 <li><a href="{% url 'update_metrics' ticker.symbol %}">Recalculate Metrics</a></li>
+                <li><a href="{% url 'ticker-graph' ticker.symbol %}">Price graph</a></li>
             </ul>
             <form method="post" action="{% url 'delete_daily_price' %}" onsubmit="return confirm('Are you sure you want to delete all DailyPrice instances?');">
                 {% csrf_token %}
