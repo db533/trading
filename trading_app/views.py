@@ -1791,7 +1791,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
 
-    # Adjusted method to identify the first record of each month
+    # Method to identify the first record of each month
     month_starts_indices = []
     previous_month = None
     for i, date in enumerate(dates):
@@ -1799,11 +1799,12 @@ def generate_ticker_graph_view(request, ticker_symbol):
             month_starts_indices.append(i)
             previous_month = date.month
 
-    # Extract the dates for the start of each month based on the adjusted indices
-    month_starts_dates = [dates[i] for i in month_starts_indices]
-    month_starts_dates.pop(0)
+    # Check if the first label is too close to the second label
+    # Adjust this condition based on your specific requirements
+    if month_starts_indices[1] - month_starts_indices[0] < 5:  # Example threshold
+        month_starts_indices.pop(0)  # Drop the first month start if too close to the second
 
-    # Generate labels for month starts
+    month_starts_dates = [dates[i] for i in month_starts_indices]
     labels = [date.strftime('%Y-%m') for date in month_starts_dates]
 
     fig, ax = plt.subplots(figsize=(15, 8))
@@ -1812,7 +1813,6 @@ def generate_ticker_graph_view(request, ticker_symbol):
     for i, (low, high) in enumerate(zip(lows, highs)):
         ax.plot([i, i], [low, high], color='black', linewidth=1)
 
-    # Explicitly set tick positions and labels for the start of each month
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
 
