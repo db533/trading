@@ -1801,7 +1801,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
 
     # Extract the dates for the start of each month based on the adjusted indices
     month_starts_dates = [dates[i] for i in month_starts_indices]
-    month_starts_indices.pop(0)
+    month_starts_dates.pop(0)
 
     # Generate labels for month starts
     labels = [date.strftime('%Y-%m') for date in month_starts_dates]
