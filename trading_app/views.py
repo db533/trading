@@ -1821,8 +1821,8 @@ def generate_ticker_graph_view(request, ticker_symbol):
                 bar_colours.append('green')
         else:
             bar_colours.append('black')
-
-
+    del bar_colours[0]
+    bar_colours.append('black')
     # Check if the first label is too close to the second label
     # Adjust this condition based on your specific requirements
     if month_starts_indices[1] - month_starts_indices[0] < 5:  # Example threshold
