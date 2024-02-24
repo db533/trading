@@ -1837,7 +1837,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         ax.plot([i, i], [low, high], color='black', linewidth=1)
 
     # Plot swing points with corrected y-positions
-    ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue')  # Example: red markers for visibility
+    ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue', linestyle='-')  # Example: red markers for visibility
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
