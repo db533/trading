@@ -1794,6 +1794,9 @@ def generate_ticker_graph_view(request, ticker_symbol):
     sp_dates = [sp.date for sp in swing_point_query]
     sp_price = [sp.price for sp in swing_point_query]
 
+    # Convert daily_prices to a dictionary for easy lookup
+    date_to_price_map = {price.datetime: (price.low_price, price.high_price) for price in daily_prices}
+
     # Method to identify the first record of each month
     month_starts_indices = []
     previous_month = None
@@ -1816,10 +1819,25 @@ def generate_ticker_graph_view(request, ticker_symbol):
     fig, ax = plt.subplots(figsize=(15, 8))
     ax.set_title(f'Price Range for {ticker_symbol}')
 
+    # Adjust the swing points plotting logic
+    sp_x_positions = []
+    sp_y_positions = []
+    for sp in swing_point_query:
+        if sp.date in date_to_price_map:
+            low_price, high_price = date_to_price_map[sp.date]
+            # Determine if the swing point is closer to the high or the low for the day
+            if abs(sp.price - high_price) < abs(sp.price - low_price):
+                sp_y_positions.append(high_price)
+            else:
+                sp_y_positions.append(low_price)
+            sp_x_positions.append(dates.index(sp.date))
+
+    # Plot adjustments and the rest of your plotting logic...
     for i, (low, high) in enumerate(zip(lows, highs)):
         ax.plot([i, i], [low, high], color='black', linewidth=1)
 
-    ax.plot(sp_indices, sp_price, marker='o', linestyle='-')
+    # Plot swing points with corrected y-positions
+    ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue')  # Example: red markers for visibility
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
