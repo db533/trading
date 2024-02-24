@@ -1790,28 +1790,26 @@ def generate_ticker_graph_view(request, ticker_symbol):
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
-    x_values = range(len(dates))  # Numeric x-axis values
 
-    # Identify positions for the start of each month
-    month_starts = [i for i, date in enumerate(dates) if date.day == 1]
+    # Identify month starts and their indices
+    month_starts_indices = [i for i, date in enumerate(dates) if date.day == 1]
+    month_starts_dates = [dates[i] for i in month_starts_indices]
+
+    # Generate labels for month starts
+    labels = [date.strftime('%Y-%m') for date in month_starts_dates]
 
     fig, ax = plt.subplots(figsize=(15, 8))
     ax.set_title(f'Price Range for {ticker_symbol}')
 
-    for i in x_values:
-        ax.plot([i, i], [lows[i], highs[i]], color='black', linewidth=1)
+    for i, (low, high) in enumerate(zip(lows, highs)):
+        ax.plot([i, i], [low, high], color='black', linewidth=1)
 
-    def custom_date_formatter(x, pos=None):
-        if int(x) in month_starts:  # Check if the position is marked for a label
-            return dates[int(x)].strftime('%Y-%m')
-        return ''  # Return empty string for positions not marked
-
-    ax.xaxis.set_major_locator(plt.FixedLocator(month_starts))  # Set ticks at the start of each month
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(custom_date_formatter))
+    # Explicitly set tick positions and labels for the start of each month
+    ax.set_xticks(month_starts_indices)
+    ax.set_xticklabels(labels, rotation=45, ha="right")
 
     ax.set_xlabel('Date')
     ax.set_ylabel('Price')
-    plt.xticks(rotation=45)
 
     plt.tight_layout()
 
