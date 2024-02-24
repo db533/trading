@@ -1815,9 +1815,9 @@ def generate_ticker_graph_view(request, ticker_symbol):
             # Get the index for the date in the list of trading_opps
             to_index = trading_opp_dates.index(date.date())
             to_action = trading_opp_action_buy[to_index]
-            if to_action == False:
+            if to_action == 0:
                 bar_colours.append('red')
-            elif to_action == True:
+            elif to_action == 1:
                 bar_colours.append('green')
         else:
             bar_colours.append('black')
