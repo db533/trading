@@ -158,7 +158,7 @@ class Wave(models.Model):
     def __str__(self):
         return f"{self.wave_type.name} from {self.start_sp.date} to {self.end_sp.date}"
 
-    def evaluate_rules(self, previous_wave=None):
+    def evaluate_rules(self, n_1_wave=None,n_2_wave=None, n_3_wave=None, n_4_wave=None):
         score = 0
         for rule in self.wave_type.rules:  # Access rules from the wave_type
             if rule['type'] == 'hard_rule':
@@ -169,24 +169,23 @@ class Wave(models.Model):
                 score += adherence * rule['weighting']
         return score
 
-    def evaluate_hard_rule(self, rule, previous_wave=None):
+    def evaluate_hard_rule(self, rule, n_1_wave=None,n_2_wave=None, n_3_wave=None, n_4_wave=None):
         """
         Evaluates a hard rule based on the rule definition and potentially the context
         of a previous wave. If the rule cannot be evaluated due to lack of prior data,
         it is assumed to be valid.
 
-        :param rule: A dictionary containing the rule definition.
         :param previous_wave: An instance of Wave or None, representing the previous wave in the sequence.
         :return: True if the rule is satisfied or cannot be evaluated due to lack of prior data, False otherwise.
         """
         # Example hard rule evaluation
         if rule['description'] == "Wave 2 cannot retrace more than 100% of Wave 1":
             # If there's no previous wave (e.g., this is the first wave), assume the rule is valid
-            if previous_wave is None:
+            if n_1_wave is None:
                 return True
             # Otherwise, evaluate the rule based on available data
             # This assumes you have a mechanism to compare the relevant properties of the current and previous waves
-            return self.end_sp.price_object.price > previous_wave.start_sp.price_object.price
+            return self.end_sp.price_object.price > n_1_wave.start_sp.price_object.price
         else:
             # Default case for unrecognized rules or those without specific evaluation logic
             return True  # Assume valid if the rule is not recognized or cannot be evaluated

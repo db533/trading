@@ -32,6 +32,7 @@ urlpatterns = [
     path('swing_point_graph/<int:opp_id>/', generate_swing_point_graph_view, name='swing_point_graph'),
     path('trading-opps-filtered/', trading_opps_filtered, name='trading-opps-filtered'),
     path('tasks/', task_queue_view, name='task_queue'),
+    path('ticker-graph/<str:ticker_symbol>/', generate_ticker_graph_view, name='ticker-graph'),
 ]
 
 from django.conf import settings

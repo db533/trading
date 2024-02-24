@@ -1777,6 +1777,57 @@ def generate_swing_point_graph_view(request, opp_id):
     response['Expires'] = '0'
     return response
 
+import matplotlib.dates as mdates
+
+def generate_ticker_graph_view(request, ticker_symbol):
+    # Fetch the ticker by symbol
+    ticker = Ticker.objects.get(symbol=ticker_symbol)
+    daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('date')
+
+    # Prepare data for plotting
+    dates = [price.date for price in daily_prices]
+    lows = [price.low_price for price in daily_prices]
+    highs = [price.high_price for price in daily_prices]
+
+    # Setting up the plot
+    fig, ax = plt.subplots(figsize=(15, 8))  # Adjust the figsize to fit full screen as needed
+    ax.set_title(f'Price Range for {ticker_symbol}')
+
+    # Plotting the lines for each day
+    for i in range(len(dates)):
+        ax.plot([dates[i], dates[i]], [lows[i], highs[i]], color='black', linewidth=1)
+
+    # Formatting the date axis
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
+    # Rotate dates for better visibility
+    plt.xticks(rotation=45)
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Price')
+
+    # Adjusting layout
+    plt.tight_layout()
+
+    # Save to a BytesIO buffer
+    buffer = io.BytesIO()
+    canvas = FigureCanvas(fig)
+    canvas.print_png(buffer)
+    plt.close(fig)  # Close the figure to release memory
+
+    # Reset buffer position to the start
+    buffer.seek(0)
+
+    # Serve the image
+    response = HttpResponse(buffer.getvalue(), content_type='image/png')
+    response['Content-Length'] = str(len(response.content))
+    # Set headers to prevent caching
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
+
+
 @login_required
 def trading_opps_filtered(request):
     form = TickerSymbolForm()
