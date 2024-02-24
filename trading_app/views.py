@@ -1785,7 +1785,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('date')
 
     # Prepare data for plotting
-    dates = [price.date for price in daily_prices]
+    dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
 
