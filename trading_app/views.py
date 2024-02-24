@@ -1813,7 +1813,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
             sp_indices.append(i)
         if date.date() in trading_opp_dates:
             # Get the index for the date in the list of trading_opps
-            to_index = trading_opp_dates.index(date)
+            to_index = trading_opp_dates.index(date.date())
             to_action = trading_opp_action_buy[to_index]
             if to_action == False:
                 bar_colours.append('red')
