@@ -1778,6 +1778,7 @@ def generate_swing_point_graph_view(request, opp_id):
     return response
 
 import matplotlib.dates as mdates
+from matplotlib.ticker import MaxNLocator
 
 def generate_ticker_graph_view(request, ticker_symbol):
     # Fetch the ticker by symbol
