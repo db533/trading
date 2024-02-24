@@ -1782,7 +1782,7 @@ import matplotlib.dates as mdates
 def generate_ticker_graph_view(request, ticker_symbol):
     # Fetch the ticker by symbol
     ticker = Ticker.objects.get(symbol=ticker_symbol)
-    daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('date')
+    daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
 
     # Prepare data for plotting
     dates = [price.datetime for price in daily_prices]
