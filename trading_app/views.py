@@ -1786,18 +1786,24 @@ from .models import Ticker, DailyPrice
 def generate_ticker_graph_view(request, ticker_symbol):
     ticker = Ticker.objects.get(symbol=ticker_symbol)
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
+    swing_point_query = SwingPoint.objects.filter(ticker=ticker).order_by('-date')
 
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
+    sp_dates = [sp.date for sp in swing_point_query]
+    sp_price = [sp.price for sp in swing_point_query]
 
     # Method to identify the first record of each month
     month_starts_indices = []
     previous_month = None
+    sp_indices =[]
     for i, date in enumerate(dates):
         if date.month != previous_month:
             month_starts_indices.append(i)
             previous_month = date.month
+        if date in sp_dates:
+            sp_indices.append[i]
 
     # Check if the first label is too close to the second label
     # Adjust this condition based on your specific requirements
@@ -1812,6 +1818,8 @@ def generate_ticker_graph_view(request, ticker_symbol):
 
     for i, (low, high) in enumerate(zip(lows, highs)):
         ax.plot([i, i], [low, high], color='black', linewidth=1)
+
+    ax.plot(sp_indices, sp_price, marker='o', linestyle='-')
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
