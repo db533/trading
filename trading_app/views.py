@@ -1791,8 +1791,15 @@ def generate_ticker_graph_view(request, ticker_symbol):
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
 
-    # Identify month starts and their indices
-    month_starts_indices = [i for i, date in enumerate(dates) if date.day == 1]
+    # Adjusted method to identify the first record of each month
+    month_starts_indices = []
+    previous_month = None
+    for i, date in enumerate(dates):
+        if date.month != previous_month:
+            month_starts_indices.append(i)
+            previous_month = date.month
+
+    # Extract the dates for the start of each month based on the adjusted indices
     month_starts_dates = [dates[i] for i in month_starts_indices]
 
     # Generate labels for month starts
