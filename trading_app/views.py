@@ -1850,7 +1850,11 @@ def generate_ticker_graph_view(request, ticker_symbol):
 
     # Plot adjustments and the rest of your plotting logic...
     for i, (low, high) in enumerate(zip(lows, highs)):
-        ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=1)
+        if bar_colours[i] == 'black':
+            linewidth = 1
+        else:
+            linewidth = 2
+        ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=linewidth)
 
     # Plot swing points with corrected y-positions
     ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue', linestyle='-')  # Example: red markers for visibility
