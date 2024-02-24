@@ -1777,8 +1777,12 @@ def generate_swing_point_graph_view(request, opp_id):
     response['Expires'] = '0'
     return response
 
-import matplotlib.dates as mdates
-from matplotlib.ticker import MaxNLocator
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator, FuncFormatter
+import io
+from django.http import HttpResponse
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from .models import Ticker, DailyPrice
 
 def generate_ticker_graph_view(request, ticker_symbol):
     # Fetch the ticker by symbol
