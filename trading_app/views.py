@@ -1825,11 +1825,16 @@ def generate_ticker_graph_view(request, ticker_symbol):
                     bar_colours.append('red')
                 elif to_action == 1:
                     bar_colours.append('green')
-                to_counter += 1
-                if len(trading_opp_dates) > to_counter:
-                    current_to_date = trading_opp_dates[to_counter] - timedelta(days=1)
-                else:
-                    current_to_date = None
+                prior_to_date = current_to_date
+                while True:
+                    to_counter += 1
+                    if len(trading_opp_dates) > to_counter:
+                        current_to_date = trading_opp_dates[to_counter] - timedelta(days=1)
+                        if prior_to_date < current_to_date:
+                            break
+                    else:
+                        current_to_date = None
+                        break
                 logger.error(
                     f'len(trading_opp_dates): {len(trading_opp_dates)} to_counter: {to_counter}. current_to_date: {current_to_date}')
             else:
