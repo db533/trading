@@ -1805,20 +1805,32 @@ def generate_ticker_graph_view(request, ticker_symbol):
     previous_month = None
     sp_indices = []
     bar_colours = []
+    to_counter = 0
+    if len(trading_opp_dates) > to_counter:
+        current_to_date = trading_opp_dates[to_counter] - timedelta(days=1)
+    else:
+        current_to_date = None
     for i, date in enumerate(dates):
         if date.month != previous_month:
             month_starts_indices.append(i)
             previous_month = date.month
         if date in sp_dates:
             sp_indices.append(i)
-        if date.date() in trading_opp_dates:
-            # Get the index for the date in the list of trading_opps
-            to_index = trading_opp_dates.index(date.date())
-            to_action = trading_opp_action_buy[to_index]
-            if to_action == 0:
-                bar_colours.append('red')
-            elif to_action == 1:
-                bar_colours.append('green')
+        if current_to_date is not None:
+            if dates.date() == current_to_date:
+                # Get the index for the date in the list of trading_opps
+                to_action = trading_opp_action_buy[to_counter]
+                if to_action == 0:
+                    bar_colours.append('red')
+                elif to_action == 1:
+                    bar_colours.append('green')
+                to_counter += 1
+                if len(trading_opp_dates) > to_counter:
+                    current_to_date = trading_opp_dates[to_counter] - timedelta(days=1)
+                else:
+                    current_to_date = None
+            else:
+                bar_colours.append('black')
         else:
             bar_colours.append('black')
     del bar_colours[0]
