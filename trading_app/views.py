@@ -1787,7 +1787,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     ticker = Ticker.objects.get(symbol=ticker_symbol)
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
     swing_point_query = SwingPoint.objects.filter(ticker=ticker).order_by('date')
-    trading_opp_query = TradingOpp.objects.filter(ticker=ticker).order_by('-datetime_identified')
+    trading_opp_query = TradingOpp.objects.filter(ticker=ticker).order_by('datetime_identified')
 
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
