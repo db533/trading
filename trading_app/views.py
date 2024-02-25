@@ -1817,7 +1817,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         if date in sp_dates:
             sp_indices.append(i)
         if current_to_date is not None:
-            if dates.date() == current_to_date:
+            if date.date() == current_to_date:
                 # Get the index for the date in the list of trading_opps
                 to_action = trading_opp_action_buy[to_counter]
                 if to_action == 0:
