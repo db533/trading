@@ -48,4 +48,17 @@
                         <tr>
                             <td><input type="text" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
                             <td><input type="text" name="action_{{ trade.id }}" value="{{ trade.get_action_display }}"></td>
-                            <td><
+                            <td><input type="number" step="any" name="price_{{ trade.id }}" value="{{ trade.price }}"></td>
+                            <td><input type="number" step="any" name="units_{{ trade.id }}" value="{{ trade.units }}"></td>
+                            <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}></td>
+                            <!-- Add other Trade fields as input fields -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Save Changes">
+        </form>
+        <hr>
+    {% endfor %}
+</body>
+{% endblock %}
