@@ -978,7 +978,11 @@ def update_tradingopp(request, opp_id):
                 date=timezone.now(),  # Use timezone.now() to get the current date and time
                 action='1' if opp.action_buy else '0',  # Set action based on action_buy of TradingOpp
                 planned=True,  # Mark the Trade as planned
-                price = latest_daily_price.close_price  # Set the price to the close_price of the latest DailyPrice
+                price = latest_daily_price.close_price,  # Set the price to the close_price of the latest DailyPrice
+                units = 0,
+                currency = 'USD',
+                rate_to_eur = 0.9213,
+                commission = 1,
             )
 
     # Ensure conversion or computation logic is correctly handled in the model's save method or elsewhere as needed
