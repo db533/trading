@@ -1983,3 +1983,24 @@ def trading_opps_with_trades_view(request):
     }
 
     return render(request, 'trading_opps_with_trades.html', context)
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import Trade
+from django.views.decorators.csrf import csrf_exempt  # Only if you're bypassing CSRF temporarily
+
+@csrf_exempt  # Consider proper CSRF protection in production
+def update_trades(request):
+    if request.method == 'POST':
+        for key in request.POST:
+            if key.startswith('date_'):
+                trade_id = key.split('_')[1]
+                trade = Trade.objects.get(id=trade_id)
+                trade.date = request.POST.get(key)
+                trade.action = request.POST.get(f'action_{trade_id}')
+                trade.price = request.POST.get(f'price_{trade_id}', 0)
+                trade.units = request.POST.get(f'units_{trade_id}', 0)
+                trade.planned = f'planned_{trade_id}' in request.POST
+                trade.save()
+        return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
+    return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
