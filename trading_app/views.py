@@ -1976,6 +1976,12 @@ def trading_opps_with_trades_view(request):
     # Fetch TradingOpp instances that have at least one Trade linked to them
     trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
+    # Group TradingOpps by date, ignoring time
+    for opp in trading_opps:
+        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+        #date_key = opp.datetime_identified.date()  # Extract date part
+        #grouped_trading_opps[date_key].append(opp)
+
     # You could also prepare trades data if needed for the template or handle it directly within the template
 
     context = {
