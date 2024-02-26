@@ -957,8 +957,7 @@ from django.views.decorators.http import require_POST
 @require_POST
 def update_tradingopp(request, opp_id):
     # Set the size of investments
-    param = Params.objects.get(key='investment_value')
-    investment_value_eur = float(param)
+    investment_value_eur = float(Params.objects.get(key='investment_value'))
     opp = get_object_or_404(TradingOpp, id=opp_id)
 
     # Check and convert if there is a value passed from the form for stop_loss_price
@@ -985,14 +984,14 @@ def update_tradingopp(request, opp_id):
                 exchange_rate = float(Params.objects.get(key='usd_rate'))
                 commission_value = 1
             investment_value_currency = investment_value_eur / exchange_rate
-            units = round(investment_value_currency / latest_daily_price.close_price,0)
+            units = round(investment_value_currency / float(latest_daily_price.close_price),0)
 
             Trade.objects.create(
                 tradingopp=opp,
                 date=timezone.now(),  # Use timezone.now() to get the current date and time
                 action='1' if opp.action_buy else '0',  # Set action based on action_buy of TradingOpp
                 planned=True,  # Mark the Trade as planned
-                price = latest_daily_price.close_price,  # Set the price to the close_price of the latest DailyPrice
+                price = float(latest_daily_price.close_price),  # Set the price to the close_price of the latest DailyPrice
                 units = units,
                 rate_to_eur = exchange_rate,
                 commission = commission_value,
