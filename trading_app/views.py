@@ -2002,6 +2002,7 @@ def update_trades(request):
             if key.startswith('date_'):
                 trade_id = key.split('_')[1]
                 trade = Trade.objects.get(id=trade_id)
+                delete_trade = f'delete_{trade_id}' in request.POST
                 if delete_trade:
                     trade.delete()
                     delete_trade = False
@@ -2011,7 +2012,6 @@ def update_trades(request):
                     trade.price = float(request.POST.get(f'price_{trade_id}', 0))
                     trade.units = float(request.POST.get(f'units_{trade_id}', 0))
                     trade.planned = f'planned_{trade_id}' in request.POST
-                    delete_trade = f'delete_{trade_id}' in request.POST
                     trade.save()
 
         return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
