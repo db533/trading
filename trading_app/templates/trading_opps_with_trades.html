@@ -47,25 +47,36 @@
             <table border="1">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Action</th>
-                        <th>Price</th>
-                        <th>Units</th>
-                        <th>Planned</th>
-                        <!-- Add other Trade fields as needed -->
+                        <th style="text-align:center;">Date</th>
+                        <th style="text-align:center;">Action</th>
+                        <th style="text-align:center;">Price</th>
+                        <th style="text-align:center;">Currency</th>
+                        <th style="text-align:center;">Exchange Rate</th>
+                        <th style="text-align:center;">Units</th>
+                        <th style="text-align:center;">Commission</th>
+                        <th style="text-align:center;">Notes</th>
+                        <th style="text-align:center;">Planned</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for trade in opp.trades.all %}
                         <tr>
                             <td><input type="date" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
-                            <td><input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy
+                            <td>
+                                <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy
                                 <input type="radio" name="action_{{ trade.id }}" value="0" {% if trade.action == '0' %}checked{% endif %}> Sell
                             </td>
                             <td><input type="number" step="any" name="price_{{ trade.id }}" value="{{ trade.price }}"></td>
+                            <td>
+                                {% for currency in trade.CURRENCY_CHOICES %}
+                                    <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}
+                                {% endfor %}
+                            </td>
+                            <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" value="{{ trade.rate_to_eur }}"></td>
                             <td><input type="number" step="any" name="units_{{ trade.id }}" value="{{ trade.units }}"></td>
+                            <td><input type="number" step="any" name="commission_{{ trade.id }}" value="{{ trade.commission }}"></td>
+                            <td><input type="text" name="notes_{{ trade.id }}" value="{{ trade.notes }}"></td>
                             <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}></td>
-                            <!-- Add other Trade fields as input fields -->
                         </tr>
                     {% endfor %}
                 </tbody>
