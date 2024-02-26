@@ -179,14 +179,14 @@ class TradingOpp(models.Model):
                 latest_price = float(daily_price.close_price)
                 action_buy = self.action_buy
                 try:
-                    if action_buy == 1:
+                    if action_buy == "1":
                         # Action is a buy. Compute reward / risk this way:
                         self.reward_risk = round(
                             (self.profit_taker_price - latest_price) * 100 / (latest_price - self.stop_loss_price))
                     else:
                         # Action is a sell. Compute reward / risk this way:
                         self.reward_risk = round(
-                            (latest_price - self.profit_taker_price) * 100 / (self.stop_loss_price) - latest_price)
+                            (latest_price - self.profit_taker_price) * 100 / (self.stop_loss_price - latest_price))
 
                 except ZeroDivisionError:
                     self.reward_risk = None  # Handle division by zero if purchase_price equals stop_loss_price
