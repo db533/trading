@@ -980,7 +980,6 @@ def update_tradingopp(request, opp_id):
                 planned=True,  # Mark the Trade as planned
                 price = latest_daily_price.close_price,  # Set the price to the close_price of the latest DailyPrice
                 units = 0,
-                currency = 'USD',
                 rate_to_eur = 0.9213,
                 commission = 1,
             )
