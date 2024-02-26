@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Trading Opportunities with Trades</title>
+</head>
+<body>
+    <h1>Trading Opportunities with Trades</h1>
+    {% for opp in trading_opps %}
+        <h2>{{ opp.ticker.symbol }} - {{ opp.strategy.name }} (ID: {{ opp.id }})</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Identified</th>
+                    <th>Stop Loss Price</th>
+                    <th>Profit Taker Price</th>
+                    <th>Reward/Risk</th>
+                    <!-- Add other TradingOpp fields as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ opp.action_buy|yesno:"BUY,SELL" }}</td>
+                    <td>{{ opp.datetime_identified }}</td>
+                    <td>{{ opp.stop_loss_price }}</td>
+                    <td>{{ opp.profit_taker_price }}</td>
+                    <td>{{ opp.reward_risk }}</td>
+                    <!-- Add other TradingOpp field values as needed -->
+                </tr>
+            </tbody>
+        </table>
+        <h3>Trades</h3>
+        <form method="post" action="{% url 'update_trades' %}">{% csrf_token %}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Action</th>
+                        <th>Price</th>
+                        <th>Units</th>
+                        <th>Planned</th>
+                        <!-- Add other Trade fields as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trade in opp.trades.all %}
+                        <tr>
+                            <td><input type="text" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
+                            <td><input type="text" name="action_{{ trade.id }}" value="{{ trade.get_action_display }}"></td>
+                            <td><

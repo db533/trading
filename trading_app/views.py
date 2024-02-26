@@ -1970,3 +1970,16 @@ def task_queue_view(request):
     tasks = Task.objects.all().values('id', 'task_name', 'task_params', 'run_at')
     count = tasks.count()
     return render(request, 'task_queue.html', {'tasks': tasks, 'count': count})
+
+@login_required()
+def trading_opps_with_trades_view(request):
+    # Fetch TradingOpp instances that have at least one Trade linked to them
+    trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
+
+    # You could also prepare trades data if needed for the template or handle it directly within the template
+
+    context = {
+        'trading_opps': trading_opps,
+    }
+
+    return render(request, 'trading_opps_with_trades.html', context)
