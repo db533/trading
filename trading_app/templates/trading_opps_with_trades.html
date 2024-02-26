@@ -47,15 +47,15 @@
             <table border="1">
                 <thead>
                     <tr>
-                        <th style="text-align:center;">Date</th>
-                        <th style="text-align:center;">Action</th>
-                        <th style="text-align:center;">Price</th>
-                        <th style="text-align:center;">Currency</th>
-                        <th style="text-align:center;">Exchange Rate</th>
-                        <th style="text-align:center;">Units</th>
-                        <th style="text-align:center;">Commission</th>
-                        <th style="text-align:center;">Notes</th>
-                        <th style="text-align:center;">Planned</th>
+                        <th style="text-align:center; width: 12ch;">Date</th>
+                        <th style="text-align:center; width: 8ch;">Action</th>
+                        <th style="text-align:center; width: 8ch;">Price</th>
+                        <th style="text-align:center; width: 12ch;">Currency</th>
+                        <th style="text-align:center; width: 12ch;">Exchange Rate</th>
+                        <th style="text-align:center; width: 8ch;">Units</th>
+                        <th style="text-align:center; width: 12ch;">Commission</th>
+                        <th style="text-align:center; width: 20ch;">Notes</th>
+                        <th style="text-align:center; width: 6ch;">Planned</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,13 +63,13 @@
                         <tr>
                             <td><input type="date" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
                             <td>
-                                <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy
+                                <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy<br>
                                 <input type="radio" name="action_{{ trade.id }}" value="0" {% if trade.action == '0' %}checked{% endif %}> Sell
                             </td>
                             <td><input type="number" step="any" name="price_{{ trade.id }}" value="{{ trade.price }}"></td>
                             <td>
                                 {% for currency in trade.CURRENCY %}
-                                    <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}
+                                    <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}<br>
                                 {% endfor %}
                             </td>
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" value="{{ trade.rate_to_eur }}"></td>
