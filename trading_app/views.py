@@ -1991,8 +1991,6 @@ def trading_opps_with_trades_view(request):
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
-        #date_key = opp.datetime_identified.date()  # Extract date part
-        #grouped_trading_opps[date_key].append(opp)
 
     # You could also prepare trades data if needed for the template or handle it directly within the template
 

@@ -155,18 +155,20 @@ class TradingOpp(models.Model):
         profit_currency = 0
         profit_eur = 0
         purchase_price = None
+        sales_price = None
         for trade in trades:
             if trade.action == '1':  # Assuming '1' is Buy
                 purchase_price = trade.price
                 units += trade.units
-                profit_currency -= trade.units * trade.price
-                profit_eur -= trade.units * trade.price * trade.rate_to_eur
+                profit_currency -= (trade.units * purchase_price)
+                profit_eur -= (trade.units * purchase_price * trade.rate_to_eur)
             elif trade.action == '0':  # Assuming '0' is Sell
+                sales_price = trade.price
                 units -= trade.units
-                profit_currency += trade.units * trade.price
-                profit_eur += trade.units * trade.price * trade.rate_to_eur
+                profit_currency += (trade.units * sales_price)
+                profit_eur += (trade.units * sales_price * trade.rate_to_eur)
 
-        if units > 0 and purchase_price is not None:
+        if (purchase_price is not None or sales_price is not None):
             self.amount_invested_currency = units * purchase_price
             self.profit_currency = profit_currency
             self.profit_eur = profit_eur
