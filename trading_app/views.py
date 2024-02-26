@@ -972,6 +972,7 @@ def update_tradingopp(request, opp_id):
     opp.save()
 
     return redirect('trading_opps_sorted')  # Ensure this name matches your URL pattern name for the listing view
+
 def trading_opps_sorted_view(request):
     # Fetch query parameters for filtering
     action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
