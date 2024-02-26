@@ -50,7 +50,7 @@
                         <th style="text-align:center; width: 12ch;">Date</th>
                         <th style="text-align:center; width: 8ch;">Action</th>
                         <th style="text-align:center; width: 8ch;">Price</th>
-                        <th style="text-align:center; width: 12ch;">Currency</th>
+                        <th style="text-align:center; width: 16ch;">Currency</th>
                         <th style="text-align:center; width: 12ch;">Exchange Rate</th>
                         <th style="text-align:center; width: 8ch;">Units</th>
                         <th style="text-align:center; width: 12ch;">Commission</th>
@@ -69,7 +69,7 @@
                             <td><input type="number" step="any" name="price_{{ trade.id }}" value="{{ trade.price }}"></td>
                             <td>
                                 {% for currency in trade.CURRENCY %}
-                                    <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}<br>
+                                    <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}
                                 {% endfor %}
                             </td>
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" value="{{ trade.rate_to_eur }}"></td>
