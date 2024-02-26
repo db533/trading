@@ -956,6 +956,8 @@ from django.views.decorators.http import require_POST
 
 @require_POST
 def update_tradingopp(request, opp_id):
+    # Set the size of investments
+    investment_value_eur = 200
     opp = get_object_or_404(TradingOpp, id=opp_id)
 
     # Check and convert if there is a value passed from the form for stop_loss_price
@@ -973,15 +975,26 @@ def update_tradingopp(request, opp_id):
         latest_daily_price = DailyPrice.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
         if latest_daily_price:
             # Create a Trade instance linked to this TradingOpp
+            tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+            is_in_tse_stocks = opp.ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+            if is_in_tse_stocks:
+                exchange_rate = 0.0061
+                commission_value = 80
+            else:
+                exchange_rate = 0.9213
+                commission_value = 1
+            investment_value_currency = investment_value_eur / exchange_rate
+            units = round(investment_value_currency / latest_daily_price.close_price,0)
+
             Trade.objects.create(
                 tradingopp=opp,
                 date=timezone.now(),  # Use timezone.now() to get the current date and time
                 action='1' if opp.action_buy else '0',  # Set action based on action_buy of TradingOpp
                 planned=True,  # Mark the Trade as planned
                 price = latest_daily_price.close_price,  # Set the price to the close_price of the latest DailyPrice
-                units = 0,
-                rate_to_eur = 0.9213,
-                commission = 1,
+                units = units,
+                rate_to_eur = exchange_rate,
+                commission = commission_value,
             )
 
     # Ensure conversion or computation logic is correctly handled in the model's save method or elsewhere as needed

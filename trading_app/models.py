@@ -297,3 +297,19 @@ class Trade(models.Model):
         super().save(*args, **kwargs)  # Call the "real" save() method.
         if self.tradingopp:  # Check if the trade is linked to a TradingOpp
             self.tradingopp.update_computed_values()
+
+class Params(models.Model):
+    TYPES = (
+        ('0', 'Float'),
+    )
+
+    key = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)
+    type = models.CharField(max_length=2,
+                              choices=TYPES,
+                              default='0',
+                              help_text='Data type for the value',
+                              verbose_name='Data type')
+
+    def __str__(self):
+        return f"{self.key} - {self.value}"
