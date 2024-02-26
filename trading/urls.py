@@ -33,6 +33,7 @@ urlpatterns = [
     path('trading-opps-filtered/', trading_opps_filtered, name='trading-opps-filtered'),
     path('tasks/', task_queue_view, name='task_queue'),
     path('ticker-graph/<str:ticker_symbol>/', generate_ticker_graph_view, name='ticker-graph'),
+    path('trading-opp/update/<int:opp_id>/', update_tradingopp, name='update_tradingopp'),
 ]
 
 from django.conf import settings
