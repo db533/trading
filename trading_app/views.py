@@ -2026,6 +2026,22 @@ def update_trades(request):
                     trade.units = float(request.POST.get(f'units_{trade_id}', 0))
                     trade.planned = f'planned_{trade_id}' in request.POST
                     trade.save()
+        trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
+        for opp in trading_opps:
+            new_trade_prefix = f'new_date_{opp.id}'
+            if request.POST.get(new_trade_prefix):
+                new_trade = Trade(
+                    tradingopp=opp,
+                    date=request.POST.get(new_trade_prefix),
+                    action=request.POST.get(f'new_action_{opp.id}'),
+                    price=float(request.POST.get(f'new_price_{opp.id}', '0')),
+                    rate_to_eur=float(request.POST.get(f'new_rate_to_eur_{opp.id}', '0')),
+                    units=float(request.POST.get(f'new_units_{opp.id}', '0')),
+                    commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
+                    notes=request.POST.get(f'new_notes_{opp.id}', '0'),
+                    # Initialize additional fields as necessary
+                )
+                new_trade.save()
 
-        return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
+        return HttpResponseRedirect(reverse('tradin_opps_with_trades'))  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
