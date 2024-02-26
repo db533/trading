@@ -174,7 +174,7 @@ class TradingOpp(models.Model):
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
             # Assuming DailyPrice model is related to Ticker and has a close_price field
-            daily_price = self.ticker.dailyprice_set.last()  # Retrieve the most recent DailyPrice instance
+            daily_price = self.ticker.dailyprice_set.order_by('-datetime').first()
             if daily_price:  # Check if a DailyPrice instance was found
                 latest_price = float(daily_price.close_price)
                 action_buy = self.action_buy
