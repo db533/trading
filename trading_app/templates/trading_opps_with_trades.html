@@ -65,7 +65,7 @@
                                 <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy<br>
                                 <input type="radio" name="action_{{ trade.id }}" value="0" {% if trade.action == '0' %}checked{% endif %}> Sell
                             </td>
-                            <td><input type="number" step="any" name="price_{{ trade.id }}" style="width: 80px;" value="{{ trade.price }} "></td>
+                            <td><input type="number" step="any" name="price_{{ trade.id }}" style="width: 80px;" value="{{ trade.price }}"></td>
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" style="width: 80px;" value="{{ trade.rate_to_eur }}"></td>
                             <td><input type="number" step="any" name="units_{{ trade.id }}" style="width: 80px;" value="{{ trade.units }}"></td>
                             <td><input type="number" step="any" name="commission_{{ trade.id }}" style="width: 60px;" value="{{ trade.commission }}"></td>
