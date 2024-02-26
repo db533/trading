@@ -274,6 +274,7 @@ class Trade(models.Model):
                               default='1',
                               help_text='Is the trade a buy or a sell?',
                               verbose_name='Action')
+    planned = models.BooleanField(default=True) # Is the purchase / sale planned or actually executed.
     price = models.FloatField()
     units = models.FloatField(help_text='Quantity of units bought or sold',)
     CURRENCY = (
