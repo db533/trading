@@ -176,7 +176,7 @@ class TradingOpp(models.Model):
             # Assuming DailyPrice model is related to Ticker and has a close_price field
             daily_price = self.ticker.dailyprice_set.last()  # Retrieve the most recent DailyPrice instance
             if daily_price:  # Check if a DailyPrice instance was found
-                purchase_price = daily_price.close_price
+                purchase_price = float(daily_price.close_price)
                 try:
                     self.reward_risk = round(
                         (self.profit_taker_price - purchase_price) * 100 / (purchase_price - self.stop_loss_price))
