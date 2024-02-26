@@ -2008,6 +2008,9 @@ def update_trades(request):
                 trade.price = request.POST.get(f'price_{trade_id}', 0)
                 trade.units = request.POST.get(f'units_{trade_id}', 0)
                 trade.planned = f'planned_{trade_id}' in request.POST
+                delete_trade = request.POST.get(f'delete_{trade_id}', 0)
                 trade.save()
+            if delete_trade:
+                trade.delete()
         return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
