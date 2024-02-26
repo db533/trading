@@ -968,6 +968,19 @@ def update_tradingopp(request, opp_id):
     if profit_taker_price:
         opp.profit_taker_price = float(profit_taker_price)  # Convert to float
 
+    # Check if 'schedule' was checked
+    if 'schedule' in request.POST:
+        latest_daily_price = DailyPrice.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
+        if latest_daily_price:
+            # Create a Trade instance linked to this TradingOpp
+            Trade.objects.create(
+                tradingopp=opp,
+                date=timezone.now(),  # Use timezone.now() to get the current date and time
+                action='1' if opp.action_buy else '0',  # Set action based on action_buy of TradingOpp
+                planned=True,  # Mark the Trade as planned
+                price = latest_daily_price.close_price  # Set the price to the close_price of the latest DailyPrice
+            )
+
     # Ensure conversion or computation logic is correctly handled in the model's save method or elsewhere as needed
     opp.save()
 
