@@ -62,8 +62,8 @@
                         <tr>
                             <td><input type="date" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
                             <td>
-                                <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == '1' %}checked{% endif %}> Buy<br>
-                                <input type="radio" name="action_{{ trade.id }}" value="0" {% if trade.action == '0' %}checked{% endif %}> Sell
+                                <input type="radio" name="action_{{ trade.id }}" value="1" > Buy<br>
+                                <input type="radio" name="action_{{ trade.id }}" value="0" > Sell
                             </td>
                             <td><input type="number" step="any" name="price_{{ trade.id }}" style="width: 80px;" value="{{ trade.price }}"></td>
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" style="width: 80px;" value="{{ trade.rate_to_eur }}"></td>
@@ -79,9 +79,10 @@
                                 <input type="radio" name="new_action_{{ opp.id }}" value="1" checked> Buy
                                 <input type="radio" name="new_action_{{ opp.id }}" value="0"> Sell
                             </td>
-                            <td><input type="number" step="any" name="new_price_{{ opp.id }}"></td>
-                            <td><input type="number" step="any" name="new_units_{{ opp.id }}"></td>
-                            <td><input type="number" step="any" name="new_commission_{{ opp.id }}"></td>
+                            <td><input type="number" step="any" name="new_price_{{ opp.id }}" style="width: 80px;"></td>
+                            <td><input type="number" step="any" name="new_rate_to_eur_{{ opp.id }}" style="width: 80px;"></td>
+                            <td><input type="number" step="any" name="new_units_{{ opp.id }}" style="width: 80px;"></td>
+                            <td><input type="number" step="any" name="new_commission_{{ opp.id }}" style="width: 60px;"></td>
                             <td><input type="text" step="any" name="new_notes_{{ opp.id }}"></td>
                             <td><input type="submit" value="Add New Trade"></td>
                         </tr>
