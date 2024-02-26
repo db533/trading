@@ -52,16 +52,23 @@
                 <tbody>
                 {% for opp in opps %}
                     <tr>
-                        <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}</td>
-                        <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
-                        <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
-                        <td>{{ opp.strategy.description }}</td>
-                        <td>
-                            {% for label, value in opp.translated_metrics.items %}
-                                <strong>{{ label }}:</strong> {{ value }}<br>
-                            {% endfor %}
-                        </td>
-                        <td>{{ opp.datetime_identified }}</td>
+                        <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
+                            <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}</td>
+                            <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
+                            <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
+                            <td>{{ opp.strategy.description }}</td>
+                            <td>
+                                {% for label, value in opp.translated_metrics.items %}
+                                    <strong>{{ label }}:</strong> {{ value }}<br>
+                                {% endfor %}
+                                <strong>Stop Loss Price:</strong>
+                                <input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" required>
+                                <strong>Profit Taker Price:</strong>
+                                <input type="number" step="any" name="profit_taker_price" value="{{ opp.profit_taker_price }}" required><br>
+                                <input type="submit" value="Update">
+                            </td>
+                            <td>{{ opp.datetime_identified }}</td>
+                        </form>
                     </tr>
                 {% endfor %}
                 </tbody>

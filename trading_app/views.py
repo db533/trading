@@ -951,6 +951,17 @@ def trading_opps_view(request):
 from collections import defaultdict
 from datetime import datetime
 
+from django.shortcuts import redirect, get_object_or_404
+from django.views.decorators.http import require_POST
+
+@require_POST
+def update_tradingopp(request, opp_id):
+    opp = get_object_or_404(TradingOpp, id=opp_id)
+    opp.stop_loss_price = request.POST.get('stop_loss_price')
+    opp.profit_taker_price = request.POST.get('profit_taker_price')
+    opp.save()
+    return redirect('trading_opps_sorted')  # Replace 'trading_opps_sorted' with the name of your listing view
+
 def trading_opps_sorted_view(request):
     # Fetch query parameters for filtering
     action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
