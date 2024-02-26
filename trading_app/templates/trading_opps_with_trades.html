@@ -68,7 +68,7 @@
                             </td>
                             <td><input type="number" step="any" name="price_{{ trade.id }}" value="{{ trade.price }}"></td>
                             <td>
-                                {% for currency in trade.CURRENCY_CHOICES %}
+                                {% for currency in trade.CURRENCY %}
                                     <input type="radio" name="currency_{{ trade.id }}" value="{{ currency.0 }}" {% if trade.currency == currency.0 %}checked{% endif %}> {{ currency.1 }}
                                 {% endfor %}
                             </td>
