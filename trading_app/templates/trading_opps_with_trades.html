@@ -76,7 +76,8 @@
                             <td><input type="number" step="any" name="units_{{ trade.id }}" style="width: 50px;" value="{{ trade.units }}"></td>
                             <td><input type="number" step="any" name="commission_{{ trade.id }}" style="width: 40px;" value="{{ trade.commission }}"></td>
                             <td><input type="text" name="notes_{{ trade.id }}" value="{{ trade.notes }}"></td>
-                            <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}></td>
+                            <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}><br>
+                            <input type="checkbox" name="delete_{{ trade.id }}"></td>
                         </tr>
                     {% endfor %}
                 </tbody>
