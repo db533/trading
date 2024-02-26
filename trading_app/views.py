@@ -1998,7 +1998,6 @@ def update_trades(request):
                 trade = Trade.objects.get(id=trade_id)
                 trade.date = request.POST.get(key)
                 action_string = request.POST.get(f'action_{trade_id}')
-                if action_string == 'Buy'
                 trade.action = request.POST.get(f'action_{trade_id}')
                 trade.price = request.POST.get(f'price_{trade_id}', 0)
                 trade.units = request.POST.get(f'units_{trade_id}', 0)
