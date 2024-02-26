@@ -2006,8 +2006,8 @@ def update_trades(request):
                 trade.date = request.POST.get(key)
                 action_string = request.POST.get(f'action_{trade_id}')
                 trade.action = request.POST.get(f'action_{trade_id}')
-                trade.price = request.POST.get(f'price_{trade_id}', 0)
-                trade.units = request.POST.get(f'units_{trade_id}', 0)
+                trade.price = float(request.POST.get(f'price_{trade_id}', 0))
+                trade.units = float(request.POST.get(f'units_{trade_id}', 0))
                 trade.planned = f'planned_{trade_id}' in request.POST
                 delete_trade = request.POST.get(f'delete_{trade_id}', 0)
                 trade.save()
