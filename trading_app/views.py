@@ -2043,5 +2043,5 @@ def update_trades(request):
                 )
                 new_trade.save()
 
-        return HttpResponseRedirect(reverse('tradin_opps_with_trades'))  # Redirect back to the list
+        return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
