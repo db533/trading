@@ -957,11 +957,19 @@ from django.views.decorators.http import require_POST
 @require_POST
 def update_tradingopp(request, opp_id):
     opp = get_object_or_404(TradingOpp, id=opp_id)
-    opp.stop_loss_price = request.POST.get('stop_loss_price')
-    opp.profit_taker_price = request.POST.get('profit_taker_price')
-    opp.save()
-    return redirect('trading_opps_sorted')  # Replace 'trading_opps_sorted' with the name of your listing view
 
+    # Check if there is a value passed from the form for stop_loss_price
+    stop_loss_price = request.POST.get('stop_loss_price')
+    if stop_loss_price:
+        opp.stop_loss_price = stop_loss_price
+
+    # Check if there is a value passed from the form for profit_taker_price
+    profit_taker_price = request.POST.get('profit_taker_price')
+    if profit_taker_price:
+        opp.profit_taker_price = profit_taker_price
+
+    opp.save()
+    return redirect('trading_opps_sorted')  # Ensure this name matches your URL pattern name for the listing view
 def trading_opps_sorted_view(request):
     # Fetch query parameters for filtering
     action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
