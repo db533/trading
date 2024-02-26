@@ -166,10 +166,11 @@ class TradingOpp(models.Model):
                 profit_currency += trade.units * trade.price
                 profit_eur += trade.units * trade.price * trade.rate_to_eur
 
-        self.amount_invested_currency = units * purchase_price
-        self.profit_currency = profit_currency
-        self.profit_eur = profit_eur
-        self.save()
+        if units > 0 and purchase_price is not None:
+            self.amount_invested_currency = units * purchase_price
+            self.profit_currency = profit_currency
+            self.profit_eur = profit_eur
+            self.save()
 
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
