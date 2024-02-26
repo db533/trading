@@ -957,7 +957,7 @@ from django.views.decorators.http import require_POST
 @require_POST
 def update_tradingopp(request, opp_id):
     # Set the size of investments
-    investment_value_eur = float(Params.objects.get(key='investment_value'))
+    investment_value_eur = float(Params.objects.get(key='investment_value').value)
     opp = get_object_or_404(TradingOpp, id=opp_id)
 
     # Check and convert if there is a value passed from the form for stop_loss_price
@@ -978,10 +978,10 @@ def update_tradingopp(request, opp_id):
             tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
             is_in_tse_stocks = opp.ticker.categories.filter(pk=tse_stocks_category.pk).exists()
             if is_in_tse_stocks:
-                exchange_rate = float(Params.objects.get(key='jpy_rate'))
+                exchange_rate = float(Params.objects.get(key='jpy_rate').value)
                 commission_value = 80
             else:
-                exchange_rate = float(Params.objects.get(key='usd_rate'))
+                exchange_rate = float(Params.objects.get(key='usd_rate').value)
                 commission_value = 1
             investment_value_currency = investment_value_eur / exchange_rate
             units = round(investment_value_currency / float(latest_daily_price.close_price),0)
