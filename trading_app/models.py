@@ -285,17 +285,6 @@ class Trade(models.Model):
     planned = models.BooleanField(default=True) # Is the purchase / sale planned or actually executed.
     price = models.FloatField()
     units = models.FloatField(help_text='Quantity of units bought or sold',)
-    CURRENCY = (
-        ('USD', 'US Dollars'),
-        ('EUR', 'Euro'),
-        ('GBP', 'British Pound'),
-        ('JPY', 'Japanese Yen'),
-    )
-    currency = models.CharField(max_length=3,
-                                choices=CURRENCY,
-                                default='USD',
-                                help_text='Currency for the transaction',
-                                verbose_name='Currency')
     rate_to_eur = models.FloatField(verbose_name='Multiplier to convert price to EUR')
     commission = models.FloatField(verbose_name='Commission in foreign currency')
     notes = models.TextField(blank=True)
