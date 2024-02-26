@@ -1997,6 +1997,7 @@ from django.views.decorators.csrf import csrf_exempt  # Only if you're bypassing
 
 @csrf_exempt  # Consider proper CSRF protection in production
 def update_trades(request):
+    delete_trade = False
     if request.method == 'POST':
         for key in request.POST:
             if key.startswith('date_'):
