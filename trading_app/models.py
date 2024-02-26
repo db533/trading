@@ -138,9 +138,53 @@ class TradingOpp(models.Model):
     swing_points = models.ManyToManyField('SwingPoint', related_name='trading_opps', blank=True)
     datetime_invalidated = models.DateTimeField(null=True, blank = True)
     confirmed = models.BooleanField(default=True)
+    stop_loss_price = models.FloatField(null=True)
+    profit_taker_price = models.FloatField(null=True)
+    reward_risk = models.FloatField(null=True)
+    stop_loss_triggered = models.BooleanField(default=False, null=True)
+    amount_invested_currency = models.FloatField(null=True)
+    profit_currency = models.FloatField(null=True)
+    profit_eur = models.FloatField(null=True)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
+
+    def update_computed_values(self):
+        trades = self.trades.all()  # Get all related trades
+        units = 0
+        profit_currency = 0
+        profit_eur = 0
+        purchase_price = None
+        for trade in trades:
+            if trade.action == '1':  # Assuming '1' is Buy
+                purchase_price = trade.price
+                units += trade.units
+                profit_currency -= trade.units * trade.price
+                profit_eur -= trade.units * trade.price * trade.rate_to_eur
+            elif trade.action == '0':  # Assuming '0' is Sell
+                units -= trade.units
+                profit_currency += trade.units * trade.price
+                profit_eur += trade.units * trade.price * trade.rate_to_eur
+
+        self.amount_invested_currency = units * purchase_price
+        self.profit_currency = profit_currency
+        self.profit_eur = profit_eur
+        self.save()
+
+    def save(self, *args, **kwargs):
+        if self.stop_loss_price is not None and self.profit_taker_price is not None:
+            # Assuming DailyPrice model is related to Ticker and has a close_price field
+            daily_price = self.ticker.dailyprice_set.last()  # Retrieve the most recent DailyPrice instance
+            if daily_price:  # Check if a DailyPrice instance was found
+                purchase_price = daily_price.close_price
+                try:
+                    self.reward_risk = round(
+                        (self.profit_taker_price - purchase_price) * 100 / (purchase_price - self.stop_loss_price))
+                except ZeroDivisionError:
+                    self.reward_risk = None  # Handle division by zero if purchase_price equals stop_loss_price
+
+        super().save(*args, **kwargs)  # Call the "real" save() method after computing reward_risk
+
 
 class WaveType(models.Model):
     name = models.CharField(max_length=100)
@@ -162,7 +206,7 @@ class Wave(models.Model):
         score = 0
         for rule in self.wave_type.rules:  # Access rules from the wave_type
             if rule['type'] == 'hard_rule':
-                if not self.evaluate_hard_rule(rule, previous_wave):
+                if not self.evaluate_hard_rule(rule, n_1_wave):
                     return 0  # Failure to meet a hard rule
             elif rule['type'] == 'guideline':
                 adherence = self.evaluate_guideline(rule)
@@ -210,3 +254,47 @@ class WaveSequence(models.Model):
 
     class Meta:
         ordering = ['order']
+
+class Trade(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+    tradingopp = models.ForeignKey(
+        TradingOpp,
+        on_delete=models.SET_NULL,  # This will set the tradingopp field to NULL instead of deleting the trade
+        related_name='trades',
+        verbose_name="Trading Opportunity",
+        null=True,  # Allows the tradingopp field to be null
+        blank=True  # Optional: Allows the field to be blank in forms/admin
+    )
+    ACTION = (
+        ('1', 'Buy'),
+        ('0', 'Sell'),
+    )
+    action = models.CharField(max_length=1,
+                              choices=ACTION,
+                              default='1',
+                              help_text='Is the trade a buy or a sell?',
+                              verbose_name='Action')
+    price = models.FloatField()
+    units = models.FloatField(help_text='Quantity of units bought or sold',)
+    CURRENCY = (
+        ('USD', 'US Dollars'),
+        ('EUR', 'Euro'),
+        ('GBP', 'British Pound'),
+        ('JPY', 'Japanese Yen'),
+    )
+    currency = models.CharField(max_length=3,
+                                choices=CURRENCY,
+                                default='USD',
+                                help_text='Currency for the transaction',
+                                verbose_name='Currency')
+    rate_to_eur = models.FloatField(verbose_name='Multiplier to convert price to EUR')
+    commission = models.FloatField(verbose_name='Commission in foreign currency')
+    notes = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.tradingopp.ticker.symbol} - {self.action} - {self.date}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        if self.tradingopp:  # Check if the trade is linked to a TradingOpp
+            self.tradingopp.update_computed_values()
