@@ -2039,6 +2039,7 @@ def update_trades(request):
                     units=float(request.POST.get(f'new_units_{opp.id}', '0')),
                     commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
                     notes=request.POST.get(f'new_notes_{opp.id}', '0'),
+                    planned=False
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
