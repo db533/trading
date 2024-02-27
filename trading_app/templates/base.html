@@ -31,7 +31,8 @@
             <li><a href="{% url 'manual_category_download' 'Swing trade opportunities'|urlencode %}">Swing opp price download</a></li>
             <li><a href="{% url 'manual_category_download' 'Test tickers'|urlencode %}">Test tickers price download</a></li><br>
             <li><a href="{% url 'task_queue' %}">Task queue</a></li>
-
+            <li><a href="{% url 'delete_ticker' %}">Delete tickers</a></li>
+            <br>
             <p><li><strong><a href="{% url 'logout' %}?next={{ request.path }}">Atslēgties</a></strong></li></p>
           {% else %}
             <li><a href="{% url 'login' %}?next={{ request.path }}">Pieslēgties</a></li>
