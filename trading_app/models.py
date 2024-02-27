@@ -156,23 +156,33 @@ class TradingOpp(models.Model):
         profit_eur = 0
         purchase_price = None
         sales_price = None
+        commissions_total = 0
         for trade in trades:
+            # Read values from trade:
+            deal_price = trade.price
+            commission_amount = trade.commission
+            unit_amount = trade.units
+            # Check if the value is blank. If so, set to 0
+            if deal_price is None:
+                deal_price = 0
+            if commission_amount is None:
+                commission_amount = 0
+            if unit_amount is None:
+                unit_amount = 0
             if trade.action == '1':  # Assuming '1' is Buy
-                purchase_price = trade.price
-                units += trade.units
-                profit_currency -= (trade.units * purchase_price)
-                profit_eur -= (trade.units * purchase_price * trade.rate_to_eur)
+                units += unit_amount
+                profit_currency -= ((unit_amount * deal_price) - commission_amount)
+                profit_eur -= (((unit_amount * deal_price) + commission_amount)  * trade.rate_to_eur)
+                commissions_total += trade.commission
             elif trade.action == '0':  # Assuming '0' is Sell
-                sales_price = trade.price
-                units -= trade.units
-                profit_currency += (trade.units * sales_price)
-                profit_eur += (trade.units * sales_price * trade.rate_to_eur)
-
-        if (purchase_price is not None or sales_price is not None):
-            self.amount_invested_currency = units * purchase_price
-            self.profit_currency = profit_currency
-            self.profit_eur = profit_eur
-            self.save()
+                units -= unit_amount
+                profit_currency += (((unit_amount * deal_price) - commission_amount)
+                profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur)
+                commissions_total += trade.commission
+        self.amount_invested_currency = round(units * deal_price,2)
+        self.profit_currency = round(profit_currency - commissions_total,2)
+        self.profit_eur = round(profit_eur, 2)
+        self.save()
 
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
