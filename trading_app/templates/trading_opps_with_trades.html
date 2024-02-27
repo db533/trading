@@ -93,11 +93,11 @@
             <input type="submit" value="Save Changes">
         </form>
         <h3>Trade performance</h3>
-            Initially invested: € {{ opp.amount_invested_currency }}<br>
-            Still invested: €
-            Income from sale: €
-            Profit: €
-            Return on capital: %
+            Initially invested: € {{ opp.amount_initially_invested_currency }}<br>
+            Still invested: € {{ opp.amount_still_invested_currency }}<br>
+            Income from sale: € {{ opp.income_from_sales_eur }}<br>
+            Commissions: € {{ opp.commissions_total_eur }}<br>
+            Realised profit: € {{ opp.realised_profit_eur }}<br>
         <hr>
     {% endfor %}
 </body>

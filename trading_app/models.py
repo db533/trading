@@ -144,8 +144,9 @@ class TradingOpp(models.Model):
     stop_loss_triggered = models.BooleanField(default=False, null=True)
     amount_initially_invested_currency = models.FloatField(null=True)
     amount_still_invested_currency = models.FloatField(null=True)
-    realised_profit_currency = models.FloatField(null=True)
+    income_from_sales_eur = models.FloatField(null=True)
     realised_profit_eur = models.FloatField(null=True)
+    commissions_total_eur = models.FloatField(null=True)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
@@ -156,7 +157,7 @@ class TradingOpp(models.Model):
         profit_currency = 0
         profit_eur = 0
         amount_initially_invested = 0
-        commissions_total = 0
+        commissions_total_eur = 0
         for trade in trades:
             # Read values from trade:
             deal_price = trade.price
@@ -171,20 +172,21 @@ class TradingOpp(models.Model):
                 unit_amount = 0
             if trade.action == '1':  # Assuming '1' is Buy
                 units += unit_amount
-                profit_currency -= ((unit_amount * deal_price) - commission_amount)
+                #profit_currency -= ((unit_amount * deal_price) - commission_amount)
                 profit_eur -= (((unit_amount * deal_price) + commission_amount)  * trade.rate_to_eur)
-                commissions_total += trade.commission
+                commissions_total_eur += (trade.commission * trade.rate_to_eur)
                 purchase_price = deal_price
                 amount_initially_invested += (unit_amount * deal_price)
             elif trade.action == '0':  # Assuming '0' is Sell
                 units -= unit_amount
-                profit_currency += ((unit_amount * deal_price) - commission_amount)
+                #profit_currency += ((unit_amount * deal_price) - commission_amount)
                 profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur
-                commissions_total += trade.commission
+                commissions_total_eur += (trade.commission * trade.rate_to_eur)
         self.amount_initially_invested_currency = round(amount_initially_invested,2)
         self.amount_still_invested_currency = round(units * purchase_price, 2)
-        self.realised_profit_currency = round(profit_currency - commissions_total,2)
+        #self.realised_profit_currency = round(profit_currency - commissions_total,2)
         self.realised_profit_eur = round(profit_eur, 2)
+        self.commissions_total_eur = round(commissions_total_eur, 2)
         self.save()
 
     def save(self, *args, **kwargs):
