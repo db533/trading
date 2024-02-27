@@ -59,7 +59,7 @@
                 </thead>
                 <tbody>
                     {% for trade in opp.trades.all %}
-                        <tr>
+                        <tr style="background-color: {% if trade.action == '1' %}lightblue{% else %}lightcoral{% endif %};">
                             <td><input type="date" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
                             <td>
                                 <input type="radio" name="action_{{ trade.id }}" value="1" {% if trade.action == "1" %}checked{% endif %}> Buy<br>
