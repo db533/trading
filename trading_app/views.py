@@ -2087,7 +2087,7 @@ def delete_ticker_view(request):
             # Strip spaces and remove empty strings
             symbols_list = [symbol.strip() for symbol in symbols_list if symbol.strip()]
             Ticker.objects.filter(symbol__in=symbols_list).delete()
-            return redirect('success_url')  # Redirect to a new URL if deletion is successful
+            return redirect('ticker_config')  # Redirect to a new URL if deletion is successful
     else:
         form = SymbolForm()
     return render(request, 'delete_ticker.html', {'form': form})
