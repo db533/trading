@@ -1995,13 +1995,36 @@ def trading_opps_with_trades_view(request):
     trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
     # Group TradingOpps by date, ignoring time
+    opp_status = {}
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+
+        # Determine if the trade is planned or executed.
+        planned = opp.planned
+
+        # Get the trades for the opp and check if there is a positive balance of units
+        trades = opp.trades.all()  # Get all related trades
+        units = 0
+        for trade in trades:
+            unit_amount = trade.units
+            if unit_amount is None:
+                unit_amount = 0
+            if trade.action == '1' and planned == False:  # Assuming '1' is Buy
+                units += unit_amount
+            else:
+                units -= unit_amount
+        if planned == True:
+            opp_status[opp.id] = 0
+        elif units > 0:
+            opp_status[opp.id] = 1
+        else:
+            opp_status[opp.id] = 2
 
     # You could also prepare trades data if needed for the template or handle it directly within the template
 
     context = {
         'trading_opps': trading_opps,
+        'opp_status' : opp_status
     }
 
     return render(request, 'trading_opps_with_trades.html', context)
