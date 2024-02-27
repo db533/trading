@@ -112,3 +112,12 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         logger.error(f'background_manual_ticker_download() completed.')
     except Exception as e:
         logger.error(f'Error occured in background_manual_ticker_download(): {e}')
+
+
+@background(schedule=5)
+def delete_ticker(ticker_symbol):
+    ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
+    if ticker is not None:
+        for ticker in ticker_list:
+            ticker.delete()
+            logger.error(f'Deleted ticker {str(ticker_symbol)}.')

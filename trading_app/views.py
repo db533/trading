@@ -22,7 +22,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 from time import sleep
-from .tasks import background_manual_category_download, background_manual_ticker_download
+from .tasks import background_manual_category_download, background_manual_ticker_download, delete_ticker
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
@@ -2086,7 +2086,8 @@ def delete_ticker_view(request):
             symbols_list = form.cleaned_data['symbols'].split(',')
             # Strip spaces and remove empty strings
             symbols_list = [symbol.strip() for symbol in symbols_list if symbol.strip()]
-            Ticker.objects.filter(symbol__in=symbols_list).delete()
+            for symbol in symbols_list:
+                delete_ticker(symbol)
             return redirect('ticker_config')  # Redirect to a new URL if deletion is successful
     else:
         form = SymbolForm()
