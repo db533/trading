@@ -2027,7 +2027,10 @@ def update_trades(request):
                     trade.date = request.POST.get(key)
                     trade.action = request.POST.get(f'action_{trade_id}')
                     trade.price = float(request.POST.get(f'price_{trade_id}', 0))
+                    trade.rate_to_eur = float(request.POST.get(f'rate_to_eur_{trade_id}', 0))
                     trade.units = float(request.POST.get(f'units_{trade_id}', 0))
+                    trade.commission = float(f'commission_{trade_id}' in request.POST)
+                    trade.notes = f'notes_{trade_id}' in request.POST
                     trade.planned = f'planned_{trade_id}' in request.POST
                     trade.save()
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
