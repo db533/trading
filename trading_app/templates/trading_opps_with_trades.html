@@ -74,7 +74,7 @@
                             <input type="checkbox" name="delete_{{ trade.id }}"> DELETE</td>
                         </tr>
                     {% endfor %}
-                    {% if opp_status.opp.id == 1 %}
+                    {% if opp.status == 1 %}
                         <tr>
                             <td><input type="date" name="new_date_{{ opp.id }}"></td>
                             <td>

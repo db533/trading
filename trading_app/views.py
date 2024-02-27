@@ -1995,7 +1995,6 @@ def trading_opps_with_trades_view(request):
     trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
     # Group TradingOpps by date, ignoring time
-    opp_status = {}
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
 
@@ -2014,17 +2013,16 @@ def trading_opps_with_trades_view(request):
             else:
                 units -= unit_amount
         if planned == True:
-            opp_status[opp.id] = 0
+            opp.status = 0
         elif units > 0:
-            opp_status[opp.id] = 1
+            opp.status = 1
         else:
-            opp_status[opp.id] = 2
+            opp.status = 2
 
     # You could also prepare trades data if needed for the template or handle it directly within the template
 
     context = {
         'trading_opps': trading_opps,
-        'opp_status' : opp_status
     }
 
     return render(request, 'trading_opps_with_trades.html', context)
