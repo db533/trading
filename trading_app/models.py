@@ -159,6 +159,7 @@ class TradingOpp(models.Model):
         amount_initially_invested = 0
         commissions_total_eur = 0
         income_from_sales_eur = 0
+        purchase_price = 0
         for trade in trades:
             # Read values from trade:
             deal_price = trade.price
