@@ -1999,13 +1999,13 @@ def trading_opps_with_trades_view(request):
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
 
-        # Determine if the trade is planned or executed.
-        planned = opp.planned
-
         # Get the trades for the opp and check if there is a positive balance of units
         trades = opp.trades.all()  # Get all related trades
         units = 0
         for trade in trades:
+            # Determine if the trade is planned or executed.
+            planned = trade.planned
+
             unit_amount = trade.units
             if unit_amount is None:
                 unit_amount = 0
