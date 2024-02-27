@@ -970,6 +970,12 @@ def update_tradingopp(request, opp_id):
     if profit_taker_price:
         opp.profit_taker_price = float(profit_taker_price)  # Convert to float
 
+    sl_triggered = request.POST.get('sl_triggered')
+    if sl_triggered:
+        opp.stop_loss_price = True
+    else:
+        opp.stop_loss_price = False
+
     # Check if 'schedule' was checked
     if 'schedule' in request.POST:
         latest_daily_price = DailyPrice.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
