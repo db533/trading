@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Ticker Symbols</title>
+</head>
+<body>
+    <h2>Delete Ticker Instances</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Delete Symbols</button>
+    </form>
+</body>
+</html>

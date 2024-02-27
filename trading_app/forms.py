@@ -34,3 +34,5 @@ class CategorySelectForm(forms.Form):
 class TickerSymbolForm(forms.Form):
     symbol = forms.CharField(max_length=10, label='Ticker Symbol')
 
+class SymbolForm(forms.Form):
+    symbols = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter symbols separated by commas'}), label='Symbols')

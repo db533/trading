@@ -36,6 +36,7 @@ urlpatterns = [
     path('trading-opp/update/<int:opp_id>/', update_tradingopp, name='update_tradingopp'),
     path('trading-opps-with-trades/', trading_opps_with_trades_view, name='trading_opps_with_trades'),
     path('update-trades/', update_trades, name='update_trades'),
+    path('delete_ticker/', delete_ticker_view, name='delete_ticker'),
 ]
 
 from django.conf import settings

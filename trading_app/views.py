@@ -2074,3 +2074,21 @@ def update_trades(request):
 
         return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
+
+from django.shortcuts import render, redirect
+from .forms import SymbolForm
+from .models import Ticker
+
+def delete_ticker_view(request):
+    if request.method == 'POST':
+        form = SymbolForm(request.POST)
+        if form.is_valid():
+            symbols_list = form.cleaned_data['symbols'].split(',')
+            # Strip spaces and remove empty strings
+            symbols_list = [symbol.strip() for symbol in symbols_list if symbol.strip()]
+            Ticker.objects.filter(symbol__in=symbols_list).delete()
+            return redirect('success_url')  # Redirect to a new URL if deletion is successful
+    else:
+        form = SymbolForm()
+    return render(request, 'delete_ticker.html', {'form': form})
+
