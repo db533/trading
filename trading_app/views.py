@@ -972,9 +972,9 @@ def update_tradingopp(request, opp_id):
 
     sl_triggered = request.POST.get('sl_triggered')
     if sl_triggered:
-        opp.stop_loss_price = True
+        opp.stop_loss_triggered = True
     else:
-        opp.stop_loss_price = False
+        opp.stop_loss_triggered = False
 
     # Check if 'schedule' was checked
     if 'schedule' in request.POST:
