@@ -176,8 +176,8 @@ class TradingOpp(models.Model):
                 commissions_total += trade.commission
             elif trade.action == '0':  # Assuming '0' is Sell
                 units -= unit_amount
-                profit_currency += (((unit_amount * deal_price) - commission_amount)
-                profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur)
+                profit_currency += ((unit_amount * deal_price) - commission_amount)
+                profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur
                 commissions_total += trade.commission
         self.amount_invested_currency = round(units * deal_price,2)
         self.profit_currency = round(profit_currency - commissions_total,2)
