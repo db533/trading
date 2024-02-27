@@ -156,8 +156,6 @@ class TradingOpp(models.Model):
         profit_currency = 0
         profit_eur = 0
         amount_initially_invested = 0
-        purchase_price = None
-        sales_price = None
         commissions_total = 0
         for trade in trades:
             # Read values from trade:
@@ -183,8 +181,8 @@ class TradingOpp(models.Model):
                 profit_currency += ((unit_amount * deal_price) - commission_amount)
                 profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur
                 commissions_total += trade.commission
-        self.amount_initially_invested = round(amount_initially_invested,2)
-        self.amount_still_invested = round(units * purchase_price, 2)
+        self.amount_initially_invested_currency = round(amount_initially_invested,2)
+        self.amount_still_invested_currency = round(units * purchase_price, 2)
         self.realised_profit_currency = round(profit_currency - commissions_total,2)
         self.realised_profit_eur = round(profit_eur, 2)
         self.save()
