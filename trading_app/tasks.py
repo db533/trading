@@ -117,7 +117,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
 @background(schedule=5)
 def delete_ticker(ticker_symbol):
     ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
-    if ticker is not None:
+    if ticker_list is not None:
         for ticker in ticker_list:
             ticker.delete()
             logger.error(f'Deleted ticker {str(ticker_symbol)}.')
