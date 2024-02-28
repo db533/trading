@@ -2104,7 +2104,7 @@ def trade_performance_list(request):
             opp.commissions_expected_currency = 0
             opp.commissions_expected_eur = 0
         opp.unrealised_profit_currency = round(opp.realised_profit_currency + opp.value_of_holding_currency - opp.commissions_expected_currency,2)
-        opp.unrealised_profit_eur = round(opp.realised_profit_currency + opp.value_of_holding_eur - opp.commissions_expected_eur,2)
+        opp.unrealised_profit_eur = round(opp.realised_profit_eur + opp.value_of_holding_eur - opp.commissions_expected_eur,2)
         if opp.realised_profit_eur > 0:
             opp.colour = 'lightgreen'
         elif opp.unrealised_profit_eur > 0:

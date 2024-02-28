@@ -65,9 +65,9 @@
                 <td>{{ opp.commissions_expected_eur }}</td>
                 <td>{{ opp.realised_profit_currency }}</td>
                 <td>{{ opp.realised_profit_eur }}</td>
-                <td>{{ opp.latest_close_price }}</td>
-                <td>{{ opp.value_of_holding_currency }}</td>
-                <td>{{ opp.value_of_holding_eur }}</td>
+                <td>{% if opp.units_still_owned > 0%}{{ opp.latest_close_price }}{% endif %}</td>
+                <td>{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_currency }}{% endif %}</td>
+                <td>{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_eur }}{% endif %}</td>
                 <td>{{ opp.unrealised_profit_currency }}</td>
                 <td>{{ opp.unrealised_profit_eur }}</td>
             </tr>
