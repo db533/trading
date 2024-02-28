@@ -5,59 +5,22 @@
     <title>Trading Opportunities with Trades</title>
 </head>
 <body>
-    <h1>Trading Opportunities with Trades</h1>
-    {% for opp in trading_opps %}
-        <h2>{{ opp.ticker.symbol }} - {{ opp.strategy.name }} (ID: {{ opp.id }})</h2>
+    <h1>Trade Performance List</h1>
         <table border="1">
             <thead>
                 <tr>
+                    <th style="text-align:center; width: 12ch;">Date</th>
                     <th style="text-align:center; width: 8ch;">Action</th>
-                    <th style="text-align:center; width: 30ch;">Graph</th>
-                    <th style="text-align:center; width: 12ch;">Strategy Name</th>
-                    <th style="text-align:center; width: 20ch;">Strategy Description</th>
-                    <th style="text-align:center; width: 70ch;">Metrics</th>
-                    <th style="text-align:center; width: 10ch;">Identified</th>
+                    <th style="text-align:center; width: 8ch;">Price</th>
+                    <th style="text-align:center; width: 12ch;">Exchange Rate</th>
+                    <th style="text-align:center; width: 8ch;">Units</th>
+                    <th style="text-align:center; width: 12ch;">Commission</th>
+                    <th style="text-align:center; width: 20ch;">Notes</th>
+                    <th style="text-align:center; width: 10ch;">Planned</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
-                        <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
-                        {% if opp.reward_risk %}<br><strong>Reward/Risk: {{ opp.reward_risk }} %<br>{% endif %}</strong></td>
-                        <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
-                        <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
-                        <td>{{ opp.strategy.description }}</td>
-                        <td>
-                            {% for label, value in opp.translated_metrics.items %}
-                                <strong>{{ label }}:</strong> {{ value }}<br>
-                            {% endfor %}
-                            <strong>Stop Loss Price:</strong>
-                            <input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" style="width: 100px;">
-                            <strong>Profit Taker Price:</strong>
-                            <input type="number" step="any" name="profit_taker_price" value="{{ opp.profit_taker_price }}" style="width: 100px;"><br>
-                            <input type="checkbox" name="sl_triggered" {% if opp.stop_loss_triggered %}checked{% endif %}><strong> Stop loss triggered </strong><input type="submit" value="Update">
-                        </td>
-                        <td>{{ opp.datetime_identified }}</td>
-                    </form>
-                </tr>
-        </tbody>
-    </table>
-        <h3>Trades</h3>
-        <form method="post" action="{% url 'update_trades' %}">{% csrf_token %}
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th style="text-align:center; width: 12ch;">Date</th>
-                        <th style="text-align:center; width: 8ch;">Action</th>
-                        <th style="text-align:center; width: 8ch;">Price</th>
-                        <th style="text-align:center; width: 12ch;">Exchange Rate</th>
-                        <th style="text-align:center; width: 8ch;">Units</th>
-                        <th style="text-align:center; width: 12ch;">Commission</th>
-                        <th style="text-align:center; width: 20ch;">Notes</th>
-                        <th style="text-align:center; width: 10ch;">Planned</th>
-                    </tr>
-                </thead>
-                <tbody>
+            {% for opp in trading_opps %}
                     {% for trade in opp.trades.all %}
                         <tr style="background-color: {% if trade.action == '1' %}lightblue{% else %}lightcoral{% endif %};">
                             <td><input type="date" name="date_{{ trade.id }}" value="{{ trade.date|date:'Y-m-d' }}"></td>
@@ -69,7 +32,7 @@
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" style="width: 80px;" value="{{ trade.rate_to_eur }}"></td>
                             <td><input type="number" step="any" name="units_{{ trade.id }}" style="width: 80px;" value="{{ trade.units }}"></td>
                             <td><input type="number" step="any" name="commission_{{ trade.id }}" style="width: 60px;" value="{{ trade.commission }}"></td>
-                            <td><textarea type="text" name="notes_{{ trade.id }}"> {{ trade.notes }}</textarea></td>
+                            <td><textarea type="text" name="notes_{{ trade.id }}">{{ trade.notes }}</textarea></td>
                             <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}> Planned<br>
                             <input type="checkbox" name="delete_{{ trade.id }}"> DELETE</td>
                         </tr>

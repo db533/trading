@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Trading Performance List</title>
+</head>
+<body>
+    <h1>Trading Performance List</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th colspan="2" style="text-align:center;">Ticker</th>
+                    <th colspan="2" style="text-align:center;">Date</th>
+                    <th colspan="2" style="text-align:center;">Initial investment</th>
+                    <th colspan="3" style="text-align:center;">Units</th>
+                    <th colspan="2" style="text-align:center;">Income from sales</th>
+                    <th colspan="4" style="text-align:center;">Commissions</th>
+                    <th colspan="2" style="text-align:center;">Realised profit</th>
+                    <th colspan="1" style="text-align:center;">Current price</th>
+                    <th colspan="2" style="text-align:center;">Value of holding</th>
+                    <th colspan="2" style="text-align:center;">Unrealised profit</th>
+                </tr>
+                <tr>
+                    <th style="text-align:center; width: 12ch;">Symbol</th>
+                    <th style="text-align:center; width: 12ch;">TradingOpp</th>
+                    <th style="text-align:center; width: 12ch;">Purchase</th>
+                    <th style="text-align:center; width: 12ch;">Last sale</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">EUR</th>
+                    <th style="text-align:center; width: 12ch;">Purchased</th>
+                    <th style="text-align:center; width: 12ch;">Sold</th>
+                    <th style="text-align:center; width: 12ch;">Held</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">EUR</th>
+                    <th style="text-align:center; width: 12ch;">Paid in currency</th>
+                    <th style="text-align:center; width: 12ch;">Paid in EUR</th>
+                    <th style="text-align:center; width: 12ch;">Expected in currency</th>
+                    <th style="text-align:center; width: 12ch;">Expected in EUR</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">EUR</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">EUR</th>
+                    <th style="text-align:center; width: 12ch;">Currency</th>
+                    <th style="text-align:center; width: 12ch;">EUR</th>
+                </tr>
+            </thead>
+        <tbody>
+        {% for opp in trading_opps %}
+            <tr style="background-color: {% if opp.realised_profit_eur > 0 %}lightgreen{% else %}lightcoral{% endif %};">
+                <td>opp.ticker.symbol</td>
+                <td>opp.id</td>
+                <td>opp.purchase_date</td>
+                <td>opp.last_sale_date</td>
+                <td>opp.amount_invested_currency</td>
+                <td>opp.amount_invested_eur</td>
+                <td>opp.units_purchased</td>
+                <td>opp.units_sold</td>
+                <td>opp.units_still_owned</td>
+                <td>opp.income_currency</td>
+                <td>opp.income_eur</td>
+                <td>opp.commissions_paid_currency</td>
+                <td>opp.commissions_paid_eur</td>
+                <td>opp.commissions_expected_currency</td>
+                <td>opp.commissions_expected_eur</td>
+                <td>opp.realised_profit_currency</td>
+                <td>opp.realised_profit_eur</td>
+                <td>opp.latest_close_price</td>
+                <td>opp.value_of_holding_currency</td>
+                <td>opp.value_of_holding_eur</td>
+                <td>opp.unrealised_profit_currency</td>
+                <td>opp.unrealised_profit_eur</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+{% endblock %}

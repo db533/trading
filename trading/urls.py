@@ -35,6 +35,7 @@ urlpatterns = [
     path('ticker-graph/<str:ticker_symbol>/', generate_ticker_graph_view, name='ticker-graph'),
     path('trading-opp/update/<int:opp_id>/', update_tradingopp, name='update_tradingopp'),
     path('trading-opps-with-trades/', trading_opps_with_trades_view, name='trading_opps_with_trades'),
+    path('trading-performance-list/', trade_performance_list, name='trade_performance_list'),
     path('trading-opps-with-planned-trades/', trading_opps_with_planned_trades, name='trading_opps_with_planned_trades'),
     path('update-trades/', update_trades, name='update_trades'),
     path('delete_ticker/', delete_ticker_view, name='delete_ticker'),

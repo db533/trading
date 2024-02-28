@@ -1991,15 +1991,9 @@ def task_queue_view(request):
 
 @login_required()
 def trading_opps_with_trades_view(request):
-    # Fetch TradingOpp instances that have at least one Trade linked to them
-    #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
-
-    # Excluding planned trades from this view
+    # Generate list of Trading Opps, both incomplete and complete and show how profit arises
     trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime_identified', '-id')
-
-    # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
-        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
 
         # Get the trades for the opp and check if there is a positive balance of units
         trades = opp.trades.all()  # Get all related trades
@@ -2021,14 +2015,100 @@ def trading_opps_with_trades_view(request):
             opp.status = 1
         else:
             opp.status = 2
+    context = {
+        'trading_opps': trading_opps,
+    }
+    return render(request, 'trade_performance_list.html', context)
 
-    # You could also prepare trades data if needed for the template or handle it directly within the template
+@login_required()
+def trade_performance_list(request):
+    # Fetch TradingOpp instances that have at least one Trade linked to them
+    #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
+
+    # Excluding planned trades from this view
+    trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime_identified', '-id')
+
+    # Group TradingOpps by date, ignoring time
+    for opp in trading_opps:
+        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+
+        # Get the trades for the opp and check if there is a positive balance of units
+        trades = opp.trades.all()  # Get all related trades
+
+        # Get the ticker and the latest price for the ticker
+        ticker = opp.ticker
+        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        if latest_candle is not None:
+            opp.latest_close_price = latest_candle.close_price
+        else:
+            opp.latest_close_price = 0
+
+        # Determine the commission and exchange rate to be used for this stock
+        tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+        is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+        if is_in_tse_stocks:
+            current_exchange_rate = float(Params.objects.get(key='jpy_rate').value)
+            commission_value = 80
+        else:
+            current_exchange_rate = float(Params.objects.get(key='usd_rate').value)
+            commission_value = 1
+
+        opp.units_still_owned = 0
+        opp.amount_invested_currency = 0
+        opp.amount_invested_eur = 0
+        opp.units_purchased = 0
+        opp.units_sold = 0
+        opp.income_currency = 0
+        opp.income_eur = 0
+        opp.commissions_paid_currency = 0
+        opp.commissions_paid_eur = 0
+        opp.purchase_date = None
+        for trade in trades:
+            # Determine if the trade is planned or executed.
+            planned = trade.planned
+
+            unit_amount = trade.units
+            if unit_amount is None:
+                unit_amount = 0
+            if trade.action == '1' :  # Assuming '1' is Buy
+                # Buy trade
+                if opp.purchase_date is None:
+                    opp.purchase_date = trade.date
+                opp.units_still_owned += unit_amount
+                opp.units_purchased += unit_amount
+                opp.amount_invested_currency += unit_amount * trade.price
+                opp.amount_invested_eur += unit_amount * trade.price * trade.rate_to_eur
+                opp.commissions_paid_currency += trade.commission
+                opp.commissions_paid_eur += trade.commission * trade.rate_to_eur
+            else:
+                # Sell trade
+                opp.last_sale_date = trade.date
+                opp.units_still_owned -= unit_amount
+                opp.units_sold += unit_amount
+                opp.income_currency += unit_amount * trade.price
+                opp.income_eur += unit_amount * trade.price * trade.rate_to_eur
+                opp.commissions_paid_currency += trade.commission
+                opp.commissions_paid_eur += trade.commission * trade.rate_to_eur
+        opp.realised_profit_currency = opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency
+        opp.realised_profit_eur = opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur
+        opp.value_of_holding_currency = opp.units_still_owned * opp.latest_close_price
+        opp.value_of_holding_eur = opp.units_still_owned * opp.latest_close_price * current_exchange_rate
+        if opp.units_still_owned > 0:
+            opp.status = 1
+            opp.commissions_expected_currency = commission_value
+            opp.commissions_expected_eur = commission_value * current_exchange_rate
+
+        else:
+            opp.status = 2
+            opp.commissions_expected_currency = 0
+            opp.commissions_expected_eur = 0
+        opp.unrealised_profit_currency = opp.realised_profit_currency + opp.value_of_holding_currency - opp.commissions_expected_currency
+        opp.unrealised_profit_eur = opp.realised_profit_currency + opp.value_of_holding_eur - opp.commissions_expected_eur
 
     context = {
         'trading_opps': trading_opps,
     }
-
-    return render(request, 'trading_opps_with_trades.html', context)
+    return render(request, 'trade_performance_list.html', context)
 
 @login_required()
 def trading_opps_with_planned_trades(request):
