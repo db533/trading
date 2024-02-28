@@ -1994,6 +1994,7 @@ def trading_opps_with_trades_view(request):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
     trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime_identified', '-id')
     for opp in trading_opps:
+        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
 
         # Get the trades for the opp and check if there is a positive balance of units
         trades = opp.trades.all()  # Get all related trades
