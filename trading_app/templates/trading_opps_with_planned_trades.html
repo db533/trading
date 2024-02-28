@@ -69,7 +69,7 @@
                             <td><input type="number" step="any" name="rate_to_eur_{{ trade.id }}" style="width: 80px;" value="{{ trade.rate_to_eur }}"></td>
                             <td><input type="number" step="any" name="units_{{ trade.id }}" style="width: 80px;" value="{{ trade.units }}"></td>
                             <td><input type="number" step="any" name="commission_{{ trade.id }}" style="width: 60px;" value="{{ trade.commission }}"></td>
-                            <td><textarea type="text" name="notes_{{ trade.id }}" value="{{ trade.notes }}"></td>
+                            <td><textarea type="text" name="notes_{{ trade.id }}" {{ trade.notes }}></textarea></td>
                             <td><input type="checkbox" name="planned_{{ trade.id }}" {% if trade.planned %}checked{% endif %}> Planned<br>
                             <input type="checkbox" name="delete_{{ trade.id }}"> DELETE</td>
                         </tr>
