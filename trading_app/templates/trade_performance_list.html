@@ -50,8 +50,8 @@
             <tr style="background-color: {{ opp.colour }};">
                 <td>{{ opp.ticker.symbol }}</td>
                 <td>{{ opp.id }}</td>
-                <td>{{ opp.purchase_date|date:"dd/mm/yy" }}</td>
-                <td>{{ opp.last_sale_date|date:"dd/mm/yy" }}</td>
+                <td>{{ opp.purchase_date|date:"d/m/y" }}</td>
+                <td>{{ opp.last_sale_date|date:"d/m/y" }}</td>
                 <td>{{ opp.amount_invested_currency }}</td>
                 <td>{{ opp.amount_invested_eur }}</td>
                 <td>{{ opp.units_purchased }}</td>
