@@ -1995,7 +1995,7 @@ def trading_opps_with_trades_view(request):
     #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
     # Excluding planned trades from this view
-    trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-date_identified', '-id')
+    trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime_identified', '-id')
 
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
