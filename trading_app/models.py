@@ -306,6 +306,16 @@ class Trade(models.Model):
                               help_text='Is the trade a buy or a sell?',
                               verbose_name='Action')
     planned = models.BooleanField(default=True) # Is the purchase / sale planned or actually executed.
+    STATUS = (
+        ('0', 'Planned'),
+        ('1', 'Trade submitted'),
+        ('2', 'Trade executed'),
+    )
+    status = models.CharField(max_length=1,
+                              choices=STATUS,
+                              default='0',
+                              help_text='Status of the trade',
+                              verbose_name='Status')
     price = models.FloatField()
     units = models.FloatField(help_text='Quantity of units bought or sold',)
     rate_to_eur = models.FloatField(verbose_name='Multiplier to convert price to EUR')
