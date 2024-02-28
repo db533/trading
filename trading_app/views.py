@@ -2018,7 +2018,7 @@ def trading_opps_with_trades_view(request):
     context = {
         'trading_opps': trading_opps,
     }
-    return render(request, 'trade_performance_list.html', context)
+    return render(request, 'trading_opps_with_trades.html', context)
 
 @login_required()
 def trade_performance_list(request):
