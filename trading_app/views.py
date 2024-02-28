@@ -2077,34 +2077,34 @@ def trade_performance_list(request):
                     opp.purchase_date = trade.date
                 opp.units_still_owned += unit_amount
                 opp.units_purchased += unit_amount
-                opp.amount_invested_currency += unit_amount * trade.price
-                opp.amount_invested_eur += unit_amount * trade.price * trade.rate_to_eur
-                opp.commissions_paid_currency += trade.commission
-                opp.commissions_paid_eur += trade.commission * trade.rate_to_eur
+                opp.amount_invested_currency += round(unit_amount * trade.price,2)
+                opp.amount_invested_eur += round(unit_amount * trade.price * trade.rate_to_eur,2)
+                opp.commissions_paid_currency += round(trade.commission,2)
+                opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
             else:
                 # Sell trade
                 opp.last_sale_date = trade.date
                 opp.units_still_owned -= unit_amount
                 opp.units_sold += unit_amount
-                opp.income_currency += unit_amount * trade.price
-                opp.income_eur += unit_amount * trade.price * trade.rate_to_eur
-                opp.commissions_paid_currency += trade.commission
-                opp.commissions_paid_eur += trade.commission * trade.rate_to_eur
-        opp.realised_profit_currency = opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency
-        opp.realised_profit_eur = opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur
-        opp.value_of_holding_currency = opp.units_still_owned * opp.latest_close_price
-        opp.value_of_holding_eur = opp.units_still_owned * opp.latest_close_price * current_exchange_rate
+                opp.income_currency += round(unit_amount * trade.price,2)
+                opp.income_eur += round(unit_amount * trade.price * trade.rate_to_eur,2)
+                opp.commissions_paid_currency += round(trade.commission,2)
+                opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
+        opp.realised_profit_currency = round(opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency,2)
+        opp.realised_profit_eur = round(opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur,2)
+        opp.value_of_holding_currency = round(opp.units_still_owned * opp.latest_close_price,2)
+        opp.value_of_holding_eur = round(opp.units_still_owned * opp.latest_close_price * current_exchange_rate,2)
         if opp.units_still_owned > 0:
             opp.status = 1
-            opp.commissions_expected_currency = commission_value
-            opp.commissions_expected_eur = commission_value * current_exchange_rate
+            opp.commissions_expected_currency = round(commission_value,2)
+            opp.commissions_expected_eur = round(commission_value * current_exchange_rate,2)
 
         else:
             opp.status = 2
             opp.commissions_expected_currency = 0
             opp.commissions_expected_eur = 0
-        opp.unrealised_profit_currency = opp.realised_profit_currency + opp.value_of_holding_currency - opp.commissions_expected_currency
-        opp.unrealised_profit_eur = opp.realised_profit_currency + opp.value_of_holding_eur - opp.commissions_expected_eur
+        opp.unrealised_profit_currency = round(opp.realised_profit_currency + opp.value_of_holding_currency - opp.commissions_expected_currency,2)
+        opp.unrealised_profit_eur = round(opp.realised_profit_currency + opp.value_of_holding_eur - opp.commissions_expected_eur,2)
 
     context = {
         'trading_opps': trading_opps,
