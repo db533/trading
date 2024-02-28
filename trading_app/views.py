@@ -1992,7 +1992,10 @@ def task_queue_view(request):
 @login_required()
 def trading_opps_with_trades_view(request):
     # Fetch TradingOpp instances that have at least one Trade linked to them
-    trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
+    #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
+
+    # Excluding planned trades from this view
+    trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime', '-id')
 
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
@@ -2026,6 +2029,22 @@ def trading_opps_with_trades_view(request):
     }
 
     return render(request, 'trading_opps_with_trades.html', context)
+
+@login_required()
+def trading_opps_with_planned_trades(request):
+    # Fetch TradingOpp instances that have at least one Trade linked to them that has planned = True
+    trading_opps = TradingOpp.objects.filter(trades__planned=True).distinct().order_by('-reward_risk', '-id')
+
+    # Group TradingOpps by date, ignoring time
+    for opp in trading_opps:
+        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+
+    context = {
+        'trading_opps': trading_opps,
+    }
+
+    return render(request, 'trading_opps_with_planned_trades.html', context)
+
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
