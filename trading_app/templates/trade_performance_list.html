@@ -47,7 +47,7 @@
             </thead>
         <tbody>
         {% for opp in trading_opps %}
-            <tr style="background-color: {% if opp.realised_profit_eur > 0 %}lightgreen{% else %}lightcoral{% endif %};">
+            <tr style="background-color: {{ opp.colour }};">
                 <td>{{ opp.ticker.symbol }}</td>
                 <td>{{ opp.id }}</td>
                 <td>{{ opp.purchase_date }}</td>
