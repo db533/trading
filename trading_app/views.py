@@ -2039,7 +2039,7 @@ def trade_performance_list(request):
         ticker = opp.ticker
         latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         if latest_candle is not None:
-            opp.latest_close_price = latest_candle.close_price
+            opp.latest_close_price = float(latest_candle.close_price)
         else:
             opp.latest_close_price = 0
 
