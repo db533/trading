@@ -48,28 +48,28 @@
         <tbody>
         {% for opp in trading_opps %}
             <tr style="background-color: {% if opp.realised_profit_eur > 0 %}lightgreen{% else %}lightcoral{% endif %};">
-                <td>opp.ticker.symbol</td>
-                <td>opp.id</td>
-                <td>opp.purchase_date</td>
-                <td>opp.last_sale_date</td>
-                <td>opp.amount_invested_currency</td>
-                <td>opp.amount_invested_eur</td>
-                <td>opp.units_purchased</td>
-                <td>opp.units_sold</td>
-                <td>opp.units_still_owned</td>
-                <td>opp.income_currency</td>
-                <td>opp.income_eur</td>
-                <td>opp.commissions_paid_currency</td>
-                <td>opp.commissions_paid_eur</td>
-                <td>opp.commissions_expected_currency</td>
-                <td>opp.commissions_expected_eur</td>
-                <td>opp.realised_profit_currency</td>
-                <td>opp.realised_profit_eur</td>
-                <td>opp.latest_close_price</td>
-                <td>opp.value_of_holding_currency</td>
-                <td>opp.value_of_holding_eur</td>
-                <td>opp.unrealised_profit_currency</td>
-                <td>opp.unrealised_profit_eur</td>
+                <td>{{ opp.ticker.symbol }}</td>
+                <td>{{ opp.id }}</td>
+                <td>{{ opp.purchase_date }}</td>
+                <td>{{ opp.last_sale_date }}</td>
+                <td>{{ opp.amount_invested_currency }}</td>
+                <td>{{ opp.amount_invested_eur }}</td>
+                <td>{{ opp.units_purchased }}</td>
+                <td>{{ opp.units_sold }}</td>
+                <td>{{ opp.units_still_owned }}</td>
+                <td>{{ opp.income_currency }}</td>
+                <td>{{ opp.income_eur }}</td>
+                <td>{{ opp.commissions_paid_currency }}</td>
+                <td>{{ opp.commissions_paid_eur }}</td>
+                <td>{{ opp.commissions_expected_currency }}</td>
+                <td>{{ opp.commissions_expected_eur }}</td>
+                <td>{{ opp.realised_profit_currency }}</td>
+                <td>{{ opp.realised_profit_eur }}</td>
+                <td>{{ opp.latest_close_price }}</td>
+                <td>{{ opp.value_of_holding_currency }}</td>
+                <td>{{ opp.value_of_holding_eur }}</td>
+                <td>{{ opp.unrealised_profit_currency }}</td>
+                <td>{{ opp.unrealised_profit_eur }}</td>
             </tr>
         {% endfor %}
         </tbody>
