@@ -1413,6 +1413,13 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 existing_tradingopp = existing_tradingopp[0]
             else:
                 existing_tradingopp = None
+
+            # Amend the most_recent_price field for all existing TradingOpps:
+            if existing_tradingopp.most_recent_price is None:
+                existing_tradingopp.most_recent_price = latest_candle.close_price
+                existing_tradingopp.most_recent_date = latest_candle.datetime
+                existing_tradingopp.save()
+
             if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
                 logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
