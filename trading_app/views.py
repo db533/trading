@@ -2199,18 +2199,21 @@ def delete_ticker_view(request):
 
 from django.shortcuts import render, redirect
 from .models import Params
-from .forms import ParamsForm
-from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
 
 def edit_all_params(request):
-    ParamsFormSet = modelformset_factory(Params, fields=('value',), extra=0)
     if request.method == 'POST':
-        formset = ParamsFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect('edit_all_params')  # Adjust the redirect as necessary
-        else:
-            print(formset.errors)  # Debugging line to print form errors
+        for key in request.POST:
+            if key != 'csrfmiddlewaretoken':  # Exclude the CSRF token
+                try:
+                    param = Params.objects.get(key=key)
+                    param.value = request.POST[key]
+                    param.save()
+                except Params.DoesNotExist:
+                    # Handle the error or ignore if the key should always exist
+                    pass
+        # Redirect to confirm changes, adjust the redirect as needed
+        return HttpResponseRedirect(request.path_info)
     else:
-        formset = ParamsFormSet(queryset=Params.objects.all())
-    return render(request, 'edit_params.html', {'formset': formset})
+        params = Params.objects.all()
+    return render(request, 'edit_params.html', {'params': params})

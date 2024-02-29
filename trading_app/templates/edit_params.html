@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Edit All Params</h2>
-  <form method="post">
+<h2>Edit All Params</h2>
+<form method="post">
     {% csrf_token %}
-    {{ formset.management_form }}
     <table>
-    {% for form in formset %}
+    {% for param in params %}
       <tr>
-        <td>{{ form.instance.key }}</td>
-        <!-- Corrected the way to display the form field -->
-        <td>{{ form.value.as_widget }}</td>
+        <td>{{ param.key }}</td>
+        <td><input type="text" name="{{ param.key }}" value="{{ param.value }}"></td>
       </tr>
     {% endfor %}
     </table>
     <button type="submit">Save changes</button>
-  </form>
+</form>
 {% endblock %}
