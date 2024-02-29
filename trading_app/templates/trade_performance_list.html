@@ -6,6 +6,9 @@
 </head>
 <body>
     <h1>Trading Performance List</h1>
+        <h3>Summary</h3>
+        <p>This is the summary</p>
+        <h3>Individual trade performance</h3>
         <table border="1">
             <thead>
                 <tr>
@@ -55,14 +58,14 @@
                 <td>{{ opp.amount_invested_currency }}</td>
                 <td>{{ opp.amount_invested_eur }}</td>
                 <td>{{ opp.units_purchased }}</td>
-                <td>{{ opp.units_sold }}</td>
-                <td>{{ opp.units_still_owned }}</td>
-                <td>{{ opp.income_currency }}</td>
-                <td>{{ opp.income_eur }}</td>
+                <td>{% if opp.units_sold > 0%}{{ opp.units_sold }}{% endif %}</td>
+                <td>{% if opp.units_still_owned > 0%}{{ opp.units_still_owned }}{% endif %}</td>
+                <td>{% if opp.income_currency > 0%}{{ opp.income_currency }}{% endif %}</td>
+                <td>{% if opp.income_eur > 0%}{{ opp.income_eur }}{% endif %}</td>
                 <td>{{ opp.commissions_paid_currency }}</td>
                 <td>{{ opp.commissions_paid_eur }}</td>
-                <td>{{ opp.commissions_expected_currency }}</td>
-                <td>{{ opp.commissions_expected_eur }}</td>
+                <td>{% if opp.commissions_expected_currency > 0%}{{ opp.commissions_expected_currency }}{% endif %}</td>
+                <td>{% if opp.commissions_expected_eur > 0%}{{ opp.commissions_expected_eur }}{% endif %}</td>
                 <td>{{ opp.realised_profit_currency }}</td>
                 <td>{{ opp.realised_profit_eur }}</td>
                 <td>{% if opp.units_still_owned > 0%}{{ opp.latest_close_price }}{% endif %}</td>
