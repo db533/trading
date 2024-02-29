@@ -51,28 +51,28 @@
         <tbody>
         {% for opp in trading_opps %}
             <tr style="background-color: {{ opp.colour }};">
-                <td>{{ opp.ticker.symbol }}</td>
-                <td>{{ opp.id }}</td>
-                <td>{{ opp.purchase_date|date:"d/m/y" }}</td>
-                <td>{{ opp.last_sale_date|date:"d/m/y" }}</td>
-                <td>{{ opp.amount_invested_currency }}</td>
-                <td>{{ opp.amount_invested_eur }}</td>
-                <td>{{ opp.units_purchased }}</td>
-                <td>{% if opp.units_sold > 0%}{{ opp.units_sold }}{% endif %}</td>
-                <td>{% if opp.units_still_owned > 0%}{{ opp.units_still_owned }}{% endif %}</td>
-                <td>{% if opp.income_currency > 0%}{{ opp.income_currency }}{% endif %}</td>
-                <td>{% if opp.income_eur > 0%}{{ opp.income_eur }}{% endif %}</td>
-                <td>{{ opp.commissions_paid_currency }}</td>
-                <td>{{ opp.commissions_paid_eur }}</td>
-                <td>{% if opp.commissions_expected_currency > 0%}{{ opp.commissions_expected_currency }}{% endif %}</td>
-                <td>{% if opp.commissions_expected_eur > 0%}{{ opp.commissions_expected_eur }}{% endif %}</td>
-                <td>{{ opp.realised_profit_currency }}</td>
-                <td>{{ opp.realised_profit_eur }}</td>
-                <td>{% if opp.units_still_owned > 0%}{{ opp.latest_close_price }}{% endif %}</td>
-                <td>{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_currency }}{% endif %}</td>
-                <td>{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_eur }}{% endif %}</td>
-                <td>{{ opp.unrealised_profit_currency }}</td>
-                <td>{{ opp.unrealised_profit_eur }}</td>
+                <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}</a></td>
+                <td style="text-align:center;">{{ opp.id }}</td>
+                <td style="text-align:center;">{{ opp.purchase_date|date:"d/m/y" }}</td>
+                <td style="text-align:center;">{{ opp.last_sale_date|date:"d/m/y" }}</td>
+                <td style="text-align:right;">{{ opp.amount_invested_currency }}</td>
+                <td style="text-align:right;">{{ opp.amount_invested_eur }}</td>
+                <td style="text-align:right;">{{ opp.units_purchased }}</td>
+                <td style="text-align:right;">{% if opp.units_sold > 0%}{{ opp.units_sold }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.units_still_owned > 0%}{{ opp.units_still_owned }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.income_currency > 0%}{{ opp.income_currency }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.income_eur > 0%}{{ opp.income_eur }}{% endif %}</td>
+                <td style="text-align:right;">{{ opp.commissions_paid_currency }}</td>
+                <td style="text-align:right;">{{ opp.commissions_paid_eur }}</td>
+                <td style="text-align:right;">{% if opp.commissions_expected_currency > 0%}{{ opp.commissions_expected_currency }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.commissions_expected_eur > 0%}{{ opp.commissions_expected_eur }}{% endif %}</td>
+                <td style="text-align:right;">{{ opp.realised_profit_currency }}</td>
+                <td style="text-align:right;">{{ opp.realised_profit_eur }}</td>
+                <td style="text-align:right;">{% if opp.units_still_owned > 0%}{{ opp.latest_close_price }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_currency }}{% endif %}</td>
+                <td style="text-align:right;">{% if opp.units_still_owned > 0%}{{ opp.value_of_holding_eur }}{% endif %}</td>
+                <td style="text-align:right;">{{ opp.unrealised_profit_currency }}</td>
+                <td style="text-align:right;">{{ opp.unrealised_profit_eur }}</td>
             </tr>
         {% endfor %}
         </tbody>
