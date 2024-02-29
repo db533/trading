@@ -1394,6 +1394,12 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
     #                   GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy, GannPointNineSell]  #
 
     ticker = Ticker.objects.get(symbol=ticker_symbol)
+    latest_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+    if latest_price is not None:
+        latest_close_price = latest_price.close_price
+    else:
+        latest_price = None
+
     try:
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
@@ -1434,6 +1440,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     existing_tradingopp.count += 1
                     # Update the metrics with the latest data e.g. current latest_T.
                     existing_tradingopp.metrics_snapshot = data
+                    existing_tradingopp.most_recent_price = latest_price
                     if recent_swing_points_exist == True:
                         for swing_point in recent_swing_points:
                             existing_tradingopp.swing_points.add(swing_point)
@@ -1449,7 +1456,8 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                         metrics_snapshot=data, # Capture relevant metrics
                         count = 1,
                         action_buy = action_buy,
-                        confirmed = confirmed
+                        confirmed = confirmed,
+                        most_recent_price = latest_price,
                     )
                     if recent_swing_points_exist == True:
                         for swing_point in recent_swing_points:
