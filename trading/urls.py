@@ -41,6 +41,7 @@ urlpatterns = [
     path('trading-opps-with-executed-trades/', trading_opps_with_executed_trades, name='trading_opps_with_executed_trades'),
     path('update-trades/', update_trades, name='update_trades'),
     path('delete_ticker/', delete_ticker_view, name='delete_ticker'),
+    path('params/edit/<int:pk>/', views.edit_params, name='edit_params'),
 ]
 
 from django.conf import settings

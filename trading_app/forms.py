@@ -36,3 +36,12 @@ class TickerSymbolForm(forms.Form):
 
 class SymbolForm(forms.Form):
     symbols = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter symbols separated by commas'}), label='Symbols')
+
+# forms.py
+from django import forms
+from .models import Params
+
+class ParamsForm(forms.ModelForm):
+    class Meta:
+        model = Params
+        fields = ['key', 'value', 'type']

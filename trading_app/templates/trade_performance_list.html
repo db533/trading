@@ -51,7 +51,7 @@
         <tbody>
         {% for opp in trading_opps %}
             <tr style="background-color: {{ opp.colour }};">
-                <td><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}</a></td>
+                <td style="text-align:center;"><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}</a></td>
                 <td style="text-align:center;">{{ opp.id }}</td>
                 <td style="text-align:center;">{{ opp.purchase_date|date:"d/m/y" }}</td>
                 <td style="text-align:center;">{{ opp.last_sale_date|date:"d/m/y" }}</td>

@@ -2197,3 +2197,18 @@ def delete_ticker_view(request):
         form = SymbolForm()
     return render(request, 'delete_ticker.html', {'form': form})
 
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import ParamsForm
+from .models import Params
+
+def edit_params(request, pk):
+    params = get_object_or_404(Params, pk=pk)
+    if request.method == "POST":
+        form = ParamsForm(request.POST, instance=params)
+        if form.is_valid():
+            form.save()
+            return redirect('params_list')  # Assuming you have a URL named 'params_list' to list Params instances
+    else:
+        form = ParamsForm(instance=params)
+    return render(request, 'edit_params.html', {'form': form})
