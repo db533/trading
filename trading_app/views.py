@@ -2155,7 +2155,7 @@ def update_trades(request):
                     trade.units = float(request.POST.get(f'units_{trade_id}', 0))
                     trade.commission = float(request.POST.get(f'commission_{trade_id}', ''))
                     trade.notes = request.POST.get(f'notes_{trade_id}', '')
-                    trade.planned = f'planned_{trade_id}' in request.POST
+                    trade.status = f'status{trade_id}' in request.POST
                     trade.save()
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
         for opp in trading_opps:
@@ -2170,7 +2170,7 @@ def update_trades(request):
                     units=float(request.POST.get(f'new_units_{opp.id}', '0')),
                     commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
                     notes=request.POST.get(f'new_notes_{opp.id}', '0'),
-                    planned=False
+                    status='0'
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()

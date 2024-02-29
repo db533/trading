@@ -54,7 +54,7 @@
                         <th style="text-align:center; width: 8ch;">Units</th>
                         <th style="text-align:center; width: 12ch;">Commission</th>
                         <th style="text-align:center; width: 20ch;">Notes</th>
-                        <th style="text-align:center; width: 10ch;">Planned</th>
+                        <th style="text-align:center; width: 14ch;">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,6 +72,7 @@
                             <td><textarea type="text" name="notes_{{ trade.id }}"> {{ trade.notes }}</textarea></td>
                             <td><input type="radio" name="status_{{ opp.id }}" value="0" checked> Planned<br>
                                 <input type="radio" name="status_{{ opp.id }}" value="1"> Submitted<br>
+                                <input type="radio" name="status_{{ opp.id }}" value="2"> Executed<br>
                             <input type="checkbox" name="delete_{{ trade.id }}"> DELETE</td>
                         </tr>
                     {% endfor %}
