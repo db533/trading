@@ -1991,32 +1991,11 @@ def task_queue_view(request):
     return render(request, 'task_queue.html', {'tasks': tasks, 'count': count})
 
 @login_required()
-def trading_opps_with_trades_view(request):
+def trading_opps_with_trades_view(request, status):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
-    trading_opps = TradingOpp.objects.filter(trades__status='2').distinct().order_by('-datetime_identified', '-id')
+    trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-datetime_identified', '-id')
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
-
-        # Get the trades for the opp and check if there is a positive balance of units
-        #trades = opp.trades.all()  # Get all related trades
-        #units = 0
-        #for trade in trades:
-            # Determine if the trade is planned or executed.
-        #    planned = trade.planned
-
-        #    unit_amount = trade.units
-        #    if unit_amount is None:
-        #        unit_amount = 0
-        #    if trade.action == '1' and planned == False:  # Assuming '1' is Buy
-        #        units += unit_amount
-        #    else:
-        #        units -= unit_amount
-        #if planned == True:
-        #    opp.status = 0
-        #elif units > 0:
-        #    opp.status = 1
-        #else:
-        #    opp.status = 2
     context = {
         'trading_opps': trading_opps,
     }
@@ -2114,20 +2093,20 @@ def trade_performance_list(request):
     }
     return render(request, 'trade_performance_list.html', context)
 
-@login_required()
-def trading_opps_with_planned_trades(request):
+#@login_required()
+#def trading_opps_with_planned_trades(request):
     # Fetch TradingOpp instances that have at least one Trade linked to them that has planned = True
-    trading_opps = TradingOpp.objects.filter(trades__status='0').distinct().order_by('-reward_risk', '-id')
+#    trading_opps = TradingOpp.objects.filter(trades__status='0').distinct().order_by('-reward_risk', '-id')
 
     # Group TradingOpps by date, ignoring time
-    for opp in trading_opps:
-        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+#    for opp in trading_opps:
+#        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
 
-    context = {
-        'trading_opps': trading_opps,
-    }
+#    context = {
+#        'trading_opps': trading_opps,
+#    }
 
-    return render(request, 'trading_opps_with_planned_trades.html', context)
+#    return render(request, 'trading_opps_with_planned_trades.html', context)
 
 
 from django.http import HttpResponseRedirect
