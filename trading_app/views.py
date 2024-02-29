@@ -2103,19 +2103,19 @@ def trade_performance_list(request):
 @login_required()
 def trading_opps_with_planned_trades(request):
     status = '0'
-    request, name, context = trading_opps_with_trades_view(request, status)
+    trading_opps_with_trades_view(request, status)
     #return render(request, name, context)
 
 @login_required()
 def trading_opps_with_scheduled_trades(request):
     status = '1'
-    request, name, context = trading_opps_with_trades_view(request, status)
+    trading_opps_with_trades_view(request, status)
     #return render(request, name, context)
 
 @login_required()
 def trading_opps_with_executed_trades(request):
     status = '2'
-    request, name, context = trading_opps_with_trades_view(request, status)
+    trading_opps_with_trades_view(request, status)
     #return render(request, name, context)
 
 
