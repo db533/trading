@@ -1996,8 +1996,15 @@ def trading_opps_with_trades_view(request, status):
     trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-datetime_identified', '-id')
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+    if status == '0':
+        title = 'Planned trades'
+    elif status == '1':
+        title = 'Scheduled trades'
+    else:
+        title = 'Executed trades'
     context = {
         'trading_opps': trading_opps,
+        'title' : title
     }
     return render(request, 'trading_opps_with_trades.html', context)
 

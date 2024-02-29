@@ -5,7 +5,7 @@
     <title>Executed Trades</title>
 </head>
 <body>
-    <h1>Executed Trades</h1>
+    <h1>{{ title }}</h1>
     {% for opp in trading_opps %}
         <h2>{{ opp.ticker.symbol }} - {{ opp.strategy.name }} (ID: {{ opp.id }})</h2>
         <table border="1">
