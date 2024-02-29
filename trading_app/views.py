@@ -2150,14 +2150,29 @@ def update_trades(request):
                     # Correctly retrieve the status value from request.POST
                     status_key = f'status_{trade_id}'  # Ensure this matches the name attribute in your form inputs
                     if status_key in request.POST:
-                        trade.status = request.POST.get(
+                        trade_status = request.POST.get(
                             status_key)  # This assumes 'status' is a string or compatible type
+                        trade.status = trade_status
                     trade.save()
+                if trade_status == '1' or trade_status == '2' and trade.action == "1":
+                    # We have a buy that is scheduled or executed. Let's add the ticker to the 'Current swing trade positions' category
+                    swing_trade_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
+                    # Access the TradingOpp from the trade
+                    trading_opp = trade.tradingopp
+
+                    # Now, access the Ticker from the TradingOpp
+                    # This step assumes that TradingOpp has a direct relationship to Ticker, like tradingopp.ticker
+                    ticker = trading_opp.ticker
+                    # Add the Ticker to the TickerCategory
+                    ticker.categories.add(swing_trade_category)
+                    ticker.save()
+
                 opp_status = request.POST.get(f'opp_status')
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
         for opp in trading_opps:
             new_trade_prefix = f'new_date_{opp.id}'
             if request.POST.get(new_trade_prefix):
+                trade_status = request.POST.get(f'status_{trade_id}')
                 new_trade = Trade(
                     tradingopp=opp,
                     date=request.POST.get(new_trade_prefix),
@@ -2167,11 +2182,21 @@ def update_trades(request):
                     units=float(request.POST.get(f'new_units_{opp.id}', '0')),
                     commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
                     notes=request.POST.get(f'new_notes_{opp.id}', '0'),
-                    status=request.POST.get(f'status_{trade_id}')
+                    status=trade_status
                     #status="0"
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
+                if trade_status == '2' and opp.amount_still_invested_currency == 0:
+                    # We have executed a trade that has brought the holding to zero.
+                    # Remove the swing trade category.
+                    swing_trade_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
+                    # Fetch the Ticker instance
+                    ticker = opp.ticker
+                    # Remove the category from the ticker's categories
+                    ticker.categories.remove(swing_trade_category)
+                    ticker.save()
+
         if opp_status == '0':
             next_url = 'trading_opps_with_planned_trades'
         elif opp_status == '1':
