@@ -2014,7 +2014,7 @@ def trade_performance_list(request):
     #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
     # Excluding planned trades from this view
-    trading_opps = TradingOpp.objects.filter(trades__planned=False).distinct().order_by('-datetime_identified', '-id')
+    trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
 
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
@@ -2165,7 +2165,8 @@ def update_trades(request):
                     units=float(request.POST.get(f'new_units_{opp.id}', '0')),
                     commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
                     notes=request.POST.get(f'new_notes_{opp.id}', '0'),
-                    status='0'
+                    status=request.POST.get(f'status_{trade_id}')
+                    #status="0"
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
