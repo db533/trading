@@ -25,6 +25,7 @@
             <tbody>
                 <tr>
                     <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
+                        <input type="hidden" name="opp_status" value="{{ status }}">
                         <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
                         {% if opp.reward_risk %}<br>Reward/Risk: {{ opp.reward_risk }} %<br>{% endif %}</td>
                         <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
@@ -47,6 +48,7 @@
     </table>
         <h3>Executed Trades</h3>
         <form method="post" action="{% url 'update_trades' %}">{% csrf_token %}
+            <input type="hidden" name="opp_status" value="{{ status }}">
             <table border="1">
                 <thead>
                     <tr>

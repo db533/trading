@@ -2100,20 +2100,20 @@ def trade_performance_list(request):
     }
     return render(request, 'trade_performance_list.html', context)
 
-#@login_required()
-#def trading_opps_with_planned_trades(request):
-    # Fetch TradingOpp instances that have at least one Trade linked to them that has planned = True
-#    trading_opps = TradingOpp.objects.filter(trades__status='0').distinct().order_by('-reward_risk', '-id')
+@login_required()
+def trading_opps_with_planned_trades(request):
+    status = '0'
+    trading_opps_with_trades_view(request, status)
 
-    # Group TradingOpps by date, ignoring time
-#    for opp in trading_opps:
-#        opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+@login_required()
+def trading_opps_with_scheduled_trades(request):
+    status = '1'
+    trading_opps_with_trades_view(request, status)
 
-#    context = {
-#        'trading_opps': trading_opps,
-#    }
-
-#    return render(request, 'trading_opps_with_planned_trades.html', context)
+@login_required()
+def trading_opps_with_executed_trades(request):
+    status = '2'
+    trading_opps_with_trades_view(request, status)
 
 
 from django.http import HttpResponseRedirect
@@ -2124,7 +2124,6 @@ from django.views.decorators.csrf import csrf_exempt  # Only if you're bypassing
 @csrf_exempt  # Consider proper CSRF protection in production
 def update_trades(request):
     delete_trade = False
-    current_url = request.build_absolute_uri()
     if request.method == 'POST':
         for key in request.POST:
             if key.startswith('date_'):
@@ -2148,6 +2147,7 @@ def update_trades(request):
                         trade.status = request.POST.get(
                             status_key)  # This assumes 'status' is a string or compatible type
                     trade.save()
+                opp_status = request.POST.get(f'opp_status')
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
         for opp in trading_opps:
             new_trade_prefix = f'new_date_{opp.id}'
@@ -2165,10 +2165,14 @@ def update_trades(request):
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
-        context = {
-            'current_url': current_url,
-        }
-        return HttpResponseRedirect(reverse('trading_opps_with_trades'), context)  # Redirect back to the list
+        if opp_status == '0':
+            next_url = 'trading_opps_with_planned_trades'
+        elif opp_status == '1':
+            next_url = 'trading_opps_with_scheduled_trades'
+        else:
+            next_url = 'trading_opps_with_executed_trades'
+
+        return HttpResponseRedirect(reverse(next_url))  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
 
 from django.shortcuts import render, redirect
