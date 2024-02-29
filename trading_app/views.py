@@ -1996,15 +1996,15 @@ def trading_opps_with_trades_view(request, status):
     trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-datetime_identified', '-id')
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
-    if status == '0':
-        title = 'Planned trades'
-    elif status == '1':
-        title = 'Scheduled trades'
-    else:
-        title = 'Executed trades'
+    #if status == '0':
+    #    title = 'Planned trades'
+    #elif status == '1':
+    #    title = 'Scheduled trades'
+    #else:
+    #    title = 'Executed trades'
     context = {
         'trading_opps': trading_opps,
-        'title' : title
+        'status' : status
     }
     return render(request, 'trading_opps_with_trades.html', context)
 
@@ -2124,6 +2124,7 @@ from django.views.decorators.csrf import csrf_exempt  # Only if you're bypassing
 @csrf_exempt  # Consider proper CSRF protection in production
 def update_trades(request):
     delete_trade = False
+    current_url = request.build_absolute_uri()
     if request.method == 'POST':
         for key in request.POST:
             if key.startswith('date_'):
@@ -2164,8 +2165,10 @@ def update_trades(request):
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
-
-        return HttpResponseRedirect(reverse('trading_opps_with_trades'))  # Redirect back to the list
+        context = {
+            'current_url': current_url,
+        }
+        return HttpResponseRedirect(reverse('trading_opps_with_trades'), context)  # Redirect back to the list
     return HttpResponseRedirect(reverse('home'))  # Redirect somewhere relevant if not a POST request
 
 from django.shortcuts import render, redirect

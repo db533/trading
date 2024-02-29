@@ -5,7 +5,10 @@
     <title>Executed Trades</title>
 </head>
 <body>
-    <h1>{{ title }}</h1>
+    <h1>{% if status == "0" %}Planned trades
+        {% elif status == "1" %}Scheduled trades
+        {% else %}Executed trades
+        {% endif%}</h1>
     {% for opp in trading_opps %}
         <h2>{{ opp.ticker.symbol }} - {{ opp.strategy.name }} (ID: {{ opp.id }})</h2>
         <table border="1">
