@@ -2004,7 +2004,7 @@ def trading_opps_with_trades_view(request, status):
     #    title = 'Executed trades'
     context = {
         'trading_opps': trading_opps,
-        'status' : status
+        'status': status,
     }
     return render(request, 'trading_opps_with_trades.html', context)
 
@@ -2104,19 +2104,19 @@ def trade_performance_list(request):
 def trading_opps_with_planned_trades(request):
     status = '0'
     request, name, context = trading_opps_with_trades_view(request, status)
-    return render(request, name, context)
+    #return render(request, name, context)
 
 @login_required()
 def trading_opps_with_scheduled_trades(request):
     status = '1'
     request, name, context = trading_opps_with_trades_view(request, status)
-    return render(request, name, context)
+    #return render(request, name, context)
 
 @login_required()
 def trading_opps_with_executed_trades(request):
     status = '2'
     request, name, context = trading_opps_with_trades_view(request, status)
-    return render(request, name, context)
+    #return render(request, name, context)
 
 
 from django.http import HttpResponseRedirect
