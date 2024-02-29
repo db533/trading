@@ -997,7 +997,7 @@ def update_tradingopp(request, opp_id):
                 date=timezone.now(),  # Use timezone.now() to get the current date and time
                 action='1' if opp.action_buy else '0',  # Set action based on action_buy of TradingOpp
                 planned=True,  # Mark the Trade as planned
-                status='1',
+                status='0',
                 price = float(latest_daily_price.close_price),  # Set the price to the close_price of the latest DailyPrice
                 units = units,
                 rate_to_eur = exchange_rate,
