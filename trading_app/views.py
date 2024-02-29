@@ -1728,21 +1728,21 @@ def generate_swing_point_graph_view(request, opp_id):
         model = content_type.model_class()
 
         # Assuming 'opp' is your TradingOpp instance and 'model' is the model class you are querying
-        #if opp.datetime_invalidated:
+        if opp.datetime_invalidated:
             # If datetime_invalidated is not None, filter for datetime less than datetime_invalidated
-        #    most_recent_price_instance = model.objects.filter(
-        #        Q(ticker=opp.ticker),
-        #        Q(datetime__lt=opp.datetime_invalidated)
-        #    ).order_by('-datetime').first()
-        #else:
+            most_recent_price_instance = model.objects.filter(
+                Q(ticker=opp.ticker),
+                Q(datetime__lt=opp.datetime_invalidated)
+            ).order_by('-datetime').first()
+        else:
             # Fetch the most recent price for this Ticker from the determined Price model
-        #    most_recent_price_instance = model.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
+            most_recent_price_instance = model.objects.filter(ticker=opp.ticker).order_by('-datetime').first()
 
-        #if most_recent_price_instance:
-        #    most_recent_price = most_recent_price_instance.close_price
-        #    most_recent_date = most_recent_price_instance.datetime
-        most_recent_price = opp.most_recent_price
-        most_recent_date = opp.most_recent_date
+        if most_recent_price_instance:
+            most_recent_price = most_recent_price_instance.close_price
+            most_recent_date = most_recent_price_instance.datetime
+        #most_recent_price = opp.most_recent_price
+        #most_recent_date = opp.most_recent_date
 
     # Prepare data for plotting
     dates = [swing_point.date for swing_point in swing_points]
