@@ -2155,7 +2155,11 @@ def update_trades(request):
                     trade.units = float(request.POST.get(f'units_{trade_id}', 0))
                     trade.commission = float(request.POST.get(f'commission_{trade_id}', ''))
                     trade.notes = request.POST.get(f'notes_{trade_id}', '')
-                    trade.status = f'status{trade_id}' in request.POST
+                    # Correctly retrieve the status value from request.POST
+                    status_key = f'status_{trade_id}'  # Ensure this matches the name attribute in your form inputs
+                    if status_key in request.POST:
+                        trade.status = request.POST.get(
+                            status_key)  # This assumes 'status' is a string or compatible type
                     trade.save()
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
         for opp in trading_opps:
