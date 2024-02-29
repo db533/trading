@@ -70,10 +70,12 @@
                             <td><input type="number" step="any" name="units_{{ trade.id }}" style="width: 80px;" value="{{ trade.units }}"></td>
                             <td><input type="number" step="any" name="commission_{{ trade.id }}" style="width: 60px;" value="{{ trade.commission }}"></td>
                             <td><textarea type="text" name="notes_{{ trade.id }}"> {{ trade.notes }}</textarea></td>
-                            <td><input type="radio" name="status_{{ opp.id }}" value="0" checked> Planned<br>
-                                <input type="radio" name="status_{{ opp.id }}" value="1"> Submitted<br>
-                                <input type="radio" name="status_{{ opp.id }}" value="2"> Executed<br>
-                            <input type="checkbox" name="delete_{{ trade.id }}"> DELETE</td>
+                            <td>
+                                <input type="radio" name="status_{{ trade.id }}" value="0" {% if trade.status == "0" %}checked{% endif %}> Planned<br>
+                                <input type="radio" name="status_{{ trade.id }}" value="1" {% if trade.status == "1" %}checked{% endif %}> Submitted<br>
+                                <input type="radio" name="status_{{ trade.id }}" value="2" {% if trade.status == "2" %}checked{% endif %}> Executed<br>
+                                <input type="checkbox" name="delete_{{ trade.id }}"> DELETE
+                            </td>
                         </tr>
                     {% endfor %}
                     {% if opp.status == '2' %}
