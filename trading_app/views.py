@@ -2208,7 +2208,9 @@ def edit_all_params(request):
         formset = ParamsFormSet(request.POST)
         if formset.is_valid():
             formset.save()
-            return redirect('params_list')  # Adjust the redirect as necessary
+            return redirect('edit_all_params')  # Adjust the redirect as necessary
+        else:
+            print(formset.errors)  # Debugging line to print form errors
     else:
         formset = ParamsFormSet(queryset=Params.objects.all())
     return render(request, 'edit_params.html', {'formset': formset})

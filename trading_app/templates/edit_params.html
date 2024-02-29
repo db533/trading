@@ -9,7 +9,8 @@
     {% for form in formset %}
       <tr>
         <td>{{ form.instance.key }}</td>
-        <td>{{ form.value }}</td>
+        <!-- Corrected the way to display the form field -->
+        <td>{{ form.value.as_widget }}</td>
       </tr>
     {% endfor %}
     </table>
