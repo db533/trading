@@ -2327,7 +2327,7 @@ def monthly_trading_performance_view(request):
         })
 
     context = {
-        'monthly_performance': trades,
+        'monthly_performance': monthly_performance,
         'trading_opps_performance': trading_opps_performance,
     }
 
