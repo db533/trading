@@ -2301,6 +2301,7 @@ def monthly_trading_performance_view(request):
         eur_spent = 0
         eur_gained = 0
         commission_eur = 0
+        last_date = None
 
         for trade in trades2:
             if trade.action == '1':  # Buy action
@@ -2309,12 +2310,14 @@ def monthly_trading_performance_view(request):
                 eur_gained += trade.units * trade.price * trade.rate_to_eur
 
             commission_eur += trade.commission * trade.rate_to_eur
+            last_date = trade.date
 
         realised_profit = eur_gained - eur_spent - commission_eur
 
         # Append the performance metrics for this TradingOpp to the list
         trading_opps_performance.append({
             'tradingopp': opp,
+            'date' : TruncMonth(last_date),
             'eur_spent': round(eur_spent, 2),
             'eur_gained': round(eur_gained, 2),
             'commission_eur': round(commission_eur, 2),

@@ -29,6 +29,7 @@
 <table>
     <thead>
         <tr>
+            <th>Date</th>
             <th>Trading Opportunity ID</th>
             <th>EUR Spent</th>
             <th>EUR Gained</th>
@@ -39,6 +40,7 @@
     <tbody>
         {% for opp in trading_opps_performance %}
         <tr>
+            <td>{{ opp.date}}</td>
             <td>{{ opp.tradingopp.id }}</td>
             <td>{{ opp.eur_spent }}</td>
             <td>{{ opp.eur_gained }}</td>
