@@ -10,6 +10,9 @@
             <th style="text-align:center; width: 12ch;">EUR Gained</th>
             <th style="text-align:center; width: 12ch;">Commissions (EUR)</th>
             <th style="text-align:center; width: 12ch;">Realised Profit</th>
+            <th style="text-align:center; width: 12ch;">Realised Profit</th>
+            <th style="text-align:center; width: 12ch;">Growth rate</th>
+            <th style="text-align:center; width: 12ch;">CAGR</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +23,8 @@
                 <td style="text-align:right;">{{ entry.total_gained }}</td>
                 <td style="text-align:right;">{{ entry.total_commission }}</td>
                 <td style="text-align:right;">{{ entry.realised_profit }}</td>
+                <td style="text-align:right;">{{ entry.growth_rate }} %</td>
+                <td style="text-align:right;">{{ entry.cagr }} %</td>
             </tr>
         {% endfor %}
     </tbody>

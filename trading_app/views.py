@@ -2290,12 +2290,17 @@ def monthly_trading_performance_view(request):
 
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
+        realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
+        growth_rate = (realised_profit / totals['total_spent'])
+        cagr = round(((growth_rate^12)-1)*100,1)
         monthly_performance.append({
             'month': month,
             'total_spent': round(totals['total_spent'], 2),
             'total_gained': round(totals['total_gained'], 2),
             'total_commission': round(totals['total_commission'], 2),
-            'realised_profit': round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2),
+            'realised_profit': realised_profit,
+            'growth_rate' : round((growth_rate-1)*100,1),
+            'cagr' : cagr,
         })
 
     trading_opps_performance = []
