@@ -5,7 +5,7 @@
 <table border="1">
     <thead>
         <tr>
-            <th style="text-align:center; width: 12ch;">Month</th>
+            <th style="text-align:center; width: 16ch;">Month</th>
             <th style="text-align:center; width: 12ch;">EUR Spent</th>
             <th style="text-align:center; width: 12ch;">EUR Gained</th>
             <th style="text-align:center; width: 12ch;">Commissions (EUR)</th>
@@ -15,11 +15,11 @@
     <tbody>
         {% for entry in monthly_performance %}
         <tr>
-            <td>{{ entry.month|date:"F Y" }}</td>
-            <td>{{ entry.total_spent }}</td>
-            <td>{{ entry.total_gained }}</td>
-            <td>{{ entry.total_commission }}</td>
-            <td>{{ entry.realised_profit }}</td>
+            <td style="text-align:center;">{{ entry.month|date:"F Y" }}</td>
+            <td style="text-align:right;">{{ entry.total_spent }}</td>
+            <td style="text-align:right;">{{ entry.total_gained }}</td>
+            <td style="text-align:right;">{{ entry.total_commission }}</td>
+            <td style="text-align:right;">{{ entry.realised_profit }}</td>
         </tr>
         {% endfor %}
     </tbody>
