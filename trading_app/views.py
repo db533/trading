@@ -2094,8 +2094,10 @@ def trade_performance_list(request):
             opp.colour = 'lightgreen'
         elif opp.unrealised_profit_eur > 0:
             opp.colour = 'lightyellow'
-        else:
+        elif opp.amount_still_invested_currency == 0:
             opp.colour = 'lightcoral'
+        else:
+            opp.colour = 'lightpink'
 
     context = {
         'trading_opps': trading_opps,
