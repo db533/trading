@@ -1996,8 +1996,38 @@ def task_queue_view(request):
 def trading_opps_with_trades_view(request, status):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
     trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-datetime_identified', '-id')
+    # Determine the commission and exchange rate to be used for this stock
+    tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
     for opp in trading_opps:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
+
+        # Get the ticker and the latest price for the ticker
+        ticker = opp.ticker
+        investment_value_eur = float(Params.objects.get(key='investment_value').value)
+        # Check if this ticker is in TSE exchange
+        is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+        if is_in_tse_stocks:
+            current_exchange_rate = float(Params.objects.get(key='jpy_rate').value)
+            commission_value = 80
+        else:
+            current_exchange_rate = float(Params.objects.get(key='usd_rate').value)
+            commission_value = 1
+        investment_value_currency = investment_value_eur / current_exchange_rate
+
+        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        if latest_candle is not None:
+            latest_close_price = float(latest_candle.close_price)
+        else:
+            latest_close_price = 0
+        profit_taker_price = opp.profit_taker_price
+        if profit_taker_price = None or latest_close_price = 0:
+            # Missing some values to compute trade profits
+            trade_profit = 0
+        else:
+            units = round(investment_value_currency / latest_close_price,0)
+            trade_profit = ((profit_taker_price - latest_close_price) * units) - (commission_value * 2 * current_exchange_rate)
+        opp.trade_profit = trade_profit
+
     #if status == '0':
     #    title = 'Planned trades'
     #elif status == '1':
