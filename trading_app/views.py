@@ -2020,7 +2020,7 @@ def trading_opps_with_trades_view(request, status):
         else:
             latest_close_price = 0
         profit_taker_price = opp.profit_taker_price
-        if profit_taker_price = None or latest_close_price = 0:
+        if profit_taker_price is None or latest_close_price == 0:
             # Missing some values to compute trade profits
             trade_profit = 0
         else:
