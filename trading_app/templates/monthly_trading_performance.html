@@ -14,10 +14,15 @@
     </thead>
     monthly_performance: {{ monthly_performance }}<br>
     <tbody>
-        {% for key in monthly_performance.keys %}
-            {{ key }}
+        {% for entry in monthly_performance %}
+            <tr>
+                <td style="text-align:center;">{{ entry.month }}</td>
+                <td style="text-align:right;">{{ entry.total_spent }}</td>
+                <td style="text-align:right;">{{ entry.total_gained }}</td>
+                <td style="text-align:right;">{{ entry.total_commission }}</td>
+                <td style="text-align:right;">{{ entry.realised_profit }}</td>
+            </tr>
         {% endfor %}
-
     </tbody>
 </table>
 
