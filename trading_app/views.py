@@ -2175,7 +2175,7 @@ def update_trades(request):
             new_trade_prefix = f'new_date_{opp.id}'
             if request.POST.get(new_trade_prefix):
                 trade_status = request.POST.get(f'status_{trade_id}')
-                action = request.POST.get(new_trade_prefix)
+                action = request.POST.get(f'new_action_{opp.id}', '0')
                 new_trade = Trade(
                     tradingopp=opp,
                     date=request.POST.get(new_trade_prefix),
