@@ -24,4 +24,29 @@
         {% endfor %}
     </tbody>
 </table>
+
+<h2>Debug Data: Trading Opportunities Performance</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Trading Opportunity ID</th>
+            <th>EUR Spent</th>
+            <th>EUR Gained</th>
+            <th>Commission (EUR)</th>
+            <th>Realised Profit (EUR)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for opp in trading_opps_performance %}
+        <tr>
+            <td>{{ opp.tradingopp.id }}</td>
+            <td>{{ opp.eur_spent }}</td>
+            <td>{{ opp.eur_gained }}</td>
+            <td>{{ opp.commission_eur }}</td>
+            <td>{{ opp.realised_profit }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock %}

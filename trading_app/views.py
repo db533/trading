@@ -2290,8 +2290,39 @@ def monthly_trading_performance_view(request):
             2  # Round to 2 decimal places
         )
 
+    trading_opps_performance = []
+
+    for opp in trading_opps:
+        # Get all trades related to this TradingOpp
+        trades = Trade.objects.filter(tradingopp=opp)
+
+        # Initialize metrics
+        eur_spent = 0
+        eur_gained = 0
+        commission_eur = 0
+
+        for trade in trades:
+            if trade.action == '1':  # Buy action
+                eur_spent += trade.units * trade.price * trade.rate_to_eur
+            elif trade.action == '0':  # Sell action
+                eur_gained += trade.units * trade.price * trade.rate_to_eur
+
+            commission_eur += trade.commission * trade.rate_to_eur
+
+        realised_profit = eur_gained - eur_spent - commission_eur
+
+        # Append the performance metrics for this TradingOpp to the list
+        trading_opps_performance.append({
+            'tradingopp': opp,
+            'eur_spent': round(eur_spent, 2),
+            'eur_gained': round(eur_gained, 2),
+            'commission_eur': round(commission_eur, 2),
+            'realised_profit': round(realised_profit, 2),
+        })
+
     context = {
         'monthly_performance': trades,
+        'trading_opps_performance': trading_opps_performance,
     }
 
     return render(request, 'monthly_trading_performance.html', context)
