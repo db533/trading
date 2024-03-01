@@ -2166,12 +2166,13 @@ def update_trades(request):
         for key in request.POST:
             if key.startswith('date_'):
                 trade_id = key.split('_')[1]
-                trade = Trade.objects.get(id=trade_id)
                 delete_trade = f'delete_{trade_id}' in request.POST
                 if delete_trade:
+                    trade = Trade.objects.get(id=trade_id)
                     trade.delete()
                     delete_trade = False
                 else:
+                    trade = Trade.objects.get(id=trade_id)
                     trade.date = request.POST.get(key)
                     trade.action = request.POST.get(f'action_{trade_id}')
                     trade.price = float(request.POST.get(f'price_{trade_id}', 0))
