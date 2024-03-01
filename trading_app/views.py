@@ -2257,45 +2257,46 @@ from collections import defaultdict
 from decimal import Decimal
 from django.db.models import Max
 
-# Annotate each TradingOpp with the date of the last transaction
-trading_opps = TradingOpp.objects.filter(
-    amount_still_invested_currency=0,
-    trades__status="2"
-).annotate(
-    last_transaction_date=Max('trades__date')
-).distinct()
+def monthly_trading_performance_view(request):
+    # Annotate each TradingOpp with the date of the last transaction
+    trading_opps = TradingOpp.objects.filter(
+        amount_still_invested_currency=0,
+        trades__status="2"
+    ).annotate(
+        last_transaction_date=Max('trades__date')
+    ).distinct()
 
-monthly_performance = []
+    monthly_performance = []
 
-# Use a temporary dictionary to track monthly totals
-monthly_totals = {}
+    # Use a temporary dictionary to track monthly totals
+    monthly_totals = {}
 
-for opp in trading_opps:
-    last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
-    if last_transaction_month not in monthly_totals:
-        monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0}
+    for opp in trading_opps:
+        last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
+        if last_transaction_month not in monthly_totals:
+            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0}
 
-    trades = opp.trades.all()
-    for trade in trades:
-        amount_eur = trade.units * trade.price * trade.rate_to_eur
-        commission_eur = trade.commission * trade.rate_to_eur
+        trades = opp.trades.all()
+        for trade in trades:
+            amount_eur = trade.units * trade.price * trade.rate_to_eur
+            commission_eur = trade.commission * trade.rate_to_eur
 
-        if trade.action == '1':  # Buy
-            monthly_totals[last_transaction_month]['total_spent'] += amount_eur
-        elif trade.action == '0':  # Sell
-            monthly_totals[last_transaction_month]['total_gained'] += amount_eur
+            if trade.action == '1':  # Buy
+                monthly_totals[last_transaction_month]['total_spent'] += amount_eur
+            elif trade.action == '0':  # Sell
+                monthly_totals[last_transaction_month]['total_gained'] += amount_eur
 
-        monthly_totals[last_transaction_month]['total_commission'] += commission_eur
+            monthly_totals[last_transaction_month]['total_commission'] += commission_eur
 
-# Convert monthly totals to the list format for the template
-for month, totals in monthly_totals.items():
-    monthly_performance.append({
-        'month': month,
-        'total_spent': round(totals['total_spent'], 2),
-        'total_gained': round(totals['total_gained'], 2),
-        'total_commission': round(totals['total_commission'], 2),
-        'realised_profit': round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2),
-    })
+    # Convert monthly totals to the list format for the template
+    for month, totals in monthly_totals.items():
+        monthly_performance.append({
+            'month': month,
+            'total_spent': round(totals['total_spent'], 2),
+            'total_gained': round(totals['total_gained'], 2),
+            'total_commission': round(totals['total_commission'], 2),
+            'realised_profit': round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2),
+        })
 
     trading_opps_performance = []
 
