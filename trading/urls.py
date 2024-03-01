@@ -42,6 +42,8 @@ urlpatterns = [
     path('update-trades/', update_trades, name='update_trades'),
     path('delete_ticker/', delete_ticker_view, name='delete_ticker'),
     path('params/edit-all/', edit_all_params, name='edit_all_params'),
+    path('monthly-performance/', monthly_trading_performance_view, name='monthly_performance'),
+]
 ]
 
 from django.conf import settings

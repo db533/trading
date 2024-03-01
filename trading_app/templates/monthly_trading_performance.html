@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Monthly Trading Performance</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>EUR Spent</th>
+            <th>EUR Gained</th>
+            <th>Commissions (EUR)</th>
+            <th>Realised Profit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in monthly_performance %}
+        <tr>
+            <td>{{ entry.month|date:"F Y" }}</td>
+            <td>{{ entry.total_spent }}</td>
+            <td>{{ entry.total_gained }}</td>
+            <td>{{ entry.total_commission }}</td>
+            <td>{{ entry.realised_profit }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

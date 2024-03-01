@@ -2245,3 +2245,44 @@ def edit_all_params(request):
     else:
         params = Params.objects.all()
     return render(request, 'edit_params.html', {'params': params})
+
+from django.db.models import Sum, F, Case, When, DecimalField
+from django.db.models.functions import TruncMonth
+from django.shortcuts import render
+from .models import TradingOpp, Trade
+from collections import defaultdict
+from decimal import Decimal
+
+def monthly_trading_performance_view(request):
+    # Filter TradingOpps with amount_still_invested_currency = 0
+    trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0)
+
+    # Get all trades related to these trading opportunities
+    trades = Trade.objects.filter(tradingopp__in=trading_opps).annotate(
+        month=TruncMonth('date'),
+        eur_spent=Case(
+            When(action='1', then=F('units') * F('price') * F('rate_to_eur')),
+            default=Decimal('0.0'),
+            output_field=DecimalField()
+        ),
+        eur_gained=Case(
+            When(action='0', then=F('units') * F('price') * F('rate_to_eur')),
+            default=Decimal('0.0'),
+            output_field=DecimalField()
+        ),
+        commission_eur=F('commission') * F('rate_to_eur')
+    ).values('month').annotate(
+        total_spent=Sum('eur_spent'),
+        total_gained=Sum('eur_gained'),
+        total_commission=Sum('commission_eur')
+    ).order_by('month')
+
+    # Calculate realized profit for each month
+    for trade in trades:
+        trade['realised_profit'] = trade['total_gained'] - trade['total_spent'] - trade['total_commission']
+
+    context = {
+        'monthly_performance': trades,
+    }
+
+    return render(request, 'monthly_trading_performance.html', context)
