@@ -12,17 +12,16 @@
             <th style="text-align:center; width: 12ch;">Realised Profit</th>
         </tr>
     </thead>
+    monthly_performance: {{ monthly_performance }}<br>
     <tbody>
-        {% for month in monthly_performance.items %}
-            {% for data in month.items %}
-                <tr>
-                    <td style="text-align:center;">{{ month }}</td> <!-- Changed this line -->
-                    <td style="text-align:right;">{{ data.total_spent }}</td>
-                    <td style="text-align:right;">{{ data.total_gained }}</td>
-                    <td style="text-align:right;">{{ data.total_commission }}</td>
-                    <td style="text-align:right;">{{ data.realised_profit }}</td>
-                </tr>
-            {% endfor %}
+        {% for month, data in monthly_performance.items %}
+            <tr>
+                <td style="text-align:center;">{{ month }}</td>
+                <td style="text-align:right;">{{ data.total_spent }}</td>
+                <td style="text-align:right;">{{ data.total_gained }}</td>
+                <td style="text-align:right;">{{ data.total_commission }}</td>
+                <td style="text-align:right;">{{ data.realised_profit }}</td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>
