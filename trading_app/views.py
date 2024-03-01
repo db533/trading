@@ -2267,7 +2267,7 @@ def monthly_trading_performance_view(request):
     ).distinct()
 
     # Prepare a data structure to hold monthly performance
-    monthly_performance = defaultdict(lambda: {'total_spent': Decimal('0.0'), 'total_gained': Decimal('0.0'), 'total_commission': Decimal('0.0')})
+    monthly_performance = defaultdict(lambda: {'total_spent': 0, 'total_gained': 0, 'total_commission': 0})
 
     for opp in trading_opps:
         # Get the month of the last transaction
@@ -2276,8 +2276,8 @@ def monthly_trading_performance_view(request):
         # Aggregate trades for this TradingOpp
         trades = opp.trades.all()
         for trade in trades:
-            amount_eur = trade.units * trade.price * trade.rate_to_eur
-            commission_eur = trade.commission * trade.rate_to_eur
+            amount_eur = round(float(trade.units * trade.price * trade.rate_to_eur),2)
+            commission_eur = round(float(trade.commission * trade.rate_to_eur),2)
 
             if trade.action == '1':  # Buy
                 monthly_performance[last_transaction_month]['total_spent'] += amount_eur
