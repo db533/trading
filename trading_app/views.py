@@ -2255,7 +2255,7 @@ from django.shortcuts import render
 from .models import TradingOpp, Trade
 from collections import defaultdict
 from decimal import Decimal
-
+from django.db.models import Max
 
 def monthly_trading_performance_view(request):
     # Annotate each TradingOpp with the date of the last transaction
