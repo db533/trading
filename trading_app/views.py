@@ -2186,18 +2186,18 @@ def update_trades(request):
                             status_key)  # This assumes 'status' is a string or compatible type
                         trade.status = trade_status
                     trade.save()
-                if trade_status == '1' or trade_status == '2' and trade.action == "1":
-                    # We have a buy that is scheduled or executed. Let's add the ticker to the 'Current swing trade positions' category
-                    swing_trade_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
-                    # Access the TradingOpp from the trade
-                    trading_opp = trade.tradingopp
+                    if trade_status == '1' or trade_status == '2' and trade.action == "1":
+                        # We have a buy that is scheduled or executed. Let's add the ticker to the 'Current swing trade positions' category
+                        swing_trade_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
+                        # Access the TradingOpp from the trade
+                        trading_opp = trade.tradingopp
 
-                    # Now, access the Ticker from the TradingOpp
-                    # This step assumes that TradingOpp has a direct relationship to Ticker, like tradingopp.ticker
-                    ticker = trading_opp.ticker
-                    # Add the Ticker to the TickerCategory
-                    ticker.categories.add(swing_trade_category)
-                    ticker.save()
+                        # Now, access the Ticker from the TradingOpp
+                        # This step assumes that TradingOpp has a direct relationship to Ticker, like tradingopp.ticker
+                        ticker = trading_opp.ticker
+                        # Add the Ticker to the TickerCategory
+                        ticker.categories.add(swing_trade_category)
+                        ticker.save()
 
                 opp_status = request.POST.get(f'opp_status')
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
