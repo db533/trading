@@ -2292,7 +2292,7 @@ def monthly_trading_performance_view(request):
     for month, totals in monthly_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
         growth_rate = (realised_profit / totals['total_spent'])
-        cagr = round(((growth_rate^12)-1)*100,1)
+        cagr = round(((growth_rate ** 12) - 1) * 100, 1)
         monthly_performance.append({
             'month': month,
             'total_spent': round(totals['total_spent'], 2),
