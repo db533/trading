@@ -2279,7 +2279,13 @@ def monthly_trading_performance_view(request):
 
     # Calculate realized profit for each month
     for trade in trades:
-        trade['realised_profit'] = float(trade['total_gained']) - float(trade['total_spent']) - float(trade['total_commission'])
+        trade['total_spent'] = round(float(trade['total_spent']), 2)  # Round to 2 decimal places
+        trade['total_gained'] = round(float(trade['total_gained']), 2)  # Round to 2 decimal places
+        trade['total_commission'] = round(float(trade['total_commission']), 2)  # Round to 2 decimal places
+        trade['realised_profit'] = round(
+            trade['total_gained'] - trade['total_spent'] - trade['total_commission'],
+            2  # Round to 2 decimal places
+        )
 
     context = {
         'monthly_performance': trades,
