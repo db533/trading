@@ -154,47 +154,50 @@ class TradingOpp(models.Model):
         return f"{self.ticker.symbol} - {self.strategy.name}"
 
     def update_computed_values(self):
-        trades = self.trades.all()  # Get all related trades
-        units = 0
-        profit_currency = 0
-        profit_eur = 0
-        amount_initially_invested = 0
-        commissions_total_eur = 0
-        income_from_sales_eur = 0
-        purchase_price = 0
-        for trade in trades:
-            # Read values from trade:
-            deal_price = trade.price
-            commission_amount = trade.commission
-            unit_amount = trade.units
-            status = trade.status
-            # Check if the value is blank. If so, set to 0
-            if deal_price is None:
-                deal_price = 0
-            if commission_amount is None:
-                commission_amount = 0
-            if unit_amount is None:
-                unit_amount = 0
-            if trade.action == '1' and status == "2":  # Assuming '1' is Buy
-                units += unit_amount
-                #profit_currency -= ((unit_amount * deal_price) - commission_amount)
-                profit_eur -= (((unit_amount * deal_price) + commission_amount)  * trade.rate_to_eur)
-                commissions_total_eur += (trade.commission * trade.rate_to_eur)
-                purchase_price = deal_price
-                amount_initially_invested += (unit_amount * deal_price)
-            elif trade.action == '0' and status == "2":  # Assuming '0' is Sell
-                units -= unit_amount
-                #profit_currency += ((unit_amount * deal_price) - commission_amount)
-                income_from_sales_eur += (unit_amount * deal_price) * trade.rate_to_eur
-                profit_eur += ((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur
-                commissions_total_eur += (trade.commission * trade.rate_to_eur)
-        self.amount_initially_invested_currency = round(amount_initially_invested,2)
-        self.amount_still_invested_currency = round(units * purchase_price, 2)
-        #self.realised_profit_currency = round(profit_currency - commissions_total,2)
-        self.income_from_sales_eur = round(income_from_sales_eur,2)
-        self.realised_profit_eur = round(profit_eur, 2)
-        self.commissions_total_eur = round(commissions_total_eur, 2)
-        self.save()
+        try:
+            trades = self.trades.all()  # Get all related trades
+            units = 0
+            profit_currency = 0
+            profit_eur = 0
+            amount_initially_invested = 0
+            commissions_total_eur = 0
+            income_from_sales_eur = 0
+            purchase_price = 0
+            for trade in trades:
+                # Read values from trade:
+                deal_price = trade.price
+                commission_amount = trade.commission
+                unit_amount = trade.units
+                status = trade.status
+                # Check if the value is blank. If so, set to 0
+                if deal_price is None:
+                    deal_price = 0
+                if commission_amount is None:
+                    commission_amount = 0
+                if unit_amount is None:
+                    unit_amount = 0
+                if trade.action == '1' and status == '2':  # Assuming '1' is Buy
+                    units += unit_amount
+                    #profit_currency -= ((unit_amount * deal_price) - commission_amount)
+                    profit_eur -= (((unit_amount * deal_price) + commission_amount)  * trade.rate_to_eur)
+                    commissions_total_eur += (trade.commission * trade.rate_to_eur)
+                    purchase_price = deal_price
+                    amount_initially_invested += (unit_amount * deal_price)
+                elif trade.action == '0' and status == "2":  # Assuming '0' is Sell
+                    units -= unit_amount
+                    #profit_currency += ((unit_amount * deal_price) - commission_amount)
+                    income_from_sales_eur += ((unit_amount * deal_price) * trade.rate_to_eur)
+                    profit_eur += (((unit_amount * deal_price) - commission_amount) * trade.rate_to_eur)
+                    commissions_total_eur += (trade.commission * trade.rate_to_eur)
+            self.amount_initially_invested_currency = round(amount_initially_invested,2)
+            self.amount_still_invested_currency = round(units * purchase_price, 2)
+            #self.realised_profit_currency = round(profit_currency - commissions_total,2)
+            self.income_from_sales_eur = round(income_from_sales_eur,2)
+            self.realised_profit_eur = round(profit_eur, 2)
+            self.commissions_total_eur = round(commissions_total_eur, 2)
+            self.save()
+        except Exception as e:
+            print(f'Error in update_computed_values(): {e}')
 
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
