@@ -2295,14 +2295,14 @@ def monthly_trading_performance_view(request):
 
     for opp in trading_opps:
         # Get all trades related to this TradingOpp
-        trades = Trade.objects.filter(tradingopp=opp)
+        trades2 = Trade.objects.filter(tradingopp=opp)
 
         # Initialize metrics
         eur_spent = 0
         eur_gained = 0
         commission_eur = 0
 
-        for trade in trades:
+        for trade in trades2:
             if trade.action == '1':  # Buy action
                 eur_spent += trade.units * trade.price * trade.rate_to_eur
             elif trade.action == '0':  # Sell action
