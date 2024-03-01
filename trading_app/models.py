@@ -167,7 +167,7 @@ class TradingOpp(models.Model):
             deal_price = trade.price
             commission_amount = trade.commission
             unit_amount = trade.units
-            planned = trade.planned
+            status = trade.status
             # Check if the value is blank. If so, set to 0
             if deal_price is None:
                 deal_price = 0
@@ -175,14 +175,14 @@ class TradingOpp(models.Model):
                 commission_amount = 0
             if unit_amount is None:
                 unit_amount = 0
-            if trade.action == '1' and planned == False:  # Assuming '1' is Buy
+            if trade.action == '1' and status == "2":  # Assuming '1' is Buy
                 units += unit_amount
                 #profit_currency -= ((unit_amount * deal_price) - commission_amount)
                 profit_eur -= (((unit_amount * deal_price) + commission_amount)  * trade.rate_to_eur)
                 commissions_total_eur += (trade.commission * trade.rate_to_eur)
                 purchase_price = deal_price
                 amount_initially_invested += (unit_amount * deal_price)
-            elif trade.action == '0':  # Assuming '0' is Sell
+            elif trade.action == '0' and status == "2":  # Assuming '0' is Sell
                 units -= unit_amount
                 #profit_currency += ((unit_amount * deal_price) - commission_amount)
                 income_from_sales_eur += (unit_amount * deal_price) * trade.rate_to_eur

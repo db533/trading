@@ -2175,16 +2175,17 @@ def update_trades(request):
             new_trade_prefix = f'new_date_{opp.id}'
             if request.POST.get(new_trade_prefix):
                 trade_status = request.POST.get(f'status_{trade_id}')
+                action = request.POST.get(new_trade_prefix)
                 new_trade = Trade(
                     tradingopp=opp,
                     date=request.POST.get(new_trade_prefix),
-                    action=request.POST.get(f'new_action_{opp.id}'),
+                    action=action,
                     price=float(request.POST.get(f'new_price_{opp.id}', '0')),
                     rate_to_eur=float(request.POST.get(f'new_rate_to_eur_{opp.id}', '0')),
                     units=float(request.POST.get(f'new_units_{opp.id}', '0')),
                     commission=float(request.POST.get(f'new_commission_{opp.id}', '0')),
                     notes=request.POST.get(f'new_notes_{opp.id}', '0'),
-                    status=trade_status
+                    status=trade_status,
                     #status="0"
                     # Initialize additional fields as necessary
                 )
