@@ -2026,7 +2026,7 @@ def trading_opps_with_trades_view(request, status):
         else:
             units = round(investment_value_currency / latest_close_price,0)
             trade_profit = ((profit_taker_price - latest_close_price) * units) - (commission_value * 2 * current_exchange_rate)
-        opp.trade_profit = trade_profit
+        opp.trade_profit = round(trade_profit,2)
 
     #if status == '0':
     #    title = 'Planned trades'
