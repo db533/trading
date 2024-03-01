@@ -2256,47 +2256,42 @@ from .models import TradingOpp, Trade
 from collections import defaultdict
 from decimal import Decimal
 
+
 def monthly_trading_performance_view(request):
-    # Filter TradingOpps with amount_still_invested_currency = 0
+    # Annotate each TradingOpp with the date of the last transaction
     trading_opps = TradingOpp.objects.filter(
         amount_still_invested_currency=0,
         trades__status="2"
+    ).annotate(
+        last_transaction_date=Max('trades__date')
     ).distinct()
 
-    # Get all trades related to these trading opportunities
-    trades = Trade.objects.filter(tradingopp__in=trading_opps).annotate(
-        month=TruncMonth('date'),
-        eur_spent=Case(
-            When(action='1', then=F('units') * F('price') * F('rate_to_eur')),
-            default=Decimal('0.0'),
-            output_field=DecimalField()
-        ),
-        eur_gained=Case(
-            When(action='0', then=F('units') * F('price') * F('rate_to_eur')),
-            default=Decimal('0.0'),
-            output_field=DecimalField()
-        ),
-        commission_eur=F('commission') * F('rate_to_eur')
-    ).values('month').annotate(
-        total_spent=Sum('eur_spent'),
-        total_gained=Sum('eur_gained'),
-        total_commission=Sum('commission_eur')
-    ).order_by('month')
+    # Prepare a data structure to hold monthly performance
+    monthly_performance = defaultdict(lambda: {'total_spent': Decimal('0.0'), 'total_gained': Decimal('0.0'), 'total_commission': Decimal('0.0')})
 
-    # Calculate realized profit for each month
-    for trade in trades:
-        trade['total_spent'] = round(float(trade['total_spent']), 2)  # Round to 2 decimal places
-        trade['total_gained'] = round(float(trade['total_gained']), 2)  # Round to 2 decimal places
-        trade['total_commission'] = round(float(trade['total_commission']), 2)  # Round to 2 decimal places
-        trade['realised_profit'] = round(
-            trade['total_gained'] - trade['total_spent'] - trade['total_commission'],
-            2  # Round to 2 decimal places
-        )
+    for opp in trading_opps:
+        # Get the month of the last transaction
+        last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
 
-    trading_opps = TradingOpp.objects.filter(
-        amount_still_invested_currency=0,
-        trades__status="2"
-    ).distinct()
+        # Aggregate trades for this TradingOpp
+        trades = opp.trades.all()
+        for trade in trades:
+            amount_eur = trade.units * trade.price * trade.rate_to_eur
+            commission_eur = trade.commission * trade.rate_to_eur
+
+            if trade.action == '1':  # Buy
+                monthly_performance[last_transaction_month]['total_spent'] += amount_eur
+            elif trade.action == '0':  # Sell
+                monthly_performance[last_transaction_month]['total_gained'] += amount_eur
+
+            monthly_performance[last_transaction_month]['total_commission'] += commission_eur
+
+    # Calculate realized profit for each month and round values
+    for month, data in monthly_performance.items():
+        data['total_spent'] = round(data['total_spent'], 2)
+        data['total_gained'] = round(data['total_gained'], 2)
+        data['total_commission'] = round(data['total_commission'], 2)
+        data['realised_profit'] = round(data['total_gained'] - data['total_spent'] - data['total_commission'], 2)
 
     trading_opps_performance = []
 
