@@ -2322,7 +2322,7 @@ def monthly_trading_performance_view(request):
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
-        growth_rate = (realised_profit / totals['total_spent'])
+        growth_rate = (totals['total_gained'] / (totals['total_spent'] + totals['total_commission']))
         cagr = round(((growth_rate ** 12) - 1) * 100, 1)
         monthly_performance.append({
             'month': month,
