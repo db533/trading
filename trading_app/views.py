@@ -2290,6 +2290,7 @@ def monthly_trading_performance_view(request):
             2  # Round to 2 decimal places
         )
 
+    trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0)
     trading_opps_performance = []
 
     for opp in trading_opps:
