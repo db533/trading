@@ -2264,7 +2264,7 @@ def monthly_trading_performance_view(request):
         trades__status="2"
     ).annotate(
         last_transaction_date=Max('trades__date')
-    ).distinct()
+    ).order_by('last_transaction_date').distinct()
 
     monthly_performance = []
 
