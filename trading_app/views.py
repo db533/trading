@@ -2317,7 +2317,7 @@ def monthly_trading_performance_view(request):
         # Append the performance metrics for this TradingOpp to the list
         trading_opps_performance.append({
             'tradingopp': opp,
-            'date' : TruncMonth(last_date),
+            'date' : last_date.date(),
             'eur_spent': round(eur_spent, 2),
             'eur_gained': round(eur_gained, 2),
             'commission_eur': round(commission_eur, 2),
