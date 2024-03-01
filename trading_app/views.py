@@ -2267,7 +2267,7 @@ def monthly_trading_performance_view(request):
     ).distinct()
 
     # Prepare a data structure to hold monthly performance
-    monthly_performance = defaultdict(lambda: {'total_spent': 0, 'total_gained': 0, 'total_commission': 0})
+    monthly_performance = defaultdict(lambda: {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'realised_profit' : 0})
 
     for opp in trading_opps:
         # Get the month of the last transaction
