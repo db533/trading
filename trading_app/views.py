@@ -2258,7 +2258,10 @@ from decimal import Decimal
 
 def monthly_trading_performance_view(request):
     # Filter TradingOpps with amount_still_invested_currency = 0
-    trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0)
+    trading_opps = TradingOpp.objects.filter(
+        amount_still_invested_currency=0,
+        trades__status="2"
+    ).distinct()
 
     # Get all trades related to these trading opportunities
     trades = Trade.objects.filter(tradingopp__in=trading_opps).annotate(
