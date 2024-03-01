@@ -44,7 +44,6 @@ urlpatterns = [
     path('params/edit-all/', edit_all_params, name='edit_all_params'),
     path('monthly-performance/', monthly_trading_performance_view, name='monthly_performance'),
 ]
-]
 
 from django.conf import settings
 from django.conf.urls.static import static
