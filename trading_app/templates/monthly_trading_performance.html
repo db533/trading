@@ -14,15 +14,10 @@
     </thead>
     monthly_performance: {{ monthly_performance }}<br>
     <tbody>
-        {% for month, data in monthly_performance.items %}
-            <tr>
-                <td style="text-align:center;">{{ month }}</td>
-                <td style="text-align:right;">{{ data.total_spent }}</td>
-                <td style="text-align:right;">{{ data.total_gained }}</td>
-                <td style="text-align:right;">{{ data.total_commission }}</td>
-                <td style="text-align:right;">{{ data.realised_profit }}</td>
-            </tr>
+        {% for key in monthly_performance.keys %}
+            {{ key }}
         {% endfor %}
+
     </tbody>
 </table>
 
