@@ -2281,17 +2281,13 @@ def monthly_trading_performance_view(request):
 
             if trade.action == '1':  # Buy
                 monthly_performance[last_transaction_month]['total_spent'] += amount_eur
+                monthly_performance[last_transaction_month]['realised_profit'] -= amount_eur
             elif trade.action == '0':  # Sell
                 monthly_performance[last_transaction_month]['total_gained'] += amount_eur
+                monthly_performance[last_transaction_month]['realised_profit'] += amount_eur
 
             monthly_performance[last_transaction_month]['total_commission'] += commission_eur
-
-    # Calculate realized profit for each month and round values
-    for month, data in monthly_performance.items():
-        data['total_spent'] = round(data['total_spent'], 2)
-        data['total_gained'] = round(data['total_gained'], 2)
-        data['total_commission'] = round(data['total_commission'], 2)
-        data['realised_profit'] = round(data['total_gained'] - data['total_spent'] - data['total_commission'], 2)
+            monthly_performance[last_transaction_month]['realised_profit'] -= commission_eur
 
     trading_opps_performance = []
 
