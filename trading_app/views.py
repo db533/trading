@@ -715,6 +715,7 @@ def manual_download(request, ticker_id, timeframe):
 
 def manual_category_download(request, category_name):
     # Retrieve all tickers that are in the given category.
+    # Retrieve all tickers that are in the given category.
     try:
         tickers_for_throtlling = 195
         logger.error(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
