@@ -1394,12 +1394,6 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
     #                   GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy, GannPointNineSell]  #
 
     ticker = Ticker.objects.get(symbol=ticker_symbol)
-    latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-    if latest_candle is not None:
-        most_recent_price = latest_candle.close_price
-        most_recent_date = latest_candle.datetime
-    else:
-        latest_price = None
 
     try:
         for StrategyClass in strategies:
@@ -1413,12 +1407,6 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 existing_tradingopp = existing_tradingopp[0]
             else:
                 existing_tradingopp = None
-
-            # Amend the most_recent_price field for all existing TradingOpps:
-            if existing_tradingopp.most_recent_price is None:
-                existing_tradingopp.most_recent_price = latest_candle.close_price
-                existing_tradingopp.most_recent_date = latest_candle.datetime
-                existing_tradingopp.save()
 
             if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
@@ -1448,8 +1436,6 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     existing_tradingopp.count += 1
                     # Update the metrics with the latest data e.g. current latest_T.
                     existing_tradingopp.metrics_snapshot = data
-                    existing_tradingopp.most_recent_price = most_recent_price
-                    existing_tradingopp.most_recent_date = most_recent_date
                     if recent_swing_points_exist == True:
                         for swing_point in recent_swing_points:
                             existing_tradingopp.swing_points.add(swing_point)
@@ -1466,8 +1452,6 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                         count = 1,
                         action_buy = action_buy,
                         confirmed = confirmed,
-                        most_recent_price = most_recent_price,
-                        most_recent_date = most_recent_date,
                     )
                     if recent_swing_points_exist == True:
                         for swing_point in recent_swing_points:

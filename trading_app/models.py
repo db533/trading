@@ -137,8 +137,6 @@ class TradingOpp(models.Model):
     action_buy = models.BooleanField(default=True)
     swing_points = models.ManyToManyField('SwingPoint', related_name='trading_opps', blank=True)
     datetime_invalidated = models.DateTimeField(null=True, blank = True)
-    most_recent_price = models.FloatField(null=True)
-    most_recent_date = models.DateTimeField(default=datetime.now())
     confirmed = models.BooleanField(default=True)
     stop_loss_price = models.FloatField(null=True)
     profit_taker_price = models.FloatField(null=True)
