@@ -145,6 +145,17 @@ class UpdateTickerMetricsCronJob(CronJobBase):
 # Trust start time: 00:03
 # Run time 1:39
 # Should complete by 01:43
+
+# Cron job settings in CPanel:
+# These matches with the following run_at_times in this file: 21:00, 00:28
+# 2-6 means run from Monday night to Friday night (after midnight)
+#Current Cron Jobs
+#Minute	Hour	Day	Month	Weekday	Command	Actions
+#2	7	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
+#30	3	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
+#3	0	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
+
+
 class DailyTSEPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['21:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
