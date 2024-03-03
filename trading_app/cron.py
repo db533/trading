@@ -109,6 +109,34 @@ class DailyTradingOppCreationCronJob(CronJobBase):
         # Run the update_ticker_metrics function
         process_trading_opportunities()
 
+# Update metric scores for tickers
+# Trust start time: 07:00
+# Run time 0:20
+# Should complete by 07:20
+class UpdateTickerMetricsCronJob(CronJobBase):
+    RUN_AT_TIMES = ['04:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    # schedule = Schedule(run_every_mins=60*24)  # Run once a day
+    code = 'trading_app.update_ticker_metrics_cron_job'
+
+    def do(self):
+        # Run the update_ticker_metrics function
+        start_time = time.time()  # Capture start time
+
+        display_local_time()
+        update_ticker_metrics()
+        process_trading_opportunities()
+        display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'UpdateTickerMetricsCronJob completed in {elapsed_time_str}')
+
+
+
 ###############################
 # ACTIVE cron jobs:
 # RUN_AT_TIMES actually execute 3 hours later than defined here.
@@ -139,7 +167,7 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
         logger.info(f'DailyTSEPriceDownloadCronJob completed in {elapsed_time_str}')
 
 
-# Download US prices. 612 prices.
+# Download US prices. 604 prices.
 # Trust start time: 03:30
 # Run time 3:25
 # Should complete by 06:55
@@ -164,30 +192,4 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
         # Log or print the elapsed time. Here's an example of logging it:
         logger.info(f'DailyUSPriceDownloadCronJob completed in {elapsed_time_str}')
 
-
-# Update metric scores for tickers
-# Trust start time: 07:00
-# Run time 0:20
-# Should complete by 07:20
-class UpdateTickerMetricsCronJob(CronJobBase):
-    RUN_AT_TIMES = ['04:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    # schedule = Schedule(run_every_mins=60*24)  # Run once a day
-    code = 'trading_app.update_ticker_metrics_cron_job'
-
-    def do(self):
-        # Run the update_ticker_metrics function
-        start_time = time.time()  # Capture start time
-
-        display_local_time()
-        update_ticker_metrics()
-        process_trading_opportunities()
-        display_local_time()
-
-        end_time = time.time()  # Capture end time
-        elapsed_time = end_time - start_time  # Compute elapsed time
-        elapsed_time_str = format_elapsed_time(start_time, end_time)
-
-        # Log or print the elapsed time. Here's an example of logging it:
-        logger.info(f'UpdateTickerMetricsCronJob completed in {elapsed_time_str}')
 

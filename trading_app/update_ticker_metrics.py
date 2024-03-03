@@ -5,6 +5,10 @@ import pandas as pd
 import pytz
 from datetime import datetime, timedelta, timezone, date
 import time
+from .price_download import format_elapsed_time
+import logging
+logger = logging.getLogger('django')
+
 
 def display_local_time():
     # Get the current datetime in UTC
