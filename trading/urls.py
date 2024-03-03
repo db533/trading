@@ -3,6 +3,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 from django.contrib import admin
 from django.urls import path, include
 from trading_app.views import *
+from .tasks import *
 
 from django.views.generic import RedirectView
 from rest_framework.authtoken.views import obtain_auth_token
@@ -24,7 +25,8 @@ urlpatterns = [
     path('ticker/<int:ticker_id>/', ticker_detail, name='ticker_detail'),
     path('ticker_delete/<int:ticker_id>/', ticker_delete, name='ticker_delete'),
     path('add-ticker/', add_ticker, name='ticker_add'),
-    path('manual_category_download/<str:category_name>/', manual_category_download, name='manual_category_download'),
+    #path('manual_category_download/<str:category_name>/', manual_category_download, name='manual_category_download'),
+    path('manual_category_download/<str:category_name>/', background_manual_category_download, name='manual_category_download'),
     path('delete_daily_price/', delete_daily_price, name='delete_daily_price'),
     path('delete_daily_price/<str:symbol>/', delete_daily_price, name='delete_daily_price_with_symbol'),
     path('trading-opps/', trading_opps_view, name='trading-opps'),

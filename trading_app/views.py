@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from candlestick import candlestick
 from . import db_candlestick
 from . import update_ticker_metrics
+from . import update_strategies
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
@@ -744,44 +745,6 @@ def manual_category_download(request, category_name):
         logger.error(f'Error occured in manual_category_download(). {e}')
     return redirect('ticker_config')
 
-# View to refresh price data for a specific ticker
-def manual_category_download_original(request, category_name):
-    # Retrieve all tickers that are in the given category.
-    tickers_for_throtlling = 195
-    logger.error(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
-
-    logger.error(f'category: {str(category_name)}')
-    category_name = category_name.replace('%20',' ')
-    category_name = category_name.replace('%2520', ' ')
-    logger.error(f'Cleaned category: {str(category_name)}')
-    tickers = Ticker.objects.filter(categories__name=category_name)
-    ticker_count = Ticker.objects.filter(categories__name=category_name).count()
-    logger.error(f'ticker_count: {str(ticker_count)}')
-    if ticker_count > tickers_for_throtlling:
-        logger.error(f'Rate throttling will occur.')
-    else:
-        logger.error(f'No rate throttling needed.')
-
-    # Iterate through all retrieved tickers and download prices.
-    for ticker in tickers:
-        start_time = display_local_time()  # record the start time of the loop
-        logger.error(f'ticker.symbol: {str(ticker.symbol)}')
-        download_prices(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
-
-        end_time = display_local_time()  # record the end time of the loop
-        elapsed_time = end_time - start_time  # calculate elapsed time
-        logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
-        logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
-        logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
-
-        if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
-            pause_duration = 20 - elapsed_time.total_seconds()
-            print('Rate throttling for', pause_duration, 'secs...')
-            logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-            sleep(pause_duration)
-
-    # Redirect to the 'ticker_config' URL pattern.
-    return redirect('ticker_config')
 
 from django.contrib import messages
 from django.http import Http404
@@ -2384,4 +2347,4 @@ def update_all_strategies(request):
         background_update_ticker_strategies(ticker.symbol)
         logger.error(f'Scheduled strategy update for {ticker.symbol}.')
     logger.error(f'All strategy updates for tickers scheduled as background tasks.')
-    return redirect('ticker_config')
+    return redirect('task_queue')

@@ -7,6 +7,8 @@ from .price_download import download_prices, download_daily_ticker_price
 from time import sleep
 import time
 from .update_strategies import *
+from .update_ticker_metrics import *
+
 
 logger = logging.getLogger('django')
 
@@ -47,6 +49,7 @@ def background_manual_category_download(category_name):
             background_manual_ticker_download(ticker.symbol, throttling)
             logger.error(f'{str(ticker.symbol)} price download requested in background...')
         logger.error(f'background_manual_category_download() completed. All price downloads created as background tasks.')
+
         logger.error(
             f'=========================================================================================')
         #time.sleep(15)
@@ -94,10 +97,14 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         start_time = display_local_time()  # record the start time of the loop
 
         # Download ticker prices
+        logger.error(f'1. Downloading latest prices from background_manual_ticker_download()...')
         download_daily_ticker_price(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
 
         # Look for trading opportunities for this ticker
-        logger.error(f'About to start process_trading_opportunities_single_ticker() from background_manual_ticker_download() in tasks.py')
+        logger.error(f'2. Updating metrics from background_manual_ticker_download()...')
+        update_single_ticker_metrics(ticker.symbol)
+
+        logger.error(f'3. Looking for valid trading strategies from background_manual_ticker_download()...')
         process_trading_opportunities_single_ticker(ticker.symbol, strategies)
         logger.error(f'Finished process_trading_opportunities_single_ticker() from background_manual_ticker_download() in tasks.py')
 
