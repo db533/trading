@@ -3,7 +3,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 from django.contrib import admin
 from django.urls import path, include
 from trading_app.views import *
-from .tasks import *
+from trading_app.tasks import *
 
 from django.views.generic import RedirectView
 from rest_framework.authtoken.views import obtain_auth_token
