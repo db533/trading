@@ -2374,7 +2374,7 @@ def monthly_trading_performance_view(request):
 
     return render(request, 'monthly_trading_performance.html', context)
 
-def update_all_strategies():
+def update_all_strategies(request):
     tickers = Ticker.objects.all()
     ticker_count = tickers.count()
     logger.error(f'Requesting update of strategies for all tickers.')
@@ -2384,3 +2384,4 @@ def update_all_strategies():
         background_update_ticker_strategies(ticker.symbol)
         logger.error(f'Scheduled strategy update for {ticker.symbol}.')
     logger.error(f'All strategy updates for tickers scheduled as background tasks.')
+    return redirect('ticker_config')
