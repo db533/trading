@@ -121,3 +121,17 @@ def delete_ticker(ticker_symbol):
         ticker.delete()
         # Assuming `logger` is correctly defined/imported elsewhere
         logger.info(f'Deleted ticker {ticker_symbol}.')  # Changed to info and fixed indentation
+
+@background(schedule=5)
+def background_update_ticker_strategies(ticker_symbol):
+    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
+                  GannPointEightSell,
+                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
+                  GannPointNineSell]
+    logger.error(
+        f'background_update_ticker_strategies() starting for ticker "{str(ticker_symbol)}"...')
+    ticker = Ticker.objects.get(symbol=ticker_symbol)
+    process_trading_opportunities_single_ticker(ticker.symbol, strategies)
+    logger.error(
+        f'background_update_ticker_strategies() finished for ticker "{str(ticker_symbol)}".')
+

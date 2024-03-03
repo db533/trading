@@ -113,10 +113,10 @@ class DailyTradingOppCreationCronJob(CronJobBase):
 # ACTIVE cron jobs:
 # RUN_AT_TIMES actually execute 3 hours later than defined here.
 
-# Download TSE prices. 576 prices.
+# Download TSE prices. 295 prices.
 # Trust start time: 00:03
-# Run time 3:12
-# Should complete by 03:15
+# Run time 1:39
+# Should complete by 01:43
 class DailyTSEPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['21:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)

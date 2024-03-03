@@ -39,6 +39,7 @@ urlpatterns = [
     path('trading-opps-with-planned-trades/', trading_opps_with_planned_trades, name='trading_opps_with_planned_trades'),
     path('trading-opps-with-scheduled-trades/', trading_opps_with_scheduled_trades, name='trading_opps_with_scheduled_trades'),
     path('trading-opps-with-executed-trades/', trading_opps_with_executed_trades, name='trading_opps_with_executed_trades'),
+    path('update_all_strategies/', update_all_strategies, name='update_all_strategies'),
     path('update-trades/', update_trades, name='update_trades'),
     path('delete_ticker/', delete_ticker_view, name='delete_ticker'),
     path('params/edit-all/', edit_all_params, name='edit_all_params'),
