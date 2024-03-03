@@ -35,6 +35,7 @@
         <tr>
             <th>Date</th>
             <th>Trading Opportunity ID</th>
+            <th>Ticker</th>
             <th>EUR Spent</th>
             <th>EUR Gained</th>
             <th>Commission (EUR)</th>
@@ -46,6 +47,7 @@
         <tr>
             <td>{{ opp.date}}</td>
             <td>{{ opp.tradingopp.id }}</td>
+            <td>{{ opp.ticker.symbol }}</td>
             <td>{{ opp.eur_spent }}</td>
             <td>{{ opp.eur_gained }}</td>
             <td>{{ opp.commission_eur }}</td>
