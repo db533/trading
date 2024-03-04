@@ -1959,7 +1959,7 @@ def task_queue_view(request):
 @login_required()
 def trading_opps_with_trades_view(request, status):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
-    trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-datetime_identified', '-id')
+    trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
     #trading_opps = TradingOpp.objects.filter(trades__status=status).order_by('-datetime_identified', '-id')
     # Determine the commission and exchange rate to be used for this stock
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()

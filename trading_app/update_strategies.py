@@ -1431,7 +1431,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 else:
                     confirmed = True
                 if existing_tradingopp is not None:
-                    logger.error(f'Existing TradingOpp being updated...')
+                    logger.error(f'Existing TradingOpp being updated (id={existing_tradingopp.id})...')
                     # This Ticker / strategy exists as an active record. Increment the count.
                     existing_tradingopp.count += 1
                     # Update the metrics with the latest data e.g. current latest_T.
@@ -1442,7 +1442,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     existing_tradingopp.save()
                 else:
                     # This Ticker / strategy is new.
-                    logger.error(f'Creating new TradingOpp...')
+
                     # Create a new TradingOpp instance.
                     trading_opp = TradingOpp.objects.create(
                         ticker=ticker,
@@ -1457,6 +1457,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                         for swing_point in recent_swing_points:
                             trading_opp.swing_points.add(swing_point)
                     trading_opp.save()
+                    logger.error(f'Created new TradingOpp. id:{trading_opp.id}.')
             else:
                 # The strategy is not valid for the ticker.
                 # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
