@@ -6,7 +6,7 @@ import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import yfinance as yf
 from time import sleep
-from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, TradingOpp, TradingStrategy, SwingPoint
+from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, TradingOpp, TradingStrategy, SwingPoint, Params
 
 import pandas as pd
 import pytz
@@ -1468,7 +1468,15 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     existing_tradingopp.save()
         logger.error(f'Finished process_trading_opportunities_single_ticker().')
     except Exception as e:
-        print(f"Error in process_trading_opportunities_single_ticker. Current ticker: {ticker.symbol}: {e}")
+        message = f'Error occured in process_trading_opportunities_single_ticker(). Current ticker: {ticker.symbol}. Error: {e}'
+        nj_param = Params.objects.get(key='night_job_end_dt')
+        end_time = datetime.now()
+        nj_param.value = end_time
+        nj_param.save()
+        nj_param = Params.objects.get(key='night_job_status_message')
+        nj_param.value = message
+        nj_param.save()
+        logger.error(message)
 
 def process_trading_opportunities():
     logger.error(f'Starting process_trading_opportunities()...')

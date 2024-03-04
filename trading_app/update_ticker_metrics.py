@@ -1,4 +1,4 @@
-from .models import Ticker, DailyPrice
+from .models import Ticker, DailyPrice, Params
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import pandas as pd
@@ -343,36 +343,46 @@ def update_ticker_metrics(ticker_symbol="All"):
     logger.info(f'Completed in {elapsed_time_str}')
 
 def update_single_ticker_metrics(ticker_symbol):
+    try:
+        print(f'Updating metrics for {ticker_symbol}...')
+        ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
+        for ticker in ticker_list:
+            # Recompute the support / resistance levels.
+            ticker = update_sr_level_data(ticker)
 
-    print(f'Updating metrics for {ticker_symbol}...')
-    ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
-    for ticker in ticker_list:
-        # Recompute the support / resistance levels.
-        ticker = update_sr_level_data(ticker)
+            last_200_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:200]  # Get the last 200 data points
+            last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 100 data points
+            last_30_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:30]  # Get the last 30 data points
+            last_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:2]  # Get the last 2 data points
+            prior_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[1:3]
+            last_7_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[
+                                 :7]  # Get the last 2 data points
+            latest_data_point = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:1]  # Get the last data point
 
-        last_200_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:200]  # Get the last 200 data points
-        last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 100 data points
-        last_30_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:30]  # Get the last 30 data points
-        last_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:2]  # Get the last 2 data points
-        prior_2_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[1:3]
-        last_7_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[
-                             :7]  # Get the last 2 data points
-        latest_data_point = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:1]  # Get the last data point
+            if len(last_200_data_points) > 3:
+                ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
+                ticker = compute_atr(ticker, last_30_data_points)
+                ticker = compute_average_volume(ticker, last_100_data_points)
+                current_2_day_rsi = compute_rsi(last_2_data_points, period=2)
+                #print('current_2_day_rsi:',current_2_day_rsi)
+                prior_2_day_rsi = compute_rsi(prior_2_data_points, period=2)
+                cumulative_two_period_two_day_rsi = (current_2_day_rsi + prior_2_day_rsi)/2
+                ticker.cumulative_two_period_two_day_rsi = cumulative_two_period_two_day_rsi
+                ticker = compute_period_high(ticker, last_7_data_points)
+                ticker = compute_period_low(ticker, last_7_data_points)
+                ticker = uptrend_hl(ticker,last_200_data_points, latest_data_point)
 
-        if len(last_200_data_points) > 3:
-            ticker = compute_ma_200_trend_strength(ticker,last_200_data_points)
-            ticker = compute_atr(ticker, last_30_data_points)
-            ticker = compute_average_volume(ticker, last_100_data_points)
-            current_2_day_rsi = compute_rsi(last_2_data_points, period=2)
-            #print('current_2_day_rsi:',current_2_day_rsi)
-            prior_2_day_rsi = compute_rsi(prior_2_data_points, period=2)
-            cumulative_two_period_two_day_rsi = (current_2_day_rsi + prior_2_day_rsi)/2
-            ticker.cumulative_two_period_two_day_rsi = cumulative_two_period_two_day_rsi
-            ticker = compute_period_high(ticker, last_7_data_points)
-            ticker = compute_period_low(ticker, last_7_data_points)
-            ticker = uptrend_hl(ticker,last_200_data_points, latest_data_point)
+                # Now update strategy fulfillment:
+                ticker = test_tae_strategy(ticker)
 
-            # Now update strategy fulfillment:
-            ticker = test_tae_strategy(ticker)
-
-            ticker.save()
+                ticker.save()
+    except Exception as e:
+        message = f'Error occured in update_single_ticker_metrics(): {e}'
+        nj_param = Params.objects.get(key='night_job_end_dt')
+        end_time = datetime.now()
+        nj_param.value = end_time
+        nj_param.save()
+        nj_param = Params.objects.get(key='night_job_status_message')
+        nj_param.value = message
+        nj_param.save()
+        logger.error(message)

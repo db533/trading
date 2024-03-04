@@ -167,6 +167,9 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
 
         display_local_time()
         #category_price_download('TSE stocks')
+        nj_param = Params.objects.get(key='night_job_start_dt')
+        nj_param.value = start_time
+        nj_param.save()
         background_manual_category_download('TSE stocks')
         display_local_time()
 

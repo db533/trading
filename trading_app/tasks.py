@@ -1,6 +1,6 @@
 from background_task import background
 import logging
-from .models import Ticker, DailyPrice
+from .models import Ticker, DailyPrice, Params
 from datetime import datetime, timedelta, timezone, date
 import pytz
 from .price_download import download_prices, download_daily_ticker_price
@@ -55,7 +55,15 @@ def background_manual_category_download(category_name):
         #time.sleep(15)
         #logger.info(f'Waited 15 seconds.')
     except Exception as e:
-        logger.error(f'Error occured in background_manual_category_download(). {e}')
+        message = f'Error occured in background_manual_category_download(). {e}'
+        nj_param = Params.objects.get(key='night_job_end_dt')
+        end_time = datetime.now()
+        nj_param.value = end_time
+        nj_param.save()
+        nj_param = Params.objects.get(key='night_job_status_message')
+        nj_param.value = message
+        nj_param.save()
+        logger.error(message)
 
 from django.utils.timezone import now
 from datetime import timedelta
@@ -121,7 +129,15 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             sleep(pause_duration)
         logger.info(f'background_manual_ticker_download() completed.')
     except Exception as e:
-        logger.error(f'Error occured in background_manual_ticker_download(): {e}')
+        message = f'Error occured in background_manual_ticker_download(): {e}'
+        nj_param = Params.objects.get(key='night_job_end_dt')
+        end_time = datetime.now()
+        nj_param.value = end_time
+        nj_param.save()
+        nj_param = Params.objects.get(key='night_job_status_message')
+        nj_param.value = message
+        nj_param.save()
+        logger.error(message)
 
 
 @background(schedule=5)
