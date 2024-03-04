@@ -336,6 +336,7 @@ class Trade(models.Model):
 class Params(models.Model):
     TYPES = (
         ('0', 'Float'),
+        ('1', "Datetime")
     )
 
     key = models.CharField(max_length=100)

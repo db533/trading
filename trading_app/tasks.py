@@ -97,13 +97,16 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         start_time = display_local_time()  # record the start time of the loop
 
         # Download ticker prices
+        logger.info(f'=====================================================================')
         logger.info(f'1. Downloading latest prices from background_manual_ticker_download()...')
         download_daily_ticker_price(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
 
         # Look for trading opportunities for this ticker
+        logger.info(f'=====================================================================')
         logger.info(f'2. Updating metrics from background_manual_ticker_download()...')
         update_single_ticker_metrics(ticker.symbol)
 
+        logger.info(f'=====================================================================')
         logger.info(f'3. Looking for valid trading strategies from background_manual_ticker_download()...')
         process_trading_opportunities_single_ticker(ticker.symbol, strategies)
         logger.info(f'Finished process_trading_opportunities_single_ticker() from background_manual_ticker_download() in tasks.py')

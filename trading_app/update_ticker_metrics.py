@@ -345,7 +345,7 @@ def update_ticker_metrics(ticker_symbol="All"):
 def update_single_ticker_metrics(ticker_symbol):
 
     print(f'Updating metrics for {ticker_symbol}...')
-    ticker_list = Ticker.objects.get(symbol=ticker_symbol)
+    ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
     for ticker in ticker_list:
         # Recompute the support / resistance levels.
         ticker = update_sr_level_data(ticker)
