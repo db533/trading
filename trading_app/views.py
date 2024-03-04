@@ -2004,6 +2004,13 @@ def trading_opps_with_trades_view(request, status):
     #    title = 'Scheduled trades'
     #else:
     #    title = 'Executed trades'
+
+    # Determine if the request is from a mobile device
+    is_mobile = request.user_agent.is_mobile
+
+    # Choose the template based on whether the user is on a mobile device
+    template_name = 'trading_opps_with_trades_mobile.html' if is_mobile else 'trading_opps_with_trades.html'
+
     context = {
         'trading_opps': trading_opps,
         'status': status,

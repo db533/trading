@@ -12,6 +12,7 @@ Django==4.1.7
 django-compat==1.0.15
 django-cron==0.6.0
 django-environ==0.10.0
+django-user-agents==0.4.0
 django-webpush==0.3.5
 django4-background-tasks==1.2.9
 djangorestframework==3.14.0
@@ -41,6 +42,7 @@ numpy==1.25.2
 opencv-python-headless==4.8.1.78
 packaging==23.1
 pandas==2.1.0
+peewee==3.17.1
 Pillow==10.1.0
 protobuf==4.21.12
 py-vapid==1.9.0
@@ -65,7 +67,9 @@ torch==2.1.1
 torchvision==0.16.1
 typing_extensions==4.7.1
 tzdata==2023.3
+ua-parser==0.18.0
 urllib3==1.26.14
+user-agents==2.2.0
 webencodings==0.5.1
-yfinance==0.2.28
+yfinance==0.2.36
 zipp==3.17.0
