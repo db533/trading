@@ -1462,7 +1462,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
                 if existing_tradingopp is not None:
                     existing_tradingopp.is_active = False
-                    existing_tradingopp.date_invalidated = timezone.now()
+                    existing_tradingopp.date_invalidated = datetime.now()
                     if action_buy is not None:
                         existing_tradingopp.action_buy = action_buy
                     existing_tradingopp.save()
