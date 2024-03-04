@@ -337,6 +337,7 @@ class Params(models.Model):
     TYPES = (
         ('0', 'Float'),
         ('1', "Datetime")
+        ('2', "String")
     )
 
     key = models.CharField(max_length=100)
