@@ -1,0 +1,10 @@
+@media screen and (max-width: 768px) {
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+    th, td {
+        white-space: nowrap;
+    }
+}
