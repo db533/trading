@@ -1994,7 +1994,8 @@ def trading_opps_with_trades_view(request, status):
         opp.trade_profit = round(trade_profit,2)
 
         # Compute the breakeven_price.
-        opp.breakeven_price = latest_close_price + ((commission_value * 2) / units)
+        opp.breakeven_price = round(latest_close_price + ((commission_value * 2) / units),2)
+        opp.breakeven_rise_percent = round(((opp.breakeven_price / latest_close_price)-1)*100,1)
 
 
     #if status == '0':
