@@ -9,6 +9,7 @@
         {% elif status == "1" %}Scheduled trades
         {% else %}Executed trades
         {% endif%}</h1>
+    <p>is_mobile: {{ is_mobile }}</p>
     {% for opp in trading_opps %}
         <h2>{{ opp.ticker.symbol }} - {{ opp.strategy.name }} (ID: {{ opp.id }})</h2>
         <table border="1">

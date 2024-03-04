@@ -2014,6 +2014,7 @@ def trading_opps_with_trades_view(request, status):
     context = {
         'trading_opps': trading_opps,
         'status': status,
+        'is_mobile' : is_mobile
     }
     return render(request, 'trading_opps_with_trades.html', context)
 
