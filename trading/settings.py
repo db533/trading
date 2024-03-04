@@ -157,6 +157,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Adjust the path as needed
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'trading_app', 'static'),
+    os.path.join(BASE_DIR, 'trading_app/static'),
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
