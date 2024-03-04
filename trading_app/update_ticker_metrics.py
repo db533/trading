@@ -340,7 +340,7 @@ def update_ticker_metrics(ticker_symbol="All"):
     elapsed_time_str = format_elapsed_time(start_time, end_time)
 
     # Log or print the elapsed time. Here's an example of logging it:
-    logger.error(f'Completed in {elapsed_time_str}')
+    logger.info(f'Completed in {elapsed_time_str}')
 
 def update_single_ticker_metrics(ticker_symbol):
 

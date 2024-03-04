@@ -718,32 +718,32 @@ def manual_category_download(request, category_name):
     # Retrieve all tickers that are in the given category.
     try:
         tickers_for_throtlling = 195
-        logger.error(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
-        logger.error(f'category: {str(category_name)}')
+        logger.info(f'manual_category_download() starting for stocks in category "{str(category_name)}"...')
+        logger.info(f'category: {str(category_name)}')
         category_name = category_name.replace('%20',' ')
         category_name = category_name.replace('%2520', ' ')
-        logger.error(f'Cleaned category: {str(category_name)}')
+        logger.info(f'Cleaned category: {str(category_name)}')
         tickers = Ticker.objects.filter(categories__name=category_name)
         ticker_count = Ticker.objects.filter(categories__name=category_name).count()
-        logger.error(f'ticker_count: {str(ticker_count)}')
+        logger.info(f'ticker_count: {str(ticker_count)}')
         if ticker_count > tickers_for_throtlling:
-            logger.error(f'Rate throttling will occur.')
+            logger.info(f'Rate throttling will occur.')
             throttling = True
         else:
-            logger.error(f'No rate throttling needed.')
+            logger.info(f'No rate throttling needed.')
             throttling = False
 
         # Iterate through all retrieved tickers and download prices.
         for ticker in tickers:
             background_manual_ticker_download(ticker.symbol, throttling)
-            logger.error(f'{str(ticker.symbol)} price download requested in background...')
-        logger.error(f'manual_category_download() completed. All price downloads created as background tasks.')
-        logger.error(
+            logger.info(f'{str(ticker.symbol)} price download requested in background...')
+        logger.info(f'manual_category_download() completed. All price downloads created as background tasks.')
+        logger.info(
             f'=========================================================================================')
         #time.sleep(15)
-        #logger.error(f'Waited 15 seconds.')
+        #logger.info(f'Waited 15 seconds.')
     except Exception as e:
-        logger.error(f'Error occured in manual_category_download(). {e}')
+        logger.info(f'Error occured in manual_category_download(). {e}')
     return redirect('ticker_config')
 
 
@@ -1834,7 +1834,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         current_to_date = trading_opp_dates[to_counter] - timedelta(days=1)
     else:
         current_to_date = None
-    logger.error(f'to_counter: {to_counter}. current_to_date: {current_to_date}')
+    logger.info(f'to_counter: {to_counter}. current_to_date: {current_to_date}')
     for i, date in enumerate(dates):
         if date.month != previous_month:
             month_starts_indices.append(i)
@@ -1859,7 +1859,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
                     else:
                         current_to_date = None
                         break
-                logger.error(
+                logger.info(
                     f'len(trading_opp_dates): {len(trading_opp_dates)} to_counter: {to_counter}. current_to_date: {current_to_date}')
             else:
                 bar_colours.append('black')
@@ -2341,11 +2341,11 @@ def monthly_trading_performance_view(request):
 def update_all_strategies(request):
     tickers = Ticker.objects.all()
     ticker_count = tickers.count()
-    logger.error(f'Requesting update of strategies for all tickers.')
-    logger.error(f'ticker_count: {str(ticker_count)}')
+    logger.info(f'Requesting update of strategies for all tickers.')
+    logger.info(f'ticker_count: {str(ticker_count)}')
 
     for ticker in tickers:
         background_update_ticker_strategies(ticker.symbol)
-        logger.error(f'Scheduled strategy update for {ticker.symbol}.')
-    logger.error(f'All strategy updates for tickers scheduled as background tasks.')
+        logger.info(f'Scheduled strategy update for {ticker.symbol}.')
+    logger.info(f'All strategy updates for tickers scheduled as background tasks.')
     return redirect('task_queue')

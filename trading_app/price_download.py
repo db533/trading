@@ -60,7 +60,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
         else:
             existing_data_retrieved = False
         if existing_data_retrieved == True:
-            logger.error(f'get_price_data(). Retrieved existing data.')
+            logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
@@ -91,7 +91,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
-    logger.error(f'get_price_data(). Existing data retrieval is complete.')
+    logger.info(f'get_price_data(). Existing data retrieval is complete.')
 
     try:
         # Ensure start_time and finish_time are timezone-aware
@@ -99,7 +99,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
         finish_time = finish_time.replace(tzinfo=timezone.utc)
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
-        logger.error(f'get_price_data(). data retrieval performed.')
+        logger.info(f'get_price_data(). data retrieval performed.')
         if not data.empty:
             print('Retrieve new price data records...')
 
@@ -179,18 +179,18 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
         existing_dates = DailyPrice.objects.filter(
             ticker=ticker, datetime__range=(start_day, finish_day)
         ).values_list('datetime', flat=True)
-        logger.error(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
+        logger.info(f'get_missing_dates. start_day: {str(start_day)} finish_day: {str(finish_day)}')
 
         try:
             # Ensure existing_dates is a list of timezone-naive or aware datetime objects
             existing_dates = [timezone.make_naive(date) for date in existing_dates]
-            logger.error(f'existing_dates: {existing_dates[:3]}')
+            logger.info(f'existing_dates: {existing_dates[:3]}')
         except Exception as e:
             logger.error(f'Failed to create existing_dates: {e}')
         # Ensure that start_day and finish_day have the time set to 4:00
         start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
         finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
-        logger.error(f'start_day_with_time: {start_day_with_time}')
+        logger.info(f'start_day_with_time: {start_day_with_time}')
 
         all_dates = pd.date_range(start=start_day_with_time, end=finish_day_with_time, freq='D')
         all_dates = all_dates.tz_localize(None)
@@ -198,12 +198,12 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
         # Ensure all_dates is a list of native python datetime objects
         all_dates = [date.to_pydatetime() for date in all_dates]
 
-        logger.error(f'all_dates: {all_dates[:3]}')
+        logger.info(f'all_dates: {all_dates[:3]}')
 
         missing_dates = [date for date in all_dates if date not in existing_dates]
 
         #print('missing_dates:', missing_dates[:3])
-        logger.error(f'missing_dates: {missing_dates}')
+        logger.info(f'missing_dates: {missing_dates}')
         #print('max(missing_dates):',max(missing_dates))
     if interval == '15m':
         existing_dates = FifteenMinPrice.objects.filter(ticker=ticker,
@@ -409,7 +409,7 @@ from decimal import Decimal
 # Following function is no longer used. Replaced by identify_highs_lows2()
 def identify_highs_lows(df, window=20):
     print('Detecting swing points...')
-    logger.error(f'Detecting swing points...')
+    logger.info(f'Detecting swing points...')
     df['swing_point_label'] = ''
     df['swing_point_current_trend'] = 0
     #print('df.columns:',df.columns)
@@ -723,7 +723,7 @@ def identify_highs_lows2(df, window=20, price_move_percent=1.5):
     # Healthy candle = > 1,5% price move from open to close AND body >=60% of total candle length.
     price_move_percent = price_move_percent / 100
     print('Detecting swing points...')
-    logger.error(f'Detecting swing points...')
+    logger.info(f'Detecting swing points...')
     df['swing_point_label'] = ''
     df['swing_point_current_trend'] = 0
     #print('df.columns:',df.columns)
@@ -915,16 +915,16 @@ def add_ema_and_trend(price_history):
     return price_history
 
 #def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
-#    logger.error(f'Running download_daily_ticker_price() for ticker_symbol: {str(ticker_symbol)}')
+#    logger.info(f'Running download_daily_ticker_price() for ticker_symbol: {str(ticker_symbol)}')
 
-#    logger.error(f'xxx---xxx')
+#    logger.info(f'xxx---xxx')
 
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     local_time = display_local_time()
     print('Timeframe:', timeframe)
     print('ticker_symbol:', ticker_symbol)
-    logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
+    logger.info(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
     # ticker_count = Ticker.objects.all().count()
     # Check if the 'TSE stocks' category exists
@@ -950,7 +950,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
             old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
             deleted_count, _ = old_prices.delete()
             print('Deleted', deleted_count, 'older DailyPrice records.')
-            logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
+            logger.info(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
             # Check if the stock is marked as a TSE stock.
             is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
@@ -958,8 +958,8 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                 hour_offset = 15
             else:
                 hour_offset = 4
-            logger.error(f'hour_offset = {str(hour_offset)}')
-            logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
+            logger.info(f'hour_offset = {str(hour_offset)}')
+            logger.info(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
             try:
                 # Request price data for the entire missing date range
@@ -1028,7 +1028,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 healthy_bearish_count=row['healthy_bearish_candle'],
                                 candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                             )
-                            logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
+                            logger.info(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                         else:
                             daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
                             daily_price.datetime_tz = daily_price.datetime
@@ -1056,15 +1056,15 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                             content_type = ContentType.objects.get_for_model(daily_price)
 
                             # First check if a swing point instance has already been created for this swing point.
-                            #logger.error(
+                            #logger.info(
                             #    f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                             #    f"content_type: {str(content_type)}")
                             existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,
                                                                                       date=row['Datetime_TZ'],
                                                                                       content_type=content_type)
-                            #logger.error(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
+                            #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                             if not existing_swing_point_instance.exists():
-                                #logger.error(f'SwingPoint does not exist.')
+                                #logger.info(f'SwingPoint does not exist.')
                                 new_swing_point = SwingPoint.objects.create(
                                     ticker=ticker,
                                     date=row['Datetime_TZ'],
@@ -1075,14 +1075,14 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     object_id=daily_price.id
                                 )
                             else:
-                                #logger.error(f'SwingPoint does exist.')
+                                #logger.info(f'SwingPoint does exist.')
                                 pass
                 else:
                     print('Insufficient data.')
             except Exception as e:
                 logger.error(f'Error in download_daily_ticker_price: {e}.')
             print('new_record_count:', new_record_count)
-            logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
+            logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
             end_time = display_local_time()  # record the end time of the loop
 
 
@@ -1101,7 +1101,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         local_time = display_local_time()
         print('Timeframe:', timeframe)
         print('ticker_symbol:', ticker_symbol)
-        logger.error(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
+        logger.info(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
 
         #ticker_count = Ticker.objects.all().count()
         # Check if the 'TSE stocks' category exists
@@ -1111,7 +1111,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
             print('TSE stocks category does not exist!!')
 
         #if ticker_symbol == 'All':
-        #    logger.error(f'All tickers requested. ticker_count: {str(ticker_count)}')
+        #    logger.info(f'All tickers requested. ticker_count: {str(ticker_count)}')
         #    ticker_group = Ticker.objects.all().order_by('symbol')
         #else:
         #    ticker_group = Ticker.objects.filter(symbol=ticker_symbol)
@@ -1119,7 +1119,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         ticker = Ticker.objects.get(symbol=ticker_symbol)
         if ticker is None:
             print('No Ticker instance found for this symbol')
-            logger.error(f'No Ticker instance found for this symbol.')
+            logger.info(f'No Ticker instance found for this symbol.')
         else:
             new_record_count=0
             if timeframe == 'Daily': # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
@@ -1134,7 +1134,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 #old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
                 #deleted_count, _ = old_prices.delete()
                 #print('Deleted', deleted_count, 'older DailyPrice records.')
-                #logger.error(f'Deleted {str(deleted_count)} older DailyPrice records.')
+                #logger.info(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
                 # Check if the stock is marked as a TSE stock.
                 is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
@@ -1142,7 +1142,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     hour_offset = 15
                 else:
                     hour_offset = 4
-                logger.error(f'hour_offset = {str(hour_offset)}')
+                logger.info(f'hour_offset = {str(hour_offset)}')
 
                 # Get the max date for DailyPrice
                 latest_daily_price = DailyPrice.objects.filter(ticker=ticker).latest('datetime')
@@ -1151,7 +1151,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 # Get the list of missing dates
                 #missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, hour_offset)
 
-                #logger.error(f'missing_dates = {str(missing_dates)}')
+                #logger.info(f'missing_dates = {str(missing_dates)}')
                 #if missing_dates:
 
                 # Set start_day to the smallest date and finish_day to the largest date in missing_dates
@@ -1161,7 +1161,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 #finish_day = max(missing_dates)
                 finish_day = timezone.now()
                 print('Retrieving data from ', start_day, ' to ', finish_day)
-                logger.error(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
+                logger.info(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
                 # Request price data for the entire missing date range
                 price_history = get_price_data(ticker, interval, start_day, finish_day)
@@ -1226,7 +1226,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                 healthy_bearish_count=row['healthy_bearish_candle'],
                                 candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                             )
-                            logger.error(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
+                            logger.info(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                         else:
                             daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
                             daily_price.datetime_tz = daily_price.datetime
@@ -1254,12 +1254,12 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             content_type = ContentType.objects.get_for_model(daily_price)
 
                             # First check if a swing point instance has already been created for this swing point.
-                            #logger.error(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
+                            #logger.info(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                             #             f"content_type: {str(content_type)}")
                             existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
-                            #logger.error(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
+                            #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                             if not existing_swing_point_instance.exists():
-                                #logger.error(f'SwingPoint does not exist.')
+                                #logger.info(f'SwingPoint does not exist.')
                                 new_swing_point = SwingPoint.objects.create(
                                     ticker=ticker,
                                     date=row['Datetime_TZ'],
@@ -1270,14 +1270,14 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                     object_id=daily_price.id
                                 )
                             else:
-                                #logger.error(f'SwingPoint does exist.')
+                                #logger.info(f'SwingPoint does exist.')
                                 pass
 
                 else:
                     print('Insufficient data.')
 
                 print('new_record_count:',new_record_count)
-                logger.error(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
+                logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
                 end_time = display_local_time()  # record the end time of the loop
                 elapsed_time = end_time - start_time  # calculate elapsed time
 
@@ -1285,7 +1285,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 #if elapsed_time.total_seconds() < 20 and ticker_symbol == "All" and ticker_count > 195:
                 #    pause_duration = 20 - elapsed_time.total_seconds()
                 #    print('Rate throttling for',pause_duration,'secs...')
-                #    logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                #    logger.info(f'Rate throttling for {str(pause_duration)} secs...')
                 #    sleep(pause_duration)
             if timeframe == '15 mins' and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol) and ((local_time.hour > 5 and local_time.hour < 15) or trigger=='User'):
                 start_day = timezone.now() - timedelta(days=7)
