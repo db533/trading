@@ -137,7 +137,7 @@ class TradingOpp(models.Model):
     action_buy = models.BooleanField(default=True)
     swing_points = models.ManyToManyField('SwingPoint', related_name='trading_opps', blank=True)
     datetime_invalidated = models.DateTimeField(null=True, blank = True)
-    confirmed = models.BooleanField(default=True)
+    confirmed = models.BooleanField(default=True) # Has price action confirmed this trading opp (True) or is it not yet confirmed. (False)
     stop_loss_price = models.FloatField(null=True)
     profit_taker_price = models.FloatField(null=True)
     reward_risk = models.FloatField(null=True)

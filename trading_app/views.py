@@ -1992,6 +1992,10 @@ def trading_opps_with_trades_view(request, status):
             trade_profit = ((profit_taker_price - latest_close_price) * units * current_exchange_rate) - (commission_value * 2 * current_exchange_rate)
         opp.trade_profit = round(trade_profit,2)
 
+        # Compute the breakeven_price.
+        opp.breakeven_price = latest_close_price + ((commission_value * 2) / units)
+
+
     #if status == '0':
     #    title = 'Planned trades'
     #elif status == '1':

@@ -75,6 +75,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
                   GannPointEightSell,
                   GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
                   GannPointNineSell]
+    errors_encountered = False
 
     try:
         logger.info(f'background_manual_ticker_download() starting for ticker "{str(ticker_symbol)}". throttling={str(throttling)}...')
@@ -127,7 +128,16 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             pause_duration = 20 - elapsed_time.total_seconds()
             logger.info(f'Rate throttling for {str(pause_duration)} secs...')
             sleep(pause_duration)
-        logger.info(f'background_manual_ticker_download() completed.')
+        if errors_encountered == False:
+            message = f'background_manual_ticker_download() completed.'
+            nj_param = Params.objects.get(key='night_job_end_dt')
+            end_time = datetime.now()
+            nj_param.value = end_time
+            nj_param.save()
+            nj_param = Params.objects.get(key='night_job_status_message')
+            nj_param.value = message
+            nj_param.save()
+            logger.error(message)
     except Exception as e:
         message = f'Error occured in background_manual_ticker_download(): {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
@@ -137,6 +147,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
         nj_param = Params.objects.get(key='night_job_status_message')
         nj_param.value = message
         nj_param.save()
+        errors_encountered = True
         logger.error(message)
 
 
