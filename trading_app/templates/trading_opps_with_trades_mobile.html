@@ -22,9 +22,9 @@
         {% for trade in opp.trades.all %}
             <li>Status: {% if trade.status == "0" %}Planned{% elif trade.status == "1" %}Scheduled{% else %}<strong>Executed</strong>{% endif %}</li>
             {% if trade.status == "2" %}<li>Date: {{ trade.date|date:'Y-m-d' }}</li>{% endif %}
+            <li><strong>Units:</strong> {{ trade.units }}</li>
+            <li><strong>Price:</strong> {{ trade.price }}</li>
             <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
-            <li>Price: {{ trade.price }}</li>
-            <li>Units: {{ trade.units }}</li>
             <li>Notes: {{ trade.notes }}</li>
        {% endfor %}
        <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
