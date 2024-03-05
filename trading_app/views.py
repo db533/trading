@@ -1992,6 +1992,7 @@ def trading_opps_with_trades_view(request, status):
             units = round(investment_value_currency / latest_close_price,0)
             trade_profit = ((profit_taker_price - latest_close_price) * units * current_exchange_rate) - (commission_value * 2 * current_exchange_rate)
         opp.trade_profit = round(trade_profit,2)
+        opp.current_exchange_rate = current_exchange_rate
 
         # Compute the breakeven_price.
         opp.breakeven_price = round(latest_close_price + ((commission_value * 2) / units),2)
