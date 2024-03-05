@@ -181,12 +181,12 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
         logger.info(f'DailyTSEPriceDownloadCronJob completed in {elapsed_time_str}')
 
 
-# Download US prices. 604 prices.
-# Trust start time: 03:30
-# Run time 3:25
-# Should complete by 06:55
+# Download US prices. 927 prices.
+# Trust start time: 01:48
+# Run time 5:09
+# Should complete by 07:00
 class DailyUSPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['00:28']
+    RUN_AT_TIMES = ['22:48']
     #schedule = Schedule(run_at_times=RUN_AT_TIMES)
     schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.daily_us_price_download_cron_job'
