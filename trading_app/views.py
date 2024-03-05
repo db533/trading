@@ -2127,7 +2127,7 @@ def trade_performance_list(request):
 
     context = {
         'trading_opps': trading_opps,
-        'cum_eur_invested' : cum_eur_invested,
+        'cum_eur_invested' : round(cum_eur_invested,,2)
     }
     return render(request, 'trade_performance_list.html', context)
 
