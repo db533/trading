@@ -14,8 +14,8 @@
           <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
               <input type="hidden" name="opp_status" value="{{ status }}">
               <strong>{{ opp.action_buy|yesno:"BUY,SELL" }}</strong><br>
-              {% if opp.reward_risk %}<p>Reward/Risk: {{ opp.reward_risk }} %</p>p>{% endif %}
-              {% if opp.trade_profit %}<p>Trade profit: {{ opp.trade_profit }}</p>{% endif %}
+              {% if opp.reward_risk %}<li>Reward/Risk: {{ opp.reward_risk }} %</li>{% endif %}
+              {% if opp.trade_profit %}<li>Trade profit: {{ opp.trade_profit }}</li>{% endif %}
               <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
               <a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}<br>
               <strong>Breakeven price: </strong>{{ opp.breakeven_price }} <strong>Breakeven rise: </strong>{{ opp.breakeven_rise_percent }} %<br>
