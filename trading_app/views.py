@@ -2091,7 +2091,7 @@ def trade_performance_list(request):
                 opp.commissions_paid_currency += round(trade.commission,2)
                 opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
         if opp.units_still_owned > 0:
-            cum_eur_invested += round((opp.units_still_owned) * purchase_price),2)
+            cum_eur_invested += round(((opp.units_still_owned) * purchase_price),2)
         opp.realised_profit_currency = round(opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency,2)
         opp.realised_profit_eur = round(opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur,2)
         opp.value_of_holding_currency = round(opp.units_still_owned * opp.latest_close_price,2)
