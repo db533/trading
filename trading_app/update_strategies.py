@@ -200,7 +200,8 @@ class GannPointOneBuy(BaseStrategy):
                                 'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
                                 'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
                                 'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)),
-                                'duration_after_latest_sp' : str(duration_after_latest_sp)} # recent_swing_points not as a string as it gets removed and accessed if present.
+                                'duration_after_latest_sp' : str(duration_after_latest_sp), 'last_sp_price' : str(last_sp_price),
+                                'latest_price.close_price' : str(latest_price.close_price)} # recent_swing_points not as a string as it gets removed and accessed if present.
                         action_buy = True
                     else:
                         # Strategy is not valid
@@ -738,17 +739,17 @@ class GannPointFiveBuy(BaseStrategy):
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
             final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
-            max_lh_price = max(lh_prices)
-            if latest_price.close_price > max_lh_price:
+            most_recent_lh_price = lh_prices[0]
+            if latest_price.close_price > most_recent_lh_price:
                 confirmed = True
                 when_confirmed = ""
             else:
                 confirmed = False
-                when_confirmed = f'When price rises above {max_lh_price}.'
+                when_confirmed = f'When price rises above {most_recent_lh_price}.'
 
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'max_lh_price' : max_lh_price,
+                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'most_recent_lh_price' : most_recent_lh_price,
                     'confirmed': confirmed, 'when_confirmed': when_confirmed}
             logger.info(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
@@ -1463,7 +1464,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
                 if existing_tradingopp is not None:
                     existing_tradingopp.is_active = False
-                    existing_tradingopp.date_invalidated = datetime.now()
+                    existing_tradingopp.datetime_invalidated = datetime.now()
                     if action_buy is not None:
                         existing_tradingopp.action_buy = action_buy
                     existing_tradingopp.save()
