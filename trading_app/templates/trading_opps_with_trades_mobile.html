@@ -20,7 +20,8 @@
           <li><strong>Profit Taker Price:</strong> {{ opp.profit_taker_price }}</li>
 
           <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
-          {{ opp.datetime_identified }}<br>
+          Date opp identified: {{ opp.datetime_identified }}<br>
+        <h4>Trades:</h4>
         {% for trade in opp.trades.all %}
             <li>Date: {{ trade.date|date:'Y-m-d' }}</li>
             <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
