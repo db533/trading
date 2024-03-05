@@ -2016,7 +2016,7 @@ def trading_opps_with_trades_view(request, status):
         'status': status,
         'is_mobile' : is_mobile
     }
-    return render(request, 'trading_opps_with_trades.html', context)
+    return render(request, template_name, context)
 
 @login_required()
 def trade_performance_list(request):
@@ -2026,6 +2026,7 @@ def trade_performance_list(request):
     # Excluding planned trades from this view
     trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
 
+    cum_eur_invested = 0
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
         # Get the trades for the opp and check if there is a positive balance of units
@@ -2083,6 +2084,8 @@ def trade_performance_list(request):
                 opp.income_eur += round(unit_amount * trade.price * trade.rate_to_eur,2)
                 opp.commissions_paid_currency += round(trade.commission,2)
                 opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
+        if opp.units_still_owned > 0:
+            cum_eur_invested += opp.amount_invested_eur
         opp.realised_profit_currency = round(opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency,2)
         opp.realised_profit_eur = round(opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur,2)
         opp.value_of_holding_currency = round(opp.units_still_owned * opp.latest_close_price,2)
@@ -2106,6 +2109,15 @@ def trade_performance_list(request):
             opp.colour = 'lightcoral'
         else:
             opp.colour = 'lightpink'
+
+    # Let's compute a summary of current status.
+    # EUR currently invested in swing trade opportunities.
+    # EUR available for investing.
+
+    # Cumulative realised profit
+    # Cumulative unrealised profit
+
+
 
     context = {
         'trading_opps': trading_opps,
