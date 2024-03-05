@@ -23,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr {% if opp.datetime_identified %}style="background-color:lightpink"{% endif %}>
+                <tr {% if opp.datetime_invalidated %}style="background-color:lightpink"{% endif %}>
                     <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
                         <input type="hidden" name="opp_status" value="{{ status }}">
                         <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
