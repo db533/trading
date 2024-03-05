@@ -2076,6 +2076,7 @@ def trade_performance_list(request):
                 opp.amount_invested_eur += round(unit_amount * trade.price * trade.rate_to_eur,2)
                 opp.commissions_paid_currency += round(trade.commission,2)
                 opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
+                purchase_price = trade.price * trade.rate_to_eur
             else:
                 # Sell trade
                 opp.last_sale_date = trade.date
@@ -2086,7 +2087,7 @@ def trade_performance_list(request):
                 opp.commissions_paid_currency += round(trade.commission,2)
                 opp.commissions_paid_eur += round(trade.commission * trade.rate_to_eur,2)
         if opp.units_still_owned > 0:
-            cum_eur_invested += opp.amount_invested_eur
+            cum_eur_invested += round((opp.units_still_owned) * purchase_price),2)
         opp.realised_profit_currency = round(opp.income_currency - opp.amount_invested_currency - opp.commissions_paid_currency,2)
         opp.realised_profit_eur = round(opp.income_eur - opp.amount_invested_eur - opp.commissions_paid_eur,2)
         opp.value_of_holding_currency = round(opp.units_still_owned * opp.latest_close_price,2)
@@ -2112,7 +2113,7 @@ def trade_performance_list(request):
             opp.colour = 'lightpink'
 
     # Let's compute a summary of current status.
-    # EUR currently invested in swing trade opportunities.
+    # EUR currently invested in swing trade opportunities = cum_eur_invested
     # EUR available for investing.
 
     # Cumulative realised profit
@@ -2122,6 +2123,7 @@ def trade_performance_list(request):
 
     context = {
         'trading_opps': trading_opps,
+        'cum_eur_invested' : cum_eur_invested,
     }
     return render(request, 'trade_performance_list.html', context)
 
