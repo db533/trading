@@ -18,19 +18,18 @@
           <li>Breakeven price: {{ opp.breakeven_price }} (+{{ opp.breakeven_rise_percent }} %)</li>
           <li><strong>Stop Loss Price:</strong> {{ opp.stop_loss_price }}</li>
           <li><strong>Profit Taker Price:</strong> {{ opp.profit_taker_price }}</li>
-
-          <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
-          Date opp identified: {{ opp.datetime_identified }}<br>
         <h4>Trades:</h4>
         {% for trade in opp.trades.all %}
-            <li>Date: {{ trade.date|date:'Y-m-d' }}</li>
-            <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
             <li>Status: {% if trade.status == "0" %}Planned{% elif trade.status == "1" %}Scheduled{% else %}Executed<{% endif %}</li>
+            {% if trade.status == "2" %}<li>Date: {{ trade.date|date:'Y-m-d' }}</li>{% endif %}
+            <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
             <li>Price: {{ trade.price }}</li>
-            <li>Exchange rate: {{ trade.rate_to_eur }}</li>
             <li>Units: {{ trade.units }}</li>
             <li>Notes: {{ trade.notes }}</li>
        {% endfor %}
+       <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
+       Date opp identified: {{ opp.datetime_identified }}<br>
+        <hr>
     {% endfor %}
 </body>
 {% endblock %}
