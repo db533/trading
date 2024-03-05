@@ -16,10 +16,13 @@
               <strong>{{ opp.action_buy|yesno:"BUY,SELL" }}</strong><br>
               {% if opp.reward_risk %}<li>Reward/Risk: {{ opp.reward_risk }} %</li>{% endif %}
               {% if opp.trade_profit %}<li>Trade profit: {{ opp.trade_profit }}</li>{% endif %}
+              <li>Breakeven price: {{ opp.breakeven_price }} (+{{ opp.breakeven_rise_percent }} %)</li>
+              <li><strong>Stop Loss Price:</strong>{{ opp.stop_loss_price }}</li>
+
               <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
               <a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}<br>
-              <strong>Breakeven price: </strong>{{ opp.breakeven_price }} <strong>Breakeven rise: </strong>{{ opp.breakeven_rise_percent }} %<br>
-              <strong>Stop Loss Price:</strong><input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" style="width: 100px;"><br>
+
+              <input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" style="width: 100px;"><br>
               <strong>Profit Taker Price:</strong><input type="number" step="any" name="profit_taker_price" value="{{ opp.profit_taker_price }}" style="width: 100px;"><br>
               <input type="checkbox" name="sl_triggered" {% if opp.stop_loss_triggered %}checked{% endif %}><strong> Stop loss triggered </strong><input type="submit" value="Update"><br>
               {{ opp.datetime_identified }}<br>
