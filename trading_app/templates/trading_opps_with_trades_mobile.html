@@ -20,7 +20,7 @@
           <li><strong>Profit Taker Price:</strong> {{ opp.profit_taker_price }}</li>
         <h4>Trades:</h4>
         {% for trade in opp.trades.all %}
-            <li>Status: {% if trade.status == "0" %}Planned{% elif trade.status == "1" %}Scheduled{% else %}Executed<{% endif %}</li>
+            <li>Status: {% if trade.status == "0" %}Planned{% elif trade.status == "1" %}Scheduled{% else %}<strong>Executed</strong>{% endif %}</li>
             {% if trade.status == "2" %}<li>Date: {{ trade.date|date:'Y-m-d' }}</li>{% endif %}
             <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
             <li>Price: {{ trade.price }}</li>
