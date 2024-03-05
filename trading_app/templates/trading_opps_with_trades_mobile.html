@@ -21,6 +21,15 @@
 
           <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
           {{ opp.datetime_identified }}<br>
+        {% for trade in opp.trades.all %}
+            <li>Date: {{ trade.date|date:'Y-m-d'
+            <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
+            <li>Status: {% if trade.status == "0" %}Planned{% elif trade.status == "1" %}Scheduled{% else %}Executed</li>
+            <li>Price: {{ trade.price }}</li>
+            <li>Exchange rate: {{ trade.rate_to_eur }}</li>
+            <li>Units: {{ trade.units }}</li>
+            <li>Notes: {{ trade.notes }}</li>
+       {% endfor %}
     {% endfor %}
 </body>
 {% endblock %}
