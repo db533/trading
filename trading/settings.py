@@ -211,7 +211,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['stderr'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'scheduled_tasks': {
