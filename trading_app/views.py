@@ -2144,8 +2144,14 @@ def trading_opps_with_scheduled_trades(request):
     return redirect('trading_opps_with_trades', status=status)
 
 @login_required()
-def trading_opps_with_executed_trades(request):
+def trading_opps_with_open_trades(request):
     status = '2'
+    # Redirect to the main view function with the status as a URL parameter
+    return redirect('trading_opps_with_trades', status=status)
+
+@login_required()
+def trading_opps_with_completed_trades(request):
+    status = '3'
     # Redirect to the main view function with the status as a URL parameter
     return redirect('trading_opps_with_trades', status=status)
 
@@ -2196,7 +2202,6 @@ def update_trades(request):
                         # Add the Ticker to the TickerCategory
                         ticker.categories.add(swing_trade_category)
                         ticker.save()
-
                 opp_status = request.POST.get(f'opp_status')
         trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
         for opp in trading_opps:
@@ -2218,14 +2223,32 @@ def update_trades(request):
                     # Initialize additional fields as necessary
                 )
                 new_trade.save()
-                if trade_status == '2' and opp.amount_still_invested_currency == 0:
-                    # We have executed a trade that has brought the holding to zero.
-                    # Remove the swing trade category.
+                if trade_status == '2':
+                    # We have executed a trade.
+                    # Check if we have units still left being held.
                     swing_trade_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
                     # Fetch the Ticker instance
                     ticker = opp.ticker
-                    # Remove the category from the ticker's categories
-                    ticker.categories.remove(swing_trade_category)
+
+                    # Get the buy trade that bought units for this Trading Opp
+                    buy_trades = Trade.objects.filter(tradingopp=opp).filter(action="1").filter(status="2")
+                    bought_units = 0
+                    for buy_trade in buy_trades:
+                        bought_units += buy_trade.units
+
+                    # Find any already saved Sales trades. (Current trade is not yet saved and should not be retrieved).
+                    sell_trades = Trade.objects.filter(tradingopp=opp).filter(action="0").filter(status="2")
+                    sold_units = 0
+                    for sell_trade in sell_trades:
+                        sold_units += sell_trade.units
+
+                    units_now_owned = bought_units - sold_units
+                    if units_now_owned > 0:
+                        # Make sure the stock is in the swing_trade_category
+                        ticker.categories.add(swing_trade_category)
+                    else:
+                        # Remove the swing trade category.
+                        ticker.categories.remove(swing_trade_category)
                     ticker.save()
 
         if opp_status == '0':
