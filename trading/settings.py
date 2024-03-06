@@ -187,19 +187,39 @@ if not os.path.exists(LOGGING_DIR):
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'stderr': {
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGGING_DIR, 'stderr.log'),
             'level': 'ERROR',
         },
+        'scheduled_tasks': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': 'scheduled_tasks.log',
+            'when': 'midnight',  # Rotate log file at midnight
+            'backupCount': 7,  # Keep 7 days of logs
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django': {
             'handlers': ['stderr'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': True,
         },
+        'scheduled_tasks': {
+            'handlers': ['scheduled_tasks'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+
     },
 }
 

@@ -217,7 +217,7 @@ def add_ticker(request):
                 print('Retrieving daily prices as new ticker added.')
                 download_prices(timeframe="Daily", ticker_symbol=ticker_symbol, trigger='User')
                 print('Updating metrics as new ticker added.')
-                update_ticker_metrics.update_ticker_metrics()
+                update_ticker_metrics.update_ticker_metrics(trigger='Manual')
             return redirect('ticker_config')
     else:
         form = TickerForm()
@@ -592,7 +592,7 @@ def five_min_price_list(request, ticker_id):
 
 @login_required
 def update_metrics_view(request, ticker_symbol):
-    update_ticker_metrics.update_ticker_metrics(ticker_symbol=ticker_symbol)
+    update_ticker_metrics.update_ticker_metrics(ticker_symbol=ticker_symbol, trigger='Manual')
     return HttpResponseRedirect(reverse('ticker_config'))  # Redirect to admin dashboard or any other desired URL
 
 @login_required

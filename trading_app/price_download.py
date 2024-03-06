@@ -20,7 +20,8 @@ import math
 from django.contrib.contenttypes.models import ContentType
 import time
 
-logger = logging.getLogger('django')
+default_logger = logging.getLogger('django')
+scheduled_logger = logging.getLogger('scheduled_tasks')
 
 def format_elapsed_time(start_time, end_time):
     """
@@ -51,7 +52,7 @@ def display_local_time():
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
-def get_price_data(ticker, interval, start_time, finish_time):
+def get_price_data(ticker, interval, start_time, finish_time, logger):
     # Fetching existing data from the database
     try:
         existing_data = DailyPrice.objects.filter(ticker=ticker).values()
@@ -171,7 +172,7 @@ def get_price_data(ticker, interval, start_time, finish_time):
     return combined_data
 
 
-def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset):
+def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logger):
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
     #print('start_day:',start_day,'timezone.make_naive(start_day):',timezone.make_naive(start_day))
     #print('finish_day:', finish_day, 'timezone.make_naive(finish_day):', timezone.make_naive(finish_day))
@@ -407,7 +408,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 from decimal import Decimal
 
 # Following function is no longer used. Replaced by identify_highs_lows2()
-def identify_highs_lows(df, window=20):
+def identify_highs_lows(df, logger, window=20):
     print('Detecting swing points...')
     logger.info(f'Detecting swing points...')
     df['swing_point_label'] = ''
@@ -552,7 +553,7 @@ def identify_highs_lows(df, window=20):
         df.at[index_label, 'swing_point_current_trend'] = final_swing_point_trend
     return df, final_swing_point_trend
 
-def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5):
+def identify_highs_lows_gann(ticker, df, logger, reversal_days=2, price_move_percent=1.5):
     # New function to compute swing points using WD Gann logic.
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
@@ -718,7 +719,7 @@ def identify_highs_lows_gann(ticker, df, reversal_days=2, price_move_percent=1.5
         print(f"Error in Gann #4 Buy2 for {ticker.symbol}: {e}")
 
 
-def identify_highs_lows2(df, window=20, price_move_percent=1.5):
+def identify_highs_lows2(df, logger, window=20, price_move_percent=1.5):
     # Rewriting function to count number of healthy bullish / bearish candles.
     # Healthy candle = > 1,5% price move from open to close AND body >=60% of total candle length.
     price_move_percent = price_move_percent / 100
@@ -922,7 +923,11 @@ def add_ema_and_trend(price_history):
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     try:
-        local_time = display_local_time()
+        if trigger == 'Cron':
+            logger = scheduled_logger
+        else:
+            logger = default_logger
+        display_local_time()
         print('Timeframe:', timeframe)
         print('ticker_symbol:', ticker_symbol)
         logger.info(f'Running download_prices() for ticker_symbol: {str(ticker_symbol)}')
@@ -964,7 +969,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
 
                 try:
                     # Request price data for the entire missing date range
-                    price_history = get_price_data(ticker, '1D', start_day, finish_day)
+                    price_history = get_price_data(ticker, '1D', start_day, finish_day, logger)
                     if len(price_history) >= 3:
                         # print('Step 11')
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
@@ -977,7 +982,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         # print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                         # if ticker.symbol == 'NNOX':
                         price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker,
-                                                                                                                 price_history,
+                                                                                                                 price_history, logger,
                                                                                                                  reversal_days=3,
                                                                                                                  price_move_percent=1.5)
                         # else:
@@ -1174,7 +1179,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 logger.info(f'Retrieving data from {str(start_day)} to {str(finish_day)}...')
 
                 # Request price data for the entire missing date range
-                price_history = get_price_data(ticker, interval, start_day, finish_day)
+                price_history = get_price_data(ticker, interval, start_day, finish_day, logger)
                 if len(price_history) >= 3:
                     #print('Step 11')
                     price_history = add_candle_data(price_history, candlestick_functions, column_names)
@@ -1186,7 +1191,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, reversal_days=3, price_move_percent=1.5)
+                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, logger, reversal_days=3, price_move_percent=1.5)
                     #else:
                     #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
@@ -1304,7 +1309,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 print('Checking 15 min data for', ticker.symbol)
 
                 # Get the list of missing dates
-                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, 23)
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day, 23, logger)
 
                 if missing_dates:
                     # Set start_day to the smallest date and finish_day to the largest date in missing_dates
@@ -1313,7 +1318,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     print('Retrieving data from ', start_day, ' to ', finish_day)
 
                     # Request price data for the entire missing date range
-                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    price_history = get_price_data(ticker, interval, start_day, finish_day, logger)
                     print('len(price_history):', len(price_history))
                     if len(price_history) >= 3:
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
@@ -1356,14 +1361,14 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 interval = '5m'
                 print('Checking 5 min data for', ticker.symbol)
                 # Get the list of missing dates
-                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day,23)
+                missing_dates = get_missing_dates(ticker, interval, start_day, finish_day,23, logger)
                 if missing_dates:
                     # Set start_day to the smallest date and finish_day to the largest date in missing_dates
                     start_day = min(missing_dates)
                     finish_day = max(missing_dates)
                     print('Retrieving data from ', start_day, ' to ', finish_day)
                     # Request price data for the entire missing date range
-                    price_history = get_price_data(ticker, interval, start_day, finish_day)
+                    price_history = get_price_data(ticker, interval, start_day, finish_day,logger)
                     print('len(price_history):', len(price_history))
                     if len(price_history) >= 3:
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
@@ -1403,54 +1408,55 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     except Exception as e:
         print(f"Error in download_prices(): {e}")
 
-# Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
-def category_price_download(category_name):
-    # Run the update_ticker_metrics function
-    strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
-                  GannPointEightSell,
-                  GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
-                  GannPointNineSell]
-    try:
-        start_time = time.time()  # Capture start time
-        tickers_for_throtlling = 195
-        logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
-        tickers = Ticker.objects.filter(categories__name=category_name)
-        ticker_count = Ticker.objects.filter(categories__name=category_name).count()
-        logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
-        if ticker_count > tickers_for_throtlling:
-            logger.error(f'Rate throttling will occur.')
-        else:
-            logger.error(f'No rate throttling needed.')
+if False:
+    # Fucntion to be called from cron job that downloads all missing daily prices for stocks in a given category name.
+    def category_price_download(category_name):
+        # Run the update_ticker_metrics function
+        strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
+                      GannPointEightSell,
+                      GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
+                      GannPointNineSell]
+        try:
+            start_time = time.time()  # Capture start time
+            tickers_for_throtlling = 195
+            logger.error(f'Price download starting for stocks in category "{str(category_name)}"...')
+            tickers = Ticker.objects.filter(categories__name=category_name)
+            ticker_count = Ticker.objects.filter(categories__name=category_name).count()
+            logger.error(f'Ticker_count of selected stocks: {str(ticker_count)}')
+            if ticker_count > tickers_for_throtlling:
+                logger.error(f'Rate throttling will occur.')
+            else:
+                logger.error(f'No rate throttling needed.')
 
-        # Iterate through all retrieved tickers and download prices.
-        for ticker in tickers:
-            start_time = display_local_time()  # record the start time of the loop
-            logger.error(f'ticker.symbol: {str(ticker.symbol)}')
+            # Iterate through all retrieved tickers and download prices.
+            for ticker in tickers:
+                start_time = display_local_time()  # record the start time of the loop
+                logger.error(f'ticker.symbol: {str(ticker.symbol)}')
 
-            # Download prices for this ticker
-            download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
+                # Download prices for this ticker
+                download_prices(timeframe='Daily', ticker_symbol=ticker.symbol)
 
-            # Look for trading opportunities for this ticker
-            logger.error(f'About to start process_trading_opportunities_single_ticker()')
-            process_trading_opportunities_single_ticker(ticker.symbol, strategies)
-            logger.error(f'Finished process_trading_opportunities_single_ticker()')
+                # Look for trading opportunities for this ticker
+                logger.error(f'About to start process_trading_opportunities_single_ticker()')
+                process_trading_opportunities_single_ticker(ticker.symbol, strategies)
+                logger.error(f'Finished process_trading_opportunities_single_ticker()')
 
-            end_time = display_local_time()  # record the end time of the loop
-            elapsed_time = end_time - start_time  # calculate elapsed time
-            logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
-            logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
-            logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
+                end_time = display_local_time()  # record the end time of the loop
+                elapsed_time = end_time - start_time  # calculate elapsed time
+                logger.error(f'elapsed_time.total_seconds(): {str(elapsed_time.total_seconds())} secs...')
+                logger.error(f'elapsed_time.total_seconds() < 20: {str(elapsed_time.total_seconds() < 20)} secs...')
+                logger.error(f'ticker_count > tickers_for_throtlling: {str(ticker_count > tickers_for_throtlling)} secs...')
 
-            if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
-                pause_duration = 20 - elapsed_time.total_seconds()
-                print('Rate throttling for',pause_duration,'secs...')
-                logger.error(f'Rate throttling for {str(pause_duration)} secs...')
-                sleep(pause_duration)
-        logger.error(f'Completed price download. Tickers processed: {ticker_count}')
-        end_time = time.time()  # Capture end time
-        elapsed_time_str = format_elapsed_time(start_time, end_time)
+                if elapsed_time.total_seconds() < 20 and ticker_count > tickers_for_throtlling:
+                    pause_duration = 20 - elapsed_time.total_seconds()
+                    print('Rate throttling for',pause_duration,'secs...')
+                    logger.error(f'Rate throttling for {str(pause_duration)} secs...')
+                    sleep(pause_duration)
+            logger.error(f'Completed price download. Tickers processed: {ticker_count}')
+            end_time = time.time()  # Capture end time
+            elapsed_time_str = format_elapsed_time(start_time, end_time)
 
-        # Log or print the elapsed time. Here's an example of logging it:
-        logger.error(f'Completed in {elapsed_time_str}')
-    except Exception as e:
-        print(f"Error in category_price_download: {e}")
+            # Log or print the elapsed time. Here's an example of logging it:
+            logger.error(f'Completed in {elapsed_time_str}')
+        except Exception as e:
+            print(f"Error in category_price_download: {e}")

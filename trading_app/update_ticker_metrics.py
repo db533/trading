@@ -7,10 +7,12 @@ from datetime import datetime, timedelta, timezone, date
 import time
 from .price_download import format_elapsed_time
 import logging
-logger = logging.getLogger('django')
+#logger = logging.getLogger('django')
+default_logger = logging.getLogger('django')
+scheduled_logger = logging.getLogger('scheduled_tasks')
 
 
-def display_local_time():
+def display_local_time(logger):
     # Get the current datetime in UTC
     utc_now = datetime.utcnow()
 
@@ -20,7 +22,7 @@ def display_local_time():
 
     # Format and print the local datetime
     local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
-    print(f'Current datetime: {local_datetime_str}')
+    logger.info(f'Current datetime: {local_datetime_str}')
 
 def compute_ma_200_trend_strength(ticker, data_points):
     ma_200_trend_strength = None
@@ -43,7 +45,7 @@ def compute_ma_200_trend_strength(ticker, data_points):
             ma_200_trend_strength = None
             print('Divide by zero error as last_closing_price =', last_closing_price)
     else:
-        print('To few data points to compute 200 day MA:', len(data_points))
+        print('Too few data points to compute 200 day MA:', len(data_points))
     ticker.ma_200_trend_strength = ma_200_trend_strength
     print('ma_200_trend_strength:',ma_200_trend_strength)
     return ticker
@@ -194,12 +196,12 @@ def uptrend_hl(ticker, data_points, latest_data_point):
         ticker.uptrend_hl_percent = 0
     return ticker
 
-def update_sr_level_data(ticker):
-    print('update_sr_level_data()...')
+def update_sr_level_data(ticker, logger):
+    logger.info('update_sr_level_data()...')
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
     latest_close_price = latest_candle.close_price if latest_candle else None
-    print('latest_close_price:', latest_close_price)
+    logger.debug('latest_close_price:', latest_close_price)
 
     # Computing the number of days from datetime to today for each DailyPrice instance
     current_date = date.today()
@@ -211,8 +213,8 @@ def update_sr_level_data(ticker):
     if latest_close_price is not None and nearest_level_value is not None:
         for dp in daily_prices_query:
             days_difference = (current_date - dp.datetime.date()).days
-            print('dp.level:',dp.level)
-            print('close_price_percentage:',(abs(dp.level-latest_close_price) / latest_close_price) * 100)
+            logger.debug(f'dp.level:{dp.level}')
+            logger.debug(f'close_price_percentage: {str((abs(dp.level-latest_close_price) / latest_close_price) * 100)}')
 
             if latest_close_price and latest_close_price != 0:
                 close_price_percentage = (abs(dp.level-latest_close_price) / latest_close_price) * 100
@@ -260,7 +262,7 @@ def update_sr_level_data(ticker):
 
         ticker.save()
     else:
-        print('No daily prices. Cannot compute metrics.')
+        logger.error('No daily prices. Cannot compute metrics.')
     return ticker
 
 def test_tae_strategy(ticker):
@@ -294,20 +296,24 @@ def test_tae_strategy(ticker):
         ticker.tae_strategy_score = 0
     return ticker
 
-def update_ticker_metrics(ticker_symbol="All"):
+def update_ticker_metrics(ticker_symbol="All", trigger='Cron'):
+    if trigger == 'Cron':
+        logger = scheduled_logger
+    else:
+        logger = default_logger
     start_time = time.time()
-    display_local_time()
+    display_local_time(logger)
 
-    print('Updating metrics:')
+    logger.info('Updating metrics:')
     if ticker_symbol == 'All':
         ticker_list = Ticker.objects.filter(is_daily=True)
     else:
         ticker_list = Ticker.objects.filter(symbol=ticker_symbol).filter(is_daily=True)
     for ticker in ticker_list:
-        print('Ticker:', ticker.symbol)
+        logger.info('Ticker:', ticker.symbol)
 
         # Recompute the support / resistance levels.
-        ticker = update_sr_level_data(ticker)
+        ticker = update_sr_level_data(ticker, logger)
 
         last_200_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:200]  # Get the last 200 data points
         last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 100 data points
@@ -342,13 +348,17 @@ def update_ticker_metrics(ticker_symbol="All"):
     # Log or print the elapsed time. Here's an example of logging it:
     logger.info(f'Completed in {elapsed_time_str}')
 
-def update_single_ticker_metrics(ticker_symbol):
+def update_single_ticker_metrics(ticker_symbol, trigger='Cron'):
     try:
-        print(f'Updating metrics for {ticker_symbol}...')
+        if trigger == 'Cron':
+            logger = scheduled_logger
+        else:
+            logger = default_logger
+        logger.info(f'Updating metrics for {ticker_symbol}...')
         ticker_list = Ticker.objects.filter(symbol=ticker_symbol)
         for ticker in ticker_list:
             # Recompute the support / resistance levels.
-            ticker = update_sr_level_data(ticker)
+            ticker = update_sr_level_data(ticker, logger)
 
             last_200_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:200]  # Get the last 200 data points
             last_100_data_points = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime')[:100]  # Get the last 100 data points
