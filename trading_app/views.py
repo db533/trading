@@ -23,7 +23,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 from time import sleep
-from .tasks import background_manual_category_download, background_manual_ticker_download, delete_ticker, background_update_ticker_strategies
+from .tasks import background_manual_ticker_download, delete_ticker, background_update_ticker_strategies
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
