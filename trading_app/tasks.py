@@ -13,7 +13,7 @@ from .update_ticker_metrics import *
 logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
 
-def display_local_time():
+def display_local_time(logger):
     # Get the current datetime in UTC
     utc_now = datetime.utcnow()
 
@@ -23,7 +23,7 @@ def display_local_time():
 
     # Format and print the local datetime
     local_datetime_str = local_datetime.strftime('%Y-%m-%d %H:%M:%S %Z')
-    print(f'Current datetime: {local_datetime_str}')
+    logger.info(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
 def background_manual_category_download(category_name):
