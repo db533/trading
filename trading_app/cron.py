@@ -160,7 +160,8 @@ if False:
 
 
 class DailyTSEPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['21:00']
+    #RUN_AT_TIMES = ['21:00']
+    RUN_AT_TIMES = ['15:45']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     #schedule = Schedule(run_every_mins=3)  # Run once a day
     code = 'trading_app.daily_tse_price_download_cron_job'
