@@ -95,11 +95,11 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             scheduled_logger.debug(f'time_difference: "{str(time_difference)}"')
 
             # Check if 18 hours have passed since the last update
-            if time_difference < timedelta(hours=28): # Adding 10 hours for the time difference
-                scheduled_logger.info(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
-                return
-            else:
-                scheduled_logger.info(f'More than 18 hours since the last update. Scheduling price download for "{ticker_symbol}".')
+            #if time_difference < timedelta(hours=28): # Adding 10 hours for the time difference
+            #    scheduled_logger.info(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
+            #    return
+            #else:
+            #    scheduled_logger.info(f'More than 18 hours since the last update. Scheduling price download for "{ticker_symbol}".')
         except DailyPrice.DoesNotExist:
             # If no DailyPrice exists, proceed with the download
             scheduled_logger.error(f'No DailyPrice record found for ticker "{ticker_symbol}". Proceeding with download.')
