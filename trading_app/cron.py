@@ -3,7 +3,8 @@
 from .models import Params
 from django_cron import CronJobBase, Schedule
 from .update_ticker_metrics import update_ticker_metrics
-from .price_download import download_prices, category_price_download
+from .price_download import download_prices
+#from .price_download import category_price_download
 from .update_strategies import process_trading_opportunities
 from .tasks import background_manual_category_download
 
