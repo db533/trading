@@ -2144,7 +2144,7 @@ def trading_opps_with_scheduled_trades(request):
     return redirect('trading_opps_with_trades', status=status)
 
 @login_required()
-def trading_opps_with_open_trades(request):
+def trading_opps_with_executed_trades(request):
     status = '2'
     # Redirect to the main view function with the status as a URL parameter
     return redirect('trading_opps_with_trades', status=status)

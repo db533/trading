@@ -145,9 +145,9 @@ if False:
 # RUN_AT_TIMES actually execute 3 hours later than defined here.
 
 # Download TSE prices. 295 prices.
-# Trust start time: 00:03
+# Trust start time: 22:30 (cron job at 22:31)
 # Run time 1:39
-# Should complete by 01:43
+# Should complete by 00:13
 
 # Cron job settings in CPanel:
 # These matches with the following run_at_times in this file: 21:00, 00:28
@@ -160,7 +160,7 @@ if False:
 
 
 class DailyTSEPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['21:00']
+    RUN_AT_TIMES = ['19:30']
     #RUN_AT_TIMES = ['15:45']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     #schedule = Schedule(run_every_mins=3)  # Run once a day
@@ -192,11 +192,11 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
 
 
 # Download US prices. 927 prices.
-# Trust start time: 01:48
+# Trust start time: 00:00, but will only start processing once TSE stocks have been downloaded, around 00:13
 # Run time 5:09
 # Should complete by 07:00
 class DailyUSPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['22:48']
+    RUN_AT_TIMES = ['21:00']
     #schedule = Schedule(run_at_times=RUN_AT_TIMES)
     schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.daily_us_price_download_cron_job'
