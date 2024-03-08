@@ -187,29 +187,24 @@ class GannPointOneBuy(BaseStrategy):
             if prior_hl_sp is not None and latest_price.close_price > last_sp_price:
                 duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                      later_candle=latest_price)
-                if duration_after_latest_sp < 6:
+                action_buy = True
+                elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp.price_object, later_candle=last_sp.price_object)
+                sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
+                price_retracement = last_sp_price - peak_sp_price
+                retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
+                rise_after_retracement = latest_price.close_price - last_sp_price
+                rise_after_retracement_percent_of_retracement = rise_after_retracement * 100 / (-price_retracement)
+                if rise_after_retracement / -price_retracement < 0.5:
+                    data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
+                            'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
+                            'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
+                            'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)),
+                            'duration_after_latest_sp' : str(duration_after_latest_sp), 'last_sp_price' : str(last_sp_price),
+                            'latest_price.close_price' : str(latest_price.close_price)} # recent_swing_points not as a string as it gets removed and accessed if present.
                     action_buy = True
-                    elapsed__duration = instance_difference_count(self.ticker, prior_hl_sp.price_object, later_candle=last_sp.price_object)
-                    sp_price_diff_vs_prior_high =  last_sp_price-prior_hl_price
-                    price_retracement = last_sp_price - peak_sp_price
-                    retracement_as_percent = price_retracement * 100 / (peak_sp_price - prior_hl_price)
-                    rise_after_retracement = latest_price.close_price - last_sp_price
-                    rise_after_retracement_percent_of_retracement = rise_after_retracement * 100 / (-price_retracement)
-                    if rise_after_retracement / -price_retracement < 0.5:
-                        data = {'sp_price_diff_vs_prior_high': str(sp_price_diff_vs_prior_high), 'price_retracement': str(price_retracement),
-                                'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
-                                'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
-                                'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)),
-                                'duration_after_latest_sp' : str(duration_after_latest_sp), 'last_sp_price' : str(last_sp_price),
-                                'latest_price.close_price' : str(latest_price.close_price)} # recent_swing_points not as a string as it gets removed and accessed if present.
-                        action_buy = True
-                    else:
-                        # Strategy is not valid
-                        logger.info(f'Price already rose > 50% of retracement. Strategy not valid.')
-                        action_buy = None
                 else:
                     # Strategy is not valid
-                    logger.info(f'Time since last SP > 5. Strategy not valid.')
+                    logger.info(f'Price already rose > 50% of retracement. Strategy not valid.')
                     action_buy = None
             else:
                 # Strategy is not valid
@@ -277,30 +272,25 @@ class GannPointOneSell(BaseStrategy):
             if prior_lh_sp is not None and latest_price.close_price < last_sp_price:
                 duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                      later_candle=latest_price)
-                if duration_after_latest_sp < 6:
-                    elapsed__duration = instance_difference_count(self.ticker, prior_lh_sp.price_object, later_candle=last_sp.price_object)
 
-                    sp_price_diff_vs_prior_low =  last_sp_price-prior_lh_price
-                    price_retracement = last_sp_price - trough_sp_price
-                    retracement_as_percent = price_retracement * 100 / (prior_lh_price - trough_sp_price)
-                    fall_after_retracement = latest_price.close_price - last_sp_price
-                    fall_after_retracement_percent_of_retracement = fall_after_retracement * 100 / (-price_retracement)
-                    if fall_after_retracement / -price_retracement < 0.5:
-                        data = {'sp_price_diff_vs_prior_low': str(sp_price_diff_vs_prior_low), 'price_retracement': str(price_retracement),
-                                'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
-                                'fall_after_retracement' : str(fall_after_retracement), 'recent_swing_points' : recent_swing_points,  # recent_swing_points not as a string as it gets removed and accessed if present.
-                                'fall_after_retracement_percent_of_retracement' : str(round(fall_after_retracement_percent_of_retracement,1)),
-                                'duration_after_latest_sp' : str(duration_after_latest_sp)}
-                        action_buy = False
-                    else:
-                        # Strategy is not valid
-                        logger.info(f'PRice fell >50% of retracement. Strategy not valid.')
-                        action_buy = None
+                elapsed__duration = instance_difference_count(self.ticker, prior_lh_sp.price_object, later_candle=last_sp.price_object)
+
+                sp_price_diff_vs_prior_low =  last_sp_price-prior_lh_price
+                price_retracement = last_sp_price - trough_sp_price
+                retracement_as_percent = price_retracement * 100 / (prior_lh_price - trough_sp_price)
+                fall_after_retracement = latest_price.close_price - last_sp_price
+                fall_after_retracement_percent_of_retracement = fall_after_retracement * 100 / (-price_retracement)
+                if fall_after_retracement / -price_retracement < 0.5:
+                    data = {'sp_price_diff_vs_prior_low': str(sp_price_diff_vs_prior_low), 'price_retracement': str(price_retracement),
+                            'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
+                            'fall_after_retracement' : str(fall_after_retracement), 'recent_swing_points' : recent_swing_points,  # recent_swing_points not as a string as it gets removed and accessed if present.
+                            'fall_after_retracement_percent_of_retracement' : str(round(fall_after_retracement_percent_of_retracement,1)),
+                            'duration_after_latest_sp' : str(duration_after_latest_sp)}
+                    action_buy = False
                 else:
                     # Strategy is not valid
-                    logger.info(f'Time since last SP > 5. Strategy not valid.')
+                    logger.info(f'PRice fell >50% of retracement. Strategy not valid.')
                     action_buy = None
-
             else:
                 # Strategy is not valid
                 action_buy = None
