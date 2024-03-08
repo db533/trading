@@ -1983,24 +1983,33 @@ def trading_opps_with_trades_view(request, status):
             commission_value = 1
         investment_value_currency = investment_value_eur / current_exchange_rate
 
-        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-        if latest_candle is not None:
-            latest_close_price = float(latest_candle.close_price)
+        # Get the Buy trade for the TradingOpp, if it exists.
+        trades = opp.trades.filter(action=1)  # Get all related trades
+        if len(trades) > 0:
+            # We have a Buy trade either planned or executed. Use this price for the calculations.
+            for trade in trades:
+                transaction_price = trade.price
         else:
-            latest_close_price = 0
+            # No Buy trade is found attached to this TradingOpp, so get the latest price and use that.
+            latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+            if latest_candle is not None:
+                latest_close_price = float(latest_candle.close_price)
+            else:
+                latest_close_price = 0
+            transaction_price = latest_close_price
         profit_taker_price = opp.profit_taker_price
-        if profit_taker_price is None or latest_close_price == 0:
+        if profit_taker_price is None or transaction_price == 0:
             # Missing some values to compute trade profits
             trade_profit = 0
         else:
-            units = round(investment_value_currency / latest_close_price,0)
-            trade_profit = ((profit_taker_price - latest_close_price) * units * current_exchange_rate) - (commission_value * 2 * current_exchange_rate)
+            units = round(investment_value_currency / transaction_price,0)
+            trade_profit = ((profit_taker_price - transaction_price) * units * current_exchange_rate) - (commission_value * 2 * current_exchange_rate)
         opp.trade_profit = round(trade_profit,2)
         opp.current_exchange_rate = current_exchange_rate
 
         # Compute the breakeven_price.
-        opp.breakeven_price = round(latest_close_price + ((commission_value * 2) / units),2)
-        opp.breakeven_rise_percent = round(((opp.breakeven_price / latest_close_price)-1)*100,1)
+        opp.breakeven_price = round(transaction_price + ((commission_value * 2) / units),2)
+        opp.breakeven_rise_percent = round(((opp.breakeven_price / transaction_price)-1)*100,1)
 
 
     #if status == '0':
