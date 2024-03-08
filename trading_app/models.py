@@ -200,7 +200,7 @@ class TradingOpp(models.Model):
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
             # Get the Buy trades that are linked to this TradingOpp
-            trades = self.trades.filter(action=1)  # Get all related trades
+            trades = self.trades.filter(action=1)  # Get all related Buy trades
             if len(trades) > 0:
                 # We have a Buy trade either planned or executed. Use this price for the calculations.
                 for trade in trades:

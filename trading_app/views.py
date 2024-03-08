@@ -1963,8 +1963,11 @@ def task_queue_view(request):
 @login_required()
 def trading_opps_with_trades_view(request, status):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
-    trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
-    #trading_opps = TradingOpp.objects.filter(trades__status=status).order_by('-datetime_identified', '-id')
+    if status = '2b':
+        # Request for executed, but still open trades.
+        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
+    else:
+        trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
     # Determine the commission and exchange rate to be used for this stock
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
     for opp in trading_opps:
@@ -2010,14 +2013,6 @@ def trading_opps_with_trades_view(request, status):
         # Compute the breakeven_price.
         opp.breakeven_price = round(transaction_price + ((commission_value * 2) / units),2)
         opp.breakeven_rise_percent = round(((opp.breakeven_price / transaction_price)-1)*100,1)
-
-
-    #if status == '0':
-    #    title = 'Planned trades'
-    #elif status == '1':
-    #    title = 'Scheduled trades'
-    #else:
-    #    title = 'Executed trades'
 
     # Determine if the request is from a mobile device
     is_mobile = request.user_agent.is_mobile
@@ -2165,8 +2160,8 @@ def trading_opps_with_executed_trades(request):
     return redirect('trading_opps_with_trades', status=status)
 
 @login_required()
-def trading_opps_with_completed_trades(request):
-    status = '3'
+def trading_opps_with_open_trades(request):
+    status = '2b'
     # Redirect to the main view function with the status as a URL parameter
     return redirect('trading_opps_with_trades', status=status)
 
