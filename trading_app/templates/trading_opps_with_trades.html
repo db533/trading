@@ -8,6 +8,7 @@
     <h1>{% if status == "0" %}Planned trades
         {% elif status == "1" %}Scheduled trades
         {% elif status == "2b" %}Open trades
+        {% elif status == "3" %}Completed trades
         {% else %}All Executed trades
         {% endif%}</h1>
     {% for opp in trading_opps %}

@@ -1968,6 +1968,9 @@ def trading_opps_with_trades_view(request, status):
         trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).order_by('-reward_risk', '-id')
         #trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).filter(
         #    trades__status=status).distinct().order_by('-reward_risk', '-id')
+    elif status == '3':
+        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0,trades__status='2').distinct().order_by('-reward_risk', '-id')
+
     else:
         trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
     # Determine the commission and exchange rate to be used for this stock
@@ -2167,6 +2170,11 @@ def trading_opps_with_open_trades(request):
     # Redirect to the main view function with the status as a URL parameter
     return redirect('trading_opps_with_trades', status=status)
 
+@login_required()
+def trading_opps_with_completed_trades(request):
+    status = '3'
+    # Redirect to the main view function with the status as a URL parameter
+    return redirect('trading_opps_with_trades', status=status)
 
 
 from django.http import HttpResponseRedirect
