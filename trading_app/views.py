@@ -1965,7 +1965,9 @@ def trading_opps_with_trades_view(request, status):
     # Generate list of Trading Opps, both incomplete and complete and show how profit arises
     if status == '2b':
         # Request for executed, but still open trades.
-        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
+        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).order_by('-reward_risk', '-id')
+        #trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).filter(
+        #    trades__status=status).distinct().order_by('-reward_risk', '-id')
     else:
         trading_opps = TradingOpp.objects.filter(trades__status=status).distinct().order_by('-reward_risk', '-id')
     # Determine the commission and exchange rate to be used for this stock
