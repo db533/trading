@@ -4,6 +4,7 @@
 <h2>Edit All Params</h2>
 <form method="post">
     {% csrf_token %}
+    <p>JPY exchagne rate can be entered as EUR to JPY. View will compute JPY to EUR</p>
     <table>
     {% for param in params %}
       <tr>

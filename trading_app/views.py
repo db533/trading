@@ -2289,7 +2289,13 @@ def edit_all_params(request):
             if key != 'csrfmiddlewaretoken':  # Exclude the CSRF token
                 try:
                     param = Params.objects.get(key=key)
-                    param.value = request.POST[key]
+                    if key == "jpy_rate":
+                        jpy_rate = request.POST[key]
+                        if jpy_rate > 0:
+                            # Rate must be EUR to JPY
+                            jpy_rate = 1 / jpy_rate
+                        else:
+                            param.value = request.POST[key]
                     param.save()
                 except Params.DoesNotExist:
                     # Handle the error or ignore if the key should always exist
