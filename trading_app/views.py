@@ -2042,8 +2042,14 @@ def trade_performance_list(request):
         latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         if latest_candle is not None:
             opp.latest_close_price = float(latest_candle.close_price)
+            opp.latest_price_datetime = latest_candle.datetime
+            # Compute the elapsed number of days between today and this date
+            today = datetime.now().date()
+            elapsed_days = (today - opp.latest_price_datetime.date()).days
+            opp.days_since_last_price = elapsed_days
         else:
             opp.latest_close_price = 0
+            opp.days_since_last_price = None  # or a default value, if appropriate
 
         # Determine the commission and exchange rate to be used for this stock
         tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
