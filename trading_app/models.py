@@ -199,20 +199,31 @@ class TradingOpp(models.Model):
 
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
-            # Assuming DailyPrice model is related to Ticker and has a close_price field
-            daily_price = self.ticker.dailyprice_set.order_by('-datetime').first()
-            if daily_price:  # Check if a DailyPrice instance was found
-                latest_price = float(daily_price.close_price)
+            # Get the Buy trades that are linked to this TradingOpp
+            trades = self.trades.filter(action=1)  # Get all related trades
+            if len(trades) > 0:
+                # We have a Buy trade either planned or executed. Use this price for the calculations.
+                for trade in trades:
+                    transaction_price = trade.price
+            else:
+                # We do not have a Buy trade associated, so use the latest close price.
+                daily_price = self.ticker.dailyprice_set.order_by('-datetime').first()
+                if daily_price:  # Check if a DailyPrice instance was found
+                    latest_price = float(daily_price.close_price)
+                    transaction_price = latest_price
+                else:
+                    transaction_price = None
+            if transaction_price:
                 action_buy = self.action_buy
                 try:
                     if action_buy == "1":
                         # Action is a buy. Compute reward / risk this way:
                         self.reward_risk = round(
-                            (self.profit_taker_price - latest_price) * 100 / (latest_price - self.stop_loss_price))
+                            (self.profit_taker_price - transaction_price) * 100 / (transaction_price - self.stop_loss_price))
                     else:
                         # Action is a sell. Compute reward / risk this way:
                         self.reward_risk = round(
-                            (latest_price - self.profit_taker_price) * 100 / (self.stop_loss_price - latest_price))
+                            (transaction_price - self.profit_taker_price) * 100 / (self.stop_loss_price - transaction_price))
 
                 except ZeroDivisionError:
                     self.reward_risk = None  # Handle division by zero if purchase_price equals stop_loss_price
