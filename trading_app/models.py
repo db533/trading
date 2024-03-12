@@ -234,6 +234,7 @@ class WaveValueRule(models.Model):
     parameter = models.CharField(max_length=100)
     compare_with_wave = models.IntegerField(help_text="Index indicating the wave to compare with. E.g., -1 for the prior wave.")
     multiplier = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    comparison_value = models.CharField(max_length=100, help_text="A value that must match")
     comparison_function = models.CharField(max_length=50, help_text="Boolean comparison function (e.g., 'lt', 'gt', 'eq').")
     result = models.BooleanField(default=False, help_text="Result of the rule evaluation.")
     seq_no = models.PositiveIntegerField(help_text="Sequence number for ordering rule evaluations.")
