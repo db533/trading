@@ -240,7 +240,7 @@ class WaveValueRule(models.Model):
     seq_no = models.PositiveIntegerField(help_text="Sequence number for ordering rule evaluations.")
 
     def __str__(self):
-        return f"Rule {self.seq_no}: {self.parameter} {self.comparison_function} with wave {self.compare_with_wave}"
+        return f"Rule {self.seq_no}: {self.parameter} x {self.multiplier} or value { self.comparison_value } {self.comparison_function} with wave {self.compare_with_wave}"
 
 class WaveRuleCombineRule(models.Model):
     operation = models.CharField(max_length=3, choices=(('AND', 'AND'), ('OR', 'OR')), help_text="Logical operation to perform on rule results.")
