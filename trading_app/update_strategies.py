@@ -712,6 +712,7 @@ class GannPointFiveBuy(BaseStrategy):
                     logger.info(f'Found a prior {swing_point.label}.')
                     if swing_point.label == 'LL':
                         section_count += 1
+                        most_recent_duration = swing_point.candle_count_since_last_swing_point
                         #most_recent_swing_label = swing_point.swing_point_label
                         recent_swing_points.append(swing_point)
                         if T_most_recent is None:

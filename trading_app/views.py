@@ -2041,6 +2041,8 @@ def trade_performance_list(request):
     trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
 
     cum_eur_invested = 0
+    cum_unrealised_value = 0
+    cum_realised_profit_eur = 0
     # Group TradingOpps by date, ignoring time
     for opp in trading_opps:
         # Get the trades for the opp and check if there is a positive balance of units
@@ -2122,6 +2124,8 @@ def trade_performance_list(request):
             opp.commissions_expected_eur = 0
         opp.unrealised_profit_currency = round(opp.realised_profit_currency + opp.value_of_holding_currency - opp.commissions_expected_currency,2)
         opp.unrealised_profit_eur = round(opp.realised_profit_eur + opp.value_of_holding_eur - opp.commissions_expected_eur,2)
+        cum_unrealised_value += round(opp.value_of_holding_eur - opp.commissions_expected_eur,2)
+        cum_realised_profit_eur += round(opp.realised_profit_eur,2)
         if opp.realised_profit_eur > 0:
             opp.colour = 'lightgreen'
         elif opp.unrealised_profit_eur > 0:
@@ -2131,18 +2135,27 @@ def trade_performance_list(request):
         else:
             opp.colour = 'lightpink'
 
-    # Let's compute a summary of current status.
-    # EUR currently invested in swing trade opportunities = cum_eur_invested
-    # EUR available for investing.
-
-    # Cumulative realised profit
-    # Cumulative unrealised profit
+    # Checking if cumulative values have changes from yesterday.
+    # Get the saved value in Params for today.
+    saved_unrealised_value_today = Params.objects.get(key='saved_unrealised_value_today')
+    saved_unrealised_value_yesterday = Params.objects.get(key='saved_unrealised_value_yesterday')
+    if float(saved_unrealised_value_today.value) != cum_unrealised_value:
+        # If it is different, save today's value to yesterday's
+        # Save new value to today.
+        saved_unrealised_value_yesterday.value = round(saved_unrealised_value_today.value,2)
+        saved_unrealised_value_yesterday.save()
+        saved_unrealised_value_today.value = round(cum_unrealised_value,2)
+        saved_unrealised_value_today.save()
 
 
 
     context = {
         'trading_opps': trading_opps,
-        'cum_eur_invested' : round(cum_eur_invested,2)
+        'cum_eur_invested' : round(cum_eur_invested,2),
+        'unrealised_value_yesterday' : saved_unrealised_value_yesterday.value,
+        'unrealised_value_today': cum_unrealised_value,
+        'cum_realised_profit_eur_today' : cum_realised_profit_eur,
+        'cum_realised_profit_eur_yesterday': None
     }
     return render(request, 'trade_performance_list.html', context)
 

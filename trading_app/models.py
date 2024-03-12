@@ -238,7 +238,7 @@ class WaveType(models.Model):
     def __str__(self):
         return self.name
 
-class Wave(models.Model):
+class WaveInstance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start_sp = models.ForeignKey(SwingPoint, on_delete=models.CASCADE, related_name='starting_waves', verbose_name="Start Swing Point")
     end_sp = models.ForeignKey(SwingPoint, on_delete=models.CASCADE, related_name='ending_waves', verbose_name="End Swing Point")
@@ -287,14 +287,14 @@ class Wave(models.Model):
 class WavePattern(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
-    waves = models.ManyToManyField(Wave, through='WaveSequence')
+    waves = models.ManyToManyField(WaveInstance, through='WaveSequence')
 
     def __str__(self):
         return self.name
 
 class WaveSequence(models.Model):
     wave_pattern = models.ForeignKey(WavePattern, on_delete=models.CASCADE)
-    wave = models.ForeignKey(Wave, on_delete=models.CASCADE)
+    wave = models.ForeignKey(WaveInstance, on_delete=models.CASCADE)
     order = models.PositiveIntegerField()
 
     class Meta:

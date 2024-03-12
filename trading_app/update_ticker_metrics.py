@@ -201,7 +201,7 @@ def update_sr_level_data(ticker, logger):
     daily_prices_query = DailyPrice.objects.filter(ticker=ticker, level__isnull=False).only('datetime', 'level', 'level_strength')
     latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
     latest_close_price = latest_candle.close_price if latest_candle else None
-    logger.debug('latest_close_price:', latest_close_price)
+    logger.debug(f'latest_close_price: {latest_close_price}' )
 
     # Computing the number of days from datetime to today for each DailyPrice instance
     current_date = date.today()
