@@ -2329,8 +2329,8 @@ def edit_all_params(request):
                             # Rate must be EUR to JPY
                             jpy_rate = 1 / jpy_rate
                             param.value = jpy_rate
-                        else:
-                            param.value = request.POST[key]
+                    else:
+                        param.value = request.POST[key]
                     param.save()
                 except Params.DoesNotExist:
                     # Handle the error or ignore if the key should always exist
