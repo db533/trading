@@ -217,4 +217,25 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
         # Log or print the elapsed time. Here's an example of logging it:
         logger.info(f'DailyUSPriceDownloadCronJob completed in {elapsed_time_str}')
 
+class NightlyPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['19:30']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=1)  # Run once a day
+    code = 'trading_app.nightly_price_download_cron_job'
+
+    def do(self):
+        start_time = time.time()  # Capture start time
+        logger.info(f'NightlyPriceDownloadCronJob starting at {start_time}')
+        display_local_time()
+        background_manual_category_download('TSE stocks')
+        background_manual_category_download('US stocks')
+        # background_manual_category_download('Test tickers')
+        display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'NightlyPriceDownloadCronJob completed in {elapsed_time_str}')
 
