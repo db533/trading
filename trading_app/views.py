@@ -2142,7 +2142,7 @@ def trade_performance_list(request):
     if float(saved_unrealised_value_today.value) != cum_unrealised_value:
         # If it is different, save today's value to yesterday's
         # Save new value to today.
-        saved_unrealised_value_yesterday.value = round(saved_unrealised_value_today.value,2)
+        saved_unrealised_value_yesterday.value = round(float(saved_unrealised_value_today.value),2)
         saved_unrealised_value_yesterday.save()
         saved_unrealised_value_today.value = round(cum_unrealised_value,2)
         saved_unrealised_value_today.save()
