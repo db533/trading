@@ -169,6 +169,7 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
     def do(self):
         start_time = time.time()  # Capture start time
         current_datetime = datetime.now()
+        logger.info(f'Starting DailyTSEPriceDownloadCronJob at {current_datetime}...')
 
         display_local_time()
         # Save the start time for the night process

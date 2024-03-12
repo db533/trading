@@ -233,7 +233,8 @@ class TradingOpp(models.Model):
 
 class WaveType(models.Model):
     name = models.CharField(max_length=100)
-    rules = models.JSONField(default=list)  # Holds rule definitions for this wave type
+    value_rules = models.ManyToManyField(WaveValueRule, related_name='wave_types', blank=True)
+    combine_rules = models.ManyToManyField(WaveRuleCombineRule, related_name='wave_types', blank=True)
 
     def __str__(self):
         return self.name
@@ -299,6 +300,53 @@ class WaveSequence(models.Model):
 
     class Meta:
         ordering = ['order']
+
+class WaveValueRule(models.Model):
+    parameter = models.CharField(max_length=100)
+    compare_with_wave = models.IntegerField(help_text="Index indicating the wave to compare with. E.g., -1 for the prior wave.")
+    multiplier = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    comparison_function = models.CharField(max_length=50, help_text="Boolean comparison function (e.g., 'lt', 'gt', 'eq').")
+    result = models.BooleanField(default=False, help_text="Result of the rule evaluation.")
+    seq_no = models.PositiveIntegerField(help_text="Sequence number for ordering rule evaluations.")
+
+    def __str__(self):
+        return f"Rule {self.seq_no}: {self.parameter} {self.comparison_function} with wave {self.compare_with_wave}"
+
+class WaveRuleCombineRule(models.Model):
+    operation = models.CharField(max_length=3, choices=(('AND', 'AND'), ('OR', 'OR')), help_text="Logical operation to perform on rule results.")
+    rules = models.ManyToManyField(WaveValueRule, related_name='combine_rules', through='WaveRuleCombineRelation')
+    seq_no = models.PositiveIntegerField(help_text="Sequence number for ordering combined rule evaluations.")
+
+    def __str__(self):
+        return f"Combine Rule {self.seq_no} with operation {self.operation}"
+
+class WaveRuleCombineRelation(models.Model):
+    combine_rule = models.ForeignKey(WaveRuleCombineRule, on_delete=models.CASCADE)
+    value_rule = models.ForeignKey(WaveValueRule, on_delete=models.CASCADE)
+    seq_no = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['seq_no']
+
+from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+class RuleEvaluation(models.Model):
+    wave_instance = models.ForeignKey(WaveInstance, on_delete=models.CASCADE, related_name='rule_evaluations')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': ('wavevaluerule', 'waverulecombinerule')})
+    object_id = models.PositiveIntegerField()
+    rule = GenericForeignKey('content_type', 'object_id')
+
+    seq_no = models.PositiveIntegerField(help_text="Sequence number for the rule evaluation.")
+    parameter_values = models.JSONField(default=dict, help_text="Parameter values used in the evaluation.")
+    evaluation_result = models.BooleanField(help_text="Result of the rule evaluation.")
+
+    class Meta:
+        ordering = ['seq_no']
+
+    def __str__(self):
+        return f"Evaluation for {self.rule} in {self.wave_instance}"
 
 class Trade(models.Model):
     date = models.DateTimeField(auto_now_add=True)
