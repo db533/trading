@@ -2325,7 +2325,7 @@ def edit_all_params(request):
                     param = Params.objects.get(key=key)
                     if key == "jpy_rate":
                         jpy_rate = float(request.POST[key])
-                        if jpy_rate > 0:
+                        if jpy_rate > 1:
                             # Rate must be EUR to JPY
                             jpy_rate = 1 / jpy_rate
                             param.value = jpy_rate
