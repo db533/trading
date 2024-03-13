@@ -32,10 +32,10 @@
                             <a href="{% url 'edit_all_params' %}" target="_blank">Edit parameters</a>
                         {% elif task.seq_no == 20 %}
                             <!-- Check Interactive Brokers for executed trades -->
-                            <a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site<br>
-                            <a href="{% url 'trading_opps_with_trades' '1'|urlencode %} " target="_blank">Scheduled trades - update with actual price and mark as executed.</a><br>
-                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - If stoploss executed, update the TradingOpp.</a><br>
-                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - add trades.</a>
+                            <li><a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site</li>
+                            <li><a href="{% url 'trading_opps_with_trades' '1'|urlencode %} " target="_blank">Scheduled trades - update with actual price and mark as executed.</a></li>
+                            <li><a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - If stoploss executed, update the TradingOpp.</a></li>
+                            <li><a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - add trades.</a></li>
                         {% elif task.seq_no == 30 %}
                             <!-- Check if any positions should have their stoploss adjusted -->
                             Check for open trades using Gann strategy #9. Amend the stop loss to yesterday's low. Open trades to amend:<br>
@@ -44,6 +44,9 @@
                             {% endfor %}
                         {% elif task.seq_no == 35 %}
                             Increase stop loss to avoid losing gains that have already been made.
+                            {% for opp_list in open_trading_opps_higher_price_list %}
+                                <li><strong>{{ opp_list.0.symbol }}</strong>. Latest price: {{ opp_list.1 }}. Stop loss: {{ opp_list.2 }} (+{{ opp_list.3 }}%)</li>
+                            {% endfor %}
                         {% elif task.seq_no == 40 %}
                             <!-- Check if any open swing trades have an invalidated Trading Opp. -->
                             <a href="{% url 'trading-opps' %}?action=sell&category=4" target="_blank">Sell recommendations for existing swing trades.</a> Most likely need to exit the trade.<br>

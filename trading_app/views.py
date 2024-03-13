@@ -2458,6 +2458,8 @@ def daily_tasks_view(request):
         amount_still_invested_currency__gt=0
     )
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+
+    # Find open trading Opps using Gann #9 strategies. These need their stop loss corrected on a daily basis
     open_nine_trading_opps_list = []
     for opp in open_nine_trading_opps:
         ticker=opp.ticker
@@ -2469,6 +2471,29 @@ def daily_tasks_view(request):
         else:
             new_stop_loss = float(latest_low) - 0.01
         open_nine_trading_opps_list.append([ticker, new_stop_loss])
+
+    # Find open trades where the latest price is more than 2% above the purchase price.
+    # latest price - stop loss / stop loss > 0.02, highlight for potential adjustment.
+    open_trading_opps_higher_price_list = []
+    for opp in TradingOpp.objects.filter(is_active=True):
+        ticker = opp.ticker
+        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        latest_price = float(latest_candle.close_price)  # Assuming you have close_price as the latest price
+
+        buy_trades = opp.trades.filter(action='1', status='2').order_by('date')
+        if buy_trades.exists():
+            buy_trade_price = float(buy_trades.first().price)  # Assuming the first executed buy trade price is what we want
+
+            price_increase_percentage = ((latest_price - buy_trade_price) / buy_trade_price) * 100
+            if opp.stop_loss_price:
+                stop_loss_difference_percentage = ((latest_price - opp.stop_loss_price) / latest_price) * 100
+            else:
+                stop_loss_difference_percentage = 0  # Default or handling case when stop_loss_price might be None
+
+            # Check if latest price is > 2% higher than buy trade price and stop loss is > 2% lower than the latest price
+            if price_increase_percentage > 2 and stop_loss_difference_percentage > 2:
+                open_trading_opps_higher_price_list.append([ticker, latest_price, opp.stop_loss_price, round(stop_loss_difference_percentage,1)])
+
     if request.method == 'POST':
         for key, value in request.POST.items():
             if key.startswith('completed_'):
@@ -2483,6 +2508,7 @@ def daily_tasks_view(request):
         'tasks': tasks,
         'open_nine_trading_opps': open_nine_trading_opps,
         'open_nine_trading_opps_list' : open_nine_trading_opps_list,
+        'open_trading_opps_higher_price_list' : open_trading_opps_higher_price_list,
     }
     return render(request, 'daily_tasks.html', context)
 
