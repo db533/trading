@@ -2463,4 +2463,4 @@ def daily_tasks_view(request):
         return redirect('name_of_your_url_for_this_view')
 
     tasks = DailyTasks.objects.order_by('seq_no')
-    return render(request, 'your_app/daily_tasks.html', {'tasks': tasks})
+    return render(request, 'daily_tasks.html', {'tasks': tasks})
