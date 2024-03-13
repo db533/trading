@@ -8,7 +8,7 @@
     <h1>Daily Tasks</h1>
         <form method="post">
             {% csrf_token %}
-            <table>
+            <table border="1">
                 <thead>
                     <tr>
                         <th>Completed</th>
@@ -22,13 +22,20 @@
                         <td>
                             <input type="checkbox" name="completed_{{ task.seq_no }}" {% if task.completed %} checked {% endif %}>
                         </td>
-                        <td>{{ task.task_name }}<br>
+                        <td><strong>{{ task.task_name }}</strong><br>
                         <!-- Add cells for additional custom content here -->
                         {% if task.seq_no == 10 %}
                             <!-- Update exchange rates -->
                             <a href="https://www.google.com/finance/quote/USD-EUR">USD exchange rate</a><br>
                             <a href="https://www.google.com/finance/quote/EUR-JPY">USD exchange rate</a><br>
                             <a href="{% url 'edit_all_params' %}">Edit parameters</a>
+                        {% elif task.seq_no == 20 %}
+                            <!-- Check Interactive Brokers for executed trades -->
+                            <a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site<br>
+                            <a href="{% url 'trading_opps_with_trades' '1'|urlencode %}">Scheduled trades - update with actual price and mark as executed.</a>
+                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}">Open trades - If stoploss executed, update the TradingOpp.</a>
+                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}">Open trades - add trades.</a>
+
                         {% endif %}
                         </td>
                     </tr>
