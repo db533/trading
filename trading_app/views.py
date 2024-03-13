@@ -2465,9 +2465,9 @@ def daily_tasks_view(request):
         latest_low = latest_candle.low_price
         is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
         if is_in_tse_stocks:
-            new_stop_loss = latest_low - 1
+            new_stop_loss = float(latest_low) - 1
         else:
-            new_stop_loss = latest_low - 0.01
+            new_stop_loss = float(latest_low) - 0.01
         open_nine_trading_opps_list.append([ticker, new_stop_loss])
     if request.method == 'POST':
         for key, value in request.POST.items():
