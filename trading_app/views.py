@@ -2454,7 +2454,7 @@ from .models import DailyTasks
 @require_http_methods(["GET", "POST"])
 def daily_tasks_view(request):
     open_nine_trading_opps = TradingOpp.objects.filter(
-        strategy__id__in=[8, 9],
+        strategy__id__in=[14,15],
         amount_still_invested_currency__gt=0
     )
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
