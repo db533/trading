@@ -2453,6 +2453,22 @@ from .models import DailyTasks
 
 @require_http_methods(["GET", "POST"])
 def daily_tasks_view(request):
+    open_nine_trading_opps = TradingOpp.objects.filter(
+        strategy__id__in=[8, 9],
+        amount_still_invested_currency__gt=0
+    )
+    tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+    open_nine_trading_opps_list = []
+    for opp in open_nine_trading_opps:
+        ticker=opp.ticker
+        latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+        latest_low = latest_candle.low_price
+        is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+        if is_in_tse_stocks:
+            new_stop_loss = latest_low - 1
+        else:
+            new_stop_loss = latest_low - 0.01
+        open_nine_trading_opps_dict.append([ticker, new_stop_loss])
     if request.method == 'POST':
         for key, value in request.POST.items():
             if key.startswith('completed_'):
@@ -2463,7 +2479,12 @@ def daily_tasks_view(request):
         return redirect('daily_tasks')
 
     tasks = DailyTasks.objects.order_by('seq_no')
-    return render(request, 'daily_tasks.html', {'tasks': tasks})
+    context = {
+        'tasks': tasks,
+        'open_nine_trading_opps': open_nine_trading_opps,
+        'open_nine_trading_opps_list' : open_nine_trading_opps_list,
+    }
+    return render(request, 'daily_tasks.html', context)
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse

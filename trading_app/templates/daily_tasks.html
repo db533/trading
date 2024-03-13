@@ -38,7 +38,10 @@
                             <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - add trades.</a>
                         {% elif task.seq_no == 30 %}
                             <!-- Check if any positions should have their stoploss adjusted -->
-                            Check for open trades using Gann strategy #9. Amend the stop loss to yesterday's low.<br>
+                            Check for open trades using Gann strategy #9. Amend the stop loss to yesterday's low. Open trades to amend:<br>
+                            {% for opp_list in open_nine_trading_opps_list %}
+                                <li><strong>{{ opp_list.0.symbol }}</strong>. New stop loss should be {{ opp_list.1 }}</li>
+                            {% endfor %}
                             Check for open positions sufficiently above the entry price. Increase stop loss.
                         {% elif task.seq_no == 40 %}
                             <!-- Check if any open swing trades have an invalidated Trading Opp. -->
@@ -57,7 +60,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <br><br><button type="submit">Update Tasks</button>
+            <br><button type="submit">Update Tasks</button>
         </form>
 </body>
 {% endblock %}

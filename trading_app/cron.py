@@ -219,9 +219,9 @@ if False:
 
 
 class NightlyPriceDownloadCronJob(CronJobBase):
-    RUN_AT_TIMES = ['19:30']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    #schedule = Schedule(run_every_mins=1)  # Run once a day
+    #RUN_AT_TIMES = ['19:30']
+    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    schedule = Schedule(run_every_mins=1)  # Run once a day
     code = 'trading_app.nightly_price_download_cron_job'
 
     def do(self):
