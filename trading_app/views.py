@@ -2464,3 +2464,10 @@ def daily_tasks_view(request):
 
     tasks = DailyTasks.objects.order_by('seq_no')
     return render(request, 'daily_tasks.html', {'tasks': tasks})
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+def clear_completed_tasks(request):
+    DailyTasks.objects.all().update(completed=False)
+    return HttpResponseRedirect(reverse('daily_tasks'))

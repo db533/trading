@@ -49,6 +49,7 @@ urlpatterns = [
     path('params/edit-all/', edit_all_params, name='edit_all_params'),
     path('monthly-performance/', monthly_trading_performance_view, name='monthly_performance'),
     path('daily-tasks/', daily_tasks_view, name='daily_tasks'),
+    path('clear-completed/', clear_completed_tasks, name='clear_completed_tasks'),
 
 ]
 
