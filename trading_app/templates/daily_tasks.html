@@ -42,7 +42,8 @@
                             {% for opp_list in open_nine_trading_opps_list %}
                                 <li><strong>{{ opp_list.0.symbol }}</strong>. New stop loss should be {{ opp_list.1 }}</li>
                             {% endfor %}
-                            Check for open positions sufficiently above the entry price. Increase stop loss.
+                        {% elif task.seq_no == 35 %}
+                            Increase stop loss to avoid losing gains that have already been made.
                         {% elif task.seq_no == 40 %}
                             <!-- Check if any open swing trades have an invalidated Trading Opp. -->
                             <a href="{% url 'trading-opps' %}?action=sell&category=4" target="_blank">Sell recommendations for existing swing trades.</a> Most likely need to exit the trade.<br>
