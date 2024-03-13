@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Daily Tasks</title>
+</head>
+<body>
+    <h1>Daily Tasks</h1>
+        <form method="post">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Completed</th>
+                        <th>Task Name</th>
+                        <!-- Add headers for additional custom content columns here -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="completed_{{ task.seq_no }}" {% if task.completed %} checked {% endif %}>
+                        </td>
+                        <td>{{ task.task_name }}</td>
+                        <!-- Add cells for additional custom content here -->
+                        {% if task.seq_no == specific_seq_no %}
+                            <!-- Custom content based on seq_no -->
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit">Update Tasks</button>
+        </form>
+</body>
+{% endblock %}

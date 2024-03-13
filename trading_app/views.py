@@ -2446,3 +2446,21 @@ def update_all_strategies(request):
         logger.info(f'Scheduled strategy update for {ticker.symbol}.')
     logger.info(f'All strategy updates for tickers scheduled as background tasks.')
     return redirect('task_queue')
+
+from django.shortcuts import render, redirect
+from django.views.decorators.http import require_http_methods
+from .models import DailyTasks
+
+@require_http_methods(["GET", "POST"])
+def daily_tasks_view(request):
+    if request.method == 'POST':
+        for key, value in request.POST.items():
+            if key.startswith('completed_'):
+                seq_no = key.split('_')[1]
+                task = DailyTasks.objects.get(seq_no=seq_no)
+                task.completed = value == 'on'
+                task.save()
+        return redirect('name_of_your_url_for_this_view')
+
+    tasks = DailyTasks.objects.order_by('seq_no')
+    return render(request, 'your_app/daily_tasks.html', {'tasks': tasks})

@@ -409,3 +409,11 @@ class Params(models.Model):
 
     def __str__(self):
         return f"{self.key} - {self.value}"
+
+class DailyTasks(models.Model):
+    seq_no = models.IntegerField()
+    task_name = models.CharField(max_length=255)
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.task_name
