@@ -26,28 +26,28 @@
                         <!-- Add cells for additional custom content here -->
                         {% if task.seq_no == 10 %}
                             <!-- Update exchange rates -->
-                            <a href="https://www.google.com/finance/quote/USD-EUR">USD exchange rate</a><br>
-                            <a href="https://www.google.com/finance/quote/EUR-JPY">USD exchange rate</a><br>
-                            <a href="{% url 'edit_all_params' %}">Edit parameters</a>
+                            <a href="https://www.google.com/finance/quote/USD-EUR" target="_blank">USD exchange rate</a><br>
+                            <a href="https://www.google.com/finance/quote/EUR-JPY" target="_blank">USD exchange rate</a><br>
+                            <a href="{% url 'edit_all_params' %}" target="_blank">Edit parameters</a>
                         {% elif task.seq_no == 20 %}
                             <!-- Check Interactive Brokers for executed trades -->
                             <a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site<br>
-                            <a href="{% url 'trading_opps_with_trades' '1'|urlencode %}">Scheduled trades - update with actual price and mark as executed.</a><br>
-                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}">Open trades - If stoploss executed, update the TradingOpp.</a><br>
-                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}">Open trades - add trades.</a>
+                            <a href="{% url 'trading_opps_with_trades' '1'|urlencode %} " target="_blank">Scheduled trades - update with actual price and mark as executed.</a><br>
+                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - If stoploss executed, update the TradingOpp.</a><br>
+                            <a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - add trades.</a>
                         {% elif task.seq_no == 30 %}
                             <!-- Check if any positions should have their stoploss adjusted -->
                             Check for open trades using Gann strategy #9. Amend the stop loss to yesterday's low.<br>
                             Check for open positions sufficiently above the entry price. Increase stop loss.
                         {% elif task.seq_no == 40 %}
                             <!-- Check if any open swing trades have an invalidated Trading Opp. -->
-                            <a href="{% url 'trading-opps' %}?action=sell&category=4">Sell recommendations for existing swing trades.</a> Most likely need to exit the trade.<br>
+                            <a href="{% url 'trading-opps' %}?action=sell&category=4" target="_blank">Sell recommendations for existing swing trades.</a> Most likely need to exit the trade.<br>
                         {% elif task.seq_no == 50 %}
                             <!-- Check if any longterm positions should be exited. -->
-                            <a href="{% url 'trading-opps' %}?action=sell&category=1">Sell recommendations for longterm positions.</a> Consider exiting or reducing size of position.<br>
+                            <a href="{% url 'trading-opps' %}?action=sell&category=1" target="_blank">Sell recommendations for longterm positions.</a> Consider exiting or reducing size of position.<br>
                         {% elif task.seq_no == 60 %}
                             <!-- Review recent opportunities for good new swing trade investments. -->
-                            <a href="{% url 'trading_opps_sorted' %}?action=all">Recent Buy recommendations.</a><br>
+                            <a href="{% url 'trading_opps_sorted' %}?action=all" target="_blank">Recent Buy recommendations.</a><br>
                             Review chart. Is there evidence to support that this is a good entry?<br>
                             Enter a stop loss and profit taker price and schedule the trade if > 300% and profit > 20 EUR.
                         {% endif %}
