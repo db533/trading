@@ -2468,7 +2468,7 @@ def daily_tasks_view(request):
             new_stop_loss = latest_low - 1
         else:
             new_stop_loss = latest_low - 0.01
-        open_nine_trading_opps_dict.append([ticker, new_stop_loss])
+        open_nine_trading_opps_list.append([ticker, new_stop_loss])
     if request.method == 'POST':
         for key, value in request.POST.items():
             if key.startswith('completed_'):
