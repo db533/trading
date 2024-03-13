@@ -2460,7 +2460,7 @@ def daily_tasks_view(request):
                 task = DailyTasks.objects.get(seq_no=seq_no)
                 task.completed = value == 'on'
                 task.save()
-        return redirect('name_of_your_url_for_this_view')
+        return redirect('daily_tasks')
 
     tasks = DailyTasks.objects.order_by('seq_no')
     return render(request, 'daily_tasks.html', {'tasks': tasks})
