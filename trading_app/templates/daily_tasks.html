@@ -22,11 +22,15 @@
                         <td>
                             <input type="checkbox" name="completed_{{ task.seq_no }}" {% if task.completed %} checked {% endif %}>
                         </td>
-                        <td>{{ task.task_name }}</td>
+                        <td>{{ task.task_name }}<br>
                         <!-- Add cells for additional custom content here -->
-                        {% if task.seq_no == specific_seq_no %}
-                            <!-- Custom content based on seq_no -->
+                        {% if task.seq_no == 10 %}
+                            <!-- Update exchange rates -->
+                            <a href="https://www.google.com/finance/quote/USD-EUR">USD exchange rate</a><br>
+                            <a href="https://www.google.com/finance/quote/EUR-JPY">USD exchange rate</a><br>
+                            <a href="{% url 'edit_all_params' %}">Edit parameters</a>
                         {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
