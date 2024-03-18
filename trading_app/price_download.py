@@ -662,7 +662,7 @@ def identify_highs_lows_gann(ticker, df, logger, reversal_days=2, price_move_per
                     # Down trend continues until high is higher on next 2 days.
                     # Assume the consequetive highs will be higher and test each to check they are indeed.
                     # If they are not, then this is not a swing point.
-                    logger.info(f"i: {i} Downtrend.")
+                    #logger.info(f"i: {i} Downtrend.")
                     count_consequetive = 0
                     #logger.info(f"len(window_slice): {len(window_slice)}")
                     #logger.info(f"window_slice['High']: {window_slice['High']}")
