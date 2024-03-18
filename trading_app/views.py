@@ -2514,7 +2514,7 @@ def daily_tasks_view(request):
     # Find open trades where the latest price is more than 2% above the purchase price.
     # latest price - stop loss / stop loss > 0.02, highlight for potential adjustment.
     open_trading_opps_higher_price_list = []
-    for opp in TradingOpp.objects.filter(is_active=True):
+    for opp in TradingOpp.objects.filter(amount_still_invested_currency__gt=0):
         ticker = opp.ticker
         latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
         latest_price = float(latest_candle.close_price)  # Assuming you have close_price as the latest price
