@@ -993,6 +993,7 @@ def trading_opps_sorted_view(request):
 
     # Group TradingOpps by date, ignoring time
     grouped_trading_opps = defaultdict(list)
+    tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
     for opp in query:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
         date_key = opp.datetime_identified.date()  # Extract date part
