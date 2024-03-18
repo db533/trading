@@ -2469,7 +2469,7 @@ def daily_tasks_view(request):
         if is_in_tse_stocks:
             new_stop_loss = float(latest_low) - 1
         else:
-            new_stop_loss = float(latest_low) - 0.01
+            new_stop_loss = round(float(latest_low) - 0.01,2)
         open_nine_trading_opps_list.append([ticker, new_stop_loss])
 
     # Find open trades where the latest price is more than 2% above the purchase price.

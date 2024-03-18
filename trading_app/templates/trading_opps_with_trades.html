@@ -87,7 +87,7 @@
                             </td>
                         </tr>
                     {% endfor %}
-                    {% if status == "2" %}
+                    {% if status == "2" or status == "2b" %}
                         <tr>
                             <td><input type="date" name="new_date_{{ opp.id }}"></td>
                             <td>
