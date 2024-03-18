@@ -998,6 +998,44 @@ def trading_opps_sorted_view(request):
         date_key = opp.datetime_identified.date()  # Extract date part
         grouped_trading_opps[date_key].append(opp)
 
+        # Get the ticker and the latest price for the ticker
+        ticker = opp.ticker
+        investment_value_eur = float(Params.objects.get(key='investment_value').value)
+        # Check if this ticker is in TSE exchange
+        is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+        if is_in_tse_stocks:
+            current_exchange_rate = float(Params.objects.get(key='jpy_rate').value)
+            commission_value = 80
+        else:
+            current_exchange_rate = float(Params.objects.get(key='usd_rate').value)
+            commission_value = 1
+        investment_value_currency = investment_value_eur / current_exchange_rate
+
+        # Get the Buy trade for the TradingOpp, if it exists.
+        trades = opp.trades.filter(action=1)  # Get all related trades
+        if len(trades) > 0:
+            # We have a Buy trade either planned or executed. Use this price for the calculations.
+            for trade in trades:
+                transaction_price = trade.price
+        else:
+            # No Buy trade is found attached to this TradingOpp, so get the latest price and use that.
+            latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+            if latest_candle is not None:
+                latest_close_price = float(latest_candle.close_price)
+            else:
+                latest_close_price = 0
+            transaction_price = latest_close_price
+        profit_taker_price = opp.profit_taker_price
+        if profit_taker_price is None or transaction_price == 0:
+            # Missing some values to compute trade profits
+            trade_profit = 0
+        else:
+            units = round(investment_value_currency / transaction_price, 0)
+            trade_profit = ((profit_taker_price - transaction_price) * units * current_exchange_rate) - (
+                        commission_value * 2 * current_exchange_rate)
+        opp.trade_profit = round(trade_profit, 2)
+
+
     context = {
         'grouped_trading_opps': dict(grouped_trading_opps),
         'categories': TickerCategory.objects.all(),

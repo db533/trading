@@ -54,7 +54,7 @@
                     <tr>
                         <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
                             <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
-                            {% if opp.reward_risk %}<br>Reward/Risk: {{ opp.reward_risk }} %<br>{% endif %}
+                            {% if opp.reward_risk %}<br>Reward/Risk: {{ opp.reward_risk }} %<br>Trade profit: {{ opp.trade_profit }} EUR<br>{% endif %}
                                 <input type="checkbox" name="schedule" id="schedule_{{ opp.id }}" value={% if opp.status == "0" %}"true"{% else %}"false"{% endif %}>
                                 <label for="schedule_{{ opp.id }}">Schedule</label></td>
                             <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
