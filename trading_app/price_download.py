@@ -922,6 +922,7 @@ def add_ema_and_trend(price_history):
 
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+    delete_old_prices = False
     try:
         if trigger == 'Cron':
             logger = scheduled_logger
@@ -953,10 +954,11 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                 # Query and delete the old prices
                 start_day = timezone.now() - timedelta(days=365)
                 finish_day = timezone.now()
-                old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
-                deleted_count, _ = old_prices.delete()
-                print('Deleted', deleted_count, 'older DailyPrice records.')
-                logger.info(f'Deleted {str(deleted_count)} older DailyPrice records.')
+                if delete_old_prices:
+                    old_prices = DailyPrice.objects.filter(datetime__lt=start_day, ticker=ticker)
+                    deleted_count, _ = old_prices.delete()
+                    print('Deleted', deleted_count, 'older DailyPrice records.')
+                    logger.info(f'Deleted {str(deleted_count)} older DailyPrice records.')
 
                 # Check if the stock is marked as a TSE stock.
                 is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
