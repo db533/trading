@@ -730,7 +730,7 @@ class GannPointFiveBuy(BaseStrategy):
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
             final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
-            most_recent_lh_price = lh_prices[0]
+            most_recent_lh_price = lh_prices[-1]
             if latest_price.close_price > most_recent_lh_price:
                 confirmed = True
                 when_confirmed = ""
@@ -815,7 +815,7 @@ class GannPointFiveSell(BaseStrategy):
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
-            min_hl_price = min(hl_prices)
+            min_hl_price = hl_prices[-1]
             if latest_price.close_price < min_hl_price:
                 confirmed = True
                 when_confirmed = ""
