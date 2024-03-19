@@ -55,7 +55,7 @@
                             <a href="{% url 'trading-opps' %}?action=sell&category=1" target="_blank">Sell recommendations for longterm positions.</a> Consider exiting or reducing size of position.<br>
                         {% elif task.seq_no == 60 %}
                             <!-- Review recent opportunities for good new swing trade investments. -->
-                            <a href="{% url 'trading_opps_sorted' %}?action=all" target="_blank">Recent Buy recommendations.</a><br>
+                            <a href="{% url 'trading_opps_sorted' %}?action=buy" target="_blank">Recent Buy recommendations.</a><br>
                             Review chart. Is there evidence to support that this is a good entry?<br>
                             Enter a stop loss and profit taker price and schedule the trade if > 300% and profit > 20 EUR.
                         {% endif %}
