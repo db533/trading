@@ -985,7 +985,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         # if ticker.symbol == 'NNOX':
                         price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker,
                                                                                                                  price_history, logger,
-                                                                                                                 reversal_days=3,
+                                                                                                                 reversal_days=2,
                                                                                                                  price_move_percent=1.5)
                         # else:
                         #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)

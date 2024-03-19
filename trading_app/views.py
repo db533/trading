@@ -703,14 +703,15 @@ def ticker_delete(request, ticker_id):
 
 # View to refresh price data for a specific ticker
 def manual_download(request, ticker_id, timeframe):
-
+    # Amended to only download daily prices regardless of the timeframe parameter.
     valid_timeframes = {"day" : "Daily", "15mins" : "15 mins", "5mins" : "5 mins"}
     if timeframe not in valid_timeframes.keys():
         print("manual_download() called with invalid timeframe:", timeframe)
     else:
         timeframe_label=valid_timeframes[timeframe]
         ticker = get_object_or_404(Ticker, id=ticker_id)
-        download_prices(timeframe=timeframe_label, ticker_symbol=ticker.symbol, trigger='User')
+        #download_prices(timeframe=timeframe_label, ticker_symbol=ticker.symbol, trigger='User')
+        background_manual_ticker_download(ticker.symbol, True)
     return redirect('ticker_config')
 
 def manual_category_download(request, category_name):
