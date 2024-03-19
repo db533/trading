@@ -1127,7 +1127,7 @@ class GannPointNineBuy(BaseStrategy):
                         recent_swing_points.append(swing_point)
                         break
                     swing_point_counter += 1
-            if sections > 0:
+            if sections > 1:
                 # At least 2 sections in most recent trend. So should analyse price movements from most recent swingpoint to most recent price
                 # Does the most recent HH get broken?
                 # Yes, then do we have 2 down candles followed by up candle.
@@ -1284,7 +1284,7 @@ class GannPointNineSell(BaseStrategy):
                         recent_swing_points.append(swing_point)
                         break
                     swing_point_counter += 1
-            if sections > 0:
+            if sections > 1:
                 # At least 2 sections in most recent trend. So should analyse price movements from most recent swingpoint to most recent price
                 # Does the most recent HH get broken?
                 # Yes, then do we have 2 down candles followed by up candle.
