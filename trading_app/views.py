@@ -745,7 +745,7 @@ def manual_category_download(request, category_name):
         #logger.info(f'Waited 15 seconds.')
     except Exception as e:
         logger.info(f'Error occured in manual_category_download(). {e}')
-    return redirect('ticker_config')
+    return redirect('task_queue')
 
 
 from django.contrib import messages
