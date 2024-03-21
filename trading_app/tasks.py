@@ -26,7 +26,7 @@ def display_local_time(logger):
     logger.info(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
-def background_manual_category_download(category_name):
+def background_manual_category_download(category_name, throttling=True):
     # Retrieve all tickers that are in the given category.
     try:
         tickers_for_throtlling = 195
@@ -38,7 +38,7 @@ def background_manual_category_download(category_name):
         tickers = Ticker.objects.filter(categories__name=category_name)
         ticker_count = Ticker.objects.filter(categories__name=category_name).count()
         scheduled_logger.info(f'ticker_count: {str(ticker_count)}')
-        if ticker_count > tickers_for_throtlling:
+        if ticker_count > tickers_for_throtlling or throttling == True:
             scheduled_logger.info(f'Rate throttling will occur.')
             throttling = True
         else:
