@@ -138,55 +138,22 @@ if False:
             # Log or print the elapsed time. Here's an example of logging it:
             logger.info(f'UpdateTickerMetricsCronJob completed in {elapsed_time_str}')
 
-    class DailyTSEPriceDownloadCronJob(CronJobBase):
-        RUN_AT_TIMES = ['19:30']
-        #RUN_AT_TIMES = ['15:45']
-        schedule = Schedule(run_at_times=RUN_AT_TIMES)
-        #schedule = Schedule(run_every_mins=3)  # Run once a day
-        code = 'trading_app.daily_tse_price_download_cron_job'
-
-        def do(self):
-            start_time = time.time()  # Capture start time
-            current_datetime = datetime.now()
-            logger.info(f'Starting DailyTSEPriceDownloadCronJob at {current_datetime}...')
-
-            display_local_time()
-            # Save the start time for the night process
-            nj_param = Params.objects.get(key='night_job_start_dt')
-            nj_param.value = current_datetime
-
-            # Clear the old status message.
-            nj_param = Params.objects.get(key='night_job_status_message')
-            nj_param.value = ''
-            nj_param.save()
-
-            background_manual_category_download('TSE stocks')
-            display_local_time()
-
-            end_time = time.time()  # Capture end time
-            elapsed_time = end_time - start_time  # Compute elapsed time
-            elapsed_time_str = format_elapsed_time(start_time, end_time)
-
-            # Log or print the elapsed time. Here's an example of logging it:
-            logger.info(f'DailyTSEPriceDownloadCronJob completed in {elapsed_time_str}')
 
 
-    # Download US prices. 927 prices.
-    # Trust start time: 00:00, but will only start processing once TSE stocks have been downloaded, around 00:13
-    # Run time 5:09
-    # Should complete by 07:00
-    class DailyUSPriceDownloadCronJob(CronJobBase):
-        RUN_AT_TIMES = ['21:00']
-        #schedule = Schedule(run_at_times=RUN_AT_TIMES)
+
+    class NightlyPriceDownloadCronJob(CronJobBase):
+        # RUN_AT_TIMES = ['19:30']
+        # schedule = Schedule(run_at_times=RUN_AT_TIMES)
         schedule = Schedule(run_every_mins=1)  # Run once a day
-        code = 'trading_app.daily_us_price_download_cron_job'
+        code = 'trading_app.nightly_price_download_cron_job'
 
         def do(self):
             start_time = time.time()  # Capture start time
+            logger.info(f'NightlyPriceDownloadCronJob starting at {start_time}')
             display_local_time()
-            #category_price_download('US stocks')
+            background_manual_category_download('TSE stocks')
             background_manual_category_download('US stocks')
-            #background_manual_category_download('Test tickers')
+            # background_manual_category_download('Test tickers')
             display_local_time()
 
             end_time = time.time()  # Capture end time
@@ -194,8 +161,7 @@ if False:
             elapsed_time_str = format_elapsed_time(start_time, end_time)
 
             # Log or print the elapsed time. Here's an example of logging it:
-            logger.info(f'DailyUSPriceDownloadCronJob completed in {elapsed_time_str}')
-
+            logger.info(f'NightlyPriceDownloadCronJob completed in {elapsed_time_str}')
 
 
 ###############################
@@ -216,21 +182,22 @@ if False:
 #30	3	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
 #3	0	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
 
-
-
-class NightlyPriceDownloadCronJob(CronJobBase):
-    #RUN_AT_TIMES = ['19:30']
-    #schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    schedule = Schedule(run_every_mins=1)  # Run once a day
-    code = 'trading_app.nightly_price_download_cron_job'
+# Download US prices. 927 prices.
+# Trust start time: 00:00, but will only start processing once TSE stocks have been downloaded, around 00:13
+# Run time 5:09
+# Should complete by 07:00
+class DailyUSPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['20:50']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=1)  # Run once a day
+    code = 'trading_app.daily_us_price_download_cron_job'
 
     def do(self):
         start_time = time.time()  # Capture start time
-        logger.info(f'NightlyPriceDownloadCronJob starting at {start_time}')
         display_local_time()
-        background_manual_category_download('TSE stocks')
+        #category_price_download('US stocks')
         background_manual_category_download('US stocks')
-        # background_manual_category_download('Test tickers')
+        #background_manual_category_download('Test tickers')
         display_local_time()
 
         end_time = time.time()  # Capture end time
@@ -238,5 +205,36 @@ class NightlyPriceDownloadCronJob(CronJobBase):
         elapsed_time_str = format_elapsed_time(start_time, end_time)
 
         # Log or print the elapsed time. Here's an example of logging it:
-        logger.info(f'NightlyPriceDownloadCronJob completed in {elapsed_time_str}')
+        logger.info(f'DailyUSPriceDownloadCronJob completed in {elapsed_time_str}')
 
+class DailyTSEPriceDownloadCronJob(CronJobBase):
+    RUN_AT_TIMES = ['5:05']
+    #RUN_AT_TIMES = ['15:45']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    #schedule = Schedule(run_every_mins=3)  # Run once a day
+    code = 'trading_app.daily_tse_price_download_cron_job'
+
+    def do(self):
+        start_time = time.time()  # Capture start time
+        current_datetime = datetime.now()
+        logger.info(f'Starting DailyTSEPriceDownloadCronJob at {current_datetime}...')
+
+        display_local_time()
+        # Save the start time for the night process
+        #nj_param = Params.objects.get(key='night_job_start_dt')
+        #nj_param.value = current_datetime
+
+        # Clear the old status message.
+        #nj_param = Params.objects.get(key='night_job_status_message')
+        #nj_param.value = ''
+        #nj_param.save()
+
+        background_manual_category_download('TSE stocks')
+        display_local_time()
+
+        end_time = time.time()  # Capture end time
+        elapsed_time = end_time - start_time  # Compute elapsed time
+        elapsed_time_str = format_elapsed_time(start_time, end_time)
+
+        # Log or print the elapsed time. Here's an example of logging it:
+        logger.info(f'DailyTSEPriceDownloadCronJob completed in {elapsed_time_str}')
