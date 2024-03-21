@@ -229,6 +229,7 @@ class DailyTSEPriceDownloadCronJob(CronJobBase):
         #nj_param.value = ''
         #nj_param.save()
 
+        background_manual_category_download('Current swing trade positions')
         background_manual_category_download('TSE stocks')
         display_local_time()
 
