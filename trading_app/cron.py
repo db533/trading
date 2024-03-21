@@ -194,6 +194,7 @@ class DailyUSPriceDownloadCronJob(CronJobBase):
 
     def do(self):
         start_time = time.time()  # Capture start time
+        logger.info(f'DailyUSPriceDownloadCronJob started at {start_time}')
         display_local_time()
         #category_price_download('US stocks')
         background_manual_category_download('US stocks')
