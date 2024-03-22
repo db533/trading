@@ -32,7 +32,7 @@
             <li><a href="{% url 'trading_opps_with_trades' '3'|urlencode %}">Completed trades</a></li>
             <li><a href="{% url 'trading_opps_with_trades' '2'|urlencode %}">Executed trades</a></li>
             <li><a href="{% url 'daily_tasks' %}">Daily tasks</a></li>
-            <li><a href="{% url 'trade_performance_list' %}">Trading Performance</a></li>
+            <li><a href="{% url 'trade_performance_list' 'all'|urlencode %}">Trading Performance</a></li>
             <li><a href="{% url 'trade_performance_list' 'open'|urlencode %}">Open trades Performance</a></li>
             <li><a href="{% url 'monthly_performance' %}">Monthly Performance</a></li>
             <br>
