@@ -2073,12 +2073,17 @@ def trading_opps_with_trades_view(request, status):
     return render(request, template_name, context)
 
 @login_required()
-def trade_performance_list(request):
+def trade_performance_list(request, status):
     # Fetch TradingOpp instances that have at least one Trade linked to them
     #trading_opps = TradingOpp.objects.filter(trades__isnull=False).distinct().order_by('-id')
 
-    # Excluding planned trades from this view
-    trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
+    if status == 'open':
+        # Only include open Trading positions.
+        # Excluding planned and closed trades from this view
+        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency__gt=0).distinct().order_by('-datetime_identified', '-id')
+    else:
+        # Including all trading opps, excluding planned.
+        trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
 
     cum_eur_invested = 0
     cum_unrealised_value = 0
