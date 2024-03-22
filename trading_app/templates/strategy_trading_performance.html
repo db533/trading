@@ -35,7 +35,7 @@
     </tbody>
 </table>
 <h2>Trading Opportunities Details</h2>
-{% for strategy in strategy_performance %}
+{% for strategy in strategy_details %}
     <h3>{{ strategy.strategy }} Details</h3>
     <table border="1">
         <thead>
@@ -48,7 +48,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for opp in strategy.strategy_details %}
+            {% for opp in strategy %}
                 <tr>
                     <td>{{ opp.id }}</td>
                     <td>{{ opp.eur_spent }}</td>
