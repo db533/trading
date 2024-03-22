@@ -2489,7 +2489,7 @@ def monthly_trading_performance_view(request):
 
     return render(request, 'monthly_trading_performance.html', context)
 
-from django.db.models import Sum, Max
+from django.db.models import Sum, Max, F
 from django.shortcuts import render
 
 
@@ -2503,6 +2503,7 @@ def strategy_trading_performance_view(request):
     ).order_by('strategy_name').distinct()
 
     strategy_performance = []
+    strategy_details = {}  # To store details of TradingOpps under each strategy
 
     # Use a temporary dictionary to track totals per strategy
     strategy_totals = {}
@@ -2511,8 +2512,10 @@ def strategy_trading_performance_view(request):
         strategy_name = opp.strategy_name
         if strategy_name not in strategy_totals:
             strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
+            strategy_details[strategy_name] = []
 
         trades = opp.trades.all()
+        eur_spent, eur_gained, commission_eur = 0, 0, 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
@@ -2521,6 +2524,15 @@ def strategy_trading_performance_view(request):
                 strategy_totals[strategy_name]['total_spent'] += amount_eur
             elif trade.action == '0':  # Sell
                 strategy_totals[strategy_name]['total_gained'] += amount_eur
+
+            opp_details = {
+                'id': opp.id,
+                'eur_spent': round(eur_spent, 2),
+                'eur_gained': round(eur_gained, 2),
+                'commission_eur': round(commission_eur, 2),
+                'realised_profit': round(eur_gained - eur_spent - commission_eur, 2),
+            }
+            strategy_details[strategy_name].append(opp_details)
 
             strategy_totals[strategy_name]['total_commission'] += commission_eur
         strategy_totals[strategy_name]['trade_count'] += 1
@@ -2547,12 +2559,14 @@ def strategy_trading_performance_view(request):
             'cagr': cagr,
             'trade_count' : totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
-            'percent_profitable_trades' : percent_profitable_trades
+            'percent_profitable_trades' : percent_profitable_trades,
+            'strategy_details': strategy_details[strategy]
 
         })
 
     context = {
         'strategy_performance': strategy_performance,
+        'strategy_details': strategy_details,  # You might not need this if you include details in strategy_performance
     }
 
     return render(request, 'strategy_trading_performance.html', context)
