@@ -7,6 +7,8 @@
 <body>
     {% if status == 'open' %}
         <h1>Open Trades Performance List</h1>
+    {% elif status == 'closed' %}
+        <h1>Closed Trades Performance List</h1>
     {% else %}
         <h1>Trading Performance List</h1>
     {% endif %}
