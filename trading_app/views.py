@@ -2545,7 +2545,8 @@ def strategy_trading_performance_view(request):
             'growth_rate': round((growth_rate-1)*100,1) if growth_rate != 0 else 0,
             'cagr': cagr,
             'trade_count' : totals['trade_count'],
-            'profitable_trade_count': percent_profitable_trades,
+            'profitable_trade_count': totals['profitable_trade_count'],
+            'percent_profitable_trades' : percent_profitable_trades
 
         })
 
