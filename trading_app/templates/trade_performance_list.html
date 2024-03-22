@@ -5,7 +5,10 @@
     <title>Trading Performance List</title>
 </head>
 <body>
-    <h1>Trading Performance List</h1>
+    {% if status = 'open' %}
+        <h1>Open Trades Performance List</h1>
+    {% else %}
+        <h1>Trading Performance List</h1>
         <h3>Summary</h3>
     <strong>Currently invested EUR:</strong> {{ cum_eur_invested }}<br>
     <strong>Unrealised value today EUR:</strong> {{ unrealised_value_today }} EUR. Yesterday: {{ unrealised_value_yesterday }} EUR<br>

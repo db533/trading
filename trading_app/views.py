@@ -2209,7 +2209,8 @@ def trade_performance_list(request, status):
         'unrealised_value_today': cum_unrealised_value,
         'cum_realised_profit_eur_today' : cum_realised_profit_eur,
         'cum_realised_profit_eur_yesterday': None,
-        'profit_if_close_today' : profit_if_close_today
+        'profit_if_close_today' : profit_if_close_today,
+        'status' : status
     }
     return render(request, 'trade_performance_list.html', context)
 
