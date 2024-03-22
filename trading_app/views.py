@@ -2174,6 +2174,8 @@ def trade_performance_list(request):
             opp.colour = 'lightcoral'
         else:
             opp.colour = 'lightpink'
+        opp.commissions_paid_currency = round(opp.commissions_paid_currency,2)
+        opp.commissions_paid_eur = round(opp.commissions_paid_eur, 2)
 
     # Checking if cumulative values have changes from yesterday.
     # Get the saved value in Params for today.
