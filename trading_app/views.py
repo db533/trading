@@ -2509,13 +2509,18 @@ def strategy_trading_performance_view(request):
     for opp in trading_opps:
         strategy_name = opp.strategy_name
         if strategy_name not in strategy_totals:
-            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0,
-                                              'trade_count': 0, 'profitable_trade_count': 0}
+            strategy_totals[strategy_name] = {
+                'total_spent': 0,
+                'total_gained': 0,
+                'total_commission': 0,
+                'trade_count': 0,
+                'profitable_trade_count': 0
+            }
             strategy_details[strategy_name] = []
 
         trades = opp.trades.all()
         eur_spent, eur_gained, commission_eur = 0, 0, 0
-
+        trade_count = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission = trade.commission * trade.rate_to_eur
@@ -2526,10 +2531,20 @@ def strategy_trading_performance_view(request):
                 eur_gained += amount_eur
 
             commission_eur += commission
+            trade_count += 1
 
         realised_profit = eur_gained - eur_spent - commission_eur
 
-        # Add check here to only append once per TradingOpp
+        # Update strategy totals here
+        strategy_totals[strategy_name]['total_spent'] += eur_spent
+        strategy_totals[strategy_name]['total_gained'] += eur_gained
+        strategy_totals[strategy_name]['total_commission'] += commission_eur
+        strategy_totals[strategy_name]['trade_count'] += trade_count
+        if realised_profit > 0:
+            strategy_totals[strategy_name][
+                'profitable_trade_count'] += 1  # This assumes each TradingOpp is a single transaction for simplicity
+
+        # Append TradingOpp details for the strategy
         if not any(opp_detail['id'] == opp.id for opp_detail in strategy_details[strategy_name]):
             strategy_details[strategy_name].append({
                 'id': opp.id,
