@@ -2517,24 +2517,28 @@ def strategy_trading_performance_view(request):
         trades = opp.trades.all()
         eur_spent, eur_gained, commission_eur = 0, 0, 0
         for trade in trades:
+            if opp.id not in strategy_details[strategy_name]:
+                strategy_details[strategy_name][opp.id] = {
+                    'eur_spent': 0,
+                    'eur_gained': 0,
+                    'commission_eur': 0,
+                    'realised_profit': 0,
+                }
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
+            strategy_details[strategy_name][opp.id]['commission_eur'] += commission_eur
 
             if trade.action == '1':  # Buy
                 strategy_totals[strategy_name]['total_spent'] += amount_eur
+                strategy_details[strategy_name][opp.id]['eur_spent'] += amount_eur
             elif trade.action == '0':  # Sell
                 strategy_totals[strategy_name]['total_gained'] += amount_eur
-
-            opp_details = {
-                'id': opp.id,
-                'eur_spent': round(eur_spent, 2),
-                'eur_gained': round(eur_gained, 2),
-                'commission_eur': round(commission_eur, 2),
-                'realised_profit': round(eur_gained - eur_spent - commission_eur, 2),
-            }
-            strategy_details[strategy_name].append(opp_details)
-
+                strategy_details[strategy_name][opp.id]['eur_gained'] += amount_eur
             strategy_totals[strategy_name]['total_commission'] += commission_eur
+        strategy_details[strategy_name][opp.id]['realised_profit'] = strategy_details[strategy_name][opp.id]['eur_gained'] -\
+                                                                     strategy_details[strategy_name][opp.id]['eur_spent'] - \
+                                                                     strategy_details[strategy_name][opp.id]['commission_eur']
+
         strategy_totals[strategy_name]['trade_count'] += 1
         if strategy_totals[strategy_name]['total_spent'] < strategy_totals[strategy_name]['total_gained']:
             strategy_totals[strategy_name]['profitable_trade_count'] += 1
