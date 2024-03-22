@@ -2512,8 +2512,7 @@ def strategy_trading_performance_view(request):
         strategy_name = opp.strategy_name
         if strategy_name not in strategy_totals:
             strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
-            strategy_details[strategy_name] = []
-
+            strategy_details[strategy_name] = {}
         trades = opp.trades.all()
         eur_spent, eur_gained, commission_eur = 0, 0, 0
         for trade in trades:
