@@ -2489,12 +2489,11 @@ def monthly_trading_performance_view(request):
 
     return render(request, 'monthly_trading_performance.html', context)
 
-from django.db.models import Sum, Max, F
-from django.shortcuts import render
+
+from django.db.models import F, Sum, Max
 
 
 def strategy_trading_performance_view(request):
-    # Annotate each TradingOpp with the strategy name
     trading_opps = TradingOpp.objects.filter(
         amount_still_invested_currency=0,
         trades__status="2"
@@ -2503,76 +2502,73 @@ def strategy_trading_performance_view(request):
     ).order_by('strategy_name').distinct()
 
     strategy_performance = []
-    strategy_details = {}  # To store details of TradingOpps under each strategy
+    strategy_details = {}  # To store details of TradingOpps under each strategy properly
 
-    # Use a temporary dictionary to track totals per strategy
     strategy_totals = {}
 
     for opp in trading_opps:
         strategy_name = opp.strategy_name
         if strategy_name not in strategy_totals:
-            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
-            strategy_details[strategy_name] = {}
+            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0,
+                                              'trade_count': 0, 'profitable_trade_count': 0}
+            strategy_details[strategy_name] = []
+
         trades = opp.trades.all()
         eur_spent, eur_gained, commission_eur = 0, 0, 0
+
         for trade in trades:
-            if opp.id not in strategy_details[strategy_name]:
-                strategy_details[strategy_name][opp.id] = {
-                    'eur_spent': 0,
-                    'eur_gained': 0,
-                    'commission_eur': 0,
-                    'realised_profit': 0,
-                }
             amount_eur = trade.units * trade.price * trade.rate_to_eur
-            commission_eur = trade.commission * trade.rate_to_eur
-            strategy_details[strategy_name][opp.id]['commission_eur'] += commission_eur
+            commission = trade.commission * trade.rate_to_eur
 
             if trade.action == '1':  # Buy
-                strategy_totals[strategy_name]['total_spent'] += amount_eur
-                strategy_details[strategy_name][opp.id]['eur_spent'] += amount_eur
+                eur_spent += amount_eur
             elif trade.action == '0':  # Sell
-                strategy_totals[strategy_name]['total_gained'] += amount_eur
-                strategy_details[strategy_name][opp.id]['eur_gained'] += amount_eur
-            strategy_totals[strategy_name]['total_commission'] += commission_eur
-        strategy_details[strategy_name][opp.id]['realised_profit'] = strategy_details[strategy_name][opp.id]['eur_gained'] -\
-                                                                     strategy_details[strategy_name][opp.id]['eur_spent'] - \
-                                                                     strategy_details[strategy_name][opp.id]['commission_eur']
+                eur_gained += amount_eur
 
-        strategy_totals[strategy_name]['trade_count'] += 1
-        if strategy_totals[strategy_name]['total_spent'] < strategy_totals[strategy_name]['total_gained']:
-            strategy_totals[strategy_name]['profitable_trade_count'] += 1
+            commission_eur += commission
 
-    # Convert strategy totals to the list format for the template
+        realised_profit = eur_gained - eur_spent - commission_eur
+
+        # Add check here to only append once per TradingOpp
+        if not any(opp_detail['id'] == opp.id for opp_detail in strategy_details[strategy_name]):
+            strategy_details[strategy_name].append({
+                'id': opp.id,
+                'eur_spent': round(eur_spent, 2),
+                'eur_gained': round(eur_gained, 2),
+                'commission_eur': round(commission_eur, 2),
+                'realised_profit': round(realised_profit, 2),
+            })
+
     for strategy, totals in strategy_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
-        percent_profitable_trades = round(totals['profitable_trade_count']*100/totals['trade_count'],1)
-        if totals['total_spent'] + totals['total_commission'] == 0:
-            growth_rate = 0
-            cagr = 0
-        else:
-            growth_rate = (totals['total_gained'] / (totals['total_spent'] + totals['total_commission']))
-            cagr = round(((growth_rate ** 12) - 1) * 100, 1)
+        percent_profitable_trades = round(totals['profitable_trade_count'] * 100 / totals['trade_count'], 1) if totals[
+                                                                                                                    'trade_count'] > 0 else 0
+        growth_rate = (totals['total_gained'] / (totals['total_spent'] + totals['total_commission'])) if (totals[
+                                                                                                              'total_spent'] +
+                                                                                                          totals[
+                                                                                                              'total_commission']) > 0 else 0
+        cagr = round(((growth_rate ** 12) - 1) * 100, 1) if growth_rate > 0 else 0
+
         strategy_performance.append({
             'strategy': strategy,
             'total_spent': round(totals['total_spent'], 2),
             'total_gained': round(totals['total_gained'], 2),
             'total_commission': round(totals['total_commission'], 2),
             'realised_profit': realised_profit,
-            'growth_rate': round((growth_rate-1)*100,1) if growth_rate != 0 else 0,
+            'growth_rate': round((growth_rate - 1) * 100, 1) if growth_rate != 0 else 0,
             'cagr': cagr,
-            'trade_count' : totals['trade_count'],
+            'trade_count': totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
-            'percent_profitable_trades' : percent_profitable_trades,
-            'strategy_details': strategy_details[strategy]
-
+            'percent_profitable_trades': percent_profitable_trades,
+            'strategy_details': strategy_details[strategy]  # Ensure this matches the list structure correctly
         })
 
     context = {
         'strategy_performance': strategy_performance,
-        'strategy_details': strategy_details,  # You might not need this if you include details in strategy_performance
     }
 
     return render(request, 'strategy_trading_performance.html', context)
+
 
 def update_all_strategies(request):
     tickers = Ticker.objects.all()
