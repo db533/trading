@@ -2531,7 +2531,7 @@ def strategy_trading_performance_view(request):
                 eur_gained += amount_eur
 
             commission_eur += commission
-            trade_count += 1
+        trade_count += 1
 
         realised_profit = eur_gained - eur_spent - commission_eur
 
