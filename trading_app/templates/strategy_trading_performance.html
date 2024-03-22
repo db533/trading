@@ -6,10 +6,12 @@
     <thead>
         <tr>
             <th style="text-align:center; width: 20ch;">Strategy</th>
+            <th style="text-align:center; width: 12ch;">Number of trades</th>
             <th style="text-align:center; width: 12ch;">EUR Spent</th>
             <th style="text-align:center; width: 12ch;">EUR Gained</th>
             <th style="text-align:center; width: 12ch;">Commissions (EUR)</th>
             <th style="text-align:center; width: 12ch;">Realised Profit</th>
+            <th style="text-align:center; width: 12ch;">Profit trade count</th>
             <th style="text-align:center; width: 12ch;">Growth rate</th>
             <th style="text-align:center; width: 12ch;">CAGR</th>
         </tr>
@@ -18,10 +20,12 @@
         {% for entry in strategy_performance %}
             <tr>
                 <td style="text-align:center;">{{ entry.strategy }}</td>
+                <td style="text-align:center;">{{ entry.trade_count }}</td>
                 <td style="text-align:right;">{{ entry.total_spent }}</td>
                 <td style="text-align:right;">{{ entry.total_gained }}</td>
                 <td style="text-align:right;">{{ entry.total_commission }}</td>
                 <td style="text-align:right;">{{ entry.realised_profit }}</td>
+                <td style="text-align:center;">{{ entry.profitable_trade_count }}</td>
                 <td style="text-align:right;">{{ entry.growth_rate }} %</td>
                 <td style="text-align:right;">{{ entry.cagr }} %</td>
             </tr>

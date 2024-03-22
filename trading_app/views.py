@@ -2509,7 +2509,7 @@ def strategy_trading_performance_view(request):
     for opp in trading_opps:
         strategy_name = opp.strategy_name
         if strategy_name not in strategy_totals:
-            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0}
+            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
 
         trades = opp.trades.all()
         for trade in trades:
@@ -2522,6 +2522,9 @@ def strategy_trading_performance_view(request):
                 strategy_totals[strategy_name]['total_gained'] += amount_eur
 
             strategy_totals[strategy_name]['total_commission'] += commission_eur
+        strategy_totals[strategy_name]['trade_count'] += 1
+        if strategy_totals[strategy_name]['total_spent'] < strategy_totals[strategy_name]['total_gained']:
+            strategy_totals[strategy_name]['profitable_trade_count'] += 1
 
     # Convert strategy totals to the list format for the template
     for strategy, totals in strategy_totals.items():
@@ -2540,6 +2543,9 @@ def strategy_trading_performance_view(request):
             'realised_profit': realised_profit,
             'growth_rate': round((growth_rate-1)*100,1) if growth_rate != 0 else 0,
             'cagr': cagr,
+            'trade_count' : totals['trade_count'],
+            'profitable_trade_count': totals['profitable_trade_count'],
+
         })
 
     context = {
