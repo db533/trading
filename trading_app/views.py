@@ -2084,7 +2084,7 @@ def trade_performance_list(request, status):
     elif status == 'closed':
         # Only include open Trading positions.
         # Excluding planned and open trades from this view
-        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0).distinct().order_by('-datetime_identified', '-id')
+        trading_opps = TradingOpp.objects.filter(amount_still_invested_currency=0).filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
     else:
         # Including all trading opps, excluding planned.
         trading_opps = TradingOpp.objects.filter(trades__status="2").distinct().order_by('-datetime_identified', '-id')
