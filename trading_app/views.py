@@ -2489,6 +2489,65 @@ def monthly_trading_performance_view(request):
 
     return render(request, 'monthly_trading_performance.html', context)
 
+from django.db.models import Sum, Max
+from django.shortcuts import render
+
+def strategy_trading_performance_view(request):
+    # Annotate each TradingOpp with the strategy name
+    trading_opps = TradingOpp.objects.filter(
+        amount_still_invested_currency=0,
+        trades__status="2"
+    ).annotate(
+        strategy_name=F('strategy__name')
+    ).order_by('strategy_name').distinct()
+
+    strategy_performance = []
+
+    # Use a temporary dictionary to track totals per strategy
+    strategy_totals = {}
+
+    for opp in trading_opps:
+        strategy_name = opp.strategy_name
+        if strategy_name not in strategy_totals:
+            strategy_totals[strategy_name] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0}
+
+        trades = opp.trades.all()
+        for trade in trades:
+            amount_eur = trade.units * trade.price * trade.rate_to_eur
+            commission_eur = trade.commission * trade.rate_to_eur
+
+            if trade.action == '1':  # Buy
+                strategy_totals[strategy_name]['total_spent'] += amount_eur
+            elif trade.action == '0':  # Sell
+                strategy_totals[strategy_name]['total_gained'] += amount_eur
+
+            strategy_totals[strategy_name]['total_commission'] += commission_eur
+
+    # Convert strategy totals to the list format for the template
+    for strategy, totals in strategy_totals.items():
+        realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
+        if totals['total_spent'] + totals['total_commission'] == 0:
+            growth_rate = 0
+            cagr = 0
+        else:
+            growth_rate = (totals['total_gained'] / (totals['total_spent'] + totals['total_commission']))
+            cagr = round(((growth_rate ** 12) - 1) * 100, 1)
+        strategy_performance.append({
+            'strategy': strategy,
+            'total_spent': round(totals['total_spent'], 2),
+            'total_gained': round(totals['total_gained'], 2),
+            'total_commission': round(totals['total_commission'], 2),
+            'realised_profit': realised_profit,
+            'growth_rate': round((growth_rate-1)*100,1) if growth_rate != 0 else 0,
+            'cagr': cagr,
+        })
+
+    context = {
+        'strategy_performance': strategy_performance,
+    }
+
+    return render(request, 'strategy_trading_performance.html', context)
+
 def update_all_strategies(request):
     tickers = Ticker.objects.all()
     ticker_count = tickers.count()
