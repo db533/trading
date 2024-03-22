@@ -2529,6 +2529,7 @@ def strategy_trading_performance_view(request):
     # Convert strategy totals to the list format for the template
     for strategy, totals in strategy_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
+        percent_profitable_trades = round(totals['profitable_trade_count']*100/totals['trade_count'],1)
         if totals['total_spent'] + totals['total_commission'] == 0:
             growth_rate = 0
             cagr = 0
@@ -2544,7 +2545,7 @@ def strategy_trading_performance_view(request):
             'growth_rate': round((growth_rate-1)*100,1) if growth_rate != 0 else 0,
             'cagr': cagr,
             'trade_count' : totals['trade_count'],
-            'profitable_trade_count': totals['profitable_trade_count'],
+            'profitable_trade_count': percent_profitable_trades,
 
         })
 
