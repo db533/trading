@@ -2187,6 +2187,7 @@ def trade_performance_list(request, status):
     saved_unrealised_value_today = Params.objects.get(key='saved_unrealised_value_today')
     saved_unrealised_value_yesterday = Params.objects.get(key='saved_unrealised_value_yesterday')
     cum_unrealised_value = round(cum_unrealised_value,2)
+    profit_if_close_today = round(cum_unrealised_value-cum_eur_invested,2)
     if float(saved_unrealised_value_today.value) != cum_unrealised_value:
         # If it is different, save today's value to yesterday's
         # Save new value to today.
@@ -2204,6 +2205,7 @@ def trade_performance_list(request, status):
         'unrealised_value_today': cum_unrealised_value,
         'cum_realised_profit_eur_today' : cum_realised_profit_eur,
         'cum_realised_profit_eur_yesterday': None
+        'profit_if_close_today' : profit_if_close_today
     }
     return render(request, 'trade_performance_list.html', context)
 
