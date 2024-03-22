@@ -2548,6 +2548,7 @@ def strategy_trading_performance_view(request):
         if not any(opp_detail['id'] == opp.id for opp_detail in strategy_details[strategy_name]):
             strategy_details[strategy_name].append({
                 'id': opp.id,
+                'ticker' : opp.ticker,
                 'eur_spent': round(eur_spent, 2),
                 'eur_gained': round(eur_gained, 2),
                 'commission_eur': round(commission_eur, 2),
