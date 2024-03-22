@@ -45,9 +45,14 @@ def background_manual_category_download(category_name, throttling=True):
             scheduled_logger.info(f'No rate throttling needed.')
             throttling = False
 
+        if category_name == 'Current swing trade positions':
+            time_threshold = 0
+        else:
+            time_threshold = 28
+
         # Iterate through all retrieved tickers and download prices.
         for ticker in tickers:
-            background_manual_ticker_download(ticker.symbol, throttling)
+            background_manual_ticker_download(ticker.symbol, throttling, time_threshold=time_threshold)
             scheduled_logger.info(f'{str(ticker.symbol)} price download requested in background...')
         scheduled_logger.info(f'background_manual_category_download() completed. All price downloads created as background tasks.')
 
@@ -70,7 +75,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 
 @background(schedule=5)
-def background_manual_ticker_download(ticker_symbol,throttling):
+def background_manual_ticker_download(ticker_symbol,throttling, time_threshold=0):
     # Retrieve a particular ticker price date and throttle if requested.
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
                   GannPointEightSell,
@@ -95,7 +100,7 @@ def background_manual_ticker_download(ticker_symbol,throttling):
             scheduled_logger.debug(f'time_difference: "{str(time_difference)}"')
 
             # Check if 18 hours have passed since the last update
-            if time_difference < timedelta(hours=28): # Adding 10 hours for the time difference
+            if time_difference < timedelta(hours=time_threshold): # Adding 10 hours for the time difference
                 scheduled_logger.info(f'Less than 18 hours since the last update. Aborting task for "{ticker_symbol}".')
                 return
             else:
