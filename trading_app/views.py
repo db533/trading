@@ -1724,7 +1724,7 @@ def generate_swing_point_graph_view(request, opp_id):
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
     # Directly access SwingPoints associated with this TradingOpp
-    swing_points = opp.swing_points.all()
+    swing_points = opp.swing_points.all().order_by('date')
 
     if swing_points.exists():
         # Use the first swing point to determine the content_type
