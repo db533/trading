@@ -986,7 +986,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker,
                                                                                                                  price_history, logger,
                                                                                                                  reversal_days=2,
-                                                                                                                 price_move_percent=1.5)
+                                                                                                                 price_move_percent=0)
                         # else:
                         #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
@@ -1193,7 +1193,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                     #print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                     #if ticker.symbol == 'NNOX':
-                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, logger, reversal_days=2, price_move_percent=1.5)
+                    price_history, swing_point_current_trend, swing_point_id_list = identify_highs_lows_gann(ticker, price_history, logger, reversal_days=2, price_move_percent=0)
                     #else:
                     #    price_history, swing_point_current_trend = identify_highs_lows2(price_history, window=3, price_move_percent=1.5)
 
