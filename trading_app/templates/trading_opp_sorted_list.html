@@ -68,7 +68,8 @@
                                 <input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" style="width: 100px;">
                                 <strong>Profit Taker Price:</strong>
                                 <input type="number" step="any" name="profit_taker_price" value="{{ opp.profit_taker_price }}" style="width: 100px;">
-                                <input type="submit" value="Update">
+                                <input type="submit" value="Update"><br>
+                                <strong>Original Stop Loss Price:</strong> {{ opp.original_stop_loss_price }}
                             </td>
                             <td>{{ opp.datetime_identified }}</td>
                         </form>

@@ -139,6 +139,7 @@ class TradingOpp(models.Model):
     datetime_invalidated = models.DateTimeField(null=True, blank = True)
     confirmed = models.BooleanField(default=True) # Has price action confirmed this trading opp (True) or is it not yet confirmed. (False)
     stop_loss_price = models.FloatField(null=True)
+    original_stop_loss_price = models.FloatField(null=True)
     profit_taker_price = models.FloatField(null=True)
     reward_risk = models.FloatField(null=True)
     stop_loss_triggered = models.BooleanField(default=False, null=True)
@@ -181,6 +182,8 @@ class TradingOpp(models.Model):
                     commissions_total_eur += (trade.commission * trade.rate_to_eur)
                     purchase_price = deal_price
                     amount_initially_invested += (unit_amount * deal_price)
+                    if self.original_stop_loss_price is None:
+                        self.original_stop_loss_price = self.stop_loss_price
                 elif trade.action == '0' and status == "2":  # Assuming '0' is Sell
                     units -= unit_amount
                     #profit_currency += ((unit_amount * deal_price) - commission_amount)
