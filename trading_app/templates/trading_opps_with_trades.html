@@ -29,7 +29,7 @@
                     <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
                         <input type="hidden" name="opp_status" value="{{ status }}">
                         <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
-                        {% if opp.reward_risk %}<br>Reward/Risk: {{ opp.reward_risk }} %<br>{% endif %}
+                        {% if opp.reward_risk %}<br>Reward/Risk: {% if opp.reward_risk < 0%}Infinite{% else %}{{ opp.reward_risk }} %{% endif %}<br>{% endif %}
                         {% if opp.trade_profit %}<br>Trade profit: {{ opp.trade_profit }}{% endif %}</td>
                         <td><img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
                         <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
