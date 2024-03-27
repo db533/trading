@@ -53,6 +53,7 @@
                         {% elif task.seq_no == 50 %}
                             <!-- Check if any longterm positions should be exited. -->
                             <a href="{% url 'trading-opps' %}?action=sell&category=1" target="_blank">Sell recommendations for longterm positions.</a> Consider exiting or reducing size of position.<br>
+                            <a href="{% url 'trading-opps' %}?action=buy&category=7" target="_blank">Buy recommendations for market beaters.</a> Consider adding to position of a market beater.<br>
                         {% elif task.seq_no == 60 %}
                             <!-- Review recent opportunities for good new swing trade investments. -->
                             <a href="{% url 'trading_opps_sorted' %}?action=buy" target="_blank">Recent Buy recommendations.</a><br>
