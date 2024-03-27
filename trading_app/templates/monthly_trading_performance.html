@@ -6,6 +6,8 @@
     <thead>
         <tr>
             <th style="text-align:center; width: 16ch;">Month</th>
+            <th style="text-align:center; width: 12ch;">Trade count</th>
+            <th style="text-align:center; width: 12ch;">Profitable trade count</th>
             <th style="text-align:center; width: 12ch;">EUR Spent</th>
             <th style="text-align:center; width: 12ch;">EUR Gained</th>
             <th style="text-align:center; width: 12ch;">Commissions (EUR)</th>
@@ -18,6 +20,8 @@
         {% for entry in monthly_performance %}
             <tr>
                 <td style="text-align:center;">{{ entry.month }}</td>
+                <td style="text-align:right;">{{ entry.trade_count }}</td>
+                <td style="text-align:right;">{{ entry.profitable_trade_count }}</td>
                 <td style="text-align:right;">{{ entry.total_spent }}</td>
                 <td style="text-align:right;">{{ entry.total_gained }}</td>
                 <td style="text-align:right;">{{ entry.total_commission }}</td>

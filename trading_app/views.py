@@ -2420,19 +2420,26 @@ def monthly_trading_performance_view(request):
     for opp in trading_opps:
         last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
         if last_transaction_month not in monthly_totals:
-            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0}
+            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
 
         trades = opp.trades.all()
+        profit = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
 
             if trade.action == '1':  # Buy
                 monthly_totals[last_transaction_month]['total_spent'] += amount_eur
+                profit -= amount_eur
             elif trade.action == '0':  # Sell
                 monthly_totals[last_transaction_month]['total_gained'] += amount_eur
+                profit += amount_eur
 
             monthly_totals[last_transaction_month]['total_commission'] += commission_eur
+            profit -= commission_eur
+        if profit > 0:
+            monthly_totals[last_transaction_month]['profitable_trade_count'] += 1
+        monthly_totals[last_transaction_month]['trade_count'] += 1
 
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
@@ -2447,6 +2454,8 @@ def monthly_trading_performance_view(request):
             'realised_profit': realised_profit,
             'growth_rate' : round((growth_rate-1)*100,1),
             'cagr' : cagr,
+            'profitable_trade_count' : totals['profitable_trade_count']
+            'trade_count': totals['trade_count']
         })
 
     trading_opps_performance = []
