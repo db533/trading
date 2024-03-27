@@ -769,6 +769,17 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 else:
                                     #logger.info(f'SwingPoint does exist.')
                                     pass
+                        # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
+                        # Find the most recent DailyPrice instance for this ticker
+                        most_recent_daily_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+                        trades_to_update = Trade.objects.filter(tradingopp__ticker=ticker,action='1',  # Where the action is 'Buy'
+                            status='0'  # And the status is 'Planned'
+                        )
+
+                        # Update the price of each trade to the close_price of the most recent DailyPrice
+                        for trade in trades_to_update:
+                            trade.price = most_recent_daily_price.close_price
+                            trade.save()
                     else:
                         print('Insufficient data.')
                 except Exception as e:
