@@ -2454,8 +2454,8 @@ def monthly_trading_performance_view(request):
             'realised_profit': realised_profit,
             'growth_rate' : round((growth_rate-1)*100,1),
             'cagr' : cagr,
-            'profitable_trade_count' : totals['profitable_trade_count']
-            'trade_count': totals['trade_count']
+            'profitable_trade_count' : totals['profitable_trade_count'],
+            'trade_count': totals['trade_count'],
         })
 
     trading_opps_performance = []
