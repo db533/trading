@@ -148,6 +148,7 @@ class TradingOpp(models.Model):
     income_from_sales_eur = models.FloatField(null=True)
     realised_profit_eur = models.FloatField(null=True)
     commissions_total_eur = models.FloatField(null=True)
+    attractiveness_score = models.FloatField(null=True)
 
     def __str__(self):
         return f"{self.ticker.symbol} - {self.strategy.name}"
@@ -202,12 +203,25 @@ class TradingOpp(models.Model):
 
     def save(self, *args, **kwargs):
         if self.stop_loss_price is not None and self.profit_taker_price is not None:
+            # Determine whether this is TSE stock or not.
+            tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+            ticker = self.ticker
+            is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
+            if is_in_tse_stocks:
+                commission = 80
+                exchange_rate = Params.objects.get(key='jpy_rate')
+            else:
+                commission = 1
+                exchange_rate = Params.objects.get(key='usd_rate')
+            commission_eur = commission * exchange_rate
+
             # Get the Buy trades that are linked to this TradingOpp
             trades = self.trades.filter(action=1)  # Get all related Buy trades
             if len(trades) > 0:
                 # We have a Buy trade either planned or executed. Use this price for the calculations.
                 for trade in trades:
                     transaction_price = trade.price
+                    units = trade.units
             else:
                 # We do not have a Buy trade associated, so use the latest close price.
                 daily_price = self.ticker.dailyprice_set.order_by('-datetime').first()
@@ -216,6 +230,9 @@ class TradingOpp(models.Model):
                     transaction_price = latest_price
                 else:
                     transaction_price = None
+                # Determine the likely number of units if do not have a buy trade.
+                investment_value = float(Params.objects.get(key='investment_value'))
+                units = round(investment_value / latest_price,0)
             if transaction_price:
                 action_buy = self.action_buy
                 try:
@@ -230,6 +247,8 @@ class TradingOpp(models.Model):
 
                 except ZeroDivisionError:
                     self.reward_risk = None  # Handle division by zero if purchase_price equals stop_loss_price
+            expected_profit = ((self.profit_taker_price - transaction_price) * units) - (commission_eur * 2)
+            self.attractiveness_score = round(expected_profit * self.reward_risk/100,1)
 
         super().save(*args, **kwargs)  # Call the "real" save() method after computing reward_risk
 
