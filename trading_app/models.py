@@ -209,10 +209,10 @@ class TradingOpp(models.Model):
             is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
             if is_in_tse_stocks:
                 commission = 80
-                exchange_rate = Params.objects.get(key='jpy_rate')
+                exchange_rate = float(Params.objects.get(key='jpy_rate').value)
             else:
                 commission = 1
-                exchange_rate = Params.objects.get(key='usd_rate')
+                exchange_rate = float(Params.objects.get(key='usd_rate').valUe)
             commission_eur = commission * exchange_rate
 
             # Get the Buy trades that are linked to this TradingOpp
@@ -231,7 +231,7 @@ class TradingOpp(models.Model):
                 else:
                     transaction_price = None
                 # Determine the likely number of units if do not have a buy trade.
-                investment_value = float(Params.objects.get(key='investment_value'))
+                investment_value = float(Params.objects.get(key='investment_value').value)
                 units = round(investment_value / latest_price,0)
             if transaction_price:
                 action_buy = self.action_buy
