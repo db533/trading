@@ -212,7 +212,7 @@ class TradingOpp(models.Model):
                 exchange_rate = float(Params.objects.get(key='jpy_rate').value)
             else:
                 commission = 1
-                exchange_rate = float(Params.objects.get(key='usd_rate').valUe)
+                exchange_rate = float(Params.objects.get(key='usd_rate').value)
             commission_eur = commission * exchange_rate
 
             # Get the Buy trades that are linked to this TradingOpp
