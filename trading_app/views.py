@@ -2456,6 +2456,7 @@ def monthly_trading_performance_view(request):
             'cagr' : cagr,
             'profitable_trade_count' : totals['profitable_trade_count'],
             'trade_count': totals['trade_count'],
+            'percent_profitable_trades': round(totals['profitable_trade_count']*100/totals['trade_count'],1),
         })
 
     trading_opps_performance = []
