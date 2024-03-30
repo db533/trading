@@ -2422,7 +2422,7 @@ def monthly_trading_performance_view(request):
         if last_transaction_month not in monthly_totals:
             monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
 
-        trades = opp.trades.objects.filter(status="2")
+        trades = opp.trades.filter(status="2")
         profit = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
