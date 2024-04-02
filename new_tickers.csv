@@ -1,601 +1,301 @@
 ﻿symbol,company_name,categories
-LU,Lufax Holding Ltd,"US stocks,US stocks - not owned"
-FHB,"First Hawaiian, Inc.","US stocks,US stocks - not owned"
-LXP,LXP Industrial Trust,"US stocks,US stocks - not owned"
-FBP,First BanCorp.,"US stocks,US stocks - not owned"
-MCW,"Mister Car Wash, Inc.","US stocks,US stocks - not owned"
-PLTK,Playtika Holding Corp.,"US stocks,US stocks - not owned"
-PTVE,Pactiv Evergreen Inc.,"US stocks,US stocks - not owned"
-HTZ,"Hertz Global Holdings, Inc.","US stocks,US stocks - not owned"
-ZGN,Ermenegildo Zegna N.V.,"US stocks,US stocks - not owned"
-GDRX,"GoodRx Holdings, Inc.","US stocks,US stocks - not owned"
-DNA,"Ginkgo Bioworks Holdings, Inc.","US stocks,US stocks - not owned"
-UP,Wheels Up Experience Inc.,"US stocks,US stocks - not owned"
-FSLY,"Fastly, Inc.","US stocks,US stocks - not owned"
-CVBF,CVB Financial Corp.,"US stocks,US stocks - not owned"
-RXO,"RXO, Inc.","US stocks,US stocks - not owned"
-FULT,Fulton Financial Corporation,"US stocks,US stocks - not owned"
-FL,"Foot Locker, Inc.","US stocks,US stocks - not owned"
-BE,Bloom Energy Corporation,"US stocks,US stocks - not owned"
-OR,Osisko Gold Royalties Ltd,"US stocks,US stocks - not owned"
-NS,NuStar Energy L.P.,"US stocks,US stocks - not owned"
-MODG,Topgolf Callaway Brands Corp.,"US stocks,US stocks - not owned"
-GBDC,"Golub Capital BDC, Inc.","US stocks,US stocks - not owned"
-PINC,"Premier, Inc.","US stocks,US stocks - not owned"
-BMBL,Bumble Inc.,"US stocks,US stocks - not owned"
-CBAY,"CymaBay Therapeutics, Inc.","US stocks,US stocks - not owned"
-ABR,"Arbor Realty Trust, Inc.","US stocks,US stocks - not owned"
-AGL,"agilon health, inc.","US stocks,US stocks - not owned"
-PRVA,"Privia Health Group, Inc.","US stocks,US stocks - not owned"
-HAYW,"Hayward Holdings, Inc.","US stocks,US stocks - not owned"
-CERT,"Certara, Inc.","US stocks,US stocks - not owned"
-HTGC,"Hercules Capital, Inc.","US stocks,US stocks - not owned"
-CTRE,"CareTrust REIT, Inc.","US stocks,US stocks - not owned"
-ARCO,Arcos Dorados Holdings Inc.,"US stocks,US stocks - not owned"
-LFST,"LifeStance Health Group, Inc.","US stocks,US stocks - not owned"
-CARG,"CarGurus, Inc.","US stocks,US stocks - not owned"
-HASI,"Hannon Armstrong Sustainable Infrastructure Capital, Inc.","US stocks,US stocks - not owned"
-SGML,Sigma Lithium Corporation,"US stocks,US stocks - not owned"
-HCM,HUTCHMED (China) Limited,"US stocks,US stocks - not owned"
-OLVI,"Oliveda International, Inc.","US stocks,US stocks - not owned"
-FLYW,Flywire Corporation,"US stocks,US stocks - not owned"
-NAD,Nuveen Quality Municipal Income Fund,"US stocks,US stocks - not owned"
-NEP,"NextEra Energy Partners, LP","US stocks,US stocks - not owned"
-EGO,Eldorado Gold Corporation,"US stocks,US stocks - not owned"
-BTE,Baytex Energy Corp.,"US stocks,US stocks - not owned"
-USAC,"USA Compression Partners, LP","US stocks,US stocks - not owned"
-PSEC,Prospect Capital Corporation,"US stocks,US stocks - not owned"
-GO,Grocery Outlet Holding Corp.,"US stocks,US stocks - not owned"
-OSCR,"Oscar Health, Inc.","US stocks,US stocks - not owned"
-HL,Hecla Mining Company,"US stocks,US stocks - not owned"
-RCKT,"Rocket Pharmaceuticals, Inc.","US stocks,US stocks - not owned"
-JAMF,Jamf Holding Corp.,"US stocks,US stocks - not owned"
-NMRK,"Newmark Group, Inc.","US stocks,US stocks - not owned"
-NABL,"N-able, Inc.","US stocks,US stocks - not owned"
-REZI,"Resideo Technologies, Inc.","US stocks,US stocks - not owned"
-RKLB,"Rocket Lab USA, Inc.","US stocks,US stocks - not owned"
-HELFY,HelloFresh SE,"US stocks,US stocks - not owned"
-NVG,Nuveen AMT-Free Municipal Credit Income Fund,"US stocks,US stocks - not owned"
-ATAT,Atour Lifestyle Holdings Limited,"US stocks,US stocks - not owned"
-EBC,"Eastern Bankshares, Inc.","US stocks,US stocks - not owned"
-IAS,Integral Ad Science Holding Corp.,"US stocks,US stocks - not owned"
-CTRYF,Country Garden Holdings Company Limited,"US stocks,US stocks - not owned"
-AROC,"Archrock, Inc.","US stocks,US stocks - not owned"
-CSQ,Calamos Strategic Total Return Fund,"US stocks,US stocks - not owned"
-PALAF,Paladin Energy Ltd,"US stocks,US stocks - not owned"
-RNW,ReNew Energy Global Plc,"US stocks,US stocks - not owned"
-TIXT,TELUS International (Cda) Inc.,"US stocks,US stocks - not owned"
-SFNC,Simmons First National Corporation,"US stocks,US stocks - not owned"
-HIW,"Highwoods Properties, Inc.","US stocks,US stocks - not owned"
-CORT,Corcept Therapeutics Incorporated,"US stocks,US stocks - not owned"
-IONQ,"IonQ, Inc.","US stocks,US stocks - not owned"
-SHLS,"Shoals Technologies Group, Inc.","US stocks,US stocks - not owned"
-QFIN,"Qifu Technology, Inc.","US stocks,US stocks - not owned"
-TGTX,"TG Therapeutics, Inc.","US stocks,US stocks - not owned"
-LGF-A,Lions Gate Entertainment Corp.,"US stocks,US stocks - not owned"
-PRMW,Primo Water Corporation,"US stocks,US stocks - not owned"
-INDV,Indivior PLC,"US stocks,US stocks - not owned"
-EXG,Eaton Vance Tax-Managed Global Diversified Equity Income Fund,"US stocks,US stocks - not owned"
-DNLI,Denali Therapeutics Inc.,"US stocks,US stocks - not owned"
-PD,"PagerDuty, Inc.","US stocks,US stocks - not owned"
-LGF-B,Lions Gate Entertainment Corp.,"US stocks,US stocks - not owned"
-KTOS,"Kratos Defense & Security Solutions, Inc.","US stocks,US stocks - not owned"
-OI,"O-I Glass, Inc.","US stocks,US stocks - not owned"
-DNUT,"Krispy Kreme, Inc.","US stocks,US stocks - not owned"
-TAC,TransAlta Corporation,"US stocks,US stocks - not owned"
-GLNG,Golar LNG Limited,"US stocks,US stocks - not owned"
-VKTX,"Viking Therapeutics, Inc.","US stocks,US stocks - not owned"
-CWK,Cushman & Wakefield plc,"US stocks,US stocks - not owned"
-ALKT,"Alkami Technology, Inc.","US stocks,US stocks - not owned"
-NTLA,"Intellia Therapeutics, Inc.","US stocks,US stocks - not owned"
-RXRX,"Recursion Pharmaceuticals, Inc.","US stocks,US stocks - not owned"
-ACVA,ACV Auctions Inc.,"US stocks,US stocks - not owned"
-AVDX,"AvidXchange Holdings, Inc.","US stocks,US stocks - not owned"
-AMBP,Ardagh Metal Packaging S.A.,"US stocks,US stocks - not owned"
-AY,Atlantica Sustainable Infrastructure plc,"US stocks,US stocks - not owned"
-BLMN,"Bloomin' Brands, Inc.","US stocks,US stocks - not owned"
-NZF,Nuveen Municipal Credit Income Fund,"US stocks,US stocks - not owned"
-VIAV,Viavi Solutions Inc.,"US stocks,US stocks - not owned"
-SOVO,"Sovos Brands, Inc.","US stocks,US stocks - not owned"
-ZLAB,Zai Lab Limited,"US stocks,US stocks - not owned"
-OPEN,Opendoor Technologies Inc.,"US stocks,US stocks - not owned"
-NJDCY,Nidec Corporation,"US stocks,US stocks - not owned"
-EPOKY,Epiroc AB (publ),"US stocks,US stocks - not owned"
-MT,ArcelorMittal S.A.,"US stocks,US stocks - not owned"
-PCRFY,Panasonic Holdings Corporation,"US stocks,US stocks - not owned"
-OWL,Blue Owl Capital Inc.,"US stocks,US stocks - not owned"
-IMBBY,Imperial Brands PLC,"US stocks,US stocks - not owned"
-MSADY,"MS&AD Insurance Group Holdings, Inc.","US stocks,US stocks - not owned"
-PHG,Koninklijke Philips N.V.,"US stocks,US stocks - not owned"
-CCL,Carnival Corporation & plc,"US stocks,US stocks - not owned"
-KYOCY,Kyocera Corporation,"US stocks,US stocks - not owned"
-SIRI,Sirius XM Holdings Inc.,"US stocks,US stocks - not owned"
-ALPMY,Astellas Pharma Inc.,"US stocks,US stocks - not owned"
-SCGLY,Société Générale Société anonyme,"US stocks,US stocks - not owned"
-ERIC,Telefonaktiebolaget LM Ericsson (publ),"US stocks,US stocks - not owned"
-UNICY,Unicharm Corporation,"US stocks,US stocks - not owned"
-ASX,"ASE Technology Holding Co., Ltd.","US stocks,US stocks - not owned"
-UMC,United Microelectronics Corporation,"US stocks,US stocks - not owned"
-HPE,Hewlett Packard Enterprise Company,"US stocks,US stocks - not owned"
-UWMC,UWM Holdings Corporation,"US stocks,US stocks - not owned"
-HSNGY,Hang Seng Bank Limited,"US stocks,US stocks - not owned"
-WBA,"Walgreens Boots Alliance, Inc.","US stocks,US stocks - not owned"
-CKHUY,CK Hutchison Holdings Limited,"US stocks,US stocks - not owned"
-PPL,PPL Corporation,"US stocks,US stocks - not owned"
-CUK,Carnival Corporation & plc,"US stocks,US stocks - not owned"
-NOKBF,Nokia Oyj,"US stocks,US stocks - not owned"
-TNRSF,Tenaris S.A.,"US stocks,US stocks - not owned"
-EBR,Centrais Elétricas Brasileiras S.A. - Eletrobrás,"US stocks,US stocks - not owned"
-NOK,Nokia Oyj,"US stocks,US stocks - not owned"
-HBAN,Huntington Bancshares Incorporated,"US stocks,US stocks - not owned"
-CTRA,Coterra Energy Inc.,"US stocks,US stocks - not owned"
-GMAB,Genmab A/S,"US stocks,US stocks - not owned"
-DIDIY,DiDi Global Inc.,"US stocks,US stocks - not owned"
-RPRX,Royalty Pharma plc,"US stocks,US stocks - not owned"
-RF,Regions Financial Corporation,"US stocks,US stocks - not owned"
-CNP,"CenterPoint Energy, Inc.","US stocks,US stocks - not owned"
-REPYY,"Repsol, S.A.","US stocks,US stocks - not owned"
-BEKE,KE Holdings Inc.,"US stocks,US stocks - not owned"
-BEP,Brookfield Renewable Partners L.P.,"US stocks,US stocks - not owned"
-VIV,Telefônica Brasil S.A.,"US stocks,US stocks - not owned"
-CTTAY,Continental Aktiengesellschaft,"US stocks,US stocks - not owned"
-WXXWY,WuXi Biologics (Cayman) Inc.,"US stocks,US stocks - not owned"
-CRBG,"Corebridge Financial, Inc.","US stocks,US stocks - not owned"
-RIVN,"Rivian Automotive, Inc.","US stocks,US stocks - not owned"
-CNHI,CNH Industrial N.V.,"US stocks,US stocks - not owned"
-GEN,Gen Digital Inc.,"US stocks,US stocks - not owned"
-TME,Tencent Music Entertainment Group,"US stocks,US stocks - not owned"
-POAHY,Porsche Automobil Holding SE,"US stocks,US stocks - not owned"
-AHCHY,Anhui Conch Cement Company Limited,"US stocks,US stocks - not owned"
-NMR,"Nomura Holdings, Inc.","US stocks,US stocks - not owned"
-SHG,"Shinhan Financial Group Co., Ltd.","US stocks,US stocks - not owned"
-AVTR,"Avantor, Inc.","US stocks,US stocks - not owned"
-FOX,Fox Corporation,"US stocks,US stocks - not owned"
-SGIOY,"Shionogi & Co., Ltd.","US stocks,US stocks - not owned"
-VFS,VinFast Auto Ltd.,"US stocks,US stocks - not owned"
-ZTO,ZTO Express (Cayman) Inc.,"US stocks,US stocks - not owned"
-VTRS,Viatris Inc.,"US stocks,US stocks - not owned"
-HST,"Host Hotels & Resorts, Inc.","US stocks,US stocks - not owned"
-CAG,"Conagra Brands, Inc.","US stocks,US stocks - not owned"
-NWSA,News Corporation,"US stocks,US stocks - not owned"
-NWS,News Corporation,"US stocks,US stocks - not owned"
-XP,XP Inc.,"US stocks,US stocks - not owned"
-KKPNY,Koninklijke KPN N.V.,"US stocks,US stocks - not owned"
-AMCR,Amcor plc,"US stocks,US stocks - not owned"
-KIM,Kimco Realty Corporation,"US stocks,US stocks - not owned"
-BEN,"Franklin Resources, Inc.","US stocks,US stocks - not owned"
-KEY,KeyCorp,"US stocks,US stocks - not owned"
-SUZ,Suzano S.A.,"US stocks,US stocks - not owned"
-PATH,UiPath Inc.,"US stocks,US stocks - not owned"
-TEVA,Teva Pharmaceutical Industries Limited,"US stocks,US stocks - not owned"
-NIO,NIO Inc.,"US stocks,US stocks - not owned"
-RTO,Rentokil Initial plc,"US stocks,US stocks - not owned"
-MRO,Marathon Oil Corporation,"US stocks,US stocks - not owned"
-HLDCY,Henderson Land Development Company Limited,"US stocks,US stocks - not owned"
-ACI,"Albertsons Companies, Inc.","US stocks,US stocks - not owned"
-SNN,Smith & Nephew plc,"US stocks,US stocks - not owned"
-CRRFY,Carrefour SA,"US stocks,US stocks - not owned"
-GRAB,Grab Holdings Limited,"US stocks,US stocks - not owned"
-NHYDY,Norsk Hydro ASA,"US stocks,US stocks - not owned"
-GFI,Gold Fields Limited,"US stocks,US stocks - not owned"
-ARCC,Ares Capital Corporation,"US stocks,US stocks - not owned"
-ZI,ZoomInfo Technologies Inc.,"US stocks,US stocks - not owned"
-ALMMF,Aluminum Corporation of China Limited,"US stocks,US stocks - not owned"
-FMS,Fresenius Medical Care AG,"US stocks,US stocks - not owned"
-WPLCF,Wise plc,"US stocks,US stocks - not owned"
-MTHRY,"M3, Inc.","US stocks,US stocks - not owned"
-AES,The AES Corporation,"US stocks,US stocks - not owned"
-BCH,Banco de Chile,"US stocks,US stocks - not owned"
-COTY,Coty Inc.,"US stocks,US stocks - not owned"
-PAA,"Plains All American Pipeline, L.P.","US stocks,US stocks - not owned"
-CX,"CEMEX, S.A.B. de C.V.","US stocks,US stocks - not owned"
-WES,"Western Midstream Partners, LP","US stocks,US stocks - not owned"
-SSDOY,"Shiseido Company, Limited","US stocks,US stocks - not owned"
-NI,NiSource Inc.,"US stocks,US stocks - not owned"
-SBS,Companhia de Saneamento Básico do Estado de São Paulo - SABESP,"US stocks,US stocks - not owned"
-PEAK,"Healthpeak Properties, Inc.","US stocks,US stocks - not owned"
-AEG,Aegon Ltd.,"US stocks,US stocks - not owned"
-PR,Permian Resources Corporation,"US stocks,US stocks - not owned"
-FLEX,Flex Ltd.,"US stocks,US stocks - not owned"
-SOUHY,South32 Limited,"US stocks,US stocks - not owned"
-NLY,"Annaly Capital Management, Inc.","US stocks,US stocks - not owned"
-YPF,YPF Sociedad Anónima,"US stocks,US stocks - not owned"
-TBVPF,Thai Beverage Public Company Limited,"US stocks,US stocks - not owned"
-HOOD,"Robinhood Markets, Inc.","US stocks,US stocks - not owned"
-AAL,American Airlines Group Inc.,"US stocks,US stocks - not owned"
-PARA,Paramount Global,"US stocks,US stocks - not owned"
-XPEV,XPeng Inc.,"US stocks,US stocks - not owned"
-CLF,Cleveland-Cliffs Inc.,"US stocks,US stocks - not owned"
-TOST,"Toast, Inc.","US stocks,US stocks - not owned"
-ONON,On Holding AG,"US stocks,US stocks - not owned"
-BSAC,Banco Santander-Chile,"US stocks,US stocks - not owned"
-RDEIY,"Redeia Corporación, S.A.","US stocks,US stocks - not owned"
-FTI,TechnipFMC plc,"US stocks,US stocks - not owned"
-TIMB,TIM S.A.,"US stocks,US stocks - not owned"
-CHWY,"Chewy, Inc.","US stocks,US stocks - not owned"
-FNMA,Federal National Mortgage Association,"US stocks,US stocks - not owned"
-PSO,Pearson plc,"US stocks,US stocks - not owned"
-ROIV,Roivant Sciences Ltd.,"US stocks,US stocks - not owned"
-VIPS,Vipshop Holdings Limited,"US stocks,US stocks - not owned"
-IMGN,"ImmunoGen, Inc.","US stocks,US stocks - not owned"
-COLD,"Americold Realty Trust, Inc.","US stocks,US stocks - not owned"
-FHN,First Horizon Corporation,"US stocks,US stocks - not owned"
-LBTYK,Liberty Global Ltd.,"US stocks,US stocks - not owned"
-SKM,"SK Telecom Co., Ltd.","US stocks,US stocks - not owned"
-LBTYA,Liberty Global Ltd.,"US stocks,US stocks - not owned"
-UNLRF,PT Unilever Indonesia Tbk,"US stocks,US stocks - not owned"
-S,"SentinelOne, Inc.","US stocks,US stocks - not owned"
-NOV,NOV Inc.,"US stocks,US stocks - not owned"
-ATH-PA,Athene Holding Ltd.,"US stocks,US stocks - not owned"
-GPK,Graphic Packaging Holding Company,"US stocks,US stocks - not owned"
-EDR,"Endeavor Group Holdings, Inc.","US stocks,US stocks - not owned"
-JDSPY,JD Sports Fashion Plc,"US stocks,US stocks - not owned"
-ARMK,Aramark,"US stocks,US stocks - not owned"
-GGB,Gerdau S.A.,"US stocks,US stocks - not owned"
-OHI,"Omega Healthcare Investors, Inc.","US stocks,US stocks - not owned"
-NYCB,"New York Community Bancorp, Inc.","US stocks,US stocks - not owned"
-SOFI,"SoFi Technologies, Inc.","US stocks,US stocks - not owned"
-NCLH,Norwegian Cruise Line Holdings Ltd.,"US stocks,US stocks - not owned"
-IVBXF,"Innovent Biologics, Inc.","US stocks,US stocks - not owned"
-IEP,Icahn Enterprises L.P.,"US stocks,US stocks - not owned"
-ELAN,Elanco Animal Health Incorporated,"US stocks,US stocks - not owned"
-CIBEY,Commercial International Bank (Egypt) S.A.E.,"US stocks,US stocks - not owned"
-IVZ,Invesco Ltd.,"US stocks,US stocks - not owned"
-PUMSY,PUMA SE,"US stocks,US stocks - not owned"
-RRC,Range Resources Corporation,"US stocks,US stocks - not owned"
-CART,Maplebear Inc.,"US stocks,US stocks - not owned"
-YMM,Full Truck Alliance Co. Ltd.,"US stocks,US stocks - not owned"
-GPS,"The Gap, Inc.","US stocks,US stocks - not owned"
-AU,AngloGold Ashanti plc,"US stocks,US stocks - not owned"
-EXEL,"Exelixis, Inc.","US stocks,US stocks - not owned"
-CSAN,Cosan S.A.,"US stocks,US stocks - not owned"
-SWN,Southwestern Energy Company,"US stocks,US stocks - not owned"
-TAL,TAL Education Group,"US stocks,US stocks - not owned"
-CFLT,"Confluent, Inc.","US stocks,US stocks - not owned"
-BRX,Brixmor Property Group Inc.,"US stocks,US stocks - not owned"
-DELHY,Delivery Hero SE,"US stocks,US stocks - not owned"
-KGC,Kinross Gold Corporation,"US stocks,US stocks - not owned"
-FNMAS,Federal National Mortgage Association,"US stocks,US stocks - not owned"
-MNSO,MINISO Group Holding Limited,"US stocks,US stocks - not owned"
-LCID,"Lucid Group, Inc.","US stocks,US stocks - not owned"
-CCCS,CCC Intelligent Solutions Holdings Inc.,"US stocks,US stocks - not owned"
-STWD,"Starwood Property Trust, Inc.","US stocks,US stocks - not owned"
-BMRRY,B&M European Value Retail S.A.,"US stocks,US stocks - not owned"
-LKNCY,Luckin Coffee Inc.,"US stocks,US stocks - not owned"
-PPC,Pilgrim's Pride Corporation,"US stocks,US stocks - not owned"
-PILBF,Pilbara Minerals Limited,"US stocks,US stocks - not owned"
-AR,Antero Resources Corporation,"US stocks,US stocks - not owned"
-PHJMF,PT Hanjaya Mandala Sampoerna Tbk,"US stocks,US stocks - not owned"
-CAE,CAE Inc.,"US stocks,US stocks - not owned"
-FRSH,Freshworks Inc.,"US stocks,US stocks - not owned"
-AGNC,AGNC Investment Corp.,"US stocks,US stocks - not owned"
-VFC,V.F. Corporation,"US stocks,US stocks - not owned"
-KVYO,"Klaviyo, Inc.","US stocks,US stocks - not owned"
-HR,Healthcare Realty Trust Incorporated,"US stocks,US stocks - not owned"
-KT,KT Corporation,"US stocks,US stocks - not owned"
-MAT,"Mattel, Inc.","US stocks,US stocks - not owned"
-LEVI,Levi Strauss & Co.,"US stocks,US stocks - not owned"
-PHYS,Sprott Physical Gold Trust,"US stocks,US stocks - not owned"
-FNMAN,Federal National Mortgage Association,"US stocks,US stocks - not owned"
-SRUUF,Sprott Physical Uranium Trust Fund,"US stocks,US stocks - not owned"
-UGP,Ultrapar Participações S.A.,"US stocks,US stocks - not owned"
-BZ,Kanzhun Limited,"US stocks,US stocks - not owned"
-CLVT,Clarivate Plc,"US stocks,US stocks - not owned"
-FNMAT,Federal National Mortgage Association,"US stocks,US stocks - not owned"
-ELP,Companhia Paranaense de Energia - COPEL,"US stocks,US stocks - not owned"
-GRFS,"Grifols, S.A.","US stocks,US stocks - not owned"
-OBDC,Blue Owl Capital Corporation,"US stocks,US stocks - not owned"
-ICL,ICL Group Ltd,"US stocks,US stocks - not owned"
-ADT,ADT Inc.,"US stocks,US stocks - not owned"
-FYBR,"Frontier Communications Parent, Inc.","US stocks,US stocks - not owned"
-FSK,FS KKR Capital Corp.,"US stocks,US stocks - not owned"
-AM,Antero Midstream Corporation,"US stocks,US stocks - not owned"
-VNO,Vornado Realty Trust,"US stocks,US stocks - not owned"
-REYN,Reynolds Consumer Products Inc.,"US stocks,US stocks - not owned"
-ALTM,Arcadium Lithium plc,"US stocks,US stocks - not owned"
-CIG,Companhia Energética de Minas Gerais - CEMIG,"US stocks,US stocks - not owned"
-UMICY,Umicore SA,"US stocks,US stocks - not owned"
-SSL,Sasol Limited,"US stocks,US stocks - not owned"
-TSRYY,Treasury Wine Estates Limited,"US stocks,US stocks - not owned"
-ESI,Element Solutions Inc,"US stocks,US stocks - not owned"
-ALGM,"Allegro MicroSystems, Inc.","US stocks,US stocks - not owned"
-MTG,MGIC Investment Corporation,"US stocks,US stocks - not owned"
-ENLC,"EnLink Midstream, LLC","US stocks,US stocks - not owned"
-MRVGF,Mirvac Group,"US stocks,US stocks - not owned"
-HLPPY,Hang Lung Properties Limited,"US stocks,US stocks - not owned"
-VLY,Valley National Bancorp,"US stocks,US stocks - not owned"
-STNE,StoneCo Ltd.,"US stocks,US stocks - not owned"
-KGFHY,Kingfisher plc,"US stocks,US stocks - not owned"
-IGT,International Game Technology PLC,"US stocks,US stocks - not owned"
-CADE,Cadence Bank,"US stocks,US stocks - not owned"
-AA,Alcoa Corporation,"US stocks,US stocks - not owned"
-RITM,Rithm Capital Corp.,"US stocks,US stocks - not owned"
-COLB,"Columbia Banking System, Inc.","US stocks,US stocks - not owned"
-DNB,"Dun & Bradstreet Holdings, Inc.","US stocks,US stocks - not owned"
-BXSL,Blackstone Secured Lending Fund,"US stocks,US stocks - not owned"
-CHX,ChampionX Corporation,"US stocks,US stocks - not owned"
-AUR,"Aurora Innovation, Inc.","US stocks,US stocks - not owned"
-PDI,PIMCO Dynamic Income Fund,"US stocks,US stocks - not owned"
-CWAN,"Clearwater Analytics Holdings, Inc.","US stocks,US stocks - not owned"
-BEPC,Brookfield Renewable Corporation,"US stocks,US stocks - not owned"
-DRS,"Leonardo DRS, Inc.","US stocks,US stocks - not owned"
-PAAS,Pan American Silver Corp.,"US stocks,US stocks - not owned"
-ZLNDY,Zalando SE,"US stocks,US stocks - not owned"
-BLCO,Bausch + Lomb Corporation,"US stocks,US stocks - not owned"
-HOMB,"Home Bancshares, Inc. (Conway, AR)","US stocks,US stocks - not owned"
-ZWS,Zurn Elkay Water Solutions Corporation,"US stocks,US stocks - not owned"
-ALSMY,Alstom SA,"US stocks,US stocks - not owned"
-DLO,DLocal Limited,"US stocks,US stocks - not owned"
-BROS,Dutch Bros Inc.,"US stocks,US stocks - not owned"
-LYFT,"Lyft, Inc.","US stocks,US stocks - not owned"
-M,"Macy's, Inc.","US stocks,US stocks - not owned"
-PWSC,"PowerSchool Holdings, Inc.","US stocks,US stocks - not owned"
-ALIT,"Alight, Inc.","US stocks,US stocks - not owned"
-ONB,Old National Bancorp,"US stocks,US stocks - not owned"
-AGI,Alamos Gold Inc.,"US stocks,US stocks - not owned"
-KRG,Kite Realty Group Trust,"US stocks,US stocks - not owned"
-KD,"Kyndryl Holdings, Inc.","US stocks,US stocks - not owned"
-FNB,F.N.B. Corporation,"US stocks,US stocks - not owned"
-BRFS,BRF S.A.,"US stocks,US stocks - not owned"
-JHG,Janus Henderson Group plc,"US stocks,US stocks - not owned"
-CWEN,"Clearway Energy, Inc.","US stocks,US stocks - not owned"
-FLO,"Flowers Foods, Inc.","US stocks,US stocks - not owned"
-UGI,UGI Corporation,"US stocks,US stocks - not owned"
-NTCO,Natura &Co Holding S.A.,"US stocks,US stocks - not owned"
-ALKS,Alkermes plc,"US stocks,US stocks - not owned"
-LNC,Lincoln National Corporation,"US stocks,US stocks - not owned"
-TKC,Turkcell Iletisim Hizmetleri A.S.,"US stocks,US stocks - not owned"
-FRO,Frontline plc,"US stocks,US stocks - not owned"
-SID,Companhia Siderúrgica Nacional,"US stocks,US stocks - not owned"
-ACAD,ACADIA Pharmaceuticals Inc.,"US stocks,US stocks - not owned"
-ETRN,Equitrans Midstream Corporation,"US stocks,US stocks - not owned"
-WU,The Western Union Company,"US stocks,US stocks - not owned"
-DXC,DXC Technology Company,"US stocks,US stocks - not owned"
-RDN,Radian Group Inc.,"US stocks,US stocks - not owned"
-RIG,Transocean Ltd.,"US stocks,US stocks - not owned"
-SNDR,"Schneider National, Inc.","US stocks,US stocks - not owned"
-RVMD,"Revolution Medicines, Inc.","US stocks,US stocks - not owned"
-RCM,R1 RCM Inc.,"US stocks,US stocks - not owned"
-GOL,Gol Linhas Aéreas Inteligentes S.A.,"US stocks,US stocks - not owned"
-SLM,SLM Corporation,"US stocks,US stocks - not owned"
-CHFLF,China Feihe Limited,"US stocks,US stocks - not owned"
-GME,GameStop Corp.,"US stocks,US stocks - not owned"
-HCP,"HashiCorp, Inc.","US stocks,US stocks - not owned"
-PTEN,"Patterson-UTI Energy, Inc.","US stocks,US stocks - not owned"
-FFIN,"First Financial Bankshares, Inc.","US stocks,US stocks - not owned"
-ASAN,"Asana, Inc.","US stocks,US stocks - not owned"
-PSNY,Polestar Automotive Holding UK PLC,"US stocks,US stocks - not owned"
-SHC,Sotera Health Company,"US stocks,US stocks - not owned"
-HUN,Huntsman Corporation,"US stocks,US stocks - not owned"
-BILI,Bilibili Inc.,"US stocks,US stocks - not owned"
-JOBY,"Joby Aviation, Inc.","US stocks,US stocks - not owned"
-SATS,EchoStar Corporation,"US stocks,US stocks - not owned"
-NVST,Envista Holdings Corporation,"US stocks,US stocks - not owned"
-OGN,Organon & Co.,"US stocks,US stocks - not owned"
-MGY,Magnolia Oil & Gas Corporation,"US stocks,US stocks - not owned"
-AQN,Algonquin Power & Utilities Corp.,"US stocks,US stocks - not owned"
-GGAL,Grupo Financiero Galicia S.A.,"US stocks,US stocks - not owned"
-PAGS,PagSeguro Digital Ltd.,"US stocks,US stocks - not owned"
-WYNMY,"Wynn Macau, Limited","US stocks,US stocks - not owned"
-INSM,Insmed Incorporated,"US stocks,US stocks - not owned"
-GT,The Goodyear Tire & Rubber Company,"US stocks,US stocks - not owned"
-CPG,Crescent Point Energy Corp.,"US stocks,US stocks - not owned"
-CEF,Sprott Physical Gold and Silver Trust,"US stocks,US stocks - not owned"
-FLNC,"Fluence Energy, Inc.","US stocks,US stocks - not owned"
-ENIC,Enel Chile S.A.,"US stocks,US stocks - not owned"
-AEO,"American Eagle Outfitters, Inc.","US stocks,US stocks - not owned"
-NXE,NexGen Energy Ltd.,"US stocks,US stocks - not owned"
-TFSL,TFS Financial Corporation,"US stocks,US stocks - not owned"
-WEN,The Wendy's Company,"US stocks,US stocks - not owned"
-PAGP,"Plains GP Holdings, L.P.","US stocks,US stocks - not owned"
-EPRT,"Essential Properties Realty Trust, Inc.","US stocks,US stocks - not owned"
-ESMT,"EngageSmart, Inc.","US stocks,US stocks - not owned"
-VRRM,Verra Mobility Corporation,"US stocks,US stocks - not owned"
-MDU,"MDU Resources Group, Inc.","US stocks,US stocks - not owned"
-VERX,"Vertex, Inc.","US stocks,US stocks - not owned"
-BTG,B2Gold Corp.,"US stocks,US stocks - not owned"
-BOX,"Box, Inc.","US stocks,US stocks - not owned"
-FMCC,Federal Home Loan Mortgage Corporation,"US stocks,US stocks - not owned"
-ALVO,Alvotech,"US stocks,US stocks - not owned"
-ASAI,Sendas Distribuidora S.A.,"US stocks,US stocks - not owned"
-BVN,Compañía de Minas Buenaventura S.A.A.,"US stocks,US stocks - not owned"
-APLE,"Apple Hospitality REIT, Inc.","US stocks,US stocks - not owned"
-LPL,"LG Display Co., Ltd.","US stocks,US stocks - not owned"
-NEOG,Neogen Corporation,"US stocks,US stocks - not owned"
-RLJ,RLJ Lodging Trust,"US stocks,US stocks - not owned"
-PSLV,Sprott Physical Silver Trust,"US stocks,US stocks - not owned"
-MAC,The Macerich Company,"US stocks,US stocks - not owned"
-BGC,"BGC Group, Inc.","US stocks,US stocks - not owned"
-FOLD,"Amicus Therapeutics, Inc.","US stocks,US stocks - not owned"
-PENN,"PENN Entertainment, Inc.","US stocks,US stocks - not owned"
-PYCR,"Paycor HCM, Inc.","US stocks,US stocks - not owned"
-MARA,"Marathon Digital Holdings, Inc.","US stocks,US stocks - not owned"
-IRT,"Independence Realty Trust, Inc.","US stocks,US stocks - not owned"
-EURN,Euronav NV,"US stocks,US stocks - not owned"
-CRDO,Credo Technology Group Holding Ltd,"US stocks,US stocks - not owned"
-LYSDY,Lynas Rare Earths Limited,"US stocks,US stocks - not owned"
-HMY,Harmony Gold Mining Company Limited,"US stocks,US stocks - not owned"
-BXMT,"Blackstone Mortgage Trust, Inc.","US stocks,US stocks - not owned"
-IQ,"iQIYI, Inc.","US stocks,US stocks - not owned"
-CUZ,Cousins Properties Incorporated,"US stocks,US stocks - not owned"
-CURLF,"Curaleaf Holdings, Inc.","US stocks,US stocks - not owned"
-IMPUY,Impala Platinum Holdings Limited,"US stocks,US stocks - not owned"
-NWL,Newell Brands Inc.,"US stocks,US stocks - not owned"
-UCBI,"United Community Banks, Inc.","US stocks,US stocks - not owned"
-STR,Sitio Royalties Corp.,"US stocks,US stocks - not owned"
-TDOC,"Teladoc Health, Inc.","US stocks,US stocks - not owned"
-BSM,"Black Stone Minerals, L.P.","US stocks,US stocks - not owned"
-MLCO,Melco Resorts & Entertainment Limited,"US stocks,US stocks - not owned"
-CXM,"Sprinklr, Inc.","US stocks,US stocks - not owned"
-QS,QuantumScape Corporation,"US stocks,US stocks - not owned"
-SEM,Select Medical Holdings Corporation,"US stocks,US stocks - not owned"
-GTES,Gates Industrial Corporation plc,"US stocks,US stocks - not owned"
-VLEEY,Valeo SE,"US stocks,US stocks - not owned"
-NVEI,Nuvei Corporation,"US stocks,US stocks - not owned"
-BTU,Peabody Energy Corporation,"US stocks,US stocks - not owned"
-TGS,Transportadora de Gas del Sur S.A.,"US stocks,US stocks - not owned"
-FNB-PE,F.N.B. Corporation,"US stocks,US stocks - not owned"
-MQ,"Marqeta, Inc.","US stocks,US stocks - not owned"
-UAA,"Under Armour, Inc.","US stocks,US stocks - not owned"
-TEO,Telecom Argentina S.A.,"US stocks,US stocks - not owned"
-UA,"Under Armour, Inc.","US stocks,US stocks - not owned"
-FMCKJ,Federal Home Loan Mortgage Corporation,"US stocks,US stocks - not owned"
-PK,Park Hotels & Resorts Inc.,"US stocks,US stocks - not owned"
-SBSW,Sibanye Stillwater Limited,"US stocks,US stocks - not owned"
-ERJ,Embraer S.A.,"US stocks,US stocks - not owned"
-BNL,"Broadstone Net Lease, Inc.","US stocks,US stocks - not owned"
-BUR,Burford Capital Limited,"US stocks,US stocks - not owned"
-ASB,Associated Banc-Corp,"US stocks,US stocks - not owned"
-DBRG,"DigitalBridge Group, Inc.","US stocks,US stocks - not owned"
-FMCKO,Federal Home Loan Mortgage Corporation,"US stocks,US stocks - not owned"
-GSAT,"Globalstar, Inc.","US stocks,US stocks - not owned"
-NEA,Nuveen AMT-Free Quality Municipal Income Fund,"US stocks,US stocks - not owned"
-MANU,Manchester United plc,"US stocks,US stocks - not owned"
-DOC,Physicians Realty Trust,"US stocks,US stocks - not owned"
-SBRA,"Sabra Health Care REIT, Inc.","US stocks,US stocks - not owned"
-VSH,"Vishay Intertechnology, Inc.","US stocks,US stocks - not owned"
-CNX,CNX Resources Corporation,"US stocks,US stocks - not owned"
-FMCCP,Federal Home Loan Mortgage Corporation,"US stocks,US stocks - not owned"
-AI,"C3.ai, Inc.","US stocks,US stocks - not owned"
-SPR,"Spirit AeroSystems Holdings, Inc.","US stocks,US stocks - not owned"
-LEG,"Leggett & Platt, Incorporated","US stocks,US stocks - not owned"
-DNP,DNP Select Income Fund Inc.,"US stocks,US stocks - not owned"
-OLK,Olink Holding AB (publ),"US stocks,US stocks - not owned"
-TGNA,TEGNA Inc.,"US stocks,US stocks - not owned"
-CNO,"CNO Financial Group, Inc.","US stocks,US stocks - not owned"
-UEC,Uranium Energy Corp.,"US stocks,US stocks - not owned"
-ATHM,Autohome Inc.,"US stocks,US stocks - not owned"
-RUN,Sunrun Inc.,"US stocks,US stocks - not owned"
-FIBK,"First Interstate BancSystem, Inc.","US stocks,US stocks - not owned"
-GTBIF,Green Thumb Industries Inc.,"US stocks,US stocks - not owned"
-JWN,"Nordstrom, Inc.","US stocks,US stocks - not owned"
-RELY,"Remitly Global, Inc.","US stocks,US stocks - not owned"
-TCN,Tricon Residential Inc.,"US stocks,US stocks - not owned"
-VSAT,"Viasat, Inc.","US stocks,US stocks - not owned"
-VIRT,"Virtu Financial, Inc.","US stocks,US stocks - not owned"
-SKT,Tanger Inc.,"US stocks,US stocks - not owned"
-BHC,Bausch Health Companies Inc.,"US stocks,US stocks - not owned"
-LBRT,Liberty Energy Inc.,"US stocks,US stocks - not owned"
-YOU,"Clear Secure, Inc.","US stocks,US stocks - not owned"
-TRIP,"Tripadvisor, Inc.","US stocks,US stocks - not owned"
-NOMD,Nomad Foods Limited,"US stocks,US stocks - not owned"
-SMMT,Summit Therapeutics Inc.,"US stocks,US stocks - not owned"
-BAK,Braskem S.A.,"US stocks,US stocks - not owned"
-ERF,Enerplus Corporation,"US stocks,US stocks - not owned"
-MP,MP Materials Corp.,"US stocks,US stocks - not owned"
-DEI,"Douglas Emmett, Inc.","US stocks,US stocks - not owned"
-SITC,SITE Centers Corp.,"US stocks,US stocks - not owned"
-KOS,Kosmos Energy Ltd.,"US stocks,US stocks - not owned"
-SVV,"Savers Value Village, Inc.","US stocks,US stocks - not owned"
-LTH,"Life Time Group Holdings, Inc.","US stocks,US stocks - not owned"
-KSS,Kohl's Corporation,"US stocks,US stocks - not owned"
-VSTS,Vestis Corporation,"US stocks,US stocks - not owned"
-CDP,COPT Defense Properties,"US stocks,US stocks - not owned"
-GNW,"Genworth Financial, Inc.","US stocks,US stocks - not owned"
-ARLP,"Alliance Resource Partners, L.P.","US stocks,US stocks - not owned"
-COUR,"Coursera, Inc.","US stocks,US stocks - not owned"
-ESRT,"Empire State Realty Trust, Inc.","US stocks,US stocks - not owned"
-CSTM,Constellium SE,"US stocks,US stocks - not owned"
-LSPD,Lightspeed Commerce Inc.,"US stocks,US stocks - not owned"
-GH,"Guardant Health, Inc.","US stocks,US stocks - not owned"
-RLX,RLX Technology Inc.,"US stocks,US stocks - not owned"
-LU,Lufax Holding Ltd,"US stocks,US stocks - not owned"
-FHB,"First Hawaiian, Inc.","US stocks,US stocks - not owned"
-LXP,LXP Industrial Trust,"US stocks,US stocks - not owned"
-FBP,First BanCorp.,"US stocks,US stocks - not owned"
-MCW,"Mister Car Wash, Inc.","US stocks,US stocks - not owned"
-PLTK,Playtika Holding Corp.,"US stocks,US stocks - not owned"
-PTVE,Pactiv Evergreen Inc.,"US stocks,US stocks - not owned"
-HTZ,"Hertz Global Holdings, Inc.","US stocks,US stocks - not owned"
-ZGN,Ermenegildo Zegna N.V.,"US stocks,US stocks - not owned"
-GDRX,"GoodRx Holdings, Inc.","US stocks,US stocks - not owned"
-DNA,"Ginkgo Bioworks Holdings, Inc.","US stocks,US stocks - not owned"
-UP,Wheels Up Experience Inc.,"US stocks,US stocks - not owned"
-FSLY,"Fastly, Inc.","US stocks,US stocks - not owned"
-CVBF,CVB Financial Corp.,"US stocks,US stocks - not owned"
-RXO,"RXO, Inc.","US stocks,US stocks - not owned"
-FULT,Fulton Financial Corporation,"US stocks,US stocks - not owned"
-FL,"Foot Locker, Inc.","US stocks,US stocks - not owned"
-BE,Bloom Energy Corporation,"US stocks,US stocks - not owned"
-OR,Osisko Gold Royalties Ltd,"US stocks,US stocks - not owned"
-NS,NuStar Energy L.P.,"US stocks,US stocks - not owned"
-MODG,Topgolf Callaway Brands Corp.,"US stocks,US stocks - not owned"
-GBDC,"Golub Capital BDC, Inc.","US stocks,US stocks - not owned"
-PINC,"Premier, Inc.","US stocks,US stocks - not owned"
-BMBL,Bumble Inc.,"US stocks,US stocks - not owned"
-CBAY,"CymaBay Therapeutics, Inc.","US stocks,US stocks - not owned"
-ABR,"Arbor Realty Trust, Inc.","US stocks,US stocks - not owned"
-AGL,"agilon health, inc.","US stocks,US stocks - not owned"
-PRVA,"Privia Health Group, Inc.","US stocks,US stocks - not owned"
-HAYW,"Hayward Holdings, Inc.","US stocks,US stocks - not owned"
-CERT,"Certara, Inc.","US stocks,US stocks - not owned"
-HTGC,"Hercules Capital, Inc.","US stocks,US stocks - not owned"
-CTRE,"CareTrust REIT, Inc.","US stocks,US stocks - not owned"
-ARCO,Arcos Dorados Holdings Inc.,"US stocks,US stocks - not owned"
-LFST,"LifeStance Health Group, Inc.","US stocks,US stocks - not owned"
-CARG,"CarGurus, Inc.","US stocks,US stocks - not owned"
-HASI,"Hannon Armstrong Sustainable Infrastructure Capital, Inc.","US stocks,US stocks - not owned"
-SGML,Sigma Lithium Corporation,"US stocks,US stocks - not owned"
-HCM,HUTCHMED (China) Limited,"US stocks,US stocks - not owned"
-OLVI,"Oliveda International, Inc.","US stocks,US stocks - not owned"
-FLYW,Flywire Corporation,"US stocks,US stocks - not owned"
-NAD,Nuveen Quality Municipal Income Fund,"US stocks,US stocks - not owned"
-NEP,"NextEra Energy Partners, LP","US stocks,US stocks - not owned"
-EGO,Eldorado Gold Corporation,"US stocks,US stocks - not owned"
-BTE,Baytex Energy Corp.,"US stocks,US stocks - not owned"
-USAC,"USA Compression Partners, LP","US stocks,US stocks - not owned"
-PSEC,Prospect Capital Corporation,"US stocks,US stocks - not owned"
-GO,Grocery Outlet Holding Corp.,"US stocks,US stocks - not owned"
-OSCR,"Oscar Health, Inc.","US stocks,US stocks - not owned"
-HL,Hecla Mining Company,"US stocks,US stocks - not owned"
-RCKT,"Rocket Pharmaceuticals, Inc.","US stocks,US stocks - not owned"
-JAMF,Jamf Holding Corp.,"US stocks,US stocks - not owned"
-NMRK,"Newmark Group, Inc.","US stocks,US stocks - not owned"
-NABL,"N-able, Inc.","US stocks,US stocks - not owned"
-REZI,"Resideo Technologies, Inc.","US stocks,US stocks - not owned"
-RKLB,"Rocket Lab USA, Inc.","US stocks,US stocks - not owned"
-HELFY,HelloFresh SE,"US stocks,US stocks - not owned"
-NVG,Nuveen AMT-Free Municipal Credit Income Fund,"US stocks,US stocks - not owned"
-ATAT,Atour Lifestyle Holdings Limited,"US stocks,US stocks - not owned"
-EBC,"Eastern Bankshares, Inc.","US stocks,US stocks - not owned"
-IAS,Integral Ad Science Holding Corp.,"US stocks,US stocks - not owned"
-CTRYF,Country Garden Holdings Company Limited,"US stocks,US stocks - not owned"
-AROC,"Archrock, Inc.","US stocks,US stocks - not owned"
-CSQ,Calamos Strategic Total Return Fund,"US stocks,US stocks - not owned"
-PALAF,Paladin Energy Ltd,"US stocks,US stocks - not owned"
-RNW,ReNew Energy Global Plc,"US stocks,US stocks - not owned"
-TIXT,TELUS International (Cda) Inc.,"US stocks,US stocks - not owned"
-SFNC,Simmons First National Corporation,"US stocks,US stocks - not owned"
-HIW,"Highwoods Properties, Inc.","US stocks,US stocks - not owned"
-CORT,Corcept Therapeutics Incorporated,"US stocks,US stocks - not owned"
-IONQ,"IonQ, Inc.","US stocks,US stocks - not owned"
-SHLS,"Shoals Technologies Group, Inc.","US stocks,US stocks - not owned"
-QFIN,"Qifu Technology, Inc.","US stocks,US stocks - not owned"
-TGTX,"TG Therapeutics, Inc.","US stocks,US stocks - not owned"
-LGF-A,Lions Gate Entertainment Corp.,"US stocks,US stocks - not owned"
-PRMW,Primo Water Corporation,"US stocks,US stocks - not owned"
-INDV,Indivior PLC,"US stocks,US stocks - not owned"
-EXG,Eaton Vance Tax-Managed Global Diversified Equity Income Fund,"US stocks,US stocks - not owned"
-DNLI,Denali Therapeutics Inc.,"US stocks,US stocks - not owned"
-PD,"PagerDuty, Inc.","US stocks,US stocks - not owned"
-LGF-B,Lions Gate Entertainment Corp.,"US stocks,US stocks - not owned"
-KTOS,"Kratos Defense & Security Solutions, Inc.","US stocks,US stocks - not owned"
-OI,"O-I Glass, Inc.","US stocks,US stocks - not owned"
-DNUT,"Krispy Kreme, Inc.","US stocks,US stocks - not owned"
-TAC,TransAlta Corporation,"US stocks,US stocks - not owned"
-GLNG,Golar LNG Limited,"US stocks,US stocks - not owned"
-VKTX,"Viking Therapeutics, Inc.","US stocks,US stocks - not owned"
-CWK,Cushman & Wakefield plc,"US stocks,US stocks - not owned"
-ALKT,"Alkami Technology, Inc.","US stocks,US stocks - not owned"
-NTLA,"Intellia Therapeutics, Inc.","US stocks,US stocks - not owned"
-RXRX,"Recursion Pharmaceuticals, Inc.","US stocks,US stocks - not owned"
-ACVA,ACV Auctions Inc.,"US stocks,US stocks - not owned"
-AVDX,"AvidXchange Holdings, Inc.","US stocks,US stocks - not owned"
-AMBP,Ardagh Metal Packaging S.A.,"US stocks,US stocks - not owned"
-AY,Atlantica Sustainable Infrastructure plc,"US stocks,US stocks - not owned"
-BLMN,"Bloomin' Brands, Inc.","US stocks,US stocks - not owned"
-NZF,Nuveen Municipal Credit Income Fund,"US stocks,US stocks - not owned"
-VIAV,Viavi Solutions Inc.,"US stocks,US stocks - not owned"
-SOVO,"Sovos Brands, Inc.","US stocks,US stocks - not owned"
-ZLAB,Zai Lab Limited,"US stocks,US stocks - not owned"
-OPEN,Opendoor Technologies Inc.,"US stocks,US stocks - not owned"
+BSX,Boston Scientific Corporation,US stocks
+UBS,UBS Group AG,US stocks
+GSK,GSK plc,US stocks
+RELX,RELX PLC,US stocks
+SLB,Schlumberger Limited,US stocks
+MO,"Altria Group, Inc.",US stocks
+ENB,Enbridge Inc.,US stocks
+FCX,Freeport-McMoRan Inc.,US stocks
+BTI,British American Tobacco p.l.c.,US stocks
+USB,U.S. Bancorp,US stocks
+BNS,The Bank of Nova Scotia,US stocks
+BN,Brookfield Corporation,US stocks
+OXY,Occidental Petroleum Corporation,US stocks
+HMC,"Honda Motor Co., Ltd.",US stocks
+E,Eni S.p.A.,US stocks
+GM,General Motors Company,US stocks
+CARR,Carrier Global Corporation,US stocks
+NGG,National Grid plc,US stocks
+TFC,Truist Financial Corporation,US stocks
+SU,Suncor Energy Inc.,US stocks
+WMB,"The Williams Companies, Inc.",US stocks
+O,Realty Income Corporation,US stocks
+JCI,Johnson Controls International plc,US stocks
+BK,The Bank of New York Mellon Corporation,US stocks
+NEM,Newmont Corporation,US stocks
+MPLX,MPLX LP,US stocks
+DOW,Dow Inc.,US stocks
+TRP,TC Energy Corporation,US stocks
+KR,The Kroger Co.,US stocks
+D,"Dominion Energy, Inc.",US stocks
+CTVA,"Corteva, Inc.",US stocks
+LVS,Las Vegas Sands Corp.,US stocks
+STM,STMicroelectronics N.V.,US stocks
+HAL,Halliburton Company,US stocks
+PEG,Public Service Enterprise Group Incorporated,US stocks
+DVN,Devon Energy Corporation,US stocks
+ADM,Archer-Daniels-Midland Company,US stocks
+SLF,Sun Life Financial Inc.,US stocks
+SE,Sea Limited,US stocks
+AEM,Agnico Eagle Mines Limited,US stocks
+DAL,"Delta Air Lines, Inc.",US stocks
+BCE,BCE Inc.,US stocks
+GLW,Corning Incorporated,US stocks
+NTR,Nutrien Ltd.,US stocks
+HWM,Howmet Aerospace Inc.,US stocks
+WY,Weyerhaeuser Company,US stocks
+BF-B,Brown-Forman Corporation,US stocks
+TECK,Teck Resources Limited,US stocks
+PINS,"Pinterest, Inc.",US stocks
+RBLX,Roblox Corporation,US stocks
+EQR,Equity Residential,US stocks
+TS,Tenaris S.A.,US stocks
+CM,Canadian Imperial Bank of Commerce,US stocks
+FE,FirstEnergy Corp.,US stocks
+ROL,"Rollins, Inc.",US stocks
+WPM,Wheaton Precious Metals Corp.,US stocks
+BAX,Baxter International Inc.,US stocks
+INVH,Invitation Homes Inc.,US stocks
+RCI,Rogers Communications Inc.,US stocks
+BALL,Ball Corporation,US stocks
+ES,Eversource Energy,US stocks
+TSN,"Tyson Foods, Inc.",US stocks
+CCJ,Cameco Corporation,US stocks
+K,Kellanova,US stocks
+FTS,Fortis Inc.,US stocks
+HRL,Hormel Foods Corporation,US stocks
+PBA,Pembina Pipeline Corporation,US stocks
+IOT,Samsara Inc.,US stocks
+CMS,CMS Energy Corporation,US stocks
+VTR,"Ventas, Inc.",US stocks
+SYF,Synchrony Financial,US stocks
+ALLY,Ally Financial Inc.,US stocks
+PSTG,"Pure Storage, Inc.",US stocks
+EQT,EQT Corporation,US stocks
+CFG,"Citizens Financial Group, Inc.",US stocks
+BAM,Brookfield Asset Management Ltd.,US stocks
+YUMC,"Yum China Holdings, Inc.",US stocks
+RTO,Rentokil Initial plc,US stocks
+MGA,Magna International Inc.,US stocks
+AMH,American Homes 4 Rent,US stocks
+MGM,MGM Resorts International,US stocks
+NRG,"NRG Energy, Inc.",US stocks
+TAP,Molson Coors Beverage Company,US stocks
+FNF,"Fidelity National Financial, Inc.",US stocks
+OVV,Ovintiv Inc.,US stocks
+AGR,"Avangrid, Inc.",US stocks
+RYAN,"Ryan Specialty Holdings, Inc.",US stocks
+SQM,Sociedad Química y Minera de Chile S.A.,US stocks
+WES,"Western Midstream Partners, LP",US stocks
+DT,"Dynatrace, Inc.",US stocks
+IP,International Paper Company,US stocks
+CPB,Campbell Soup Company,US stocks
+USFD,US Foods Holding Corp.,US stocks
+UDR,"UDR, Inc.",US stocks
+WRK,WestRock Company,US stocks
+GFL,GFL Environmental Inc.,US stocks
+ELS,"Equity LifeStyle Properties, Inc.",US stocks
+EQH,"Equitable Holdings, Inc.",US stocks
+IPG,"The Interpublic Group of Companies, Inc.",US stocks
+WPC,W. P. Carey Inc.,US stocks
+DINO,HF Sinclair Corporation,US stocks
+JNPR,"Juniper Networks, Inc.",US stocks
+CNM,"Core & Main, Inc.",US stocks
+TWLO,Twilio Inc.,US stocks
+ONON,On Holding AG,US stocks
+BBWI,"Bath & Body Works, Inc.",US stocks
+REXR,"Rexford Industrial Realty, Inc.",US stocks
+TPR,"Tapestry, Inc.",US stocks
+UNM,Unum Group,US stocks
+MOS,The Mosaic Company,US stocks
+INFA,Informatica Inc.,US stocks
+CTLT,"Catalent, Inc.",US stocks
+CUBE,CubeSmart,US stocks
+DAY,Dayforce Inc,US stocks
+WTRG,"Essential Utilities, Inc.",US stocks
+BXP,"Boston Properties, Inc.",US stocks
+APG,APi Group Corporation,US stocks
+QGEN,Qiagen N.V.,US stocks
+TPX,"Tempur Sealy International, Inc.",US stocks
+X,United States Steel Corporation,US stocks
+JEF,Jefferies Financial Group Inc.,US stocks
+CIB,Bancolombia S.A.,US stocks
+SKX,"Skechers U.S.A., Inc.",US stocks
+COHR,Coherent Corp.,US stocks
+KNX,Knight-Swift Transportation Holdings Inc.,US stocks
+ORI,Old Republic International Corporation,US stocks
+KBR,"KBR, Inc.",US stocks
+SN,"SharkNinja, Inc.",US stocks
+BIRK,Birkenstock Holding plc,US stocks
+RRC,Range Resources Corporation,US stocks
+ARMK,Aramark,US stocks
+STVN,Stevanato Group S.p.A.,US stocks
+WBS,Webster Financial Corporation,US stocks
+MTDR,Matador Resources Company,US stocks
+HESM,Hess Midstream LP,US stocks
+BWA,BorgWarner Inc.,US stocks
+RDDT,"Reddit, Inc.",US stocks
+OHI,"Omega Healthcare Investors, Inc.",US stocks
+NNN,"NNN REIT, Inc.",US stocks
+W,Wayfair Inc.,US stocks
+BRBR,"BellRing Brands, Inc.",US stocks
+FMC,FMC Corporation,US stocks
+CAVA,"CAVA Group, Inc.",US stocks
+AXTA,Axalta Coating Systems Ltd.,US stocks
+SUM,"Summit Materials, Inc.",US stocks
+MUR,Murphy Oil Corporation,US stocks
+FLR,Fluor Corporation,US stocks
+OLN,Olin Corporation,US stocks
+DAR,Darling Ingredients Inc.,US stocks
+CMA,Comerica Incorporated,US stocks
+NYT,The New York Times Company,US stocks
+GMED,"Globus Medical, Inc.",US stocks
+PBF,PBF Energy Inc.,US stocks
+AZEK,The AZEK Company Inc.,US stocks
+CIEN,Ciena Corporation,US stocks
+NE,Noble Corporation plc,US stocks
+BERY,"Berry Global Group, Inc.",US stocks
+OGE,OGE Energy Corp.,US stocks
+FR,"First Industrial Realty Trust, Inc.",US stocks
+VNT,Vontier Corporation,US stocks
+STAG,"STAG Industrial, Inc.",US stocks
+WAL,Western Alliance Bancorporation,US stocks
+CMC,Commercial Metals Company,US stocks
+BILL,"BILL Holdings, Inc.",US stocks
+HRB,"H&R Block, Inc.",US stocks
+ATI,ATI Inc.,US stocks
+AA,Alcoa Corporation,US stocks
+BYD,Boyd Gaming Corporation,US stocks
+TMHC,Taylor Morrison Home Corporation,US stocks
+ESNT,Essent Group Ltd.,US stocks
+GIL,Gildan Activewear Inc.,US stocks
+FAF,First American Financial Corporation,US stocks
+GXO,"GXO Logistics, Inc.",US stocks
+FLS,Flowserve Corporation,US stocks
+DTM,"DT Midstream, Inc.",US stocks
+TRNO,Terreno Realty Corporation,US stocks
+OMF,"OneMain Holdings, Inc.",US stocks
+MLI,"Mueller Industries, Inc.",US stocks
+PB,"Prosperity Bancshares, Inc.",US stocks
+BXSL,Blackstone Secured Lending Fund,US stocks
+FOUR,"Shift4 Payments, Inc.",US stocks
+HOG,"Harley-Davidson, Inc.",US stocks
+SM,SM Energy Company,US stocks
+BROS,Dutch Bros Inc.,US stocks
+G,Genpact Limited,US stocks
+ADC,Agree Realty Corporation,US stocks
+VVV,Valvoline Inc.,US stocks
+DV,"DoubleVerify Holdings, Inc.",US stocks
+SON,Sonoco Products Company,US stocks
+ZWS,Zurn Elkay Water Solutions Corporation,US stocks
+SNV,Synovus Financial Corp.,US stocks
+AL,Air Lease Corporation,US stocks
+PLNT,"Planet Fitness, Inc.",US stocks
+CLS,Celestica Inc.,US stocks
+AXS,AXIS Capital Holdings Limited,US stocks
+ST,Sensata Technologies Holding plc,US stocks
+ALK,"Alaska Air Group, Inc.",US stocks
+SMAR,Smartsheet Inc.,US stocks
+LNC,Lincoln National Corporation,US stocks
+CPRI,Capri Holdings Limited,US stocks
+JHG,Janus Henderson Group plc,US stocks
+KBH,KB Home,US stocks
+SLGN,Silgan Holdings Inc.,US stocks
+SEE,Sealed Air Corporation,US stocks
+JXN,Jackson Financial Inc.,US stocks
+SUN,Sunoco LP,US stocks
+NSA,National Storage Affiliates Trust,US stocks
+SQSP,"Squarespace, Inc.",US stocks
+RDN,Radian Group Inc.,US stocks
+NFG,National Fuel Gas Company,US stocks
+HGV,Hilton Grand Vacations Inc.,US stocks
+RYN,Rayonier Inc.,US stocks
+MDC,"M.D.C. Holdings, Inc.",US stocks
+AIRC,Apartment Income REIT Corp.,US stocks
+BIPC,Brookfield Infrastructure Corporation,US stocks
+AEL,American Equity Investment Life Holding Company,US stocks
+GBCI,"Glacier Bancorp, Inc.",US stocks
+POR,Portland General Electric Company,US stocks
+PRGO,Perrigo Company plc,US stocks
+NJR,New Jersey Resources Corporation,US stocks
+TEX,Terex Corporation,US stocks
+HP,"Helmerich & Payne, Inc.",US stocks
+GOLF,Acushnet Holdings Corp.,US stocks
+BHVN,Biohaven Ltd.,US stocks
+KRC,Kilroy Realty Corporation,US stocks
+SPR,"Spirit AeroSystems Holdings, Inc.",US stocks
+NOG,"Northern Oil and Gas, Inc.",US stocks
+MAIN,Main Street Capital Corporation,US stocks
+AB,AllianceBernstein Holding L.P.,US stocks
+VIST,"Vista Energy, S.A.B. de C.V.",US stocks
+DFH,"Dream Finders Homes, Inc.",US stocks
+AVNT,Avient Corporation,US stocks
+KMPR,Kemper Corporation,US stocks
+ORA,"Ormat Technologies, Inc.",US stocks
+TDC,Teradata Corporation,US stocks
+BMA,Banco Macro S.A.,US stocks
+MC,Moelis & Company,US stocks
+BKH,Black Hills Corporation,US stocks
+CRC,California Resources Corporation,US stocks
+CVI,"CVR Energy, Inc.",US stocks
+SDRL,Seadrill Limited,US stocks
+OGS,"ONE Gas, Inc.",US stocks
+TPH,"Tri Pointe Homes, Inc.",US stocks
+PRKS,United Parks & Resorts Inc.,US stocks
+LAZ,"Lazard, Inc.",US stocks
+EVH,"Evolent Health, Inc.",US stocks
+ALE,"ALLETE, Inc.",US stocks
+CXT,"Crane NXT, Co.",US stocks
+HI,"Hillenbrand, Inc.",US stocks
+TNL,Travel + Leisure Co.,US stocks
+PNM,"PNM Resources, Inc.",US stocks
+DOCN,"DigitalOcean Holdings, Inc.",US stocks
+SR,Spire Inc.,US stocks
+KFY,Korn Ferry,US stocks
+SLG,SL Green Realty Corp.,US stocks
+YETI,"YETI Holdings, Inc.",US stocks
+ENOV,Enovis Corporation,US stocks
+WHD,"Cactus, Inc.",US stocks
+KTB,"Kontoor Brands, Inc.",US stocks
+ENV,"Envestnet, Inc.",US stocks
+EPR,EPR Properties,US stocks
+APAM,Artisan Partners Asset Management Inc.,US stocks
+FHI,"Federated Hermes, Inc.",US stocks
+HCC,"Warrior Met Coal, Inc.",US stocks
+RNG,"RingCentral, Inc.",US stocks
+QTWO,"Q2 Holdings, Inc.",US stocks
+WOR,"Worthington Enterprises, Inc.",US stocks
+AX,"Axos Financial, Inc.",US stocks
+ADNT,Adient plc,US stocks
+BRC,Brady Corporation,US stocks
+ABM,ABM Industries Incorporated,US stocks
+ATMU,Atmus Filtration Technologies Inc.,US stocks
+AVA,Avista Corporation,US stocks
+YELP,Yelp Inc.,US stocks
+LRN,"Stride, Inc.",US stocks
+CWT,California Water Service Group,US stocks
+GRBK,"Green Brick Partners, Inc.",US stocks
+INSW,"International Seaways, Inc.",US stocks
+AUB,Atlantic Union Bankshares Corporation,US stocks
+SLVM,Sylvamo Corporation,US stocks
+EVTC,"EVERTEC, Inc.",US stocks
+CBU,"Community Bank System, Inc.",US stocks
+GVA,Granite Construction Incorporated,US stocks
+PGTI,"PGT Innovations, Inc.",US stocks
+TGLS,Tecnoglass Inc.,US stocks
+CPE,Callon Petroleum Company,US stocks
+KNTK,Kinetik Holdings Inc.,US stocks
+BOH,Bank of Hawaii Corporation,US stocks
+WNS,WNS (Holdings) Limited,US stocks
+PRIM,Primoris Services Corporation,US stocks
+RAMP,"LiveRamp Holdings, Inc.",US stocks
+PARR,"Par Pacific Holdings, Inc.",US stocks
+EAT,"Brinker International, Inc.",US stocks
+AMN,"AMN Healthcare Services, Inc.",US stocks
+DAVA,Endava plc,US stocks
+CALX,"Calix, Inc.",US stocks
+WLY,"John Wiley & Sons, Inc.",US stocks
+HNI,HNI Corporation,US stocks
+AIR,AAR Corp.,US stocks
+THS,"TreeHouse Foods, Inc.",US stocks
