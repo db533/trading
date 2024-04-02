@@ -955,7 +955,11 @@ def update_tradingopp(request, opp_id):
                 exchange_rate = float(Params.objects.get(key='usd_rate').value)
                 commission_value = 1
             investment_value_currency = investment_value_eur / exchange_rate
-            units = round(investment_value_currency / float(latest_daily_price.close_price),0)
+            if is_in_tse_stocks:
+                units = round((investment_value_currency / float(latest_daily_price.close_price)) / 100) * 100
+            else:
+                units = round(investment_value_currency / float(latest_daily_price.close_price),0)
+
 
             Trade.objects.create(
                 tradingopp=opp,
