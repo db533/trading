@@ -372,8 +372,8 @@ class GannPointThreeBuy(BaseStrategy):
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
                         first_sp = swing_point
-                        downtrend_price_movement = swing_point_price_difference(self.ticker,first_sp, lowpoint_sp)
-                        logger.info(f'Found a prior {swing_point.label}. So downtrend started here. downtrend_price_movement: {downtrend_price_movement}')
+                        downtrend_price_movement = swing_point_price_difference(self.ticker,latest_lh_sp, lowpoint_sp)
+                        logger.info(f'Found a prior {swing_point.label}. So downtrend started here. downtrend_price_movement from latest_lh: {downtrend_price_movement}')
                         recent_swing_points.append(swing_point)
                         break
                     swing_point_counter += 1
@@ -383,7 +383,12 @@ class GannPointThreeBuy(BaseStrategy):
                     logger.info(f'Strategy valid.')
                     action_buy = True
                 else:
-                    logger.info(f'Upswing price movement insufficient or 3+ sections not present in downswing. Strategy not valid.')
+                    if max_P >= abs(latest_P):
+                        logger.info(f'Upswing price movement insufficient. Not the biggest increase. max_P = {max_P}, abs(latest_P) = {abs(latest_P)}. Strategy not valid.')
+                    elif len(P_prev) <= 2:
+                        logger.info(f'Less than 3 sections in the downswing. len(P_prev) = {len(P_prev)}. Strategy not valid.')
+                    else:
+                        logger.info(f'Price has fallen from latest HL swingpoint. latest_price.close_price = {latest_price.close_price}, pullback_sp.price = {pullback_sp.price}. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=lowpoint_sp.price_object)
@@ -485,10 +490,18 @@ class GannPointThreeSell(BaseStrategy):
                     logger.info(f'Strategy valid.')
                     action_buy = False
                 else:
-                    logger.info(f'Downswing price movement insufficient or 3+ sections not present in upswing. Strategy not valid.')
+                    if min_P <= latest_P:
+                        logger.info(
+                            f'Downswing price movement insufficient. Not the biggest decrease. min_P = {min_P}, latest_P = {latest_P}. Strategy not valid.')
+                    elif len(P_prev) <= 2:
+                        logger.info(f'Less than 3 sections in the upswing. len(P_prev) = {len(P_prev)}. Strategy not valid.')
+                    else:
+                        logger.info(f'Price has risen from latest LH swingpoint. Strategy not valid.')
+
+                    logger.info(f'Downswing price movement insufficient or 3+ sections not present in upswing. latest_price.close_price = {latest_price.close_price}, pullback_sp.price = {pullback_sp.price}. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
-                prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
+,                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
                 duration_after_latest_sp = instance_difference_count(self.ticker, pullback_sp.price_object,
                                                                      later_candle=latest_price)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'min_P': str(min_P), 'sections': str(len(P_prev)),
@@ -725,23 +738,14 @@ class GannPointFiveBuy(BaseStrategy):
                     recent_swing_points.append(swing_point)
                     break
                 swing_point_counter += 1
-        if T_most_recent is not None:
+        if T_most_recent is not None and latest_price.close_price > last_candle.close_price:
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
             final_upswing_size = round((latest_price.close_price - swing_point.price) / swing_point.price, 3) - 1
-            most_recent_lh_price = lh_prices[-1]
-            if latest_price.close_price > most_recent_lh_price:
-                confirmed = True
-                when_confirmed = ""
-            else:
-                confirmed = False
-                when_confirmed = f'When price rises above {most_recent_lh_price}.'
-
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),
                     'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
-                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp), 'most_recent_lh_price' : most_recent_lh_price,
-                    'confirmed': confirmed, 'when_confirmed': when_confirmed}
+                    'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.info(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
                 action_buy = True
@@ -810,22 +814,15 @@ class GannPointFiveSell(BaseStrategy):
                     recent_swing_points.append(swing_point)
                     break
                 swing_point_counter += 1
-        if T_most_recent is not None:
+        if T_most_recent is not None and latest_price.close_price < last_candle.close_price:
             final_downswing_size = round((swing_point.price - latest_price.close_price) / swing_point.price,3)
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
             duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                  later_candle=latest_price)
-            min_hl_price = hl_prices[-1]
-            if latest_price.close_price < min_hl_price:
-                confirmed = True
-                when_confirmed = ""
-            else:
-                confirmed = False
-                when_confirmed = f'When price falls below {min_hl_price}.'
 
             data = {'latest_T': str(latest_T), 'T_most_recent': str(T_most_recent),'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration),
-                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size), 'min_hl_price' : min_hl_price,
-                    'duration_after_latest_sp' : str(duration_after_latest_sp), 'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed}
+                    'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size),
+                    'duration_after_latest_sp' : str(duration_after_latest_sp)}
             logger.info(f'T_most_recent during prior series of swings: {T_most_recent}.')
             if T_most_recent < latest_T and section_count > 1:
                 action_buy = False
