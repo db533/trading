@@ -501,7 +501,7 @@ class GannPointThreeSell(BaseStrategy):
                     logger.info(f'Downswing price movement insufficient or 3+ sections not present in upswing. latest_price.close_price = {latest_price.close_price}, pullback_sp.price = {pullback_sp.price}. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
-,                 prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
+                prior_trend_duration = instance_difference_count(self.ticker, first_sp.price_object, later_candle=highpoint_sp.price_object)
                 duration_after_latest_sp = instance_difference_count(self.ticker, pullback_sp.price_object,
                                                                      later_candle=latest_price)
                 data = {'latest_P': str(latest_P), 'P_prev': str(P_prev), 'min_P': str(min_P), 'sections': str(len(P_prev)),
