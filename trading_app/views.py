@@ -2424,10 +2424,11 @@ def monthly_trading_performance_view(request):
     for opp in trading_opps:
         last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
         if last_transaction_month not in monthly_totals:
-            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0}
+            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0, 'total_days' : 0}
 
         trades = opp.trades.filter(status="2")
         profit = 0
+        date_bought = None
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
@@ -2435,15 +2436,23 @@ def monthly_trading_performance_view(request):
             if trade.action == '1':  # Buy
                 monthly_totals[last_transaction_month]['total_spent'] += amount_eur
                 profit -= amount_eur
+                if date_bought is None:
+                    date_bought = trade.date
             elif trade.action == '0':  # Sell
                 monthly_totals[last_transaction_month]['total_gained'] += amount_eur
                 profit += amount_eur
+                date_sold = trade.date
 
             monthly_totals[last_transaction_month]['total_commission'] += commission_eur
             profit -= commission_eur
         if profit > 0:
             monthly_totals[last_transaction_month]['profitable_trade_count'] += 1
         monthly_totals[last_transaction_month]['trade_count'] += 1
+
+        # Calculate the difference
+        difference = date_sold - date_bought
+        trade_days = difference.days
+        monthly_totals[last_transaction_month]['total_days'] += trade_days
 
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
@@ -2460,6 +2469,7 @@ def monthly_trading_performance_view(request):
             'cagr' : cagr,
             'profitable_trade_count' : totals['profitable_trade_count'],
             'trade_count': totals['trade_count'],
+            'average_duration': round(totals['total_days'] / totals['trade_count'], 1),
             'percent_profitable_trades': round(totals['profitable_trade_count']*100/totals['trade_count'],1),
         })
 
@@ -2528,32 +2538,41 @@ def strategy_trading_performance_view(request):
                 'total_gained': 0,
                 'total_commission': 0,
                 'trade_count': 0,
-                'profitable_trade_count': 0
+                'profitable_trade_count': 0,
+                'total_days' : 0,
             }
             strategy_details[strategy_name] = []
 
         trades = opp.trades.all()
         eur_spent, eur_gained, commission_eur = 0, 0, 0
         trade_count = 0
+        date_bought = None
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission = trade.commission * trade.rate_to_eur
 
             if trade.action == '1':  # Buy
                 eur_spent += amount_eur
+                if date_bought == None:
+                    date_bought = trade.date
             elif trade.action == '0':  # Sell
                 eur_gained += amount_eur
+                date_sold = trade.date
 
             commission_eur += commission
         trade_count += 1
 
         realised_profit = eur_gained - eur_spent - commission_eur
+        # Calculate the difference
+        difference = date_sold - date_bought
+        trade_days = difference.days
 
         # Update strategy totals here
         strategy_totals[strategy_name]['total_spent'] += eur_spent
         strategy_totals[strategy_name]['total_gained'] += eur_gained
         strategy_totals[strategy_name]['total_commission'] += commission_eur
         strategy_totals[strategy_name]['trade_count'] += trade_count
+        strategy_totals[strategy_name]['total_days'] += trade_days
         if realised_profit > 0:
             strategy_totals[strategy_name][
                 'profitable_trade_count'] += 1  # This assumes each TradingOpp is a single transaction for simplicity
@@ -2590,6 +2609,7 @@ def strategy_trading_performance_view(request):
             'trade_count': totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
             'percent_profitable_trades': percent_profitable_trades,
+            'average_duration' : round(totals['total_days'] / totals['trade_count'],1),
             'strategy_details': strategy_details[strategy]  # Ensure this matches the list structure correctly
         })
 
