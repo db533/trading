@@ -571,14 +571,19 @@ class GannPointFourBuy2(BaseStrategy):
                     swing_point_counter += 1
             if len(T_prev) > 0:
                 max_T = max(T_prev)
-                if max_T < latest_T and len(T_prev) > 1:
+                if max_T < latest_T and len(T_prev) > 1 and latest_price > last_sp.price :
                     # The most recent upward rally is longer than the longest upward rally during the down trend.
                     # And we have had at least 2 sections of upward movement during the down trend.
                     logger.info(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
                     action_buy = True
                 else:
-                    # The most recent upward rally is shorter than the longest upward rally during the down trend.
-                    logger.info(f'Latest upswing shorter than longest up swing during down trend. Strategy not valid.')
+                    if max_T >= latest_T:
+                        logger.info(f'Latest upswing shorter than longest up swing during down trend. max_T = {max_T}, latest_T = {latest_T}. Strategy not valid.')
+                    elif len(T_prev) <= 1:
+                        logger.info(f'One or no entries in T_prev. len(T_prev) = {len(T_prev)}. Strategy not valid.')
+                    else:
+                        # The most recent upward rally is shorter than the longest upward rally during the down trend.
+                        logger.info(f'Latest price is below the last LL. latest_price = {latest_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
@@ -651,7 +656,7 @@ class GannPointFourSell(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T < latest_T and len(T_prev) > 1:
+            if max_T < latest_T and len(T_prev) > 1 and latest_price < last_sp.price:
                 # The most recent downward rally is longer than the longest downward rally during the down trend.
                 # And we have at least 2 sections of downward movement during the most recent upward trend.
                 logger.info(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
@@ -659,6 +664,16 @@ class GannPointFourSell(BaseStrategy):
 
             else:
                 # The most recent downward rally is shorter than the longest downward rally during the down trend.
+                if max_T >= latest_T:
+                    logger.info(
+                        f'Latest upswing shorter than longest up swing during down trend. max_T = {max_T}, latest_T = {latest_T}. Strategy not valid.')
+                elif len(T_prev) <= 1:
+                    logger.info(f'One or no entries in T_prev. len(T_prev) = {len(T_prev)}. Strategy not valid.')
+                else:
+                    # The most recent upward rally is shorter than the longest upward rally during the down trend.
+                    logger.info(
+                        f'Latest price is above the last HH. latest_price = {latest_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
+
                 logger.info(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
                 action_buy = None
             prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
