@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ
 import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
 
 env = environ.Env()
 environ.Env.read_env(overwrite=True)  # reading .env file
@@ -32,6 +33,10 @@ SECRET_KEY = 'django-insecure-hiy-539d@@#)21gybk+)m37$v&ve#2(83pn_z1%96!g6cnli!^
 DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env('ALLOWED_HOSTS', cast=[str])
+
+# Enable or disable database query logging
+DB_QUERY_LOGGING_ENABLED = True
+
 
 # Get the IP address of this host
 import socket
@@ -79,6 +84,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
+    'trading_app.query_log_middleware.QueryLogMiddleware',
 ]
 
 ROOT_URLCONF = 'trading.urls'
@@ -193,6 +199,10 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
+        'detailed': {
+            'format': '{asctime} {levelname} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
         'stderr': {
@@ -208,6 +218,12 @@ LOGGING = {
             'backupCount': 7,  # Keep 7 days of logs
             'formatter': 'verbose',
         },
+        'db_query_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/db_queries.log',  # Update this path
+            'formatter': 'detailed',
+        },
     },
     'loggers': {
         'django': {
@@ -220,7 +236,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-
+        'db_query_logger': {
+            'handlers': ['db_query_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 
