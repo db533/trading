@@ -997,7 +997,7 @@ class GannPointSixSell(BaseStrategy):
                 # Strategy is valid.
                 data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
                 logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
-                action_buy = True
+                action_buy = False
             else:
                 data = {}
                 logger.info(f'Strategy not valid. T_recent ({T_recent}) is not larger than max_T ({max_T}).')
