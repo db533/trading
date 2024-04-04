@@ -571,7 +571,7 @@ class GannPointFourBuy2(BaseStrategy):
                     swing_point_counter += 1
             if len(T_prev) > 0:
                 max_T = max(T_prev)
-                if max_T < latest_T and len(T_prev) > 1 and latest_price > last_sp.price :
+                if max_T < latest_T and len(T_prev) > 1 and float(latest_price.close_price) > float(last_sp.price):
                     # The most recent upward rally is longer than the longest upward rally during the down trend.
                     # And we have had at least 2 sections of upward movement during the down trend.
                     logger.info(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
@@ -583,7 +583,7 @@ class GannPointFourBuy2(BaseStrategy):
                         logger.info(f'One or no entries in T_prev. len(T_prev) = {len(T_prev)}. Strategy not valid.')
                     else:
                         # The most recent upward rally is shorter than the longest upward rally during the down trend.
-                        logger.info(f'Latest price is below the last LL. latest_price = {latest_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
+                        logger.info(f'Latest price is below the last LL. latest_price.close_price = {latest_price.close_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
                     action_buy = None
                 # Compute the days between the start and end of the down trend.
                 prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
@@ -656,7 +656,7 @@ class GannPointFourSell(BaseStrategy):
                 swing_point_counter += 1
         if len(T_prev) > 0:
             max_T = max(T_prev)
-            if max_T < latest_T and len(T_prev) > 1 and latest_price < last_sp.price:
+            if max_T < latest_T and len(T_prev) > 1 and float(latest_price.close_price) < float(last_sp.price):
                 # The most recent downward rally is longer than the longest downward rally during the down trend.
                 # And we have at least 2 sections of downward movement during the most recent upward trend.
                 logger.info(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
@@ -672,7 +672,7 @@ class GannPointFourSell(BaseStrategy):
                 else:
                     # The most recent upward rally is shorter than the longest upward rally during the down trend.
                     logger.info(
-                        f'Latest price is above the last HH. latest_price = {latest_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
+                        f'Latest price is above the last HH. latest_price.close_price = {latest_price.close_price}, last_sp.price = {last_sp.price}. Strategy not valid.')
 
                 logger.info(f'Latest downswing shorter than longest down swing during up trend. Strategy not valid.')
                 action_buy = None
@@ -847,6 +847,72 @@ class GannPointFiveSell(BaseStrategy):
         logger.info(f'Latest T: {latest_T}.')
         logger.info(f'........')
         return action_buy, data
+
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
+
+def count_candles_between(swing_point, candle_1, candle_2):
+    # Determine the model class for the candles based on the content type of the swing point
+    model_cls = swing_point.content_type.model_class()
+
+    # Ensure candle_1.datetime is always the earlier datetime
+    if candle_1.datetime > candle_2.datetime:
+        candle_1, candle_2 = candle_2, candle_1
+
+    # Count how many candles of the identified type exist between the two candles' datetime
+    # Including the end datetime as part of the range ensures that consecutive candles have a count of 1
+    candle_count = model_cls.objects.filter(
+        datetime__gte=candle_1.datetime,
+        datetime__lte=candle_2.datetime,
+        ticker=swing_point.ticker  # Assuming you want to count candles for the same ticker as the swing point
+    ).count()
+
+    # Adjust the count to consider consecutive candles as 1 apart
+    candle_count = candle_count - 1 if candle_count > 0 else 0
+
+    return candle_count
+
+
+class GannPointSixBuy(BaseStrategy):
+    name="Gann's Buying point #6"
+
+    def check_criteria(self):
+        action_buy = None
+        # Access the latest DailyPrice (or other relevant price model) for the ticker
+        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_counter = 1
+        latest_T = 0
+        recent_swing_points = []
+        if latest_price is not None:
+            latest_close_price = latest_price.close_price
+        else:
+            # We have no price data for this ticker, so strategy cannot be detected.
+            data = {}
+            action_buy = None
+            logger.info(f'Latest T: {latest_T}.')
+            logger.info(f'........')
+            return action_buy, data
+        for swing_point in swing_point_query:
+            # Check first is a LL
+            logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
+            if swing_point_counter == 1:
+                if swing_point.label == 'LL' and latest_close_price > swing_point.price:
+                    logger.info(f'Detected first swingpoint is LL and latest close price is higher.')
+                    last_candle = swing_point.price_object
+                    last_sp = swing_point
+                    recent_swing_points.append(swing_point)
+                    T_recent = count_candles_between(last_sp, last_candle, latest_price)
+                else:
+                    # This strategy cannot be true. End review of swing points.
+                    logger.info(f'First swingpoint not LL. Strategy not valid.')
+                    break
+                    # Now need to determine the elapsed days since this LL or HH.
+                swing_point_counter += 1
+                most_recent_label = 'LL'
+            elif swing_point_counter > 1 and most_recent_label == 'LL':
+
+
 
 class GannPointEightBuy(BaseStrategy):
     name="Gann's Buying point #8"
