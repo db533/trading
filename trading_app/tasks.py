@@ -80,7 +80,7 @@ def background_manual_ticker_download(ticker_symbol,throttling, time_threshold=0
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
                   GannPointEightSell,
                   GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
-                  GannPointNineSell]
+                  GannPointNineSell, GannPointSixBuy, GannPointSixSell]
     errors_encountered = False
 
     try:
@@ -170,7 +170,7 @@ def background_update_ticker_strategies(ticker_symbol):
     strategies = [GannPointFourBuy2, GannPointFourSell, GannPointFiveBuy, GannPointFiveSell, GannPointEightBuy,
                   GannPointEightSell,
                   GannPointThreeBuy, GannPointThreeSell, GannPointOneBuy, GannPointOneSell, GannPointNineBuy,
-                  GannPointNineSell]
+                  GannPointNineSell,GannPointSixBuy, GannPointSixSell]
     scheduled_logger.info(
         f'background_update_ticker_strategies() starting for ticker "{str(ticker_symbol)}"...')
     try:
