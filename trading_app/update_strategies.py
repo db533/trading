@@ -872,45 +872,45 @@ def count_candles_between(swing_point, candle_1, candle_2):
 
     return candle_count
 
+if False:
+    class GannPointSixBuy(BaseStrategy):
+        name="Gann's Buying point #6"
 
-class GannPointSixBuy(BaseStrategy):
-    name="Gann's Buying point #6"
-
-    def check_criteria(self):
-        action_buy = None
-        # Access the latest DailyPrice (or other relevant price model) for the ticker
-        latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
-        swing_point_counter = 1
-        latest_T = 0
-        recent_swing_points = []
-        if latest_price is not None:
-            latest_close_price = latest_price.close_price
-        else:
-            # We have no price data for this ticker, so strategy cannot be detected.
-            data = {}
+        def check_criteria(self):
             action_buy = None
-            logger.info(f'Latest T: {latest_T}.')
-            logger.info(f'........')
-            return action_buy, data
-        for swing_point in swing_point_query:
-            # Check first is a LL
-            logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
-            if swing_point_counter == 1:
-                if swing_point.label == 'LL' and latest_close_price > swing_point.price:
-                    logger.info(f'Detected first swingpoint is LL and latest close price is higher.')
-                    last_candle = swing_point.price_object
-                    last_sp = swing_point
-                    recent_swing_points.append(swing_point)
-                    T_recent = count_candles_between(last_sp, last_candle, latest_price)
-                else:
-                    # This strategy cannot be true. End review of swing points.
-                    logger.info(f'First swingpoint not LL. Strategy not valid.')
-                    break
-                    # Now need to determine the elapsed days since this LL or HH.
-                swing_point_counter += 1
-                most_recent_label = 'LL'
-            elif swing_point_counter > 1 and most_recent_label == 'LL':
+            # Access the latest DailyPrice (or other relevant price model) for the ticker
+            latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_counter = 1
+            latest_T = 0
+            recent_swing_points = []
+            if latest_price is not None:
+                latest_close_price = latest_price.close_price
+            else:
+                # We have no price data for this ticker, so strategy cannot be detected.
+                data = {}
+                action_buy = None
+                logger.info(f'Latest T: {latest_T}.')
+                logger.info(f'........')
+                return action_buy, data
+            for swing_point in swing_point_query:
+                # Check first is a LL
+                logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
+                if swing_point_counter == 1:
+                    if swing_point.label == 'LL' and latest_close_price > swing_point.price:
+                        logger.info(f'Detected first swingpoint is LL and latest close price is higher.')
+                        last_candle = swing_point.price_object
+                        last_sp = swing_point
+                        recent_swing_points.append(swing_point)
+                        T_recent = count_candles_between(last_sp, last_candle, latest_price)
+                    else:
+                        # This strategy cannot be true. End review of swing points.
+                        logger.info(f'First swingpoint not LL. Strategy not valid.')
+                        break
+                        # Now need to determine the elapsed days since this LL or HH.
+                    swing_point_counter += 1
+                    most_recent_label = 'LL'
+                elif swing_point_counter > 1 and most_recent_label == 'LL':
 
 
 
