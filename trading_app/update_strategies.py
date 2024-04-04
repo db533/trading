@@ -923,12 +923,17 @@ class GannPointSixBuy(BaseStrategy):
             else:
                 logger.info(f'Downtrend started. swing_point.label: {swing_point.label}')
                 break
-        max_T = max(T_list)
-        if T_recent > max_T:
-            # Strategy is valid.
-            data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
-            logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
-            action_buy = True
+        if len(T_list)>0:
+            max_T = max(T_list)
+            if T_recent > max_T:
+                # Strategy is valid.
+                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
+                logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
+                action_buy = True
+            else:
+                data = {}
+                logger.info(f'Strategy not valid. T_recent ({T_recent}) is not larger than max_T ({max_T}).')
+                action_buy = None
         else:
             data = {}
             action_buy = None
@@ -986,12 +991,17 @@ class GannPointSixSell(BaseStrategy):
             else:
                 logger.info(f'Uptrend started. swing_point.label: {swing_point.label}')
                 break
-        max_T = max(T_list)
-        if T_recent > max_T:
-            # Strategy is valid.
-            data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
-            logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
-            action_buy = False
+        if len(T_list)>0:
+            max_T = max(T_list)
+            if T_recent > max_T:
+                # Strategy is valid.
+                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
+                logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
+                action_buy = True
+            else:
+                data = {}
+                logger.info(f'Strategy not valid. T_recent ({T_recent}) is not larger than max_T ({max_T}).')
+                action_buy = None
         else:
             data = {}
             action_buy = None
