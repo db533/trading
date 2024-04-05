@@ -1638,7 +1638,13 @@ class GannSixCustomizer(BaseGraphCustomizer):
 
         self.draw_vertical_line(ax, date_list[-2], price_list[-1], float(most_recent_price))
         self.draw_vertical_line(ax, most_recent_date, float(most_recent_price), price_list[-1])
-        if int(T_recent) > 2:
+        # Only add the label if there is a large enough gap.
+        # Determine gap by finding what % of space for this segment.
+        first_date = min(date_list)
+        range_for_gap = most_recent_date - date_list[-2]
+        overall_date_range = most_recent_date - first_date
+        share_date_range = range_for_gap / overall_date_range
+        if share_date_range > 0.1:
             label_price = float(price_list[-1]) - (2*offset_down)
             label_date = date_list[-2] + (most_recent_date - date_list[-2]) / 2
             ax.text(label_date, label_price, f"t={T_recent}", fontsize=9, ha='center',
