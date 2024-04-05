@@ -882,7 +882,8 @@ class GannPointSixBuy(BaseStrategy):
         swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
         swing_point_counter = 1
         recent_swing_points = []
-        T_list=[]
+        sections = 0
+        max_T = 0
         if latest_price is not None:
             latest_close_price = latest_price.close_price
         else:
@@ -917,17 +918,21 @@ class GannPointSixBuy(BaseStrategy):
                 last_ll_candle = swing_point.price_object
                 recent_swing_points.append(swing_point)
                 T_latest = count_candles_between(last_sp, last_ll_candle, last_lh_candle)
-                T_list.append(T_latest)
                 most_recent_label = 'LL'
+                sections += 1
+                if T_latest > max_T:
+                    max_T = T_latest
+                    start_sp_counter = swing_point_counter
+                    end_sp_counter = swing_point_counter-1
                 logger.info(f'Detected a LL swingpoint before a LH. T_latest = {T_latest}')
             else:
                 logger.info(f'Downtrend started. swing_point.label: {swing_point.label}')
                 break
-        if len(T_list)>0:
-            max_T = max(T_list)
+        if sections > 2:
             if T_recent > max_T:
                 # Strategy is valid.
-                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
+                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points,
+                        'start_sp_counter' : str(start_sp_counter), 'end_sp_counter' : str(end_sp_counter),}
                 logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
                 action_buy = True
             else:
@@ -936,6 +941,7 @@ class GannPointSixBuy(BaseStrategy):
                 action_buy = None
         else:
             data = {}
+            logger.info(f'Strategy not valid. Too few sections prior to change in direction. sections = {sections}.')
             action_buy = None
         logger.info(f'........')
         return action_buy, data
@@ -951,6 +957,8 @@ class GannPointSixSell(BaseStrategy):
         swing_point_counter = 1
         recent_swing_points = []
         T_list=[]
+        sections = 0
+        max_T = 0
         if latest_price is not None:
             latest_close_price = latest_price.close_price
         else:
@@ -987,15 +995,20 @@ class GannPointSixSell(BaseStrategy):
                 T_latest = count_candles_between(last_sp, last_hh_candle, last_hl_candle)
                 T_list.append(T_latest)
                 most_recent_label = 'HH'
+                sections += 1
+                if T_latest > max_T:
+                    max_T = T_latest
+                    start_sp_counter = swing_point_counter
+                    end_sp_counter = swing_point_counter - 1
                 logger.info(f'Detected a HH swingpoint before a HL. T_latest = {T_latest}')
             else:
                 logger.info(f'Uptrend started. swing_point.label: {swing_point.label}')
                 break
-        if len(T_list)>0:
-            max_T = max(T_list)
+        if sections > 2:
             if T_recent > max_T:
                 # Strategy is valid.
-                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points}
+                data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points,
+                        'start_sp_counter': str(start_sp_counter), 'end_sp_counter': str(end_sp_counter), }
                 logger.info(f'Strategy valid. T_recent ({T_recent}) is larger than max_T ({max_T}).')
                 action_buy = False
             else:
@@ -1004,6 +1017,7 @@ class GannPointSixSell(BaseStrategy):
                 action_buy = None
         else:
             data = {}
+            logger.info(f'Strategy not valid. Too few sections prior to change in direction. sections = {sections}.')
             action_buy = None
         logger.info(f'........')
         return action_buy, data

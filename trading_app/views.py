@@ -1622,6 +1622,31 @@ class GannEightCustomizer(BaseGraphCustomizer):
         # Draw a line between (date1, price) and (date2, price)
         ax.plot([date1, date2], [price, price], color='orange', linestyle='--')
 
+class GannSixCustomizer(BaseGraphCustomizer):
+    def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
+        print('Starting GannSixCustomizer()...')
+        #Extract T values
+        T_recent = int(trading_opp.metrics_snapshot.get('T_recent'))
+        max_T = int(trading_opp.metrics_snapshot.get('max_T'))
+
+        price_list = [swing_point.price for swing_point in swing_points]
+        min_price = min(price_list)
+        max_price = max(price_list)
+
+        date_list = [swing_point.date for swing_point in swing_points]
+        date_list.append(most_recent_date)
+
+        self.draw_vertical_line(ax, date_list[-2], price_list[-1], float(most_recent_price))
+        self.draw_vertical_line(ax, most_recent_date, float(most_recent_price), price_list[-1])
+        label_price = float(price_list[-1]) + offset_up
+        label_date = date_list[-2] + (most_recent_date - date_list[-2]) / 2
+        ax.text(label_date, label_price, f"t={T_recent}", fontsize=9, ha='center',
+                va='bottom')
+
+    def draw_vertical_line(self, ax, date, start_price, min_price):
+        # Draw a line between (date, start_price) and (date, min_price)
+        ax.plot([date, date], [start_price, min_price], color='orange', linestyle='--')
+
 class GannNineCustomizer(BaseGraphCustomizer):
     def customize_graph(self, ax, trading_opp, swing_points, most_recent_price, most_recent_date, strategy_data, offset_up, offset_down):
         print('Starting GannNineCustomizer()...')
@@ -1708,6 +1733,9 @@ def get_graph_customizer(trading_strategy):
         "Gann's Selling point #1": GannOneSellCustomizer(),
         "Gann's Buying point #9": GannNineCustomizer(),
         "Gann's Selling point #9": GannNineCustomizer(),
+        "Gann's Buying point #6": GannSixCustomizer(),
+        "Gann's Selling point #6": GannSixCustomizer(),
+
         # Map more strategies to their customizers
     }
     return customizers.get(trading_strategy.name, BaseGraphCustomizer())
