@@ -1639,7 +1639,7 @@ class GannSixCustomizer(BaseGraphCustomizer):
         self.draw_vertical_line(ax, date_list[-2], price_list[-1], float(most_recent_price))
         self.draw_vertical_line(ax, most_recent_date, float(most_recent_price), price_list[-1])
         if int(T_recent) > 2:
-            label_price = float(price_list[-1]) + offset_down
+            label_price = float(price_list[-1]) - (2*offset_down)
             label_date = date_list[-2] + (most_recent_date - date_list[-2]) / 2
             ax.text(label_date, label_price, f"t={T_recent}", fontsize=9, ha='center',
                     va='bottom')
