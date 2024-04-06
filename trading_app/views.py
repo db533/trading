@@ -2634,8 +2634,8 @@ def strategy_trading_performance_view(request):
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
         percent_profitable_trades = round(totals['profitable_trade_count'] * 100 / totals['trade_count'], 1) if totals[
                                                                                                                     'trade_count'] > 0 else 0
-        growth_rate = (totals['growth_rate'] / totals['trade_count'] ) if (totals['trade_count'] > 0 else 0
-        cagr = (totals['cagr'] / totals['trade_count']) if (totals['trade_count'] > 0 else 0
+        growth_rate = (totals['growth_rate'] / totals['trade_count'] ) if (totals['trade_count'] > 0) else 0
+        cagr = (totals['cagr'] / totals['trade_count']) if (totals['trade_count'] > 0) else 0
 
         strategy_performance.append({
             'strategy': strategy,
