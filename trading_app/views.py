@@ -2604,15 +2604,15 @@ def strategy_trading_performance_view(request):
         # Calculate the difference
         difference = date_sold - date_bought
         trade_days = difference.days + 1
-        cagr = round(((1 + growth_rate/100) ** (365/trade_days))-1,1)
+        cagr = round((((1 + growth_rate/100) ** (365/trade_days))-1)*100,1)
         # Update strategy totals here
         strategy_totals[strategy_name]['total_spent'] += eur_spent
         strategy_totals[strategy_name]['total_gained'] += eur_gained
         strategy_totals[strategy_name]['total_commission'] += commission_eur
         strategy_totals[strategy_name]['trade_count'] += trade_count
         strategy_totals[strategy_name]['total_days'] += trade_days
-        strategy_totals[strategy_name]['growth_rate'] += growth_rate
-        strategy_totals[strategy_name]['cagr'] += cagr
+        strategy_totals[strategy_name]['growth_rate'] += ((growth_rate/100)+1)
+        strategy_totals[strategy_name]['cagr'] += ((cagr / 100)+1)
         if realised_profit > 0:
             strategy_totals[strategy_name][
                 'profitable_trade_count'] += 1  # This assumes each TradingOpp is a single transaction for simplicity
@@ -2634,8 +2634,8 @@ def strategy_trading_performance_view(request):
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
         percent_profitable_trades = round(totals['profitable_trade_count'] * 100 / totals['trade_count'], 1) if totals[
                                                                                                                     'trade_count'] > 0 else 0
-        growth_rate = (totals['growth_rate'] / totals['trade_count'] ) if (totals['trade_count'] > 0) else 0
-        cagr = (totals['cagr'] / totals['trade_count']) if (totals['trade_count'] > 0) else 0
+        growth_rate = ((totals['growth_rate'] / totals['trade_count'] )-1)*100 if (totals['trade_count'] > 0) else 0
+        cagr = ((totals['cagr'] / totals['trade_count'])-1)*100 if (totals['trade_count'] > 0) else 0
 
         strategy_performance.append({
             'strategy': strategy,
