@@ -2628,6 +2628,7 @@ def strategy_trading_performance_view(request):
                 'realised_profit': round(realised_profit, 2),
                 'growth_rate': round(growth_rate, 1),
                 'cagr': round(cagr, 1),
+                'trade_days' : trade_days,
             })
 
     for strategy, totals in strategy_totals.items():
