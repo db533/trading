@@ -2603,9 +2603,7 @@ def strategy_trading_performance_view(request):
         growth_rate = ((eur_gained / (eur_spent + commission_eur)) - 1) * 100
         # Calculate the difference
         difference = date_sold - date_bought
-        trade_days = difference.days
-        if trade_days == 0:
-            trade_days = 1
+        trade_days = difference.days + 1
         cagr = round(((1 + growth_rate/100) ** (365/trade_days))-1,1)
         # Update strategy totals here
         strategy_totals[strategy_name]['total_spent'] += eur_spent
