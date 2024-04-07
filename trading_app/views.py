@@ -2550,11 +2550,11 @@ def monthly_trading_performance_view(request):
     context = {
         'monthly_performance': monthly_performance,
         'trading_opps_performance': trading_opps_performance,
-        'overall_growth_rate' : overall_growth_rate,
-        'overall_cagr' : overall_cagr,
+        'overall_growth_rate' : round(overall_growth_rate,1),
+        'overall_cagr' : int(overall_cagr),
         'overall_trade_count' : overall_trade_count,
         'overall_profit' : round(overall_profit,2),
-        'total_capital': round(overall_profit + 5000,0),
+        'total_capital': round(overall_profit + 5000,2),
     }
 
     return render(request, 'monthly_trading_performance.html', context)
