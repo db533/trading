@@ -2553,6 +2553,8 @@ def monthly_trading_performance_view(request):
         'overall_growth_rate' : overall_growth_rate,
         'overall_cagr' : overall_cagr,
         'overall_trade_count' : overall_trade_count,
+        'overall_profit' : round(overall_profit,2),
+        'total_capital': round(overall_profit + 5000,0),
     }
 
     return render(request, 'monthly_trading_performance.html', context)
