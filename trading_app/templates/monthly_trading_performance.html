@@ -13,7 +13,7 @@
             <th style="text-align:center; width: 12ch;">Commissions (EUR)</th>
             <th style="text-align:center; width: 12ch;">Realised Profit</th>
             <th style="text-align:center; width: 12ch;">Average duration (days)</th>
-            <th style="text-align:center; width: 12ch;">Growth rate</th>
+            <th style="text-align:center; width: 12ch;">Average Growth rate</th>
             <th style="text-align:center; width: 12ch;">CAGR</th>
         </tr>
     </thead>
@@ -46,6 +46,8 @@
             <th>EUR Gained</th>
             <th>Commission (EUR)</th>
             <th>Realised Profit (EUR)</th>
+            <th>Growth rate</th>
+            <th>CAGR</th>
         </tr>
     </thead>
     <tbody>
@@ -58,6 +60,8 @@
             <td>{{ opp.eur_gained }}</td>
             <td>{{ opp.commission_eur }}</td>
             <td>{{ opp.realised_profit }}</td>
+            <td>{{ opp.growth_rate }}</td>
+            <td>{{ opp.cagr }}</td>
         </tr>
         {% endfor %}
     </tbody>
