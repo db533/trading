@@ -2604,7 +2604,7 @@ def strategy_trading_performance_view(request):
         # Calculate the difference
         difference = date_sold - date_bought
         trade_days = difference.days + 1
-        cagr = round((((1 + growth_rate/100) ** (365/trade_days))-1)*100,1)
+        cagr = round((growth_rate ** (365/trade_days)),1)
         # Update strategy totals here
         strategy_totals[strategy_name]['total_spent'] += eur_spent
         strategy_totals[strategy_name]['total_gained'] += eur_gained
@@ -2612,7 +2612,7 @@ def strategy_trading_performance_view(request):
         strategy_totals[strategy_name]['trade_count'] += trade_count
         strategy_totals[strategy_name]['total_days'] += trade_days
         strategy_totals[strategy_name]['growth_rate'] += growth_rate
-        strategy_totals[strategy_name]['cagr'] += ((cagr / 100)+1)
+        strategy_totals[strategy_name]['cagr'] += cagr
         if realised_profit > 0:
             strategy_totals[strategy_name][
                 'profitable_trade_count'] += 1  # This assumes each TradingOpp is a single transaction for simplicity
@@ -2627,7 +2627,7 @@ def strategy_trading_performance_view(request):
                 'commission_eur': round(commission_eur, 2),
                 'realised_profit': round(realised_profit, 2),
                 'growth_rate': round((growth_rate-1)*100, 1),
-                'cagr': round(cagr, 1),
+                'cagr': round((cagr-1)*100, 1),
                 'trade_days' : trade_days,
             })
 
