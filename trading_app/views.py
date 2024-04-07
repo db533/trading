@@ -2600,7 +2600,7 @@ def strategy_trading_performance_view(request):
         trade_count += 1
 
         realised_profit = eur_gained - eur_spent - commission_eur
-        growth_rate = ((eur_gained / (eur_spent + commission_eur)) - 1) * 100
+        growth_rate = eur_gained / (eur_spent + commission_eur)
         # Calculate the difference
         difference = date_sold - date_bought
         trade_days = difference.days + 1
@@ -2611,7 +2611,7 @@ def strategy_trading_performance_view(request):
         strategy_totals[strategy_name]['total_commission'] += commission_eur
         strategy_totals[strategy_name]['trade_count'] += trade_count
         strategy_totals[strategy_name]['total_days'] += trade_days
-        strategy_totals[strategy_name]['growth_rate'] += ((growth_rate/100)+1)
+        strategy_totals[strategy_name]['growth_rate'] += growth_rate
         strategy_totals[strategy_name]['cagr'] += ((cagr / 100)+1)
         if realised_profit > 0:
             strategy_totals[strategy_name][
@@ -2626,7 +2626,7 @@ def strategy_trading_performance_view(request):
                 'eur_gained': round(eur_gained, 2),
                 'commission_eur': round(commission_eur, 2),
                 'realised_profit': round(realised_profit, 2),
-                'growth_rate': round(growth_rate, 1),
+                'growth_rate': round((growth_rate-1)*100, 1),
                 'cagr': round(cagr, 1),
                 'trade_days' : trade_days,
             })
