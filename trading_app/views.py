@@ -2637,6 +2637,10 @@ def strategy_trading_performance_view(request):
                                                                                                                     'trade_count'] > 0 else 0
         growth_rate = ((totals['growth_rate'] / totals['trade_count'] )-1)*100 if (totals['trade_count'] > 0) else 0
         cagr = ((totals['cagr'] / totals['trade_count'])-1)*100 if (totals['trade_count'] > 0) else 0
+        if cagr > 100:
+            cagr_rounding = 0
+        else:
+            cagr_rounding = 1
 
         strategy_performance.append({
             'strategy': strategy,
@@ -2645,7 +2649,7 @@ def strategy_trading_performance_view(request):
             'total_commission': round(totals['total_commission'], 2),
             'realised_profit': realised_profit,
             'growth_rate': round(growth_rate,1)  if growth_rate != 0 else 0,
-            'cagr': round(cagr,1) ,
+            'cagr': round(cagr,cagr_rounding) ,
             'trade_count': totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
             'percent_profitable_trades': percent_profitable_trades,
