@@ -2467,6 +2467,8 @@ def monthly_trading_performance_view(request):
         profit = 0
         date_bought = None
         last_date = None
+        eur_spent = 0
+        eur_gained = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
