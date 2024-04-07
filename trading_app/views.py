@@ -2452,6 +2452,7 @@ def monthly_trading_performance_view(request):
     ).order_by('-last_transaction_date').distinct()
 
     monthly_performance = []
+    trading_opps_performance = []
 
     # Use a temporary dictionary to track monthly totals
     monthly_totals = {}
@@ -2459,11 +2460,13 @@ def monthly_trading_performance_view(request):
     for opp in trading_opps:
         last_transaction_month = opp.last_transaction_date.strftime('%Y-%m')
         if last_transaction_month not in monthly_totals:
-            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0, 'total_days' : 0}
+            monthly_totals[last_transaction_month] = {'total_spent': 0, 'total_gained': 0, 'total_commission': 0, 'trade_count' : 0, 'profitable_trade_count' : 0,
+                                                      'total_days' : 0, 'growth_rate' : 0, 'cagr' : 0}
 
         trades = opp.trades.filter(status="2")
         profit = 0
         date_bought = None
+        last_date = None
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission_eur = trade.commission * trade.rate_to_eur
@@ -2471,13 +2474,16 @@ def monthly_trading_performance_view(request):
             if trade.action == '1':  # Buy
                 monthly_totals[last_transaction_month]['total_spent'] += amount_eur
                 profit -= amount_eur
+                eur_spent += amount_eur
+
                 if date_bought is None:
                     date_bought = trade.date
             elif trade.action == '0':  # Sell
                 monthly_totals[last_transaction_month]['total_gained'] += amount_eur
+                eur_gained += amount_eur
                 profit += amount_eur
                 date_sold = trade.date
-
+            last_date = trade.date
             monthly_totals[last_transaction_month]['total_commission'] += commission_eur
             profit -= commission_eur
         if profit > 0:
@@ -2485,22 +2491,42 @@ def monthly_trading_performance_view(request):
         monthly_totals[last_transaction_month]['trade_count'] += 1
 
         # Calculate the difference
+        growth_rate = eur_gained / (eur_spent + commission_eur)
         difference = date_sold - date_bought
-        trade_days = difference.days
+        trade_days = difference.days + 1
+        cagr = round((growth_rate ** (365 / trade_days)), 1)
         monthly_totals[last_transaction_month]['total_days'] += trade_days
+        monthly_totals[last_transaction_month]['growth_rate'] += growth_rate
+        monthly_totals[last_transaction_month]['cagr'] += cagr
+
+        # Append the performance metrics for this TradingOpp to the list
+        trading_opps_performance.append({
+            'tradingopp': opp,
+            'date': last_date.date(),
+            'eur_spent': round(eur_spent, 2),
+            'eur_gained': round(eur_gained, 2),
+            'commission_eur': round(commission_eur, 2),
+            'realised_profit': round(profit, 2),
+            'growth_rate' : round((growth_rate-1)*100,1),
+            'cagr' : cagr,
+        })
 
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
-        growth_rate = (totals['total_gained'] / (totals['total_spent'] + totals['total_commission']))
-        cagr = round(((growth_rate ** 12) - 1) * 100, 1)
+        growth_rate = ((totals['growth_rate'] / totals['trade_count'] )-1)*100
+        cagr = ((totals['cagr'] / totals['trade_count']) - 1) * 100
+        if cagr > 100:
+            cagr = int(cagr)
+        else:
+            cagr = round(cagr,1)
         monthly_performance.append({
             'month': month,
             'total_spent': round(totals['total_spent'], 2),
             'total_gained': round(totals['total_gained'], 2),
             'total_commission': round(totals['total_commission'], 2),
             'realised_profit': realised_profit,
-            'growth_rate' : round((growth_rate-1)*100,1),
+            'growth_rate' : round(growth_rate,1),
             'cagr' : cagr,
             'profitable_trade_count' : totals['profitable_trade_count'],
             'trade_count': totals['trade_count'],
@@ -2508,38 +2534,38 @@ def monthly_trading_performance_view(request):
             'percent_profitable_trades': round(totals['profitable_trade_count']*100/totals['trade_count'],1),
         })
 
-    trading_opps_performance = []
 
-    for opp in trading_opps:
-        # Get all trades related to this TradingOpp
-        trades2 = Trade.objects.filter(tradingopp=opp)
+    if False:
+        for opp in trading_opps:
+            # Get all trades related to this TradingOpp
+            trades2 = Trade.objects.filter(tradingopp=opp)
 
-        # Initialize metrics
-        eur_spent = 0
-        eur_gained = 0
-        commission_eur = 0
-        last_date = None
+            # Initialize metrics
+            eur_spent = 0
+            eur_gained = 0
+            commission_eur = 0
 
-        for trade in trades2:
-            if trade.action == '1':  # Buy action
-                eur_spent += trade.units * trade.price * trade.rate_to_eur
-            elif trade.action == '0':  # Sell action
-                eur_gained += trade.units * trade.price * trade.rate_to_eur
 
-            commission_eur += trade.commission * trade.rate_to_eur
-            last_date = trade.date
+            for trade in trades2:
+                if trade.action == '1':  # Buy action
+                    eur_spent += trade.units * trade.price * trade.rate_to_eur
+                elif trade.action == '0':  # Sell action
+                    eur_gained += trade.units * trade.price * trade.rate_to_eur
 
-        realised_profit = eur_gained - eur_spent - commission_eur
+                commission_eur += trade.commission * trade.rate_to_eur
+                last_date = trade.date
 
-        # Append the performance metrics for this TradingOpp to the list
-        trading_opps_performance.append({
-            'tradingopp': opp,
-            'date' : last_date.date(),
-            'eur_spent': round(eur_spent, 2),
-            'eur_gained': round(eur_gained, 2),
-            'commission_eur': round(commission_eur, 2),
-            'realised_profit': round(realised_profit, 2),
-        })
+            realised_profit = eur_gained - eur_spent - commission_eur
+
+            # Append the performance metrics for this TradingOpp to the list
+            trading_opps_performance.append({
+                'tradingopp': opp,
+                'date' : last_date.date(),
+                'eur_spent': round(eur_spent, 2),
+                'eur_gained': round(eur_gained, 2),
+                'commission_eur': round(commission_eur, 2),
+                'realised_profit': round(realised_profit, 2),
+            })
 
     context = {
         'monthly_performance': monthly_performance,
