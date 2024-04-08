@@ -2370,7 +2370,7 @@ def update_trades(request):
                         sold_units += sell_trade.units
 
                     units_now_owned = bought_units - sold_units
-                    if units_now_owned > 0:
+                    if units_now_owned > 0.01:
                         # Make sure the stock is in the swing_trade_category
                         ticker.categories.add(swing_trade_category)
                     else:

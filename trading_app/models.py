@@ -247,7 +247,7 @@ class TradingOpp(models.Model):
 
                 except ZeroDivisionError:
                     self.reward_risk = None  # Handle division by zero if purchase_price equals stop_loss_price
-            expected_profit = ((self.profit_taker_price - transaction_price) * units) - (commission_eur * 2)
+            expected_profit = ((self.profit_taker_price - transaction_price) * units * exchange_rate) - (commission_eur * 2)
             self.attractiveness_score = round(expected_profit * self.reward_risk/100,1)
 
         super().save(*args, **kwargs)  # Call the "real" save() method after computing reward_risk
