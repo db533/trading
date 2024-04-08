@@ -1168,11 +1168,11 @@ class GannPointEightSell(BaseStrategy):
             return action_buy, data
         for swing_point in swing_point_query:
             # Check first is a HH
-            #logger.error(
+            #logger.info(
             #    f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
             if swing_point_counter == 1:
                 if swing_point.label == 'HH' and latest_close_price < swing_point.price:
-                    logger.error(f'Detected first swingpoint is HH and latest close price is lower.')
+                    logger.info(f'Detected first swingpoint is HH and latest close price is lower.')
                     last_candle = swing_point.price_object
                     last_high = last_candle.high_price
                     last_sp = swing_point
@@ -1181,7 +1181,7 @@ class GannPointEightSell(BaseStrategy):
                     most_recent_price = float(swing_point.price_object.high_price)
                 else:
                     # This strategy cannot be true. End review of swing points.
-                    logger.error(f'First swingpoint not HH. Strategy not valid.')
+                    logger.info(f'First swingpoint not HH. Strategy not valid.')
                     break
                     # Now need to determine the elapsed days since this LL or HH.
                 latest_T = instance_difference_count(self.ticker, swing_point.price_object)
@@ -1198,34 +1198,34 @@ class GannPointEightSell(BaseStrategy):
                         recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
                         first_candle = most_recent_low_swing_point_candle
-                        logger.error(
+                        logger.info(
                             f'Found a prior {swing_point.label} before a {most_recent_label}. Found a bottom.')
                         tops_dates.append(most_recent_date.isoformat())
                         top_prices.append(most_recent_price)
                         tops += 1
                     else:
-                        logger.error(
+                        logger.info(
                             f'Successive lows. Not creating / continuing valid peaks pattern.')
                         break
                 elif swing_point.label == 'HH' or swing_point.label == 'LH':
                     if (most_recent_label == 'HL' or most_recent_label == 'LL'):
                         # This is potentially another top.
-                        logger.error(f'Found a prior {swing_point.label} after a {most_recent_label}.')
+                        logger.info(f'Found a prior {swing_point.label} after a {most_recent_label}.')
                         # Test if the top is within the threshold to be considered at the same level as the last low.
                         high_price_percent_variance = abs(swing_point.price_object.high_price - last_high) * 100 / last_high
                         recent_swing_points.append(swing_point)
                         most_recent_label = swing_point.label
                         most_recent_price = float(swing_point.price_object.high_price)
                         if high_price_percent_variance < max_variance_percent:
-                            logger.error(
+                            logger.info(
                                 f'Low is within threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
                             most_recent_low_swing_point_candle = swing_point.price_object
                         else:
-                            logger.error(
+                            logger.info(
                                 f'Low is outside threshold {high_price_percent_variance} vs max_variance_percent of {max_variance_percent}.')
                             break
                     else:
-                        logger.error(
+                        logger.info(
                             f'Successive highs. Not creating / continuing valid bottoms pattern.')
                         break
                 swing_point_counter += 1
@@ -1245,15 +1245,15 @@ class GannPointEightSell(BaseStrategy):
             data = {'latest_T': str(latest_T), 'tops': str(tops), 'top_duration': str(top_duration),
                     'recent_swing_points': recent_swing_points, 'duration_after_latest_sp' : str(duration_after_latest_sp),
                     'confirmed' : str(confirmed), 'when_confirmed' : when_confirmed, 'tops_dates' : str(tops_dates), 'top_price' : str(top_price)}
-            logger.error(f'Multiple tops detected: {tops}.')
+            logger.info(f'Multiple tops detected: {tops}.')
             if latest_price.close_price < min_bottom:
-                logger.error(f'Latest close ({latest_price.close_price}) is below min_bottom ({min_bottom}).')
+                logger.info(f'Latest close ({latest_price.close_price}) is below min_bottom ({min_bottom}).')
                 action_buy = False
         else:
             data = {}
             action_buy = None
-        logger.error(f'Latest T: {latest_T}.')
-        logger.error(f'........')
+        logger.info(f'Latest T: {latest_T}.')
+        logger.info(f'........')
         return action_buy, data
 
 class GannPointNineBuy(BaseStrategy):
@@ -1276,15 +1276,15 @@ class GannPointNineBuy(BaseStrategy):
             most_recent_hh_price = None
             for swing_point in swing_point_query:
                 # Check first is a HL
-                #logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
+                #logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
                 if swing_point_counter == 1:
                     if swing_point.label == 'HL':
-                        logger.error(f'Detected first swingpoint. HL')
+                        logger.info(f'Detected first swingpoint. HL')
                         last_sp = swing_point
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
-                        logger.error(f'First swingpoint not HL. Strategy not valid.')
+                        logger.info(f'First swingpoint not HL. Strategy not valid.')
                         break
                     # Now need to determine the elapsed days since this LL or HH.
                     #latest_T = instance_difference_count(self.ticker, swing_point.price_object)
@@ -1294,7 +1294,7 @@ class GannPointNineBuy(BaseStrategy):
                     if swing_point.label == 'HH' and most_recent_label == 'HL':
                         # Swing point is a high.
                         # Save the number of days that that it took to reach this swing point.
-                        logger.error(f'Found a prior {swing_point.label}.')
+                        logger.info(f'Found a prior {swing_point.label}.')
                         #T_prev.append(swing_point.candle_count_since_last_swing_point)
                         most_recent_label = 'HH'
                         recent_swing_points.append(swing_point)
@@ -1302,13 +1302,13 @@ class GannPointNineBuy(BaseStrategy):
                         if most_recent_hh_price is None:
                             most_recent_hh_price = swing_point.price
                     elif swing_point.label == 'HL' and most_recent_label == 'HH':
-                        logger.error(f'Found a prior {swing_point.label}. Another peak in the sequence.')
+                        logger.info(f'Found a prior {swing_point.label}. Another peak in the sequence.')
                         most_recent_label = 'HH'
                         recent_swing_points.append(swing_point)
                     else :
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
-                        logger.error(f'Found a prior {swing_point.label}. Sections: {sections}.')
+                        logger.info(f'Found a prior {swing_point.label}. Sections: {sections}.')
                         first_sp = swing_point
                         recent_swing_points.append(swing_point)
                         break
@@ -1318,7 +1318,7 @@ class GannPointNineBuy(BaseStrategy):
                 # Does the most recent HH get broken?
                 # Yes, then do we have 2 down candles followed by up candle.
                 # Then check we have no close with a lower low.
-                logger.error(f'Found sufficient sections to analyse recent price action.')
+                logger.info(f'Found sufficient sections to analyse recent price action.')
                 # Get the candles to be analysed.
                 prices = DailyPrice.objects.filter(ticker=self.ticker, datetime__gt=last_sp.price_object.datetime).order_by('datetime')
                 hh_price_exceeded = False
@@ -1331,72 +1331,57 @@ class GannPointNineBuy(BaseStrategy):
                 for price in prices:
                     print(price.datetime, 'most_recent_hh_price:', most_recent_hh_price, 'price.close_price:', price.close_price)
                     duration_to_start += 1
-                    if hh_price_exceeded == False and price.close_price > most_recent_hh_price:
-                        # price has closed above the previous HH swingpoint.
+                    if hh_price_exceeded == False and price.close_price < most_recent_hh_price:
+                        # price has closed below the previous HH swingpoint.
                         hh_price_exceeded = True
                         prev_low_price = price.low_price
-                        logger.error(f'Price has exceeded the previous HH. Checking individual price candles.')
+                        logger.info(f'Price is below the previous LL. Checking individual price candles.')
                     elif hh_price_exceeded == True:
-                        # Price exceeded the prior HH. Start looking for the pattern.
-                        #if price.high_price > prev_high_price: and price.low_price > prev_low_price:
-                        print(price.datetime, 'prev_low_price:', prev_low_price, 'price.low_price:',
-                              price.low_price)
-                        if prev_low_price is None or price.low_price > prev_low_price:
-                            # Higher candle
-                            if len(pattern) == 3:
-                                logger.error(f"Continuous H still true...")
-                                pattern_detected = True
-                                individual_candles.append({'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' })
-                                ind_candle_count += 1
-                            elif len(pattern) < 3:
-                                # Expected a lower candle, got a higher.
-                                pattern_detected = False
-                                logger.error(f"Got Higher, expected a lower. Restarting search for pattern.")
-                                start_candle = {}
-                                individual_candles = []
-                                ind_candle_count = 0
-                                pattern = []
-                            if len(pattern) == 0:
-                                pattern = ['higher']
-                                logger.error(f'First H found... pattern: {pattern}')
-                                # Save current candle as the peak in case the pattern is found
-                                start_candle = new_start
-                                individual_candles.append({'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' })
-                                ind_candle_count += 1
-                            prev_low_price = price.low_price
-                        elif price.low_price < prev_low_price:
-                            # Lower candle
-                            if (len(pattern) == 1 and pattern[0] == 'higher') or (len(pattern) == 2 and pattern[1] == 'lower'):
-                                pattern.append('lower')
-                                logger.error(f'L found... pattern: {pattern}')
-                                # Save current candle as might be the 2-day retracement candle.
-                                individual_candles.append({'datetime': price.datetime.isoformat(),
-                                                                        'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'red' })
-                                ind_candle_count += 1
-                            elif pattern_detected:
-                                pattern_detected = False
-                                logger.error(f"Found L when expecting continuous H's. Pattern broken.")
-                                start_candle = {}
-                                individual_candles = []
-                                ind_candle_count = 0
-                                pattern = []
-                            prev_low_price = price.low_price
+                        # Price went below above HH. Start looking for the pattern.
+                        print(price.datetime, 'prev_high_price:', prev_high_price, 'price.low_price:', price.low_price)
+                        if len(pattern) == 0 and price.high_price > prev_high_price:
+                            # Found first expected candle. Higher.
+                            pattern = ['higher']
+                            logger.info(f'First H found... pattern: {pattern}')
+                            start_candle = new_start
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'green'})
+                            ind_candle_count = 1
+                            # Save current candle as the peak in case the pattern is found
+                        elif (len(pattern) == 1 and pattern[0] == 'higher') or (len(pattern) == 2 and pattern[1] == 'lower') and price.high_price < prev_high_price:
+                            # We have found the first lower or also the subsequent higher and we have a higher candle, so pattern is being continued.
+                            pattern.append('lower')
+                            logger.info(f'L found... pattern: {pattern}')
+                            # Save current candle as might be the 2-day retracement candle.
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'red'})
+                            ind_candle_count += 1
+                        elif (len(pattern) == 3 and pattern[2] == 'lower') and price.high_price > prev_high_price:
+                            # We had a lower, then higher, then higher candle and now have a lower.
+                            logger.info(f"Continuous H still true after 2 lows...")
+                            pattern_detected = True
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'green'})
                         else:
                             # Either high or low not matching expected pattern.
                             pattern_detected = False
-                            logger.error(f"Either low is unchanged. Pattern broken.")
+                            logger.info(f"High or low not matching the expected pattern.")
                             start_candle = {}
                             individual_candles = []
                             ind_candle_count = 0
                             pattern = []
-                            prev_low_price = price.low_price
+                            prev_high_price = price.high_price
+
+
+
                     new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
 
             if sections > 0 and pattern_detected == True:
-                logger.error(f'Strategy confirmed to be valid.')
+                logger.info(f'Strategy confirmed to be valid.')
                 action_buy = True
 
                 #prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
@@ -1408,7 +1393,7 @@ class GannPointNineBuy(BaseStrategy):
             else:
                 data = {}
                 action_buy = None
-            logger.error(f'........')
+            logger.info(f'........')
             return action_buy, data
         except Exception as e:
             print(f"Error in Gann #9 Buying for {self.ticker.symbol}: {e}")
@@ -1433,15 +1418,15 @@ class GannPointNineSell(BaseStrategy):
             most_recent_ll_price = None
             for swing_point in swing_point_query:
                 # Check first is a LH
-                #logger.error(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
+                #logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}".')
                 if swing_point_counter == 1:
                     if swing_point.label == 'LH':
-                        logger.error(f'Detected first swingpoint. LH')
+                        logger.info(f'Detected first swingpoint. LH')
                         last_sp = swing_point
                         recent_swing_points.append(swing_point)
                     else:
                         # This strategy cannot be true. End review of swing points.
-                        logger.error(f'First swingpoint not LH. Strategy not valid.')
+                        logger.info(f'First swingpoint not LH. Strategy not valid.')
                         break
                     # Now need to determine the elapsed days since this LL or HH.
                     #latest_T = instance_difference_count(self.ticker, swing_point.price_object)
@@ -1451,7 +1436,7 @@ class GannPointNineSell(BaseStrategy):
                     if swing_point.label == 'LL' and most_recent_label == 'LH':
                         # Swing point is a low.
                         # Save the number of days that that it took to reach this swing point.
-                        logger.error(f'Found a prior {swing_point.label}.')
+                        logger.info(f'Found a prior {swing_point.label}.')
                         #T_prev.append(swing_point.candle_count_since_last_swing_point)
                         most_recent_label = 'LL'
                         recent_swing_points.append(swing_point)
@@ -1459,23 +1444,23 @@ class GannPointNineSell(BaseStrategy):
                         if most_recent_ll_price is None:
                             most_recent_ll_price = swing_point.price
                     elif swing_point.label == 'LH' and most_recent_label == 'LL':
-                        logger.error(f'Found a prior {swing_point.label}. Another trough in the sequence.')
+                        logger.info(f'Found a prior {swing_point.label}. Another trough in the sequence.')
                         most_recent_label = 'LL'
                         recent_swing_points.append(swing_point)
                     else :
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
-                        logger.error(f'Found a prior {swing_point.label}. Sections: {sections}.')
+                        logger.info(f'Found a prior {swing_point.label}. Sections: {sections}.')
                         first_sp = swing_point
                         recent_swing_points.append(swing_point)
                         break
                     swing_point_counter += 1
             if sections > 0:
                 # At least 2 sections in most recent trend. So should analyse price movements from most recent swingpoint to most recent price
-                # Does the most recent HH get broken?
+                # Does the most recent LL get broken?
                 # Yes, then do we have 2 down candles followed by up candle.
                 # Then check we have no close with a lower low.
-                logger.error(f'Found sufficient sections to analyse recent price action.')
+                logger.info(f'Found sufficient sections to analyse recent price action.')
                 # Get the candles to be analysed.
                 prices = DailyPrice.objects.filter(ticker=self.ticker, datetime__gte=last_sp.price_object.datetime).order_by('datetime')
                 ll_price_exceeded = False
@@ -1489,56 +1474,43 @@ class GannPointNineSell(BaseStrategy):
                     print(price.datetime, 'most_recent_ll_price:', most_recent_ll_price, 'price.low_price:',price.low_price )
                     duration_to_start += 1
                     if ll_price_exceeded == False and price.low_price < most_recent_ll_price:
-                        # price has closed above the previous HH swingpoint.
+                        # price has closed below the previous LL swingpoint.
                         ll_price_exceeded = True
-                        prev_low_price = price.low_price
                         prev_high_price = price.high_price
-                        logger.error(f'Price is below the previous LL. Checking individual price candles.')
+                        logger.info(f'Price is below the previous LL. Checking individual price candles.')
                     elif ll_price_exceeded == True:
                         # Price went below prior LL. Start looking for the pattern.
                         print(price.datetime, 'prev_high_price:', prev_high_price, 'price.high_price:', price.high_price)
-                        if prev_high_price is None or price.high_price < prev_high_price:
-                            # Lower candle
-                            if len(pattern) < 3:
-                                logger.error(f"Expected a higher, got a lower price.")
-                                pattern_detected = False
-                                start_candle = {}
-                                individual_candles = []
-                                ind_candle_count = 0
-                                pattern = []
-                            elif len(pattern) == 3:
-                                logger.error(f"Continuous L still true...")
-                                pattern_detected = True
-                                individual_candles.append({'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' })
-                                ind_candle_count += 1
-                            if len(pattern) == 0:
-                                pattern = ['lower']
-                                logger.error(f'First L found... pattern: {pattern}')
-                                start_candle = new_start
-                                individual_candles.append({'datetime' : price.datetime.isoformat(), 'low_price': float(price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' })
-                                ind_candle_count = 1
-                                # Save current candle as the peak in case the pattern is found
-                            prev_high_price = price.high_price
-                        elif price.high_price > prev_high_price:
-                            # Higher candle
-                            if (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher'):
-                                pattern.append('higher')
-                                logger.error(f'H found... pattern: {pattern}')
-                                # Save current candle as might be the 2-day retracement candle.
-                                individual_candles.append({'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),'high_price': float(price.high_price), 'colour' : 'green' })
-                                ind_candle_count += 1
-                            elif pattern_detected:
-                                pattern_detected = False
-                                logger.error(f"Found H when expecting continuous L's. Pattern broken.")
-                                pattern = []
-                                start_candle = {}
-                                individual_candles = []
-                                ind_candle_count = 0
-                            prev_high_price = price.high_price
+                        if len(pattern) == 0 and price.high_price < prev_high_price:
+                            # Found first expected candle. Lower.
+                            pattern = ['lower']
+                            logger.info(f'First L found... pattern: {pattern}')
+                            start_candle = new_start
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'red'})
+                            ind_candle_count = 1
+                            # Save current candle as the peak in case the pattern is found
+                        elif (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher') and price.high_price > prev_high_price:
+                            # We have found the first lower or also the subsequent higher and we have a higher candle, so pattern is being continued.
+                            pattern.append('higher')
+                            logger.info(f'H found... pattern: {pattern}')
+                            # Save current candle as might be the 2-day retracement candle.
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'green'})
+                            ind_candle_count += 1
+                        elif (len(pattern) == 3 and pattern[2] == 'higher') and price.high_price < prev_high_price:
+                            # We had a lower, then higher, then higher candle and now have a lower.
+                            logger.info(f"Continuous L still true after 2 highs...")
+                            pattern_detected = True
+                            individual_candles.append(
+                                {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
+                                 'high_price': float(price.high_price), 'colour': 'red'})
                         else:
                             # Either high or low not matching expected pattern.
                             pattern_detected = False
-                            logger.error(f"High is unchanged. Pattern broken.")
+                            logger.info(f"High or low not matching the expected pattern.")
                             start_candle = {}
                             individual_candles = []
                             ind_candle_count = 0
@@ -1546,7 +1518,7 @@ class GannPointNineSell(BaseStrategy):
                             prev_high_price = price.high_price
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
-                logger.error(f'Strategy confirmed to be valid.')
+                logger.info(f'Strategy confirmed to be valid.')
                 action_buy = False
 
                 #prior_trend_duration = instance_difference_count(self.ticker, first_candle, later_candle=last_candle)
@@ -1558,7 +1530,7 @@ class GannPointNineSell(BaseStrategy):
             else:
                 data = {}
                 action_buy = None
-            logger.error(f'........')
+            logger.info(f'........')
             return action_buy, data
         except Exception as e:
             print(f"Error in Gann #9 Sellining for {self.ticker.symbol}: {e}")
@@ -1577,7 +1549,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
         for StrategyClass in strategies:
             strategy = StrategyClass(ticker)
             #print('strategy:', strategy)
-            logger.error(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
+            logger.info(f'Checking strategy: "{str(strategy.name)}" for ticker "{str(ticker.symbol)}"')
             action_buy, data = strategy.check_criteria()
             strategy_instance = TradingStrategy.objects.get(name=strategy.name)
             existing_tradingopp = TradingOpp.objects.filter(ticker=ticker).filter(is_active=1).filter(strategy=strategy_instance)
@@ -1588,7 +1560,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
 
             if action_buy is not None:
                 #print('Strategy criteria met for', ticker.symbol)
-                logger.error(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
+                logger.info(f'Criteria met for "{str(ticker.symbol)}" for trading strategy"{str(strategy.name)}"...')
                 #ticker_id_in_strategy.append(ticker.id)
                 if 'recent_swing_points' in data:
                     recent_swing_points = data['recent_swing_points']
@@ -1609,7 +1581,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                 else:
                     confirmed = True
                 if existing_tradingopp is not None:
-                    logger.error(f'Existing TradingOpp being updated (id={existing_tradingopp.id})...')
+                    logger.info(f'Existing TradingOpp being updated (id={existing_tradingopp.id})...')
                     # This Ticker / strategy exists as an active record. Increment the count.
                     existing_tradingopp.count += 1
                     # Update the metrics with the latest data e.g. current latest_T.
@@ -1635,7 +1607,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                         for swing_point in recent_swing_points:
                             trading_opp.swing_points.add(swing_point)
                     trading_opp.save()
-                    logger.error(f'Created new TradingOpp. id:{trading_opp.id}.')
+                    logger.info(f'Created new TradingOpp. id:{trading_opp.id}.')
             else:
                 # The strategy is not valid for the ticker.
                 # Check if there was an active TradingOpp for this Ticker / strategy and set is_active=0
@@ -1645,7 +1617,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     if action_buy is not None:
                         existing_tradingopp.action_buy = action_buy
                     existing_tradingopp.save()
-        logger.error(f'Finished process_trading_opportunities_single_ticker().')
+        logger.info(f'Finished process_trading_opportunities_single_ticker().')
     except Exception as e:
         message = f'Error occured in process_trading_opportunities_single_ticker(). Current ticker: {ticker.symbol}. Error: {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
@@ -1658,7 +1630,7 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
         logger.error(message)
 
 def process_trading_opportunities():
-    logger.error(f'Starting process_trading_opportunities()...')
+    logger.info(f'Starting process_trading_opportunities()...')
     tickers = Ticker.objects.all()
     #tickers = Ticker.objects.filter(symbol="LUV")
     #strategies = [TAEStrategy, TwoPeriodCumRSI, DoubleSevens]  # List of strategy classes
@@ -1669,7 +1641,8 @@ def process_trading_opportunities():
         for ticker in tickers:
 
             process_trading_opportunities_single_ticker(ticker.symbol, strategies)
-        logger.error(f'Finished process_trading_opportunities().')
+        logger.info(f'Finished process_trading_opportunities().')
     except Exception as e:
-        print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
+        #print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
+        logger.error(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
 
