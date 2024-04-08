@@ -24,6 +24,7 @@ from django.urls import reverse
 from django.db.models import Q
 from time import sleep
 from .tasks import background_manual_ticker_download, delete_ticker, background_update_ticker_strategies
+from .price_download import download_daily_ticker_price
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
@@ -522,7 +523,8 @@ def edit_ticker(request, ticker_id):
                 existing_prices = DailyPrice.objects.all()
                 if len(existing_prices) == 0:
                     print('About to call download_prices(timeframe="Daily")...')
-                    download_prices(timeframe="Daily", ticker_symbol=ticker.symbol, trigger='User')
+                    #download_prices(timeframe="Daily", ticker_symbol=ticker.symbol, trigger='User')
+                    download_daily_ticker_price(timeframe='Daily', ticker_symbol=ticker.symbol, trigger='User')
             if ticker.is_fifteen_min:
                 print('About to call download_prices(timeframe="15 mins")...')
                 download_prices(timeframe="15 mins", ticker_symbol=ticker.symbol, trigger='User')
