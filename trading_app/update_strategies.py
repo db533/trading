@@ -1338,7 +1338,7 @@ class GannPointNineBuy(BaseStrategy):
                         logger.info(f'Price is below the previous LL. Checking individual price candles.')
                     elif hh_price_exceeded == True:
                         # Price went below above HH. Start looking for the pattern.
-                        print(price.datetime, 'prev_high_price:', prev_high_price, 'price.low_price:', price.low_price)
+                        logger.info(f'{price.datetime}, prev_high_price: {prev_high_price}, price.low_price: {price.high_price}')
                         if len(pattern) == 0 and price.high_price > prev_high_price:
                             # Found first expected candle. Higher.
                             pattern = ['higher']
