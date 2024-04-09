@@ -1323,7 +1323,7 @@ class GannPointNineBuy(BaseStrategy):
                 prices = DailyPrice.objects.filter(ticker=self.ticker, datetime__gt=last_sp.price_object.datetime).order_by('datetime')
                 hh_price_exceeded = False
                 # Initialize variables
-                prev_high_price = None
+                #prev_high_price = None
                 prev_low_price = None
                 pattern = []  # To track the pattern (higher, lower, lower, higher)
                 individual_candles = []
@@ -1335,6 +1335,7 @@ class GannPointNineBuy(BaseStrategy):
                         # price has closed below the previous HH swingpoint.
                         hh_price_exceeded = True
                         prev_low_price = price.low_price
+                        prev_high_price = price.high_price
                         logger.info(f'Price is below the previous LL. Checking individual price candles.')
                     elif hh_price_exceeded == True:
                         # Price went below above HH. Start looking for the pattern.
@@ -1348,6 +1349,7 @@ class GannPointNineBuy(BaseStrategy):
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'green'})
                             ind_candle_count = 1
+                            prev_high_price = price.high_price
                             # Save current candle as the peak in case the pattern is found
                         elif (len(pattern) == 1 and pattern[0] == 'higher') or (len(pattern) == 2 and pattern[1] == 'lower') and price.high_price < prev_high_price:
                             # We have found the first lower or also the subsequent higher and we have a higher candle, so pattern is being continued.
@@ -1358,10 +1360,12 @@ class GannPointNineBuy(BaseStrategy):
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'red'})
                             ind_candle_count += 1
+                            prev_high_price = price.high_price
                         elif (len(pattern) == 3 and pattern[2] == 'lower') and price.high_price > prev_high_price:
                             # We had a lower, then higher, then higher candle and now have a lower.
                             logger.info(f"Continuous H still true after 2 lows...")
                             pattern_detected = True
+                            prev_high_price = price.high_price
                             individual_candles.append(
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'green'})
@@ -1374,8 +1378,7 @@ class GannPointNineBuy(BaseStrategy):
                             ind_candle_count = 0
                             pattern = []
                             prev_high_price = price.high_price
-
-
+                            prev_low_price = price.low_price
 
                     new_start = {'datetime': price.datetime.isoformat(),
                                  'low_price': float(price.low_price), 'high_price': float(price.high_price), 'colour' : 'green' }
@@ -1477,11 +1480,12 @@ class GannPointNineSell(BaseStrategy):
                         # price has closed below the previous LL swingpoint.
                         ll_price_exceeded = True
                         prev_high_price = price.high_price
+                        prev_low_price = price.low_price
                         logger.info(f'Price is below the previous LL. Checking individual price candles.')
                     elif ll_price_exceeded == True:
                         # Price went below prior LL. Start looking for the pattern.
                         print(price.datetime, 'prev_high_price:', prev_high_price, 'price.high_price:', price.high_price)
-                        if len(pattern) == 0 and price.high_price < prev_high_price:
+                        if len(pattern) == 0 and price.low_price < prev_low_price:
                             # Found first expected candle. Lower.
                             pattern = ['lower']
                             logger.info(f'First L found... pattern: {pattern}')
@@ -1490,8 +1494,9 @@ class GannPointNineSell(BaseStrategy):
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'red'})
                             ind_candle_count = 1
+                            prev_low_price = price.low_price
                             # Save current candle as the peak in case the pattern is found
-                        elif (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher') and price.high_price > prev_high_price:
+                        elif (len(pattern) == 1 and pattern[0] == 'lower') or (len(pattern) == 2 and pattern[1] == 'higher') and price.low_price > prev_low_price:
                             # We have found the first lower or also the subsequent higher and we have a higher candle, so pattern is being continued.
                             pattern.append('higher')
                             logger.info(f'H found... pattern: {pattern}')
@@ -1500,10 +1505,12 @@ class GannPointNineSell(BaseStrategy):
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'green'})
                             ind_candle_count += 1
-                        elif (len(pattern) == 3 and pattern[2] == 'higher') and price.high_price < prev_high_price:
+                            prev_low_price = price.low_price
+                        elif (len(pattern) == 3 and pattern[2] == 'higher') and price.low_price < prev_low_price:
                             # We had a lower, then higher, then higher candle and now have a lower.
                             logger.info(f"Continuous L still true after 2 highs...")
                             pattern_detected = True
+                            prev_low_price = price.low_price
                             individual_candles.append(
                                 {'datetime': price.datetime.isoformat(), 'low_price': float(price.low_price),
                                  'high_price': float(price.high_price), 'colour': 'red'})
@@ -1515,6 +1522,7 @@ class GannPointNineSell(BaseStrategy):
                             individual_candles = []
                             ind_candle_count = 0
                             pattern = []
+                            prev_low_price = price.low_price
                             prev_high_price = price.high_price
                     new_start = {'datetime' : price.datetime.isoformat(), 'low_price':float( price.low_price), 'high_price' : float(price.high_price), 'colour' : 'red' }
             if sections > 0 and pattern_detected == True:
