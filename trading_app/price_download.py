@@ -686,6 +686,8 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
 
+                        # Get the ContentType for the DailyPrice model
+                        content_type = ContentType.objects.get_for_model(daily_price)
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
                             if math.isnan(row['Close']):
@@ -744,8 +746,6 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                             daily_price.save()
                             if len(row['swing_point_label']) > 0:
                                 # This was noted to be a swing point
-                                # Get the ContentType for the DailyPrice model
-                                content_type = ContentType.objects.get_for_model(daily_price)
 
                                 # First check if a swing point instance has already been created for this swing point.
                                 #logger.info(
@@ -769,6 +769,14 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 else:
                                     #logger.info(f'SwingPoint does exist.')
                                     pass
+                            else:
+                                # Should not find any swing points connected to this candle. If exist, should be deleted.
+                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,
+                                                                                          date=row['Datetime_TZ'],
+                                                                                          content_type=content_type)
+                                if existing_swing_point_instance:
+                                    existing_swing_point_instance.delete()
+
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
                         most_recent_daily_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
