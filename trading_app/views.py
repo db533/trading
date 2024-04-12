@@ -2092,6 +2092,8 @@ def trading_opps_with_trades_view(request, status):
             trade_profit = 0
         else:
             units = round(investment_value_currency / transaction_price,0)
+            if units < 1:
+                units = 1
             trade_profit = ((profit_taker_price - transaction_price) * units * current_exchange_rate) - (commission_value * 2 * current_exchange_rate)
         opp.trade_profit = round(trade_profit,2)
         opp.current_exchange_rate = current_exchange_rate
