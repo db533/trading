@@ -856,8 +856,6 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
 
-                        # Get the ContentType for the DailyPrice model
-                        content_type = ContentType.objects.get_for_model(daily_price)
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
                             if math.isnan(row['Close']):
@@ -914,6 +912,10 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 daily_price.healthy_bearish_count = row['healthy_bearish_candle']
                                 daily_price.candle_count_since_last_swing_point = row['candle_count_since_last_swing_point']
                             daily_price.save()
+
+                            # Get the ContentType for the DailyPrice model
+                            content_type = ContentType.objects.get_for_model(daily_price)
+
                             if len(row['swing_point_label']) > 0:
                                 # This was noted to be a swing point
 
