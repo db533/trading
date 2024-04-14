@@ -314,6 +314,7 @@ class GannPointThreeBuy(BaseStrategy):
             P_prev = []
             larger_P = 0
             recent_swing_points = []
+            latest_lh_sp = None
             for swing_point in swing_point_query:
                 # Check first is a HL
                 logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
@@ -372,7 +373,10 @@ class GannPointThreeBuy(BaseStrategy):
                         # This must be the start of the prior up trend.
                         # Stop checking further swing points.
                         first_sp = swing_point
-                        downtrend_price_movement = swing_point_price_difference(self.ticker,latest_lh_sp, lowpoint_sp)
+                        if latest_lh_sp is not None:
+                            downtrend_price_movement = swing_point_price_difference(self.ticker,latest_lh_sp, lowpoint_sp)
+                        else:
+                            downtrend_price_movement = 0
                         logger.info(f'Found a prior {swing_point.label}. So downtrend started here. downtrend_price_movement from latest_lh: {downtrend_price_movement}')
                         recent_swing_points.append(swing_point)
                         break
@@ -479,7 +483,11 @@ class GannPointThreeSell(BaseStrategy):
                         # This must be the start of the prior down trend.
                         # Stop checking further swing points.
                         first_sp = swing_point
-                        uptrend_price_movement = swing_point_price_difference(self.ticker,first_sp,highpoint_sp)
+                        if latest_hl_sp is not None:
+                            uptrend_price_movement = swing_point_price_difference(self.ticker, first_sp, latest_hl_sp)
+                        else:
+                            uptrend_price_movement = 0
+
                         logger.info(f'Found a prior {swing_point.label}. So downtrend started here. uptrend_price_movement : {uptrend_price_movement}')
                         recent_swing_points.append(swing_point)
                         break
