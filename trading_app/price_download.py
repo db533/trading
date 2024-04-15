@@ -985,8 +985,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...'
                                     existing_swing_point_instance.delete()
                                 else:
-                                    logger.info(
-                                        f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.'
+                                    logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.')
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
