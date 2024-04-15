@@ -803,7 +803,8 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
             if timeframe == 'Daily':  # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
                 print('start_time:')
                 start_time = display_local_time()  # record the start time of the loop
-                print('Downloading daily prices...')
+                #print('Downloading daily prices...')
+                logger.info(f'[PRICE DOWNLOAD] Downloading daily prices...')
 
                 # Query and delete the old prices
                 start_day = timezone.now() - timedelta(days=365)
