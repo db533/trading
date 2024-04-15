@@ -569,6 +569,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
         df['candle_count_since_last_swing_point'] = 0
         # print('df.columns:',df.columns)
         print('len(df):', len(df))
+        logger.info(f'len(df): {len(df)}')
 
         # Delete existing swing points for the ticker as new ones will be determined.
         print('ticker:', ticker)
