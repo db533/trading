@@ -975,16 +975,18 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                         content_type=content_type,
                                         object_id=daily_price.id
                                     )
-                                else:
-                                    #logger.info(f'SwingPoint does exist.')
-                                    pass
                             else:
                                 # Should not find any swing points connected to this candle. If exist, should be deleted.
+
                                 existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,
                                                                                           date=row['Datetime_TZ'],
                                                                                           content_type=content_type)
                                 if existing_swing_point_instance:
+                                    logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...'
                                     existing_swing_point_instance.delete()
+                                else:
+                                    logger.info(
+                                        f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.'
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
