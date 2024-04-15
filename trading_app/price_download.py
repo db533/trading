@@ -582,11 +582,13 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                                         ((df['Close'] - df['Open']) / (df['High'] - df['Low']) > 0.6)).astype(int)
         df['healthy_bearish_candle'] = ((df['Open'] > df['Close'] * (1 + price_move_percent)) &
                                         ((df['Open'] - df['Close']) / (df['High'] - df['Low']) > 0.6)).astype(int)
-
+        logger.info(f'Step 1')
         # Determine initial direction: If price closes higher, up trend, if lower, down trend
         # Up trend continues until low is lower on next 2 days. (If reversal_days = 2)
         # Down trend continues until high is higher on next 2 days.
+        logger.info(f'len(df) - reversal_days: {len(df) - reversal_days}')
         for i in range(0, len(df) - reversal_days ):
+            logger.info(f'Step 2')
             if i == 0:
                 # This is start of data. Determine the initial direction.
                 index_label = df.index[0]
