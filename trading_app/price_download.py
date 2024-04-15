@@ -119,8 +119,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         combined_data = combined_data[
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
     except Exception as e:
-        print(f"Error downloading data for {ticker.symbol}: {e}")
-        combined_data = pd.DataFrame(columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume']
+        logger.error(f"Error downloading data for {ticker.symbol}: {e}")
+        combined_data = pd.DataFrame(
+            columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     return combined_data
 
 def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logger):
