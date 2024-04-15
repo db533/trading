@@ -561,17 +561,18 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
     logger.info(f'reversal_days: {reversal_days}')
-    df['swing_point_label'] = ''
-    df['swing_point_price'] = 0
-    df['swing_point_price'] = df['swing_point_price'].astype(float)
-    df['swing_point_current_trend'] = 0
-    df['candle_count_since_last_swing_point'] = 0
-    # print('df.columns:',df.columns)
-    print('len(df):', len(df))
-
-    # Delete existing swing points for the ticker as new ones will be determined.
-    print('ticker:', ticker)
     try:
+        df['swing_point_label'] = ''
+        df['swing_point_price'] = 0
+        df['swing_point_price'] = df['swing_point_price'].astype(float)
+        df['swing_point_current_trend'] = 0
+        df['candle_count_since_last_swing_point'] = 0
+        # print('df.columns:',df.columns)
+        print('len(df):', len(df))
+
+        # Delete existing swing points for the ticker as new ones will be determined.
+        print('ticker:', ticker)
+
         healthy_bullish_count = 0
         healthy_bearish_count = 0
         current_trend_seq_count = 0
