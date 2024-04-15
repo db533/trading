@@ -618,10 +618,11 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                 low_day_0 = df.iloc[i]['Low']
                 tomorrow_high = df.iloc[i+1]['High']
                 tomorrow_low = df.iloc[i + 1]['Low']
+                logger.info(
+                    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
                 #logger.info(f'Up Step 6.')
                 if high_day_0 > tomorrow_high and low_day_0 > tomorrow_low:
-                    logger.info(f'Up Step 7A. high_day_0 > tomorrow_high and low_day_0 > tomorrow_low')
-                    logger.info(f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}')
+                    logger.info(f'Up Step 7A. Highs and lows lower tomorrow')
                     # High today ends tomorrow and low also lower. Check for confirmations.
                     change_confirmations = 0
 
@@ -646,13 +647,14 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                     if df.iloc[i + 1]['bearish'] > 0 or df.iloc[i + 1]['bearish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
                         logger.info(f'Up Step 7E. df.iloc[i + 1][bearish] > 0 or df.iloc[i + 1][bearish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
+                    logger.info(f'change_confirmations = {change_confirmations}')
 
                     if change_confirmations >= 2:
                         logger.info(f'Up Step 8. change_confirmations >= 2')
                         # At least 2 signals confirm the swing point.
                         if high_day_0 > last_high_reference:
                             # This high is higher than the previous high so this is a HH.
-                            logger.info(f'Up Step 8A. high_day_0 > last_high_reference')
+                            logger.info(f'Up Step 8A. high_day_0 > last_high_reference. SP = HH')
                             df.at[index_label, 'swing_point_label'] = "HH"
                             if last_swing_point == 'HL':
                                 current_trend_seq_count += 1
@@ -660,7 +662,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                                 current_trend_seq_count = 1
                             last_swing_point = 'HH'
                         else:
-                            logger.info(f'Up Step 8B. high_day_0 <= last_high_reference')
+                            logger.info(f'Up Step 8B. high_day_0 <= last_high_reference. SP = LH')
                             df.at[index_label, 'swing_point_label'] = "LH"
                             if last_swing_point == 'HL':
                                 current_trend_seq_count = 1
@@ -679,10 +681,11 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                 tomorrow_high = df.iloc[i + 1]['High']
                 tomorrow_low = df.iloc[i + 1]['Low']
                 logger.info(f'Step 10.')
+                logger.info(
+                    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
                 if high_day_0 < tomorrow_high and low_day_0 < tomorrow_low:
-                    logger.info(f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}')
                     # Low today ends tomorrow and high also higher. Check for confirmations.
-                    logger.info(f'Step 11. high_day_0 < tomorrow_high and low_day_0 < tomorrow_low')
+                    logger.info(f'Step 11. Highs and lows are both higher tomorrow.')
                     change_confirmations = 0
 
                     # Is the close on day_0 in the lower quartile of the day's range?
@@ -706,14 +709,14 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                     if df.iloc[i + 1]['bullish'] > 0 or df.iloc[i + 1]['bullish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
                         logger.info(f'Step 11D. df.iloc[i + 1][bullish] > 0 or df.iloc[i + 1][bullish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
-
+                    logger.info(f'change_confirmations = {change_confirmations}')
                     if change_confirmations >= 2:
                         logger.info(f'Step 12. change_confirmations >= 2')
                         # At least 2 signals confirm the swing point.
                         # Down trend ended on Day 0.
                         if low_day_0 > last_low_reference:
                             # This low is higher than the previous high so this is a HL.
-                            logger.info(f'Step 12A. low_day_0 > last_low_reference')
+                            logger.info(f'Step 12A. low_day_0 > last_low_reference. SP = HL')
                             df.at[index_label, 'swing_point_label'] = "HL"
                             if last_swing_point == 'HH':
                                 current_trend_seq_count += 1
@@ -721,7 +724,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                                 current_trend_seq_count = 1
                             last_swing_point = 'HL'
                         else:
-                            logger.info(f'Step 12B. low_day_0 <= last_low_reference')
+                            logger.info(f'Step 12B. low_day_0 <= last_low_reference. SP = LL')
                             df.at[index_label, 'swing_point_label'] = "LL"
                             if last_swing_point == 'HH':
                                 current_trend_seq_count = 1
