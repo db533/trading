@@ -982,7 +982,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                                                                           date=row['Datetime_TZ'],
                                                                                           content_type=content_type)
                                 if existing_swing_point_instance:
-                                    logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...'
+                                    logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...')
                                     existing_swing_point_instance.delete()
                                 else:
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.')
