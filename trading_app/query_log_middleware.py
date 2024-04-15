@@ -20,7 +20,7 @@ class QueryLogMiddleware(MiddlewareMixin):
         total_query_time = sum(float(query['time']) for query in connection.queries)
 
         if hasattr(request, 'resolver_match'):
-            if resolver_match is not None:
+            if request.resolver_match is not None:
                 view_name = '"{}"'.format(request.resolver_match.view_name)
             else:
                 view_name = '"Unknown"'
