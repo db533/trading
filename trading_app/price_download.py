@@ -642,7 +642,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
-                    if df.iloc[i + 1]['bearish_detected'] > 0 or df.iloc[i + 1]['bearish_reversal_detected'] > 0:
+                    if df.iloc[i + 1]['bearish'] > 0 or df.iloc[i + 1]['bearish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
                         change_confirmations += 1
 
                     if change_confirmations >= 2:
@@ -700,7 +700,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
-                    if df.iloc[i + 1]['bullish_detected'] > 0 or df.iloc[i + 1]['bullish_reversal_detected'] > 0:
+                    if df.iloc[i + 1]['bullish'] > 0 or df.iloc[i + 1]['bullish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
                         logger.info(f'Step 11D.')
                         change_confirmations += 1
 
