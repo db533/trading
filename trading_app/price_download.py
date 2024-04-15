@@ -629,21 +629,22 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                     lower_quartile_price = ((high_day_0 - low_day_0) * 0.25) + low_day_0
                     if df.iloc[i]['Close'] <= lower_quartile_price:
                         # Price closed in lower quartile on potential swing point day.
-                        logger.info(f'Up Step 7B. df.iloc[i]['Close'] <= lower_quartile_price')
+                        logger.info(f'Up Step 7B. df.iloc[i][Close] <= lower_quartile_price')
                         change_confirmations +=1
 
                     # Is Day 1 close less than the low of Day 0?
                     if df.iloc[i+1]['Close'] < low_day_0:
-                        logger.info(f'Up Step 7C. df.iloc[i+1]['Close'] < low_day_0')
+                        logger.info(f'Up Step 7C. df.iloc[i+1][Close] < low_day_0')
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']:
-                        logger.info(f'Up Step 7D. df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']')
+                        logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
                     if df.iloc[i + 1]['bearish'] > 0 or df.iloc[i + 1]['bearish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
+                        logger.info(f'Up Step 7E. df.iloc[i + 1][bearish] > 0 or df.iloc[i + 1][bearish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
 
                     if change_confirmations >= 2:
@@ -688,22 +689,22 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                     upper_quartile_price = high_day_0 - ((high_day_0 - low_day_0) * 0.25)
                     if df.iloc[i]['Close'] >= upper_quartile_price:
                         # Price closed in upper quartile on potential swing point day.
-                        logger.info(f'Step 11A. df.iloc[i]['Close'] >= upper_quartile_price')
+                        logger.info(f'Step 11A. df.iloc[i][Close] >= upper_quartile_price')
                         change_confirmations += 1
 
                     # Is Day 1 close greater than the high of Day 0?
                     if df.iloc[i + 1]['Close'] > high_day_0:
-                        logger.info(f'Step 11B. df.iloc[i + 1]['Close'] > high_day_0')
+                        logger.info(f'Step 11B. df.iloc[i + 1][Close] > high_day_0')
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']:
-                        logger.info(f'Step 11C. df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']')
+                        logger.info(f'Step 11C. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
                     if df.iloc[i + 1]['bullish'] > 0 or df.iloc[i + 1]['bullish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
-                        logger.info(f'Step 11D. df.iloc[i + 1]['bullish'] > 0 or df.iloc[i + 1]['bullish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0')
+                        logger.info(f'Step 11D. df.iloc[i + 1][bullish] > 0 or df.iloc[i + 1][bullish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
 
                     if change_confirmations >= 2:
