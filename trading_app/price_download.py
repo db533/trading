@@ -561,6 +561,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
     logger.info(f'reversal_days: {reversal_days}')
+    logger.info(f'df.columns: {df.columns}')
     try:
         df['swing_point_label'] = ''
         df['swing_point_price'] = 0
