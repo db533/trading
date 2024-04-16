@@ -109,6 +109,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index
             data['Datetime_TZ'] = data.index
+            data.index = data.index.tz_localize('UTC') if data.index.tz is None else data.index.tz_convert('UTC')
+
         combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
@@ -562,6 +564,8 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
             window_slice = df.iloc[i:i + reversal_days + 1]
             swing_point_occured = False
             candle_count_since_last_swing_point += 1
+            average_prior_vol_slice = df.iloc[max(i-2,0):i+1]
+            average_volume = average_prior_vol_slice['Volume'].mean()
             #logger.info(f'Step 4. candle_count_since_last_swing_point={candle_count_since_last_swing_point}')
             if uptrend_in_progress:
                 # First check if a new high was not achieved (but only if this is not the first record).
@@ -591,7 +595,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
-                    if df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']:
+                    if df.iloc[i + 1]['Volume'] > average_volume*1.2:
                         logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
                         change_confirmations += 1
 
@@ -653,7 +657,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
-                    if df.iloc[i + 1]['Volume'] > df.iloc[i]['Volume']:
+                    if df.iloc[i + 1]['Volume'] > average_volume*1.2:
                         logger.info(f'Step 11C. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
                         change_confirmations += 1
 
