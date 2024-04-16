@@ -113,6 +113,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
         if existing_data_retrieved == True:
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
+        else:
+            combined_data = data
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
         combined_data['Ticker'] = ticker.symbol
