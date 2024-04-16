@@ -1966,7 +1966,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     sp_y_positions = []
     logger.info(f'[SP on ticker-graph] Adding swing points on graph...')
     logger.info(f'sp_dates: {sp_dates}')
-    logger.info(f'sp_dates: {sp_dates}')
+    logger.info(f'sp_price: {sp_price}')
     logger.info(f'sp_indices: {sp_indices}')
     for sp in swing_point_query:
         if sp.date in date_to_price_map:
