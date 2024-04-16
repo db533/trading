@@ -110,11 +110,14 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data['Datetime'] = data.index
             data['Datetime_TZ'] = data.index
             data.index = data.index.tz_localize('UTC') if data.index.tz is None else data.index.tz_convert('UTC')
-
+        else:
+            logger.info(f'get_price_data(). Retrieved data is empty.')
         if existing_data_retrieved == True:
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
+            logger.info(f'get_price_data(). Combined with existing data.')
         else:
             combined_data = data
+            logger.info(f'get_price_data(). No existing data to combine new data with.')
         # Convert the first row to a dictionary
         first_row_dict = combined_data.iloc[0].to_dict()
 
