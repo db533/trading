@@ -109,7 +109,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index
             data['Datetime_TZ'] = data.index
-            data.index = data.index.tz_localize('UTC') if data.index.tz is None else data.index.tz_convert('UTC')
+            data.index = data.index.tz_localize(None)  # Making index tz-naive
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
         if existing_data_retrieved == True:
