@@ -583,7 +583,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
             #logger.info(f'Step 4. candle_count_since_last_swing_point={candle_count_since_last_swing_point}')
             if uptrend_in_progress:
                 # First check if a new high was not achieved (but only if this is not the first record).
-                logger.info(f'Uptrend in progress...')
+                logger.info(f'Uptrend in progress... {index_label}')
                 high_day_0 = df.iloc[i]['High']
                 low_day_0 = df.iloc[i]['Low']
                 tomorrow_high = df.iloc[i+1]['High']
@@ -645,7 +645,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         swing_point_occured = True
             else:
                 # Down trend in progress
-                logger.info(f'Step 9. Downtrend in progress...')
+                logger.info(f'Step 9. Downtrend in progress... {index_label}')
                 high_day_0 = df.iloc[i]['High']
                 low_day_0 = df.iloc[i]['Low']
                 tomorrow_high = df.iloc[i + 1]['High']
