@@ -113,6 +113,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
         if existing_data_retrieved == True:
+            existing_df.index = existing_df.index.tz_localize(None)  # Making index tz-naive
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             logger.info(f'get_price_data(). Combined with existing data.')
         else:
@@ -609,7 +610,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > average_volume*1.2:
-                        logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
+                        logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > average_volume*1.2')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
@@ -671,7 +672,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > average_volume*1.2:
-                        logger.info(f'Step 11C. df.iloc[i + 1][Volume] > df.iloc[i][Volume]')
+                        logger.info(f'Step 11C. df.iloc[i + 1][Volume] > average_volume*1.2')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
