@@ -91,6 +91,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #print(existing_df.tail(5))
             # Filter out records that are newer than start_time
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
+            logger.info(f'Existing data:')
+            logger.info(f'existing_df:{existing_df}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -110,6 +112,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data['Datetime'] = data.index
             data['Datetime_TZ'] = data.index
             data.index = data.index.tz_localize(None)  # Making index tz-naive
+            # Convert the first row to a dictionary
+            logger.info(f'Data downloaded from Yahoo:')
+            logger.info(f'data: {data}')
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
         if existing_data_retrieved == True:
