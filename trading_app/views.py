@@ -1965,13 +1965,16 @@ def generate_ticker_graph_view(request, ticker_symbol):
     sp_x_positions = []
     sp_y_positions = []
     logger.info(f'[SP on ticker-graph] Adding swing points on graph...')
+    logger.info(f'sp_dates: {sp_dates}')
+    logger.info(f'sp_dates: {sp_dates}')
+    logger.info(f'sp_indices: {sp_indices}')
     for sp in swing_point_query:
         if sp.date in date_to_price_map:
             low_price, high_price = date_to_price_map[sp.date]
             # Determine if the swing point is closer to the high or the low for the day
             if abs(sp.price - high_price) < abs(sp.price - low_price):
                 sp_y_positions.append(high_price)
-                logger.info(f'Date: {sp.date}. HIGH. Price: {high_price}. sp_x_position: {dates.index(sp.date)}')
+                logger.info(f'Date: {sp.date}. sp_price: {sp.price}. HIGH. Price: {high_price}. sp_x_position: {dates.index(sp.date)}')
             else:
                 sp_y_positions.append(low_price)
                 logger.info(f'Date: {sp.date}. LOW. Price: {low_price}. sp_x_position: {dates.index(sp.date)}')
