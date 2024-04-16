@@ -115,6 +115,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
         else:
             combined_data = data
+        # Convert the first row to a dictionary
+        first_row_dict = combined_data.iloc[0].to_dict()
+
+        # Display the dictionary
+        print(first_row_dict)
+        logger.info(f'first_row_dict: {first_row_dict}')
+
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
         combined_data['Ticker'] = ticker.symbol
