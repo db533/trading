@@ -580,7 +580,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
             candle_count_since_last_swing_point += 1
             average_prior_vol_slice = df.iloc[max(i-2,0):i+1]
             average_volume = average_prior_vol_slice['Volume'].mean()
-            #logger.info(f'Step 4. candle_count_since_last_swing_point={candle_count_since_last_swing_point}')
+            logger.info(f'{index_label}: Open: {df.iloc[i]["Open"]}, High: {df.iloc[i]["High"]}, Low: {df.iloc[i]["Low"]}, Close: {df.iloc[i]["Close"]}')
             if uptrend_in_progress:
                 # First check if a new high was not achieved (but only if this is not the first record).
                 logger.info(f'Uptrend in progress... {index_label}')
