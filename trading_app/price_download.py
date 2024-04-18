@@ -115,15 +115,23 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Convert the first row to a dictionary
             logger.info(f'Data downloaded from Yahoo:')
             logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
+            step = 1
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
+            step = 2
+        step = 3
         if existing_data_retrieved == True:
             logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            step = 4
             existing_df.index = existing_df.index.tz_localize(None)  # Making index tz-naive
+            step = 5
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
+            step = 6
             logger.info(f'get_price_data(). Combined with existing data.')
         else:
+            step = 7
             combined_data = data
+            step = 8
             logger.info(f'get_price_data(). No existing data to combine new data with.')
         # Convert the first row to a dictionary
         first_row_dict = combined_data.iloc[0].to_dict()
@@ -141,7 +149,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         combined_data = combined_data[
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
     except Exception as e:
-        logger.error(f"Error downloading data for {ticker.symbol}: {e}")
+        logger.error(f"Error downloading data for {ticker.symbol}: Step: {step}. {e}")
         combined_data = pd.DataFrame(
             columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     return combined_data
