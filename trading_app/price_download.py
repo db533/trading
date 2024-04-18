@@ -118,6 +118,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
         if existing_data_retrieved == True:
+            logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df.index = existing_df.index.tz_localize(None)  # Making index tz-naive
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             logger.info(f'get_price_data(). Combined with existing data.')
