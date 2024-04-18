@@ -109,8 +109,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             print('Retrieve new price data records...')
 
             # Create a 'Datetime' column from the index
-            data['Datetime'] = data.index
-            data['Datetime_TZ'] = data.index
+            data['Datetime'] = data.index.tz_convert('UTC')
+            data['Datetime_TZ'] = data.index.tz_convert('UTC')
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             # Convert the first row to a dictionary
             logger.info(f'Data downloaded from Yahoo:')
