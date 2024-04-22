@@ -121,9 +121,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
-            logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
-            step = 4
             existing_df.index = existing_df.index.tz_convert('UTC')
+            step = 4
+            logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 5
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             step = 6
