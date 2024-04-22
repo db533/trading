@@ -109,8 +109,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             print('Retrieve new price data records...')
 
             # Create a 'Datetime' column from the index
-            data['Datetime'] = data.index.tz_convert('UTC')
-            data['Datetime_TZ'] = data.index.tz_convert('UTC')
+            data['Datetime'] = data.index.tz_convert('UTC').tz_localize(None)
+            data['Datetime_TZ'] = data.index.tz_convert('UTC').tz_localize(None)
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             # Convert the first row to a dictionary
             logger.info(f'Data downloaded from Yahoo:')
@@ -121,7 +121,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
-            existing_df.index = existing_df.index.tz_convert('UTC')
+            existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 4
             logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 5
