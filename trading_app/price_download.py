@@ -105,6 +105,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
         logger.info(f'get_price_data(). data retrieval performed.')
+        logger.info(f'data as received from Yahoo: data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
         if not data.empty:
             print('Retrieve new price data records...')
 
@@ -121,6 +122,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
+            logger.info(f'existing_df before changes: data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 3.5
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
@@ -140,16 +142,24 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
         # Display the dictionary
         print(first_row_dict)
+        step = 9
         logger.info(f'first_row_dict: {first_row_dict}')
 
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
+        step = 10
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
+        step = 11
         combined_data['Ticker'] = ticker.symbol
+        step = 12
         combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100
+        step = 13
         combined_data.at[combined_data.index[0], 'PercentChange'] = 0
-        combined_data.dropna(subset=['Open'], inplace=True)
+        step = 14
+        combined_data.dropna(subset=['Open'], inplace=True
+        step = 15
         combined_data = combined_data[
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
+        step = 16
     except Exception as e:
         logger.error(f"Error downloading data for {ticker.symbol}: Step: {step}. {e}")
         combined_data = pd.DataFrame(
