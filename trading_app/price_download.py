@@ -122,6 +122,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 3
         if existing_data_retrieved == True:
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
+            existing_df.index = existing_df['Datetime_TZ'].tz_convert('UTC').tz_localize(None)
             step = 4
             logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 5
