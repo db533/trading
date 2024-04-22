@@ -122,7 +122,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
-            logger.info(f'existing_df before changes: data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
+            logger.info(f'existing_df before any changes: existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 3.5
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
@@ -155,7 +155,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 13
         combined_data.at[combined_data.index[0], 'PercentChange'] = 0
         step = 14
-        combined_data.dropna(subset=['Open'], inplace=True
+        combined_data.dropna(subset=['Open'], inplace=True)
         step = 15
         combined_data = combined_data[
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
