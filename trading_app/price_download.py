@@ -63,6 +63,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         if existing_data_retrieved == True:
             logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
+            logger.info(
+                f'existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
             existing_df['Open'] = existing_df['open_price'].astype(float)
@@ -122,7 +124,6 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
-            logger.info(f'existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 3.5
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
