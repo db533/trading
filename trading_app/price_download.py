@@ -105,7 +105,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
         logger.info(f'get_price_data(). data retrieval performed.')
-        logger.info(f'data as received from Yahoo: data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
+        logger.info(f'data as received from Yahoo: data.index[0]:{data.index[0]} data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
         if not data.empty:
             print('Retrieve new price data records...')
 
@@ -122,7 +122,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 2
         step = 3
         if existing_data_retrieved == True:
-            logger.info(f'existing_df before any changes: existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            logger.info(f'existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 3.5
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
