@@ -117,6 +117,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             # Convert the first row to a dictionary
             logger.info(f'Data downloaded from Yahoo:')
+            logger.info(f'data.index[0].to_dict(): {data.index[0].to_dict()}')
             logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
             step = 1
         else:
