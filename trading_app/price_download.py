@@ -150,6 +150,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 10
         logger.info(f'combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
+        logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
         step = 11
         combined_data['Ticker'] = ticker.symbol
