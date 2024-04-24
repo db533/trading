@@ -96,6 +96,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
             step = 2
             logger.info(f'step = {step} Existing data:')
+            logger.info(f'len(existing_df):{len(existing_df)}')
             logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
             logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
     except Exception as e:
