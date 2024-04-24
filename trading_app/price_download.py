@@ -94,7 +94,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Filter out records that are newer than start_time
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
             logger.info(f'Existing data:')
-            logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
+            logger.info(f'existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -117,7 +117,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             # Convert the first row to a dictionary
             step = 0.5
-            logger.info(f'Data downloaded from Yahoo:')
+            logger.info(f'step: {step} Data downloaded from Yahoo:')
             logger.info(f'data.index[0]: {data.index[0]}')
             logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
             step = 1
@@ -134,12 +134,12 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 5
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             step = 6
-            logger.info(f'get_price_data(). Combined with existing data.')
+            logger.info(f'step: {step} get_price_data(). Combined with existing data.')
         else:
             step = 7
             combined_data = data
             step = 8
-            logger.info(f'get_price_data(). No existing data to combine new data with.')
+            logger.info(f'step: {step} get_price_data(). No existing data to combine new data with.')
         # Convert the first row to a dictionary
         first_row_dict = combined_data.iloc[0].to_dict()
 
@@ -150,7 +150,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         step = 10
-        logger.info(f'combined_data.index[0]: {combined_data.index[0]}')
+        logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
