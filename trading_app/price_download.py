@@ -96,7 +96,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
             step = 2
             logger.info(f'step = {step} Existing data:')
-            logger.info(f'existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
+            logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
+            logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
@@ -132,7 +133,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 8
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
             step = 9
-            logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             step = 11
@@ -148,7 +149,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         # Display the dictionary
         print(first_row_dict)
         step = 14
-        logger.info(f'first_row_dict: {first_row_dict}')
+        logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
+        logger.info(f'combined_data: {first_row_dict}')
 
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         step = 15
