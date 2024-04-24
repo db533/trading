@@ -61,10 +61,11 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         else:
             existing_data_retrieved = False
         if existing_data_retrieved == True:
+            step = 1
             logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
             logger.info(
-                f'existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
             existing_df['Open'] = existing_df['open_price'].astype(float)
@@ -93,7 +94,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #print(existing_df.tail(5))
             # Filter out records that are newer than start_time
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
-            logger.info(f'Existing data:')
+            step = 2
+            logger.info(f'step = {step} Existing data:')
             logger.info(f'existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
@@ -104,9 +106,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         # Ensure start_time and finish_time are timezone-aware
         start_time = start_time.replace(tzinfo=timezone.utc)
         finish_time = finish_time.replace(tzinfo=timezone.utc)
-
+        step = 3
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
-        logger.info(f'get_price_data(). data retrieval performed.')
+        logger.info(f'step = {step} get_price_data(). data retrieval performed.')
         logger.info(f'data as received from Yahoo: data.index[0]:{data.index[0]} data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
         if not data.empty:
             print('Retrieve new price data records...')
@@ -116,56 +118,56 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data['Datetime_TZ'] = data.index.tz_convert('UTC').tz_localize(None)
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             # Convert the first row to a dictionary
-            step = 0.5
+            step = 4
             logger.info(f'step: {step} Data downloaded from Yahoo:')
             logger.info(f'data.index[0]: {data.index[0]}')
             logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
-            step = 1
+            step = 5
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
-            step = 2
-        step = 3
+            step = 6
+        step = 7
         if existing_data_retrieved == True:
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
-            step = 3.5
+            step = 8
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
-            step = 4
+            step = 9
             logger.info(f'existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
-            step = 5
+            step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
-            step = 6
+            step = 11
             logger.info(f'step: {step} get_price_data(). Combined with existing data.')
         else:
-            step = 7
+            step = 12
             combined_data = data
-            step = 8
+            step = 13
             logger.info(f'step: {step} get_price_data(). No existing data to combine new data with.')
         # Convert the first row to a dictionary
         first_row_dict = combined_data.iloc[0].to_dict()
 
         # Display the dictionary
         print(first_row_dict)
-        step = 9
+        step = 14
         logger.info(f'first_row_dict: {first_row_dict}')
 
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
-        step = 10
+        step = 15
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
-        step = 11
+        step = 16
         combined_data['Ticker'] = ticker.symbol
-        step = 12
+        step = 17
         combined_data['PercentChange'] = combined_data['Close'].pct_change() * 100
-        step = 13
+        step = 18
         combined_data.at[combined_data.index[0], 'PercentChange'] = 0
-        step = 14
+        step = 19
         combined_data.dropna(subset=['Open'], inplace=True)
-        step = 15
+        step = 20
         combined_data = combined_data[
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
-        step = 16
+        step = 21
     except Exception as e:
         logger.error(f"Error downloading data for {ticker.symbol}: Step: {step}. {e}")
         combined_data = pd.DataFrame(
