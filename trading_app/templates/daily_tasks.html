@@ -32,7 +32,7 @@
                             <a href="{% url 'edit_all_params' %}" target="_blank">Edit parameters</a>
                         {% elif task.seq_no == 20 %}
                             <!-- Check Interactive Brokers for executed trades -->
-                            <li><a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site</li>
+                            <li><a href="https://www.interactivebrokers.co.uk/sso/Login" target="_blank">Check executed buy/sell trades in Interactive Brokers site</a></li>
                             <li><a href="{% url 'trading_opps_with_trades' '1'|urlencode %} " target="_blank">Scheduled trades - update with actual price and mark as executed.</a></li>
                             <li><a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - If stoploss executed, update the TradingOpp.</a></li>
                             <li><a href="{% url 'trading_opps_with_trades' '2b'|urlencode %}" target="_blank">Open trades - add trades.</a></li>
