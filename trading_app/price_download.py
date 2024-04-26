@@ -64,12 +64,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 1
             logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
-            logger.info(
-                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             tz_info=[]
             for x in existing_df["Datetime_TZ"]:
                 tz_info.append(x.tzinfo)
-            logger.info(f'tz_info: {tz_info}')
+            logger.info(
+                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()} tz_info: {tz_info}')
+
+            #logger.info(f'tz_info: {tz_info}')
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
             existing_df['Open'] = existing_df['open_price'].astype(float)
