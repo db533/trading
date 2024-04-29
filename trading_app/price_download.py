@@ -86,8 +86,11 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #print(existing_df.tail(5))
 
             #print('Step 3')
-            existing_df = existing_df.set_index('Datetime')
-            existing_df = existing_df['Datetime'] = existing_df.index
+            try:
+                existing_df = existing_df.set_index('Datetime')
+                existing_df = existing_df['Datetime'] = existing_df.index
+            except Exception as e:
+                logger.error(f"1. Error during loop: {e}")
             #print('Step 4')
             #existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             existing_df = existing_df.drop(columns=['ticker_id', 'open_price', 'high_price', 'low_price', 'close_price','volume'])
@@ -107,7 +110,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             datetime_tzinfo = []
             for x in range(len(existing_df)):
                 tzinfo.append(existing_df.iloc[x]["datetime_tz"])
-                datetime_tzinfo.append(existing_df.iloc[x]["datetime"])
+                datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
             logger.info(f'len(tzinfo): {len(tzinfo)}')
             logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
             for handler in logger.handlers:
