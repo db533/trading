@@ -103,28 +103,15 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             tzinfo = []
             datetime_tzinfo = []
-            logger.info(f'step = 2a')
-            try:
-                for x in range(len(existing_df)):
-                    tzinfo.append(existing_df.iloc[x]["datetime_tz"])
-                    datetime_tzinfo.append(existing_df.iloc[x]["datetime"])
-            except Exception as e:
-                logger.error(f"Error during loop: {e}")
-            logger.info(f'step = 2b')
+            for x in range(len(existing_df)):
+                tzinfo.append(existing_df.iloc[x]["datetime_tz"])
+                datetime_tzinfo.append(existing_df.iloc[x]["datetime"])
             logger.info(f'len(tzinfo): {len(tzinfo)}')
-            logger.info(f'step = 2c')
             logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
-            logger.info(f'step = 2d')
             for handler in logger.handlers:
                 handler.flush()
-            logger.info(f'step = 2e')
             logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
-            logger.info(f'step = 2f')
             logger.info(f'existing_df["datetime"] values: {datetime_tzinfo}')
-            logger.info(f'step = 2g')
-            for handler in logger.handlers:
-                handler.flush()
-            logger.info(f'step = 2h')
 
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
@@ -160,6 +147,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 8
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
+            existing_df.index = existing_df['Datetime'].tz_localize(None)
             step = 9
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 10
