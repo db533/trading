@@ -64,12 +64,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 1
             logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
-            tz_info=[]
-            for x in existing_df["Datetime_TZ"]:
-                tz_info.append(x.tzinfo)
             logger.info(
-                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()} tz_info: {tz_info}')
-
+                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             #logger.info(f'tz_info: {tz_info}')
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
@@ -105,7 +101,10 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'len(existing_df):{len(existing_df)}')
             logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
             logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
-            logger.info(f'existing_df["Datetime_TZ"].apply(lambda x: x.tzinfo): {existing_df["Datetime_TZ"].apply(lambda x: x.tzinfo)}')
+            tzinfo = []
+            for x in range(len(existing_df)):
+                tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
+            logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
