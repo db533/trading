@@ -158,6 +158,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             step = 11
+            data['Datetime'] = data['Datetime'].tz_localize(None)
+            data['Datetime_TZ'] = data['Datetime_TZ'].tz_localize(None)
+            step = 11.5
             logger.info(f'step: {step} get_price_data(). Combined with existing data.')
         else:
             step = 12
