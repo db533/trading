@@ -158,7 +158,18 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 14
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data: {first_row_dict}')
-
+        tzinfo = []
+        for x in range(len(combined_data)):
+            tzinfo.append(combined_data.iloc[x]["Datetime"])
+        logger.info(f'combined_data["Datetime"] values: {tzinfo}')
+        tzinfo = []
+        for x in range(len(combined_data)):
+            tzinfo.append(combined_data.iloc[x]["Datetime_TZ"])
+        logger.info(f'combined_data["Datetime_TZ"] values: {tzinfo}')
+        tzinfo = []
+        for x in range(len(combined_data)):
+            tzinfo.append(combined_data.index[x])
+        logger.info(f'combined_data.index values: {tzinfo}')
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         step = 15
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
