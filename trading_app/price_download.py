@@ -106,8 +106,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'step = 2a')
             try:
                 for x in range(len(existing_df)):
-                    tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
-                    datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
+                    tzinfo.append(existing_df.iloc[x]["datetime_tz"])
+                    datetime_tzinfo.append(existing_df.iloc[x]["datetime"])
             except Exception as e:
                 logger.error(f"Error during loop: {e}")
             logger.info(f'step = 2b')
@@ -120,7 +120,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'step = 2e')
             logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
             logger.info(f'step = 2f')
-            logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
+            logger.info(f'existing_df["datetime"] values: {datetime_tzinfo}')
             logger.info(f'step = 2g')
             for handler in logger.handlers:
                 handler.flush()
