@@ -87,8 +87,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
             #print('Step 3')
             try:
-                existing_df = existing_df.set_index('Datetime')
-                existing_df = existing_df['Datetime'] = existing_df.index
+                existing_df['Datetime_index'] = existing_df['Datetime']
+                existing_df = existing_df.set_index('Datetime_index')
             except Exception as e:
                 logger.error(f"1. Error during loop: {e}")
             #print('Step 4')
