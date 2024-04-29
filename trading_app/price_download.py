@@ -104,9 +104,12 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             tzinfo = []
             datetime_tzinfo = []
             logger.info(f'step = 2a')
-            for x in range(len(existing_df)):
-                tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
-                datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
+            try:
+                for x in range(len(existing_df)):
+                    tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
+                    datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
+            except Exception as e:
+                logger.error(f"Error during loop: {e}")
             logger.info(f'step = 2b')
             logger.info(f'len(tzinfo): {len(tzinfo)}')
             logger.info(f'step = 2c')
