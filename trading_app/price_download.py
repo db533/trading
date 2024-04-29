@@ -87,6 +87,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
             #print('Step 3')
             existing_df = existing_df.set_index('Datetime')
+            existing_df = existing_df['Datetime'] = existing_df.index
             #print('Step 4')
             #existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             existing_df = existing_df.drop(columns=['ticker_id', 'open_price', 'high_price', 'low_price', 'close_price','volume'])
