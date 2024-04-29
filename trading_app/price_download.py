@@ -107,9 +107,11 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
                 tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
             for x in range(len(existing_df)):
                 datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
+            logger.info(f'len(tzinfo): {len(tzinfo)}')
             logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
             for handler in logger.handlers:
                 handler.flush()
+            logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
             logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
             for handler in logger.handlers:
                 handler.flush()
