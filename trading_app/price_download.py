@@ -92,8 +92,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             except Exception as e:
                 logger.error(f"1. Error during loop: {e}")
             #print('Step 4')
-            #existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
-            existing_df = existing_df.drop(columns=['ticker_id', 'open_price', 'high_price', 'low_price', 'close_price','volume'])
+            existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             #print('existing_df.head(5) after set_index:')
             #print(existing_df.head(5))
             #print('existing_df.tail(5) after set_index:')
@@ -109,14 +108,14 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             tzinfo = []
             datetime_tzinfo = []
             for x in range(len(existing_df)):
-                tzinfo.append(existing_df.iloc[x]["datetime_tz"])
+                tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
                 datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
             logger.info(f'len(tzinfo): {len(tzinfo)}')
             logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
             for handler in logger.handlers:
                 handler.flush()
             logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
-            logger.info(f'existing_df["datetime"] values: {datetime_tzinfo}')
+            logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
 
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
