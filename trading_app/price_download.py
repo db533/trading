@@ -102,9 +102,12 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
             logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             tzinfo = []
+            datetime_tzinfo = []
             for x in range(len(existing_df)):
                 tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
+                datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
             logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
+            logger.info(f'existing_df["Datetime"] values: {tzinfo}')
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
