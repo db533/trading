@@ -222,7 +222,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
         step = 21
         combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize("UTC")
-        combined_data.index = combined_data.tz_localize('UTC')
+        combined_data.index = combined_data.index.tz_localize('UTC')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
 
