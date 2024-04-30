@@ -92,7 +92,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             except Exception as e:
                 logger.error(f"1. Error during loop: {e}")
             #print('Step 4')
+            step = 1.5
+            logger.info(f'step = {step} Existing data:')
+            logger.info(f'existing_df.columns:{existing_df.columns}')
+            logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
+            step=1.7
+            logger.info(f'existing_df.columns:{existing_df.columns}')
             #print('existing_df.head(5) after set_index:')
             #print(existing_df.head(5))
             #print('existing_df.tail(5) after set_index:')
