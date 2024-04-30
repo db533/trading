@@ -166,6 +166,14 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 11
             logger.info(
                 f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+            #combined_data.iloc[0]['Datetime'] = combined_data.iloc[0]['Datetime'].dt.tz_localize(None)
+            #combined_data.iloc[0]['Datetime_TZ'] = combined_data.iloc[0]['Datetime_TZ'].dt.tz_localize(None)
+            #step = 11.3
+            #logger.info(
+            #    f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+            combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'], errors='coerce')
+            combined_data['Datetime_TZ'] = pd.to_datetime(combined_data['Datetime_TZ'], errors='coerce')
+
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize(None)
             combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize(None)
             step = 11.5
