@@ -167,6 +167,10 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
+            data_len = len(combined_data)
+            logger.info(f'data_len: {data_len}')
+            logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
+            logger.info(f'combined_data.iloc[data_len-1].to_dict(): {combined_data.iloc[data_len - 1].to_dict()}')
             step = 11
             logger.info(
                 f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
