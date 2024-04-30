@@ -98,6 +98,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             step=1.7
+            logger.info(f'step = {step} Existing data:')
             logger.info(f'existing_df.columns:{existing_df.columns}')
             #print('existing_df.head(5) after set_index:')
             #print(existing_df.head(5))
@@ -157,7 +158,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 8
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
-            existing_df.index = existing_df['datetime'].tz_localize(None)
+            existing_df.index = existing_df['Datetime'].tz_localize(None)
             step = 9
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             step = 10
