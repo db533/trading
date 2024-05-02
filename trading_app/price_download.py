@@ -1035,6 +1035,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 print(row)
                             if not DailyPrice.objects.filter(ticker=ticker, datetime=row['Datetime_TZ']).exists():
                                 new_record_count += 1
+                                logger.info(f'About to create new record for datetime {str(row["Datetime_TZ"])}...')
                                 daily_price = DailyPrice(
                                     ticker=ticker,
                                     datetime=row['Datetime_TZ'],
@@ -1065,6 +1066,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 )
                                 logger.info(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                             else:
+                                logger.info(f'About to update existing record for datetime {str(row["Datetime_TZ"])}...')
                                 daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
                                 daily_price.datetime_tz = daily_price.datetime
                                 daily_price.patterns_detected = row['patterns_detected']
@@ -1096,11 +1098,11 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 #logger.info(
                                 #    f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                                 #    f"content_type: {str(content_type)}")
-                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,
-                                                                                          date=row['Datetime_TZ'],
-                                                                                          content_type=content_type)
+                                logger.info(f'This record is labelled as a swingpoint.')
+                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],content_type=content_type)
                                 #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                                 if not existing_swing_point_instance.exists():
+                                    logger.info(f'Creating a swingpoint for datetime {str(row["Datetime_TZ"])} because does not exist.')
                                     #logger.info(f'SwingPoint does not exist.')
                                     new_swing_point = SwingPoint.objects.create(
                                         ticker=ticker,
@@ -1120,8 +1122,6 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 if existing_swing_point_instance:
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...')
                                     existing_swing_point_instance.delete()
-                                else:
-                                    logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.')
                         logger.info(
                             f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
                         nat_indexes = check_for_nat(price_history)
