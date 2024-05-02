@@ -1066,7 +1066,9 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
+                        logger.info(f'About to find most_recent_daily_price...')
                         most_recent_daily_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+                        logger.info(f'trades_to_update...')
                         trades_to_update = Trade.objects.filter(tradingopp__ticker=ticker,action='1',  # Where the action is 'Buy'
                             status='0'  # And the status is 'Planned'
                         )
