@@ -948,19 +948,31 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                     price_history = get_price_data(ticker, '1D', start_day, finish_day, logger)
                     if len(price_history) >= 3:
                         # print('Step 11')
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
                         logger.info(f'About to call add_candle_data()...')
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
                         # print('Step 12')
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
                         logger.info(f'About to call add_db_candle_data()...')
                         price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
                         # print('Step 13')
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
                         logger.info(f'About to call count_patterns()...')
                         count_patterns(price_history, pattern_types)
                         # print('Step 14')
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
+
                         logger.info(f'About to call find_levels()...')
                         sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                         # print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                         # if ticker.symbol == 'NNOX':
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
+
                         logger.info(f'About to call identify_highs_lows_gann2()...')
                         price_history, swing_point_current_trend = identify_highs_lows_gann2(ticker,
                                                                                                                  price_history, logger,
@@ -975,10 +987,15 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         ticker.swing_point_current_trend = swing_point_current_trend
                         # print('Step 16')
                         ticker.save()
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
+
                         print('ticker.swing_point_current_trend:', ticker.swing_point_current_trend)
                         logger.info(f'About to call add_levels_to_price_history()...')
                         price_history = add_levels_to_price_history(price_history, sr_levels, retests)
                         # print('Step 17')
+                        logger.info(
+                            f'price_history.columns: {price_history.columns}')
                         logger.info(f'About to call add_ema_and_trend()...')
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
