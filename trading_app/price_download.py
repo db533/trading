@@ -53,7 +53,7 @@ def display_local_time():
     return local_datetime
 
 
-def check_for_nat(df):
+def check_for_nat(logger, df):
     # Checking both 'Datetime' and 'Datetime_TZ' columns for NaT
     nat_indexes = df[df['Datetime'].isna() | df['Datetime_TZ'].isna()].index.tolist()
 
@@ -1028,7 +1028,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
                         logger.info(
                             f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                        nat_indexes = check_for_nat(price_history)
+                        nat_indexes = check_for_nat(logger, price_history)
                         step = 1
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
@@ -1136,7 +1136,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         step = 13
                         logger.info(
                             f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                        nat_indexes = check_for_nat(price_history)
+                        nat_indexes = check_for_nat(logger, price_history)
                         step = 14
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
@@ -1280,7 +1280,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 18')
                     # Call the function and pass the 'price_history' DataFrame
                     logger.info(f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                    nat_indexes = check_for_nat(price_history)
+                    nat_indexes = check_for_nat(logger, price_history)
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
                         if math.isnan(row['Close']):
@@ -1365,7 +1365,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                 else:
                     print('Insufficient data.')
                 logger.info(f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                nat_indexes = check_for_nat(price_history)
+                nat_indexes = check_for_nat(logger, price_history)
 
                 print('new_record_count:',new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
