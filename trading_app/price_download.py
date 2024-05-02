@@ -227,6 +227,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
 
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize(None)
             combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize(None)
+            logger.info(f'[E] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+            check_for_nat(logger, combined_data)
             step = 11.5
             logger.info(f'step: {step} get_price_data(). Combined with existing data.')
         else:
@@ -255,6 +257,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             tzinfo.append(combined_data.index[x])
         logger.info(f'combined_data.index values: {tzinfo}')
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
+        logger.info(f'[F] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+        check_for_nat(logger, combined_data)
         step = 15
         logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
@@ -278,7 +282,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
-        logger.info(f'[E] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+        logger.info(f'[G] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
         check_for_nat(logger, combined_data)
 
     except Exception as e:
