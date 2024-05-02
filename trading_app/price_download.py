@@ -983,6 +983,8 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
                         logger.info(
+                            f'price_history.columns: {price_history.columns}')
+                        logger.info(
                             f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
                         nat_indexes = check_for_nat(price_history)
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
