@@ -55,13 +55,18 @@ def display_local_time():
 
 def check_for_nat(logger, df):
     # Checking both 'Datetime' and 'Datetime_TZ' columns for NaT
-    nat_indexes = df[df['Datetime'].isna() | df['Datetime_TZ'].isna()].index.tolist()
+    nat_indexes = df[df['Datetime'].isna()].index.tolist()
+    nat_indexes_tz = df[df['Datetime_TZ'].isna()].index.tolist()
 
     # If NaT values are found, log the index values
     if nat_indexes:
-        logger.info(f"NaT found at index positions: {nat_indexes}")
+        logger.info(f"NaT found in Datetime at index positions: {nat_indexes}")
     else:
-        logger.info("No NaT values found in the DataFrame.")
+        logger.info("No NaT values found in the Datetime column.")
+    if nat_indexes_tz:
+        logger.info(f"NaT found in Datetime_TZ at index positions: {nat_indexes_tz}")
+    else:
+        logger.info("No NaT values found in the Datetime_TZ column.")
 
     return nat_indexes
 
@@ -182,6 +187,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'data.index[data_len-1]: {data.index[data_len-1]}')
             logger.info(f'data.iloc[data_len-1].to_dict(): {data.iloc[data_len-1].to_dict()}')
             logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
+            logger.info(f'[B] About to check for NaT in data in Datetime and Datetime_TZ...')
+            check_for_nat(logger, data)
             step = 5
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
@@ -196,12 +203,16 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
             logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
+            logger.info(f'[C] About to check for NaT in in existing_df in Datetime and Datetime_TZ...')
+            check_for_nat(logger, existing_df)
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             data_len = len(combined_data)
             logger.info(f'data_len: {data_len}')
             logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
             logger.info(f'combined_data.iloc[data_len-1].to_dict(): {combined_data.iloc[data_len - 1].to_dict()}')
+            logger.info(f'[D] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+            check_for_nat(logger, combined_data)
             step = 11
             logger.info(
                 f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
@@ -267,6 +278,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+        logger.info(f'[E] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+        check_for_nat(logger, combined_data)
 
     except Exception as e:
         logger.error(f"Error downloading data for {ticker.symbol}: Step: {step}. {e}")
@@ -1028,7 +1041,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
                         logger.info(
                             f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                        nat_indexes = check_for_nat(logger, price_history)
+                        check_for_nat(logger, price_history)
                         step = 1
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
