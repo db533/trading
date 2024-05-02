@@ -52,6 +52,19 @@ def display_local_time():
     print(f'Current datetime: {local_datetime_str}')
     return local_datetime
 
+
+def check_for_nat(df):
+    # Checking both 'Datetime' and 'Datetime_TZ' columns for NaT
+    nat_indexes = df[df['Datetime'].isna() | df['Datetime_TZ'].isna()].index.tolist()
+
+    # If NaT values are found, log the index values
+    if nat_indexes:
+        logger.info(f"NaT found at index positions: {nat_indexes}")
+    else:
+        logger.info("No NaT values found in the DataFrame.")
+
+    return nat_indexes
+
 def get_price_data(ticker, interval, start_time, finish_time, logger):
     # Fetching existing data from the database
     try:
@@ -969,7 +982,9 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         logger.info(f'About to call add_ema_and_trend()...')
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
-
+                        logger.info(
+                            f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                        nat_indexes = check_for_nat(price_history)
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
                             if math.isnan(row['Close']):
@@ -1063,6 +1078,9 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     existing_swing_point_instance.delete()
                                 else:
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance does not exist.')
+                        logger.info(
+                            f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                        nat_indexes = check_for_nat(price_history)
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
@@ -1200,7 +1218,9 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     #print('Step 17')
                     price_history = add_ema_and_trend(price_history)
                     #print('Step 18')
-
+                    # Call the function and pass the 'price_history' DataFrame
+                    logger.info(f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                    nat_indexes = check_for_nat(price_history)
                     # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                     for index, row in price_history.iterrows():
                         if math.isnan(row['Close']):
@@ -1284,6 +1304,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
 
                 else:
                     print('Insufficient data.')
+                logger.info(f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                nat_indexes = check_for_nat(price_history)
 
                 print('new_record_count:',new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
