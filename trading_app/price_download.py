@@ -240,7 +240,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         combined_data.dropna(subset=['Open'], inplace=True)
         step = 20
         combined_data = combined_data[
-            ['Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
+            ['Datetime_TZ', 'Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume', 'PercentChange']]
         step = 21
         #combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize("UTC")
         combined_data.index = combined_data.index.tz_localize(None)
