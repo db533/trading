@@ -1133,27 +1133,32 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     step = 12
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...')
                                     existing_swing_point_instance.delete()
+                        step = 13
                         logger.info(
                             f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
                         nat_indexes = check_for_nat(price_history)
+                        step = 14
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
                         logger.info(f'About to find most_recent_daily_price...')
                         most_recent_daily_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
+                        step = 15
                         logger.info(f'trades_to_update...')
                         trades_to_update = Trade.objects.filter(tradingopp__ticker=ticker,action='1',  # Where the action is 'Buy'
                             status='0'  # And the status is 'Planned'
                         )
+                        step = 16
 
                         # Update the price of each trade to the close_price of the most recent DailyPrice
                         for trade in trades_to_update:
                             trade.price = most_recent_daily_price.close_price
                             trade.save()
+                        step = 17
                     else:
                         print('Insufficient data.')
                 except Exception as e:
-                    logger.error(f'step = {step}. Error in download_daily_ticker_price: {e}.')
+                    logger.error(f'index: {index}. step = {step}. Error in download_daily_ticker_price: {e}.')
                 print('new_record_count:', new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
                 end_time = display_local_time()  # record the end time of the loop
