@@ -65,6 +65,21 @@ def check_for_nat(df):
 
     return nat_indexes
 
+def get_largest_index_value(df):
+    """
+    Returns the largest index value of a pandas DataFrame.
+
+    Parameters:
+        df (pd.DataFrame): The DataFrame whose largest index value is required.
+
+    Returns:
+        The largest index value of the DataFrame.
+    """
+    if df.index.empty:
+        return None  # Return None if the DataFrame is empty
+    else:
+        return df.index.max()
+
 def get_price_data(ticker, interval, start_time, finish_time, logger):
     # Fetching existing data from the database
     try:
@@ -166,6 +181,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'data_len: {data_len}')
             logger.info(f'data.index[data_len-1]: {data.index[data_len-1]}')
             logger.info(f'data.iloc[data_len-1].to_dict(): {data.iloc[data_len-1].to_dict()}')
+            logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
             step = 5
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
@@ -178,6 +194,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             existing_df.index = existing_df['Datetime'].tz_localize(None)
             step = 9
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
+            logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             data_len = len(combined_data)
@@ -192,6 +210,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #step = 11.3
             #logger.info(
             #    f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+            logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
             combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'], errors='coerce')
             combined_data['Datetime_TZ'] = pd.to_datetime(combined_data['Datetime_TZ'], errors='coerce')
 
@@ -226,6 +245,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         logger.info(f'combined_data.index values: {tzinfo}')
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
         step = 15
+        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
@@ -244,6 +264,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 21
         #combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize("UTC")
         combined_data.index = combined_data.index.tz_localize(None)
+        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
         logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
 
@@ -950,29 +971,32 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         # print('Step 11')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
+                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         logger.info(f'About to call add_candle_data()...')
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
                         # print('Step 12')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
+                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         logger.info(f'About to call add_db_candle_data()...')
                         price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
                         # print('Step 13')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
+                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         logger.info(f'About to call count_patterns()...')
                         count_patterns(price_history, pattern_types)
                         # print('Step 14')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
-
+                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         logger.info(f'About to call find_levels()...')
                         sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                         # print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                         # if ticker.symbol == 'NNOX':
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
-
+                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         logger.info(f'About to call identify_highs_lows_gann2()...')
                         price_history, swing_point_current_trend = identify_highs_lows_gann2(ticker,
                                                                                                                  price_history, logger,
@@ -989,7 +1013,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         ticker.save()
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
-
+                        logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
                         print('ticker.swing_point_current_trend:', ticker.swing_point_current_trend)
                         logger.info(f'About to call add_levels_to_price_history()...')
                         price_history = add_levels_to_price_history(price_history, sr_levels, retests)
@@ -1001,6 +1025,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         # print('Step 18')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
+                        logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
                         logger.info(
                             f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
                         nat_indexes = check_for_nat(price_history)
