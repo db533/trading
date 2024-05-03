@@ -224,6 +224,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
             #combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'], errors='coerce')
             #combined_data['Datetime_TZ'] = pd.to_datetime(combined_data['Datetime_TZ'], errors='coerce')
+            logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype)}')
+            logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype)}')
 
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize(None)
             combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize(None)
