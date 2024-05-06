@@ -204,8 +204,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         if existing_data_retrieved == True:
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 8
-            existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
-            existing_df.index = existing_df['Datetime'].tz_localize(None)
+            existing_df['Datetime_TZ'] = existing_df['Datetime_TZ'].tz_localize(None)
+            existing_df['Datetime'] = existing_df['Datetime'].tz_localize(None)
             logger.info(f'step = {step}')
             logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
             logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
