@@ -221,6 +221,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             check_for_nat(logger, existing_df)
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
+            combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'])
+            combined_data['Datetime_TZ'] = pd.to_datetime(combined_data['Datetime_TZ'])
             data_len = len(combined_data)
             logger.info(f'data_len: {data_len}')
             logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
