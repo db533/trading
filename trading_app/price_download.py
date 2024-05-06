@@ -177,6 +177,10 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data['Datetime'] = data.index.tz_convert('UTC').tz_localize(None)
             data['Datetime_TZ'] = data.index.tz_convert('UTC').tz_localize(None)
             data.index = data.index.tz_convert('UTC')  # Making index tz-naive
+            logger.info(f'step = {step}')
+            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+
             # Convert the first row to a dictionary
             step = 4
             data_len=len(data)
@@ -187,6 +191,9 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'data.index[data_len-1]: {data.index[data_len-1]}')
             logger.info(f'data.iloc[data_len-1].to_dict(): {data.iloc[data_len-1].to_dict()}')
             logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
+            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+
             logger.info(f'[B] About to check for NaT in data in Datetime and Datetime_TZ...')
             check_for_nat(logger, data)
             step = 5
@@ -199,10 +206,17 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 8
             existing_df.index = existing_df['Datetime_TZ'].tz_localize(None)
             existing_df.index = existing_df['Datetime'].tz_localize(None)
+            logger.info(f'step = {step}')
+            logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
+            logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+
             step = 9
             logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
             logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
+            logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
+            logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+
             logger.info(f'[C] About to check for NaT in in existing_df in Datetime and Datetime_TZ...')
             check_for_nat(logger, existing_df)
             step = 10
@@ -211,6 +225,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'data_len: {data_len}')
             logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
             logger.info(f'combined_data.iloc[data_len-1].to_dict(): {combined_data.iloc[data_len - 1].to_dict()}')
+            logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype}')
+            logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype}')
             logger.info(f'[D] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
             check_for_nat(logger, combined_data)
             step = 11
