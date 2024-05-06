@@ -216,6 +216,10 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
             logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
             logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+            logger.info(f'existing_df.index.dtype): {existing_df.index.dtype}')
+            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+            logger.info(f'data.index.dtype): {data.index.dtype}')
 
             logger.info(f'[C] About to check for NaT in in existing_df in Datetime and Datetime_TZ...')
             check_for_nat(logger, existing_df)
