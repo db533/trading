@@ -143,7 +143,7 @@ def background_manual_ticker_download(ticker_symbol,throttling, time_threshold=0
             nj_param = Params.objects.get(key='night_job_status_message')
             nj_param.value = message
             nj_param.save()
-            scheduled_logger.error(message)
+            scheduled_logger.info(message)
     except Exception as e:
         message = f'Error occured in background_manual_ticker_download(): {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
