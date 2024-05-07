@@ -176,7 +176,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index.tz_convert('UTC').tz_localize(None)
             data['Datetime_TZ'] = data.index.tz_convert('UTC').tz_localize(None)
-            data.index = data.index.tz_convert('UTC')  # Making index tz-naive
+            #data.index = data.index.tz_convert('UTC')  # Making index tz-naive
+            data.index = data.index.tz_convert('UTC').tz_localize(None)
             logger.info(f'step = {step}')
             logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
             logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
