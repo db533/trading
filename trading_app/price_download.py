@@ -1028,6 +1028,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         logger.info(f'About to call add_db_candle_data()...')
                         price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
                         # print('Step 13')
+                        price_history['Datetime_TZ'] = price_history['Datetime_TZ'].dt.tz_localize('UTC')
                         logger.info(
                             f'price_history.columns: {price_history.columns}')
                         logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')

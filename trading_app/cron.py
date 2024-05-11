@@ -182,9 +182,9 @@ if False:
 #30	3	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
 #3	0	*	*	2-6	/home/saknesar/digitalaisbizness.lv/trading/runcrons.sh
 
-# Download US prices. 927 prices.
+# Download US prices. 999 prices.
 # Trust start time: 00:00, but will only start processing once TSE stocks have been downloaded, around 00:13
-# Run time 5:09
+# Run time 5:35
 # Should complete by 07:00
 class DailyUSPriceDownloadCronJob(CronJobBase):
     RUN_AT_TIMES = ['21:00']
