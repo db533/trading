@@ -140,6 +140,7 @@ class GannPointOneBuy(BaseStrategy):
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            ma_strength = self.ticker.ma_200_trend_strength
             swing_point_counter = 1
             prior_hl_sp = None
             recent_swing_points = []
@@ -184,7 +185,7 @@ class GannPointOneBuy(BaseStrategy):
                         logger.info(f'Third swingpoint not HL. Strategy not valid.')
                     break
                 swing_point_counter += 1
-            if prior_hl_sp is not None and latest_price.close_price > last_sp_price:
+            if prior_hl_sp is not None and latest_price.close_price > last_sp_price and ma_strength >= 0.1:
                 duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                      later_candle=latest_price)
                 action_buy = True
@@ -200,7 +201,7 @@ class GannPointOneBuy(BaseStrategy):
                             'rise_after_retracement' : str(rise_after_retracement), 'recent_swing_points' : recent_swing_points,
                             'rise_after_retracement_percent_of_retracement' : str(round(rise_after_retracement_percent_of_retracement,1)),
                             'duration_after_latest_sp' : str(duration_after_latest_sp), 'last_sp_price' : str(last_sp_price),
-                            'latest_price.close_price' : str(latest_price.close_price)} # recent_swing_points not as a string as it gets removed and accessed if present.
+                            'latest_price.close_price' : str(latest_price.close_price), 'ma_strength' : str(ma_strength)} # recent_swing_points not as a string as it gets removed and accessed if present.
                     action_buy = True
                 else:
                     # Strategy is not valid
@@ -225,6 +226,7 @@ class GannPointOneSell(BaseStrategy):
             swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
+            ma_strength = self.ticker.ma_200_trend_strength
             swing_point_counter = 1
             prior_lh_sp = None
             recent_swing_points = []
@@ -269,7 +271,7 @@ class GannPointOneSell(BaseStrategy):
                         logger.info(f'Third swingpoint not LH. Strategy not valid.')
                     break
                 swing_point_counter += 1
-            if prior_lh_sp is not None and latest_price.close_price < last_sp_price:
+            if prior_lh_sp is not None and latest_price.close_price < last_sp_price and ma_strength<=-0.1:
                 duration_after_latest_sp = instance_difference_count(self.ticker, last_sp.price_object,
                                                                      later_candle=latest_price)
 
@@ -285,11 +287,11 @@ class GannPointOneSell(BaseStrategy):
                             'retracement_as_percent': str(round(retracement_as_percent,1)), 'elapsed__duration': str(elapsed__duration),
                             'fall_after_retracement' : str(fall_after_retracement), 'recent_swing_points' : recent_swing_points,  # recent_swing_points not as a string as it gets removed and accessed if present.
                             'fall_after_retracement_percent_of_retracement' : str(round(fall_after_retracement_percent_of_retracement,1)),
-                            'duration_after_latest_sp' : str(duration_after_latest_sp)}
+                            'duration_after_latest_sp' : str(duration_after_latest_sp), 'ma_strength' : str(ma_strength)}
                     action_buy = False
                 else:
                     # Strategy is not valid
-                    logger.info(f'PRice fell >50% of retracement. Strategy not valid.')
+                    logger.info(f'Price fell >50% of retracement. Strategy not valid.')
                     action_buy = None
             else:
                 # Strategy is not valid
