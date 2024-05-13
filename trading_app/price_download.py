@@ -97,8 +97,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             step = 1
             logger.info(f'get_price_data(). Retrieved existing data.')
             existing_df = pd.DataFrame.from_records(existing_data)
-            logger.info(
-                f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            #logger.info(
+            #    f'step: {step} existing_df before any changes: existing_df.index[0]:{existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
             #logger.info(f'tz_info: {tz_info}')
             existing_df['Datetime_TZ'] = pd.to_datetime(existing_df['datetime_tz'])
             existing_df['Datetime'] = pd.to_datetime(existing_df['datetime'])
@@ -126,13 +126,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
                 logger.error(f"1. Error during loop: {e}")
             #print('Step 4')
             step = 1.5
-            logger.info(f'step = {step} Existing data:')
-            logger.info(f'existing_df.columns:{existing_df.columns}')
-            logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
+            #logger.info(f'step = {step} Existing data:')
+            #logger.info(f'existing_df.columns:{existing_df.columns}')
+            #logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             existing_df = existing_df.drop(columns=['datetime', 'datetime_tz', 'ticker_id', 'open_price', 'high_price', 'low_price', 'close_price', 'volume'])
             step=1.7
-            logger.info(f'step = {step} Existing data:')
-            logger.info(f'existing_df.columns:{existing_df.columns}')
+            #logger.info(f'step = {step} Existing data:')
+            #logger.info(f'existing_df.columns:{existing_df.columns}')
             #print('existing_df.head(5) after set_index:')
             #print(existing_df.head(5))
             #print('existing_df.tail(5) after set_index:')
@@ -140,22 +140,22 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             # Filter out records that are newer than start_time
             existing_df = existing_df[existing_df.index < pd.to_datetime(start_time)]
             step = 2
-            logger.info(f'step = {step} Existing data:')
-            logger.info(f'len(existing_df):{len(existing_df)}')
-            logger.info(f'existing_df.columns:{existing_df.columns}')
-            logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
-            logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
+            #logger.info(f'step = {step} Existing data:')
+            #logger.info(f'len(existing_df):{len(existing_df)}')
+            #logger.info(f'existing_df.columns:{existing_df.columns}')
+            #logger.info(f'existing_df.index[0]:{existing_df.index[0]}')
+            #logger.info(f'existing_df.iloc[0].to_dict():{str(existing_df.iloc[0].to_dict())}')
             tzinfo = []
             datetime_tzinfo = []
             for x in range(len(existing_df)):
                 tzinfo.append(existing_df.iloc[x]["Datetime_TZ"])
                 datetime_tzinfo.append(existing_df.iloc[x]["Datetime"])
-            logger.info(f'len(tzinfo): {len(tzinfo)}')
-            logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
+            #logger.info(f'len(tzinfo): {len(tzinfo)}')
+            #logger.info(f'existing_df["Datetime_TZ"] values: {tzinfo}')
             for handler in logger.handlers:
                 handler.flush()
-            logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
-            logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
+            #logger.info(f'len(datetime_tzinfo): {len(datetime_tzinfo)}')
+            #logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
 
     except Exception as e:
         print(f"Error fetching existing data for {ticker.symbol}: {e}")
@@ -168,8 +168,8 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         finish_time = finish_time.replace(tzinfo=timezone.utc)
         step = 3
         data = yf.Ticker(ticker.symbol).history(interval=interval, start=start_time, end=finish_time)
-        logger.info(f'step = {step} get_price_data(). data retrieval performed.')
-        logger.info(f'data as received from Yahoo: data.index[0]:{data.index[0]} data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
+        #logger.info(f'step = {step} get_price_data(). data retrieval performed.')
+        #logger.info(f'data as received from Yahoo: data.index[0]:{data.index[0]} data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
         if not data.empty:
             print('Retrieve new price data records...')
 
@@ -178,55 +178,55 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             data['Datetime_TZ'] = data.index.tz_convert('UTC').tz_localize(None)
             #data.index = data.index.tz_convert('UTC')  # Making index tz-naive
             data.index = data.index.tz_convert('UTC').tz_localize(None)
-            logger.info(f'step = {step}')
-            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
-            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+            #logger.info(f'step = {step}')
+            #logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            #logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
 
             # Convert the first row to a dictionary
             step = 4
             data_len=len(data)
-            logger.info(f'step: {step} Data downloaded from Yahoo:')
-            logger.info(f'data.index[0]: {data.index[0]}')
-            logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
-            logger.info(f'data_len: {data_len}')
-            logger.info(f'data.index[data_len-1]: {data.index[data_len-1]}')
-            logger.info(f'data.iloc[data_len-1].to_dict(): {data.iloc[data_len-1].to_dict()}')
-            logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
-            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
-            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+            #logger.info(f'step: {step} Data downloaded from Yahoo:')
+            #logger.info(f'data.index[0]: {data.index[0]}')
+            #logger.info(f'data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
+            #logger.info(f'data_len: {data_len}')
+            #logger.info(f'data.index[data_len-1]: {data.index[data_len-1]}')
+            #logger.info(f'data.iloc[data_len-1].to_dict(): {data.iloc[data_len-1].to_dict()}')
+            #logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
+            #logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            #logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
 
-            logger.info(f'[B] About to check for NaT in data in Datetime and Datetime_TZ...')
-            check_for_nat(logger, data)
+            #logger.info(f'[B] About to check for NaT in data in Datetime and Datetime_TZ...')
+            #check_for_nat(logger, data)
             step = 5
         else:
             logger.info(f'get_price_data(). Retrieved data is empty.')
             step = 6
         step = 7
         if existing_data_retrieved == True:
-            logger.info(f'step = {step}')
-            logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
-            logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+            #logger.info(f'step = {step}')
+            #logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
+            #logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
             existing_df.index = existing_df.index.tz_convert('UTC').tz_localize(None)
             step = 8
             existing_df['Datetime'] = existing_df['Datetime'].dt.tz_localize(None)
             existing_df['Datetime_TZ'] = existing_df['Datetime_TZ'].dt.tz_localize(None)
-            logger.info(f'step = {step}')
-            logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
-            logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+            #logger.info(f'step = {step}')
+            #logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
+            #logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
 
             step = 9
-            logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
-            logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
-            logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
-            logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
-            logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
-            logger.info(f'existing_df.index.dtype): {existing_df.index.dtype}')
-            logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
-            logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
-            logger.info(f'data.index.dtype): {data.index.dtype}')
+            #logger.info(f'step = {step} existing_df.index[0]: {existing_df.index[0]} existing_df.iloc[0].to_dict(): {existing_df.iloc[0].to_dict()}')
+            #logger.info(f'get_largest_index_value(data): {get_largest_index_value(data)}')
+            #logger.info(f'get_largest_index_value(existing_df): {get_largest_index_value(existing_df)}')
+            #logger.info(f'existing_df["Datetime"].dtype): {existing_df["Datetime"].dtype}')
+            #logger.info(f'existing_df["Datetime_TZ"].dtype): {existing_df["Datetime_TZ"].dtype}')
+            #logger.info(f'existing_df.index.dtype): {existing_df.index.dtype}')
+            #logger.info(f'data["Datetime"].dtype): {data["Datetime"].dtype}')
+            #logger.info(f'data["Datetime_TZ"].dtype): {data["Datetime_TZ"].dtype}')
+            #logger.info(f'data.index.dtype): {data.index.dtype}')
 
-            logger.info(f'[C] About to check for NaT in in existing_df in Datetime and Datetime_TZ...')
-            check_for_nat(logger, existing_df)
+            #logger.info(f'[C] About to check for NaT in in existing_df in Datetime and Datetime_TZ...')
+            #check_for_nat(logger, existing_df)
             step = 10
             combined_data = pd.concat([existing_df, data]).sort_index().drop_duplicates()
             combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'])
@@ -234,66 +234,66 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize(None)
             combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize(None)
             data_len = len(combined_data)
-            logger.info(f'data_len: {data_len}')
-            logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
-            logger.info(f'combined_data.iloc[data_len-1].to_dict(): {combined_data.iloc[data_len - 1].to_dict()}')
-            logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype}')
-            logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype}')
-            logger.info(f'[D] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
-            check_for_nat(logger, combined_data)
+            #logger.info(f'data_len: {data_len}')
+            #logger.info(f'combined_data.index[data_len-1]: {combined_data.index[data_len - 1]}')
+            #logger.info(f'combined_data.iloc[data_len-1].to_dict(): {combined_data.iloc[data_len - 1].to_dict()}')
+            #logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype}')
+            #logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype}')
+            #logger.info(f'[D] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+            #check_for_nat(logger, combined_data)
             step = 11
-            logger.info(
-                f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+            #logger.info(
+            #    f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
             #combined_data.iloc[0]['Datetime'] = combined_data.iloc[0]['Datetime'].dt.tz_localize(None)
             #combined_data.iloc[0]['Datetime_TZ'] = combined_data.iloc[0]['Datetime_TZ'].dt.tz_localize(None)
             #step = 11.3
             #logger.info(
             #    f'step = {step} combined_data.index[0]: {combined_data.index[0]} combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
-            logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
+            #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
             combined_data['Datetime'] = pd.to_datetime(combined_data['Datetime'])
             combined_data['Datetime_TZ'] = pd.to_datetime(combined_data['Datetime_TZ'])
-            logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype}')
-            logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype}')
+            #logger.info(f'combined_data["Datetime"].dtype): {combined_data["Datetime"].dtype}')
+            #logger.info(f'combined_data["Datetime_TZ"].dtype): {combined_data["Datetime_TZ"].dtype}')
 
             combined_data['Datetime'] = combined_data['Datetime'].dt.tz_localize(None)
             combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize(None)
-            logger.info(f'[E] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+            #logger.info(f'[E] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
             check_for_nat(logger, combined_data)
             step = 11.5
-            logger.info(f'step: {step} get_price_data(). Combined with existing data.')
+            #logger.info(f'step: {step} get_price_data(). Combined with existing data.')
         else:
             step = 12
             combined_data = data
             step = 13
-            logger.info(f'step: {step} get_price_data(). No existing data to combine new data with.')
+            #logger.info(f'step: {step} get_price_data(). No existing data to combine new data with.')
         # Convert the first row to a dictionary
         first_row_dict = combined_data.iloc[0].to_dict()
 
         # Display the dictionary
         print(first_row_dict)
         step = 14
-        logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
-        logger.info(f'combined_data: {first_row_dict}')
+        #logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
+        #logger.info(f'combined_data: {first_row_dict}')
         tzinfo = []
         for x in range(len(combined_data)):
             tzinfo.append(combined_data.iloc[x]["Datetime"])
-        logger.info(f'combined_data["Datetime"] values: {tzinfo}')
+        #logger.info(f'combined_data["Datetime"] values: {tzinfo}')
         tzinfo = []
         for x in range(len(combined_data)):
             tzinfo.append(combined_data.iloc[x]["Datetime_TZ"])
-        logger.info(f'combined_data["Datetime_TZ"] values: {tzinfo}')
+        #logger.info(f'combined_data["Datetime_TZ"] values: {tzinfo}')
         tzinfo = []
         for x in range(len(combined_data)):
             tzinfo.append(combined_data.index[x])
-        logger.info(f'combined_data.index values: {tzinfo}')
+        #logger.info(f'combined_data.index values: {tzinfo}')
         combined_data = combined_data.loc[~combined_data.index.duplicated(keep='last')]
-        logger.info(f'[F] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
-        check_for_nat(logger, combined_data)
+        #logger.info(f'[F] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+        #check_for_nat(logger, combined_data)
         step = 15
-        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
-        logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
-        logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
-        logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
+        #logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
+        #logger.info(f'combined_data["Datetime_TZ"].iloc[0]: {combined_data["Datetime_TZ"].iloc[0]}')
+        #logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
         combined_data.sort_values(by='Datetime_TZ', inplace=True)
         step = 16
         combined_data['Ticker'] = ticker.symbol
@@ -309,10 +309,10 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         step = 21
         #combined_data['Datetime_TZ'] = combined_data['Datetime_TZ'].dt.tz_localize("UTC")
         combined_data.index = combined_data.index.tz_localize(None)
-        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
-        logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
-        logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
-        logger.info(f'[G] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
+        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(combined_data)}')
+        #logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
+        #logger.info(f'combined_data.iloc[0].to_dict(): {combined_data.iloc[0].to_dict()}')
+        #logger.info(f'[G] About to check for NaT in in combined_data in Datetime and Datetime_TZ...')
         check_for_nat(logger, combined_data)
 
     except Exception as e:
@@ -761,19 +761,19 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
             candle_count_since_last_swing_point += 1
             average_prior_vol_slice = df.iloc[max(i-2,0):i+1]
             average_volume = average_prior_vol_slice['Volume'].mean()
-            logger.info(f'{index_label}: Open: {df.iloc[i]["Open"]}, High: {df.iloc[i]["High"]}, Low: {df.iloc[i]["Low"]}, Close: {df.iloc[i]["Close"]}')
+            #logger.info(f'{index_label}: Open: {df.iloc[i]["Open"]}, High: {df.iloc[i]["High"]}, Low: {df.iloc[i]["Low"]}, Close: {df.iloc[i]["Close"]}')
             if uptrend_in_progress:
                 # First check if a new high was not achieved (but only if this is not the first record).
-                logger.info(f'Uptrend in progress... {index_label}')
+                #logger.info(f'Uptrend in progress... {index_label}')
                 high_day_0 = df.iloc[i]['High']
                 low_day_0 = df.iloc[i]['Low']
                 tomorrow_high = df.iloc[i+1]['High']
                 tomorrow_low = df.iloc[i + 1]['Low']
-                logger.info(
-                    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
+                #logger.info(
+                #    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
                 #logger.info(f'Up Step 6.')
                 if high_day_0 > tomorrow_high and low_day_0 > tomorrow_low:
-                    logger.info(f'Up Step 7A. Highs and lows lower tomorrow')
+                    #logger.info(f'Up Step 7A. Highs and lows lower tomorrow')
                     # High today ends tomorrow and low also lower. Check for confirmations.
                     change_confirmations = 0
 
@@ -781,31 +781,31 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                     lower_quartile_price = ((high_day_0 - low_day_0) * 0.25) + low_day_0
                     if df.iloc[i]['Close'] <= lower_quartile_price:
                         # Price closed in lower quartile on potential swing point day.
-                        logger.info(f'Up Step 7B. df.iloc[i][Close] <= lower_quartile_price')
+                        #logger.info(f'Up Step 7B. df.iloc[i][Close] <= lower_quartile_price')
                         change_confirmations +=1
 
                     # Is Day 1 close less than the low of Day 0?
                     if df.iloc[i+1]['Close'] < low_day_0:
-                        logger.info(f'Up Step 7C. df.iloc[i+1][Close] < low_day_0')
+                        #logger.info(f'Up Step 7C. df.iloc[i+1][Close] < low_day_0')
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > average_volume*1.2:
-                        logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > average_volume*1.2')
+                        #logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > average_volume*1.2')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
                     if df.iloc[i + 1]['bearish'] > 0 or df.iloc[i + 1]['bearish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
-                        logger.info(f'Up Step 7E. df.iloc[i + 1][bearish] > 0 or df.iloc[i + 1][bearish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
+                        #logger.info(f'Up Step 7E. df.iloc[i + 1][bearish] > 0 or df.iloc[i + 1][bearish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
-                    logger.info(f'change_confirmations = {change_confirmations}')
+                    #logger.info(f'change_confirmations = {change_confirmations}')
 
                     if change_confirmations >= 2:
-                        logger.info(f'Up Step 8. change_confirmations >= 2')
+                        #logger.info(f'Up Step 8. change_confirmations >= 2')
                         # At least 2 signals confirm the swing point.
                         if high_day_0 > last_high_reference:
                             # This high is higher than the previous high so this is a HH.
-                            logger.info(f'Up Step 8A. high_day_0 > last_high_reference. SP = HH')
+                            #logger.info(f'Up Step 8A. high_day_0 > last_high_reference. SP = HH')
                             df.at[index_label, 'swing_point_label'] = "HH"
                             if last_swing_point == 'HL':
                                 current_trend_seq_count += 1
@@ -813,7 +813,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                                 current_trend_seq_count = 1
                             last_swing_point = 'HH'
                         else:
-                            logger.info(f'Up Step 8B. high_day_0 <= last_high_reference. SP = LH')
+                            #logger.info(f'Up Step 8B. high_day_0 <= last_high_reference. SP = LH')
                             df.at[index_label, 'swing_point_label'] = "LH"
                             if last_swing_point == 'HL':
                                 current_trend_seq_count = 1
@@ -826,48 +826,48 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         swing_point_occured = True
             else:
                 # Down trend in progress
-                logger.info(f'Step 9. Downtrend in progress... {index_label}')
+                #logger.info(f'Step 9. Downtrend in progress... {index_label}')
                 high_day_0 = df.iloc[i]['High']
                 low_day_0 = df.iloc[i]['Low']
                 tomorrow_high = df.iloc[i + 1]['High']
                 tomorrow_low = df.iloc[i + 1]['Low']
-                logger.info(f'Step 10.')
-                logger.info(
-                    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
+                #logger.info(f'Step 10.')
+                #logger.info(
+                #    f'high_day_0={high_day_0}, tomorrow_high={tomorrow_high}, low_day_0={low_day_0}, tomorrow_low={tomorrow_low}')
                 if high_day_0 < tomorrow_high and low_day_0 < tomorrow_low:
                     # Low today ends tomorrow and high also higher. Check for confirmations.
-                    logger.info(f'Step 11. Highs and lows are both higher tomorrow.')
+                    #logger.info(f'Step 11. Highs and lows are both higher tomorrow.')
                     change_confirmations = 0
 
                     # Is the close on day_0 in the lower quartile of the day's range?
                     upper_quartile_price = high_day_0 - ((high_day_0 - low_day_0) * 0.25)
                     if df.iloc[i]['Close'] >= upper_quartile_price:
                         # Price closed in upper quartile on potential swing point day.
-                        logger.info(f'Step 11A. df.iloc[i][Close] >= upper_quartile_price')
+                        #logger.info(f'Step 11A. df.iloc[i][Close] >= upper_quartile_price')
                         change_confirmations += 1
 
                     # Is Day 1 close greater than the high of Day 0?
                     if df.iloc[i + 1]['Close'] > high_day_0:
-                        logger.info(f'Step 11B. df.iloc[i + 1][Close] > high_day_0')
+                        #logger.info(f'Step 11B. df.iloc[i + 1][Close] > high_day_0')
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
                     if df.iloc[i + 1]['Volume'] > average_volume*1.2:
-                        logger.info(f'Step 11C. df.iloc[i + 1][Volume] > average_volume*1.2')
+                        #logger.info(f'Step 11C. df.iloc[i + 1][Volume] > average_volume*1.2')
                         change_confirmations += 1
 
                     # Is there a bearish or reversal candle on Day 1?
                     if df.iloc[i + 1]['bullish'] > 0 or df.iloc[i + 1]['bullish_reversal'] > 0 or df.iloc[i + 1]['reversal'] > 0:
-                        logger.info(f'Step 11D. df.iloc[i + 1][bullish] > 0 or df.iloc[i + 1][bullish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
+                        #logger.info(f'Step 11D. df.iloc[i + 1][bullish] > 0 or df.iloc[i + 1][bullish_reversal] > 0 or df.iloc[i + 1][reversal] > 0')
                         change_confirmations += 1
-                    logger.info(f'change_confirmations = {change_confirmations}')
+                    #logger.info(f'change_confirmations = {change_confirmations}')
                     if change_confirmations >= 2:
-                        logger.info(f'Step 12. change_confirmations >= 2')
+                        #logger.info(f'Step 12. change_confirmations >= 2')
                         # At least 2 signals confirm the swing point.
                         # Down trend ended on Day 0.
                         if low_day_0 > last_low_reference:
                             # This low is higher than the previous high so this is a HL.
-                            logger.info(f'Step 12A. low_day_0 > last_low_reference. SP = HL')
+                            #logger.info(f'Step 12A. low_day_0 > last_low_reference. SP = HL')
                             df.at[index_label, 'swing_point_label'] = "HL"
                             if last_swing_point == 'HH':
                                 current_trend_seq_count += 1
@@ -875,7 +875,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                                 current_trend_seq_count = 1
                             last_swing_point = 'HL'
                         else:
-                            logger.info(f'Step 12B. low_day_0 <= last_low_reference. SP = LL')
+                            #logger.info(f'Step 12B. low_day_0 <= last_low_reference. SP = LL')
                             df.at[index_label, 'swing_point_label'] = "LL"
                             if last_swing_point == 'HH':
                                 current_trend_seq_count = 1
@@ -887,16 +887,16 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         last_low_reference = low_day_0
                         swing_point_occured = True
             if swing_point_occured == True:
-                logger.info(f'Step 13.')
+                #logger.info(f'Step 13.')
                 df.at[index_label, 'healthy_bullish_candle'] = healthy_bullish_count
                 df.at[index_label, 'healthy_bearish_candle'] = healthy_bearish_count
                 df.at[index_label, 'candle_count_since_last_swing_point'] = candle_count_since_last_swing_point
                 candle_count_since_last_swing_point = 0
                 final_swing_point_trend = df.loc[index_label, 'swing_point_current_trend']
-                logger.info(f'Step 14.')
+                #logger.info(f'Step 14.')
                 if current_trend_seq_count > 2:
                     # This data point is part of a swing trend.
-                    logger.info(f'Step 15.')
+                    #logger.info(f'Step 15.')
                     if last_swing_point[0] == "H":
                         df.at[index_label, 'swing_point_current_trend'] = 1
                         # print('Setting uptrend.')
@@ -905,7 +905,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         # print('Setting downtrend.')
             else:
                 # Not a swing point, so reset the healthy candle count to 0 for this data point
-                logger.info(f'Step 16.')
+                #logger.info(f'Step 16.')
                 df.at[index_label, 'healthy_bullish_candle'] = 0
                 df.at[index_label, 'healthy_bearish_candle'] = 0
 
