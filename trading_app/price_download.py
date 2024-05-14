@@ -1016,36 +1016,36 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                     price_history = get_price_data(ticker, '1D', start_day, finish_day, logger)
                     if len(price_history) >= 3:
                         # print('Step 11')
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
-                        logger.info(f'About to call add_candle_data()...')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
+                        #logger.info(f'About to call add_candle_data()...')
                         price_history = add_candle_data(price_history, candlestick_functions, column_names)
                         # print('Step 12')
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
-                        logger.info(f'About to call add_db_candle_data()...')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
+                        #logger.info(f'About to call add_db_candle_data()...')
                         price_history = add_db_candle_data(price_history, db_candlestick_functions, db_column_names)
                         # print('Step 13')
-                        price_history['Datetime_TZ'] = price_history['Datetime_TZ'].dt.tz_localize('UTC')
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
-                        logger.info(f'About to call count_patterns()...')
+                        #price_history['Datetime_TZ'] = price_history['Datetime_TZ'].dt.tz_localize('UTC')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
+                        #logger.info(f'About to call count_patterns()...')
                         count_patterns(price_history, pattern_types)
                         # print('Step 14')
-                        logger.info(
+                        #logger.info(
                             f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
-                        logger.info(f'About to call find_levels()...')
+                        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
+                        #logger.info(f'About to call find_levels()...')
                         sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
                         # print('price_history.tail(3) before identify_highs_lows():',price_history.tail(3))
                         # if ticker.symbol == 'NNOX':
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
-                        logger.info(f'About to call identify_highs_lows_gann2()...')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
+                        #logger.info(f'About to call identify_highs_lows_gann2()...')
                         price_history, swing_point_current_trend = identify_highs_lows_gann2(ticker,
                                                                                                                  price_history, logger,
                                                                                                                  reversal_days=2,
@@ -1059,24 +1059,24 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         ticker.swing_point_current_trend = swing_point_current_trend
                         # print('Step 16')
                         ticker.save()
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
                         print('ticker.swing_point_current_trend:', ticker.swing_point_current_trend)
-                        logger.info(f'About to call add_levels_to_price_history()...')
+                        #logger.info(f'About to call add_levels_to_price_history()...')
                         price_history = add_levels_to_price_history(price_history, sr_levels, retests)
                         # print('Step 17')
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'About to call add_ema_and_trend()...')
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'About to call add_ema_and_trend()...')
                         price_history = add_ema_and_trend(price_history)
                         # print('Step 18')
-                        logger.info(
-                            f'price_history.columns: {price_history.columns}')
-                        logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
-                        logger.info(
-                            f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                        check_for_nat(logger, price_history)
+                        #logger.info(
+                        #    f'price_history.columns: {price_history.columns}')
+                        #logger.info(f'get_largest_index_value(price_history): {get_largest_index_value(price_history)}')
+                        #logger.info(
+                        #    f'[A] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                        #check_for_nat(logger, price_history)
                         step = 1
                         # Save price_history data to the DailyPrice model only if the 'Datetime' value doesn't exist
                         for index, row in price_history.iterrows():
@@ -1115,9 +1115,9 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     healthy_bearish_count=row['healthy_bearish_candle'],
                                     candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                                 )
-                                logger.info(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
+                                #logger.info(f'Defined new daily_price instance. datetime_tz: {str(row["Datetime_TZ"])}')
                             else:
-                                logger.info(f'About to update existing record for datetime {str(row["Datetime_TZ"])}...')
+                                #logger.info(f'About to update existing record for datetime {str(row["Datetime_TZ"])}...')
                                 step = 4
                                 daily_price = DailyPrice.objects.get(ticker=ticker, datetime=row['Datetime_TZ'])
                                 daily_price.datetime_tz = daily_price.datetime
@@ -1152,13 +1152,13 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 #logger.info(
                                 #    f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                                 #    f"content_type: {str(content_type)}")
-                                logger.info(f'This record is labelled as a swingpoint.')
+                                #logger.info(f'This record is labelled as a swingpoint.')
                                 existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],content_type=content_type)
                                 step = 7
                                 #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                                 if not existing_swing_point_instance.exists():
                                     step = 8
-                                    logger.info(f'Creating a swingpoint for datetime {str(row["Datetime_TZ"])} because does not exist.')
+                                    #logger.info(f'Creating a swingpoint for datetime {str(row["Datetime_TZ"])} because does not exist.')
                                     #logger.info(f'SwingPoint does not exist.')
                                     new_swing_point = SwingPoint.objects.create(
                                         ticker=ticker,
@@ -1182,17 +1182,17 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                     logger.info(f'For {row["Datetime_TZ"]}, existing_swing_point_instance exists: {str(existing_swing_point_instance)}. Deleting...')
                                     existing_swing_point_instance.delete()
                         step = 13
-                        logger.info(
-                            f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
-                        nat_indexes = check_for_nat(logger, price_history)
+                        #logger.info(
+                        #    f'[B] About to check for NaT in Datetime and Datetime_TZ for ticker {str(ticker.symbol)}...')
+                        #nat_indexes = check_for_nat(logger, price_history)
                         step = 14
 
                         # Now retrieve any planned trades for this ticker and amend the price to match the latest close price.
                         # Find the most recent DailyPrice instance for this ticker
-                        logger.info(f'About to find most_recent_daily_price...')
+                        #logger.info(f'About to find most_recent_daily_price...')
                         most_recent_daily_price = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
                         step = 15
-                        logger.info(f'trades_to_update...')
+                        #logger.info(f'trades_to_update...')
                         trades_to_update = Trade.objects.filter(tradingopp__ticker=ticker,action='1',  # Where the action is 'Buy'
                             status='0'  # And the status is 'Planned'
                         )
