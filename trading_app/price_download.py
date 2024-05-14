@@ -1036,7 +1036,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         count_patterns(price_history, pattern_types)
                         # print('Step 14')
                         #logger.info(
-                            f'price_history.columns: {price_history.columns}')
+                        #    f'price_history.columns: {price_history.columns}')
                         #logger.info(f'get_largest_index_value(combined_data): {get_largest_index_value(price_history)}')
                         #logger.info(f'About to call find_levels()...')
                         sr_levels, retests, last_high_low_level = find_levels(price_history, window=20)
