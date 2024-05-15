@@ -1756,7 +1756,7 @@ import matplotlib.pyplot as plt
 import io
 from django.db.models import Q
 
-def generate_swing_point_graph_view(request, opp_id, magnitute):
+def generate_swing_point_graph_view(request, opp_id, magnitude):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
     ticker = opp.ticker
