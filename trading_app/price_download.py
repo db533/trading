@@ -714,6 +714,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
     try:
         df['swing_point_label'] = ''
         df['swing_point_price'] = 0
+        df['magnitude'] = 0
         df['swing_point_price'] = df['swing_point_price'].astype(float)
         df['swing_point_current_trend'] = 0
         df['candle_count_since_last_swing_point'] = 0
@@ -823,6 +824,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         df.at[index_label, 'swing_point_price'] = high_day_0
                         uptrend_in_progress = False  # Now trend is downward.
                         last_high_reference = high_day_0
+                        df.at[index_label, 'magnitude'] = 1
                         swing_point_occured = True
             else:
                 # Down trend in progress
@@ -885,6 +887,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         uptrend_in_progress = True  # Now trend is upward.
                         df.at[index_label, 'swing_point_price'] = low_day_0
                         last_low_reference = low_day_0
+                        df.at[index_label, 'magnitude'] = 1
                         swing_point_occured = True
             if swing_point_occured == True:
                 #logger.info(f'Step 13.')
@@ -956,10 +959,14 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-#def download_daily_ticker_price2(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
-#    logger.info(f'Running download_daily_ticker_price() for ticker_symbol: {str(ticker_symbol)}')
-
-#    logger.info(f'xxx---xxx')
+def find_higher_order_swing_points(ticker, price_history, logger):
+    # price_history is a pandas dataframe
+    magnitude_to_test = 2
+    # Retrieve the price candles for swing points at the priod magnitude level.
+    swing_points = price_history['magnitude']
+    # Loop through each swing point
+        # If the swing point label is the first LL, prior swingpoint was a H
+        # If the swing point label is the first HH, prior swingpoint was a L
 
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
@@ -1153,7 +1160,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 #    f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                                 #    f"content_type: {str(content_type)}")
                                 #logger.info(f'This record is labelled as a swingpoint.')
-                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],content_type=content_type)
+                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],magnitude=row["magnitude"],content_type=content_type)
                                 step = 7
                                 #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                                 if not existing_swing_point_instance.exists():
@@ -1167,9 +1174,13 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                         label=row['swing_point_label'],
                                         candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                                         content_type=content_type,
-                                        object_id=daily_price.id
+                                        object_id=daily_price.id,
+                                        magnitude=row['magnitude'],
                                     )
                                     step = 9
+                                else:
+                                    existing_swing_point_instance.magnitude = row['magnitude']
+                                    existing_swing_point_instance.save()
                             else:
                                 # Should not find any swing points connected to this candle. If exist, should be deleted.
                                 step = 10
@@ -1393,7 +1404,7 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                             # First check if a swing point instance has already been created for this swing point.
                             #logger.info(f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                             #             f"content_type: {str(content_type)}")
-                            existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], content_type=content_type)
+                            existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker, date=row['Datetime_TZ'], magnitude=row['magnitude'], content_type=content_type)
                             #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                             if not existing_swing_point_instance.exists():
                                 #logger.info(f'SwingPoint does not exist.')
@@ -1404,7 +1415,8 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                                     label=row['swing_point_label'],
                                     candle_count_since_last_swing_point=row['candle_count_since_last_swing_point'],
                                     content_type=content_type,
-                                    object_id=daily_price.id
+                                    object_id=daily_price.id,
+                                    magnitude=row['magnitude'],
                                 )
                             else:
                                 #logger.info(f'SwingPoint does exist.')

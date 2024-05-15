@@ -1756,7 +1756,7 @@ import matplotlib.pyplot as plt
 import io
 from django.db.models import Q
 
-def generate_swing_point_graph_view(request, opp_id):
+def generate_swing_point_graph_view(request, opp_id, magnitute):
     # Fetch the TradingOpp instance by ID
     opp = TradingOpp.objects.get(id=opp_id)
     ticker = opp.ticker
@@ -1765,7 +1765,7 @@ def generate_swing_point_graph_view(request, opp_id):
     # Access the metrics_snapshot directly
     metrics_snapshot = opp.metrics_snapshot
     # Directly access SwingPoints associated with this TradingOpp
-    swing_points = opp.swing_points.all().order_by('date')
+    swing_points = opp.swing_points.filter(magnitude=magnitude).order_by('date')
 
     if swing_points.exists():
         # Use the first swing point to determine the content_type
@@ -1895,14 +1895,12 @@ from .models import Ticker, DailyPrice
 def generate_ticker_graph_view(request, ticker_symbol):
     ticker = Ticker.objects.get(symbol=ticker_symbol)
     daily_prices = DailyPrice.objects.filter(ticker=ticker).order_by('datetime')
-    swing_point_query = SwingPoint.objects.filter(ticker=ticker).order_by('date')
+
     trading_opp_query = TradingOpp.objects.filter(ticker=ticker).order_by('datetime_identified')
 
     dates = [price.datetime for price in daily_prices]
     lows = [price.low_price for price in daily_prices]
     highs = [price.high_price for price in daily_prices]
-    sp_dates = [sp.date for sp in swing_point_query]
-    sp_price = [sp.price for sp in swing_point_query]
     trading_opp_dates = [to.datetime_identified.date() for to in trading_opp_query]
     trading_opp_action_buy = [to.action_buy for to in trading_opp_query]
 
@@ -1961,6 +1959,21 @@ def generate_ticker_graph_view(request, ticker_symbol):
     fig, ax = plt.subplots(figsize=(15, 8))
     ax.set_title(f'Price Range for {ticker.company_name} ({ticker_symbol})')
 
+    # Plot adjustments and the rest of your plotting logic...
+    for i, (low, high) in enumerate(zip(lows, highs)):
+        if bar_colours[i] == 'black':
+            linewidth = 1
+        else:
+            linewidth = 2
+        ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=linewidth)
+
+    # Find the maximum value of magnitude for swingpoints for this ticker.
+    magnitude_step = 1
+
+    swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude=magnitude_step).order_by('date')
+    sp_dates = [sp.date for sp in swing_point_query]
+    sp_price = [sp.price for sp in swing_point_query]
+
     # Adjust the swing points plotting logic
     sp_x_positions = []
     sp_y_positions = []
@@ -1980,17 +1993,12 @@ def generate_ticker_graph_view(request, ticker_symbol):
                 logger.info(f'Date: {sp.date}. LOW. Price: {low_price}. sp_x_position: {dates.index(sp.date)}')
             sp_x_positions.append(dates.index(sp.date))
 
-
-    # Plot adjustments and the rest of your plotting logic...
-    for i, (low, high) in enumerate(zip(lows, highs)):
-        if bar_colours[i] == 'black':
-            linewidth = 1
-        else:
-            linewidth = 2
-        ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=linewidth)
-
     # Plot swing points with corrected y-positions
-    ax.plot(sp_x_positions, sp_y_positions, 'o', color='blue', linestyle='-')  # Example: red markers for visibility
+    if magnitude_step == 1:
+        point_colour = 'blue'
+    else:
+        point_colour = 'light blue'
+    ax.plot(sp_x_positions, sp_y_positions, 'o', color=magnitude_step, linestyle='-')  # Example: red markers for visibility
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")

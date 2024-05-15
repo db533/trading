@@ -137,7 +137,7 @@ class GannPointOneBuy(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             ma_strength = self.ticker.ma_200_trend_strength
@@ -223,7 +223,7 @@ class GannPointOneSell(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             ma_strength = self.ticker.ma_200_trend_strength
@@ -309,7 +309,7 @@ class GannPointThreeBuy(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1
@@ -421,7 +421,7 @@ class GannPointThreeSell(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1
@@ -535,7 +535,7 @@ class GannPointFourBuy2(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1
@@ -620,7 +620,7 @@ class GannPointFourSell(BaseStrategy):
     def check_criteria(self):
         data = {}
         action_buy = None
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         existing_downtrend = None
@@ -712,7 +712,7 @@ class GannPointFiveBuy(BaseStrategy):
         data = {}
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_most_recent = None
@@ -788,7 +788,7 @@ class GannPointFiveSell(BaseStrategy):
         data = {}
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
         swing_point_counter = 1
         T_most_recent = None
@@ -889,7 +889,7 @@ class GannPointSixBuy(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         swing_point_counter = 1
         recent_swing_points = []
         sections = 0
@@ -963,7 +963,7 @@ class GannPointSixSell(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         swing_point_counter = 1
         recent_swing_points = []
         T_list=[]
@@ -1039,7 +1039,7 @@ class GannPointEightBuy(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         swing_point_counter = 1
         latest_T = 0
         max_top = None
@@ -1157,7 +1157,7 @@ class GannPointEightSell(BaseStrategy):
         action_buy = None
         # Access the latest DailyPrice (or other relevant price model) for the ticker
         latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
-        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+        swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
         swing_point_counter = 1
         latest_T = 0
         min_bottom = None
@@ -1274,7 +1274,7 @@ class GannPointNineBuy(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1
@@ -1420,7 +1420,7 @@ class GannPointNineSell(BaseStrategy):
             data = {}
             action_buy = None
             # Access the latest DailyPrice (or other relevant price model) for the ticker
-            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).order_by('-date')
+            swing_point_query = SwingPoint.objects.filter(ticker=self.ticker).filter(magnitude=1).order_by('-date')
 
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
             swing_point_counter = 1

@@ -27,7 +27,7 @@
             <li>Action: {% if trade.action == "1" %}BUY{% else %}SELL{% endif %}</li>
             <li>Notes: {{ trade.notes }}</li>
        {% endfor %}
-       <img src="{% url 'swing_point_graph' opp_id=opp.id %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
+       <img src="{% url 'swing_point_graph' opp_id=opp.id magnitude=1 %}" alt="Swing Points Graph" style="width: 400px; height: auto;"><br>
        Date opp identified: {{ opp.datetime_identified }}<br>
         <hr>
     {% endfor %}
