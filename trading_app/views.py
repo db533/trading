@@ -1998,7 +1998,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         point_colour = 'blue'
     else:
         point_colour = 'light blue'
-    ax.plot(sp_x_positions, sp_y_positions, 'o', color=magnitude_step, linestyle='-')  # Example: red markers for visibility
+    ax.plot(sp_x_positions, sp_y_positions, 'o', color=point_colour, linestyle='-')  # Example: red markers for visibility
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
