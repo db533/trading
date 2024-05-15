@@ -1910,7 +1910,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     # Method to identify the first record of each month
     month_starts_indices = []
     previous_month = None
-    sp_indices = []
+    #sp_indices = []
     bar_colours = []
     to_counter = 0
     if len(trading_opp_dates) > to_counter:
@@ -1922,8 +1922,8 @@ def generate_ticker_graph_view(request, ticker_symbol):
         if date.month != previous_month:
             month_starts_indices.append(i)
             previous_month = date.month
-        if date in sp_dates:
-            sp_indices.append(i)
+        #if date in sp_dates:
+        #    sp_indices.append(i)
         if current_to_date is not None:
             if date.date() == current_to_date:
                 # Get the index for the date in the list of trading_opps
@@ -1980,7 +1980,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
     logger.info(f'[SP on ticker-graph] Adding swing points on graph...')
     logger.info(f'sp_dates: {sp_dates}')
     logger.info(f'sp_price: {sp_price}')
-    logger.info(f'sp_indices: {sp_indices}')
+    #logger.info(f'sp_indices: {sp_indices}')
     for sp in swing_point_query:
         if sp.date in date_to_price_map:
             low_price, high_price = date_to_price_map[sp.date]
