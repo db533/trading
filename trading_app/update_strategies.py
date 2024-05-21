@@ -548,8 +548,8 @@ class GannPointThreeSell(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
-        logger.error(
-            f"{script_name} - {func_name} - {self.name} : {e}")
+            logger.error(
+                f"{script_name} - {func_name} - {self.name} : {e}")
         return action_buy, data
 
 class GannPointFourBuy2(BaseStrategy):
