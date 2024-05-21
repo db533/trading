@@ -19,6 +19,7 @@ from decimal import Decimal
 import math
 from django.contrib.contenttypes.models import ContentType
 import time
+import traceback
 
 default_logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
@@ -129,7 +130,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
                 existing_df['Datetime_index'] = existing_df['Datetime']
                 existing_df = existing_df.set_index('Datetime_index')
             except Exception as e:
-                logger.error(f"{script_name} - {func_name} 1. Error during loop: {e}")
+                tb = traceback.extract_tb(e.__traceback__)
+                tb_entry = tb[-1]
+                script_name = tb_entry.filename
+                func_name = tb_entry.name
+                lineno = tb_entry.lineno
+                logger.error(
+                    f"{script_name} - {func_name} - {lineno}: {e}")
             #print('Step 4')
             step = 1.5
             #logger.info(f'step = {step} Existing data:')
@@ -164,8 +171,14 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
 
     except Exception as e:
-        print(f"{script_name} - {func_name} Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        logger.error(
+            f"{script_name} - {func_name} - {lineno}: Error fetching existing data for {ticker.symbol}: {e}")
     logger.info(f'get_price_data(). Existing data retrieval is complete.')
 
     try:
@@ -322,7 +335,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         check_for_nat(logger, combined_data)
 
     except Exception as e:
-        logger.error(f"{script_name} - {func_name} Error downloading data for {ticker.symbol}: Step: {step}. {e}")
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        logger.error(
+            f"{script_name} - {func_name} - {lineno}: Error downloading data for {ticker.symbol}: {e}")
         combined_data = pd.DataFrame(
             columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     return combined_data
@@ -343,7 +362,13 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logg
             existing_dates = [timezone.make_naive(date) for date in existing_dates]
             logger.info(f'existing_dates: {existing_dates[:3]}')
         except Exception as e:
-            logger.error(f'{script_name} - {func_name} Failed to create existing_dates: {e}')
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            func_name = tb_entry.name
+            lineno = tb_entry.lineno
+            logger.error(
+                f"{script_name} - {func_name} - {lineno}: Failed to create existing_dates: {e}")
         # Ensure that start_day and finish_day have the time set to 4:00
         start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
         finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
@@ -715,7 +740,13 @@ def identify_highs_lows_gann(ticker, df, logger, reversal_days=2, price_move_per
 
         return df, final_swing_point_trend
     except Exception as e:
-        print(f"Error in identify_highs_lows_gann() for {ticker.symbol}: {e}")
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        logger.error(
+            f"{script_name} - {func_name} - {lineno} - {ticker.symbol}: {e}")
 
 def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_percent=1.5):
     func_name = 'identify_highs_lows_gann2()'
@@ -927,8 +958,13 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
 
         return df, final_swing_point_trend
     except Exception as e:
-        print(f"Error in identify_highs_lows_gann2() for {ticker.symbol}: {e}")
-
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        logger.error(
+            f"{script_name} - {func_name} - {lineno} - {ticker.symbol}: {e}")
 
 def add_levels_to_price_history(df, sr_levels, retests):
     func_name = 'add_levels_to_price_history()'
@@ -1235,12 +1271,23 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                     else:
                         print('Insufficient data.')
                 except Exception as e:
-                    logger.error(f'{script_name} - {func_name} index: {index}. step = {step}. Error in download_daily_ticker_price: {e}.')
+                    tb = traceback.extract_tb(e.__traceback__)
+                    tb_entry = tb[-1]
+                    script_name = tb_entry.filename
+                    func_name = tb_entry.name
+                    lineno = tb_entry.lineno
+                    logger.error(
+                        f"{script_name} - {func_name} - {lineno} - {ticker.symbol} - index: {index}: {e}")
                 print('new_record_count:', new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
                 end_time = display_local_time()  # record the end time of the loop
     except Exception as e:
-        message = f'{script_name} - {func_name} Error occured in download_daily_ticker_price(): {e}'
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        message = f'{script_name} - {func_name} - {lineno}: {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
         end_time = datetime.now()
         nj_param.value = end_time
@@ -1561,4 +1608,9 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
                     else:
                         print('Insufficient data.')
     except Exception as e:
-        print(f"Error in download_prices(): {e}")
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        func_name = tb_entry.name
+        lineno = tb_entry.lineno
+        logger.error(f"{script_name} - {func_name} - {lineno}: {e}")

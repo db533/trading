@@ -1,4 +1,5 @@
 import logging
+import traceback
 
 logging.basicConfig(level=logging.INFO)
 import os
@@ -66,8 +67,17 @@ class TAEStrategy(BaseStrategy):
                         'bullish_detected': str(bullish_detected), 'bearish_detected': str(bearish_detected), 'bullish_reversal_detected' : str(bullish_reversal_detected)}
                 return action_buy, data
         except Exception as e:
+            # Extract the current exception traceback
+            tb = traceback.extract_tb(e.__traceback__)
+
+            # Get the last traceback entry (where the error occurred)
+            tb_entry = tb[-1]
+
+            # Extract the filename, line number, and function name
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
 
         return action_buy, data
 
@@ -90,8 +100,13 @@ class TwoPeriodCumRSI(BaseStrategy):
                 data = {'cumulative_two_period_two_day_rsi': str(cumulative_two_period_two_day_rsi),}
                 return action_buy, data
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            func_name = tb_entry.name
+            lineno = tb_entry.lineno
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class DoubleSevens(BaseStrategy):
@@ -116,8 +131,17 @@ class DoubleSevens(BaseStrategy):
                         action_buy = False
                         data = {'latest_close_price': str(latest_close_price), 'seven_day_max': str(seven_day_max), }
         except Exception as e:
+            # Extract the current exception traceback
+            tb = traceback.extract_tb(e.__traceback__)
+
+            # Get the last traceback entry (where the error occurred)
+            tb_entry = tb[-1]
+
+            # Extract the filename, line number, and function name
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 def instance_difference_count(ticker, earlier_candle, later_candle=None):
@@ -230,8 +254,13 @@ class GannPointOneBuy(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointOneSell(BaseStrategy):
@@ -317,8 +346,13 @@ class GannPointOneSell(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointThreeBuy(BaseStrategy):
@@ -433,8 +467,13 @@ class GannPointThreeBuy(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointThreeSell(BaseStrategy):
@@ -452,6 +491,7 @@ class GannPointThreeSell(BaseStrategy):
             P_prev = []
             larger_P = 0
             recent_swing_points = []
+            latest_hl_sp = None
             for swing_point in swing_point_query:
                 # Check first is a HL
                 logger.info(f'Swing point for "{str(self.ticker.symbol)}" at "{str(swing_point.date)}". swing_point_label:"{str(swing_point.label)}". candle_count_since_last_swing_point:"{str(swing_point.candle_count_since_last_swing_point)}".')
@@ -548,8 +588,13 @@ class GannPointThreeSell(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointFourBuy2(BaseStrategy):
@@ -636,8 +681,13 @@ class GannPointFourBuy2(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointFourSell(BaseStrategy):
@@ -731,8 +781,13 @@ class GannPointFourSell(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointFiveBuy(BaseStrategy):
@@ -811,8 +866,13 @@ class GannPointFiveBuy(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointFiveSell(BaseStrategy):
@@ -892,8 +952,13 @@ class GannPointFiveSell(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 from django.contrib.contenttypes.models import ContentType
@@ -996,8 +1061,13 @@ class GannPointSixBuy(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointSixSell(BaseStrategy):
@@ -1077,8 +1147,13 @@ class GannPointSixSell(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointEightBuy(BaseStrategy):
@@ -1200,8 +1275,13 @@ class GannPointEightBuy(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointEightSell(BaseStrategy):
@@ -1321,8 +1401,13 @@ class GannPointEightSell(BaseStrategy):
             logger.info(f'Latest T: {latest_T}.')
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointNineBuy(BaseStrategy):
@@ -1468,8 +1553,13 @@ class GannPointNineBuy(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy, data
 
 class GannPointNineSell(BaseStrategy):
@@ -1614,8 +1704,13 @@ class GannPointNineSell(BaseStrategy):
                 action_buy = None
             logger.info(f'........')
         except Exception as e:
+            tb = traceback.extract_tb(e.__traceback__)
+            tb_entry = tb[-1]
+            script_name = tb_entry.filename
+            lineno = tb_entry.lineno
+            func_name = tb_entry.name
             logger.error(
-                f"{script_name} - {func_name} - {self.name} : {e}")
+                f"{script_name} - {func_name} - {self.name} - {lineno}: {e}")
         return action_buy,data
 
 from django.utils import timezone
@@ -1702,7 +1797,12 @@ def process_trading_opportunities_single_ticker(ticker_symbol, strategies):
                     existing_tradingopp.save()
         logger.info(f'Finished process_trading_opportunities_single_ticker().')
     except Exception as e:
-        message = f'{script_name} - {func_name} Error occured in process_trading_opportunities_single_ticker(). Current ticker: {ticker.symbol}. Error: {e}'
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        lineno = tb_entry.lineno
+        func_name = tb_entry.name
+        message = f'{script_name} - {func_name} - {lineno} Current ticker: {ticker.symbol}. Error: {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
         end_time = datetime.now()
         nj_param.value = end_time
@@ -1727,6 +1827,11 @@ def process_trading_opportunities():
             process_trading_opportunities_single_ticker(ticker.symbol, strategies)
         logger.info(f'Finished process_trading_opportunities().')
     except Exception as e:
+        tb = traceback.extract_tb(e.__traceback__)
+        tb_entry = tb[-1]
+        script_name = tb_entry.filename
+        lineno = tb_entry.lineno
+        func_name = tb_entry.name
         #print(f"Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
-        logger.error(f"{script_name} - {func_name} Error in process_trading_opportunities. Current ticker: {ticker.symbol}: {e}")
+        logger.error(f"{script_name} - {func_name} - {lineno} Current ticker: {ticker.symbol}: {e}")
 
