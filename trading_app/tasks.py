@@ -12,6 +12,7 @@ from .update_ticker_metrics import *
 
 logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
+script_name = 'tasks.py'
 
 def display_local_time(logger):
     # Get the current datetime in UTC

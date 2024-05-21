@@ -1755,6 +1755,7 @@ from matplotlib.dates import date2num
 import matplotlib.pyplot as plt
 import io
 from django.db.models import Q
+script_name = 'views.py'
 
 def generate_swing_point_graph_view(request, opp_id, magnitude):
     # Fetch the TradingOpp instance by ID

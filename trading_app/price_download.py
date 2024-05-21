@@ -22,8 +22,10 @@ import time
 
 default_logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
+script_name = 'price_download.py'
 
 def format_elapsed_time(start_time, end_time):
+    func_name='format_elapsed_time()'
     """
     Calculate elapsed time and format it as hours, minutes, and seconds.
 
@@ -40,6 +42,7 @@ def format_elapsed_time(start_time, end_time):
     return f"{hours} : {minutes}  : {seconds}"
 
 def display_local_time():
+    func_name = 'display_local_time()'
     # Get the current datetime in UTC
     utc_now = datetime.utcnow()
 
@@ -54,6 +57,7 @@ def display_local_time():
 
 
 def check_for_nat(logger, df):
+    func_name = 'check_for_nat()'
     # Checking both 'Datetime' and 'Datetime_TZ' columns for NaT
     nat_indexes = df[df['Datetime'].isna()].index.tolist()
     nat_indexes_tz = df[df['Datetime_TZ'].isna()].index.tolist()
@@ -71,6 +75,7 @@ def check_for_nat(logger, df):
     return nat_indexes
 
 def get_largest_index_value(df):
+    func_name = 'get_largest_index_value()'
     """
     Returns the largest index value of a pandas DataFrame.
 
@@ -86,6 +91,7 @@ def get_largest_index_value(df):
         return df.index.max()
 
 def get_price_data(ticker, interval, start_time, finish_time, logger):
+    func_name = 'get_price_data()'
     # Fetching existing data from the database
     try:
         existing_data = DailyPrice.objects.filter(ticker=ticker).values()
@@ -123,7 +129,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
                 existing_df['Datetime_index'] = existing_df['Datetime']
                 existing_df = existing_df.set_index('Datetime_index')
             except Exception as e:
-                logger.error(f"1. Error during loop: {e}")
+                logger.error(f"{script_name} - {func_name} 1. Error during loop: {e}")
             #print('Step 4')
             step = 1.5
             #logger.info(f'step = {step} Existing data:')
@@ -158,7 +164,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #logger.info(f'existing_df["Datetime"] values: {datetime_tzinfo}')
 
     except Exception as e:
-        print(f"Error fetching existing data for {ticker.symbol}: {e}")
+        print(f"{script_name} - {func_name} Error fetching existing data for {ticker.symbol}: {e}")
         existing_df = pd.DataFrame(columns=['Datetime', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     logger.info(f'get_price_data(). Existing data retrieval is complete.')
 
@@ -199,7 +205,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
             #check_for_nat(logger, data)
             step = 5
         else:
-            logger.info(f'get_price_data(). Retrieved data is empty.')
+            logger.info(f'{script_name} - {func_name} get_price_data(). Retrieved data is empty.')
             step = 6
         step = 7
         if existing_data_retrieved == True:
@@ -316,12 +322,13 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         check_for_nat(logger, combined_data)
 
     except Exception as e:
-        logger.error(f"Error downloading data for {ticker.symbol}: Step: {step}. {e}")
+        logger.error(f"{script_name} - {func_name} Error downloading data for {ticker.symbol}: Step: {step}. {e}")
         combined_data = pd.DataFrame(
             columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     return combined_data
 
 def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logger):
+    func_name = 'get_missing_dates()'
     # Get the list of dates missing in DailyPrice for the given ticker within the date range
     #print('start_day:',start_day,'timezone.make_naive(start_day):',timezone.make_naive(start_day))
     #print('finish_day:', finish_day, 'timezone.make_naive(finish_day):', timezone.make_naive(finish_day))
@@ -336,7 +343,7 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logg
             existing_dates = [timezone.make_naive(date) for date in existing_dates]
             logger.info(f'existing_dates: {existing_dates[:3]}')
         except Exception as e:
-            logger.error(f'Failed to create existing_dates: {e}')
+            logger.error(f'{script_name} - {func_name} Failed to create existing_dates: {e}')
         # Ensure that start_day and finish_day have the time set to 4:00
         start_day_with_time = datetime.combine(start_day, time(hour_offset, 0))
         finish_day_with_time = datetime.combine(finish_day, time(hour_offset, 0))
@@ -375,6 +382,7 @@ def get_missing_dates(ticker, interval, start_day, finish_day, hour_offset, logg
     return missing_dates
 
 def add_candle_data(price_history, candlestick_functions, column_names):
+    func_name = 'add_candle_data()'
     for candlestick_func, column_name in zip(candlestick_functions, column_names):
         price_history = candlestick_func(price_history, target=column_name, ohlc=['Open', 'High', 'Low', 'Close'])
         price_history[column_name].fillna(False, inplace=True)
@@ -382,6 +390,7 @@ def add_candle_data(price_history, candlestick_functions, column_names):
 
 
 def add_db_candle_data(price_history, db_candlestick_functions, db_column_names):
+    func_name = 'add_db_candle_data()'
     for db_candlestick_func, column_name in zip(db_candlestick_functions, db_column_names):
         price_history = db_candlestick_func(price_history, target=column_name, ohlc=['Open', 'High', 'Low', 'Close'])
         price_history[column_name].fillna(False, inplace=True)
@@ -426,6 +435,7 @@ pattern_types = {
 
 
 def count_patterns(df, pattern_types):
+    func_name = 'count_patterns()'
     # Initialize new columns with zeros
     for pattern_type in pattern_types.keys():
         df[pattern_type] = 0
@@ -443,6 +453,7 @@ def count_patterns(df, pattern_types):
 
 
 def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_percent=0.01):
+    func_name = 'find_levels()'
     # def find_levels(df, columns=['Close'], window=20, retest_threshold_percent=0.001):
     df.index = pd.to_datetime(df.index, utc=True)
     support = {}
@@ -557,6 +568,7 @@ def find_levels(df, columns=['Open', 'Close'], window=20, retest_threshold_perce
 from decimal import Decimal
 
 def identify_highs_lows_gann(ticker, df, logger, reversal_days=2, price_move_percent=1.5):
+    func_name = 'identify_highs_lows_gann()'
     # New function to compute swing points using WD Gann logic.
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
@@ -706,6 +718,7 @@ def identify_highs_lows_gann(ticker, df, logger, reversal_days=2, price_move_per
         print(f"Error in identify_highs_lows_gann() for {ticker.symbol}: {e}")
 
 def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_percent=1.5):
+    func_name = 'identify_highs_lows_gann2()'
     # New function to compute swing points using WD Gann logic.
     print('Detecting swing points according to Gann logic...')
     logger.info(f'Detecting swing points according to Gann logic...')
@@ -918,6 +931,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
 
 
 def add_levels_to_price_history(df, sr_levels, retests):
+    func_name = 'add_levels_to_price_history()'
     # Initialize new columns with default values
     df['level'] = None
     df['level_type'] = 0
@@ -940,6 +954,7 @@ def add_levels_to_price_history(df, sr_levels, retests):
 
 
 def add_ema_and_trend(price_history):
+    func_name = 'add_ema_and_trend()'
     # Calculate the Exponential Moving Average for 200 data points
     price_history['EMA_200'] = price_history['Close'].ewm(span=200, adjust=False).mean()
 
@@ -960,16 +975,19 @@ def add_ema_and_trend(price_history):
     return price_history
 
 def find_higher_order_swing_points(ticker, price_history, logger):
+    func_name = 'find_higher_order_swing_points()'
     # price_history is a pandas dataframe
     magnitude_to_test = 2
     # Retrieve the price candles for swing points at the priod magnitude level.
     swing_points = price_history['magnitude']
+    # If second swing point is higher than first one, First swingpoint = HL else = LH
     # Loop through each swing point
         # If the swing point label is the first LL, prior swingpoint was a H
         # If the swing point label is the first HH, prior swingpoint was a L
 
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+    func_name = 'download_daily_ticker_price()'
     delete_old_prices = False
     try:
         if trigger == 'Cron':
@@ -992,7 +1010,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
         new_record_count = 0
         if ticker is None:
             print('No Ticker instance found for this symbol')
-            logger.error(f'No Ticker instance found for this symbol.')
+            logger.error(f'{script_name} - {func_name} No Ticker instance found for this symbol.')
         else:
             if timeframe == 'Daily':  # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
                 print('start_time:')
@@ -1217,12 +1235,12 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                     else:
                         print('Insufficient data.')
                 except Exception as e:
-                    logger.error(f'index: {index}. step = {step}. Error in download_daily_ticker_price: {e}.')
+                    logger.error(f'{script_name} - {func_name} index: {index}. step = {step}. Error in download_daily_ticker_price: {e}.')
                 print('new_record_count:', new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
                 end_time = display_local_time()  # record the end time of the loop
     except Exception as e:
-        message = f'Error occured in download_daily_ticker_price(): {e}'
+        message = f'{script_name} - {func_name} Error occured in download_daily_ticker_price(): {e}'
         nj_param = Params.objects.get(key='night_job_end_dt')
         end_time = datetime.now()
         nj_param.value = end_time
@@ -1233,6 +1251,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
         logger.error(message)
 
 def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
+    func_name = 'download_prices()'
     # timeframe = Timeframe for which to download prices.
         # valid values = "Daily", "15 mins", "5 mins"
     # ticker_symbol = which ticker to download
