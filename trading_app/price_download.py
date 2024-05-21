@@ -1045,8 +1045,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
         ticker = Ticker.objects.get(symbol=ticker_symbol)
         new_record_count = 0
         if ticker is None:
-            print('No Ticker instance found for this symbol')
-            logger.error(f'{script_name} - {func_name} No Ticker instance found for this symbol.')
+            logger.error(f'{func_name} No Ticker instance found for this symbol.')
         else:
             if timeframe == 'Daily':  # and (ticker_symbol == 'All' or ticker_symbol == ticker.symbol):
                 print('start_time:')
