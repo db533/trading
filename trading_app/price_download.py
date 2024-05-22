@@ -1143,12 +1143,14 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
 
                         # print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                         # print('Step 15')
-                        sp_count = len(price_history[price_history['magnitude'] > 0])
                         magnitude_to_test = 2
-                        logger.info(f'price_history.columns: {price_history.columns}')
+                        sp_count = len(price_history[price_history['magnitude'] > (magnitude_to_test - 2)])
+                        logger.info(f'magnitude_to_test: {magnitude_to_test} sp_count: {sp_count}')
                         while sp_count > 6:
                             price_history, sp_count = find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_test)
                             magnitude_to_test += 1
+                            #sp_count = len(price_history[price_history['magnitude'] > (magnitude_to_test - 2)])
+                            logger.info(f'magnitude_to_test: {magnitude_to_test} sp_count: {sp_count}')
                         ticker.last_high_low = last_high_low_level
                         ticker.swing_point_current_trend = swing_point_current_trend
                         # print('Step 16')
