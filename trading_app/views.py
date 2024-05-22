@@ -2001,7 +2001,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         if magnitude_step == 1:
             point_colour = 'blue'
         elif magnitude_step == 2:
-            point_colour = 'light blue'
+            point_colour = 'cyan'
         else:
             point_colour = 'purple'
         ax.plot(sp_x_positions, sp_y_positions, 'o', color=point_colour, linestyle='-')  # Example: red markers for visibility
