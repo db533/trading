@@ -1216,7 +1216,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],magnitude=row["magnitude"],content_type=content_type).first()
                                 step = 7
                                 #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
-                                if not existing_swing_point_instance.exists():
+                                if existing_swing_point_instance is None:
                                     step = 8
                                     #logger.info(f'Creating a swingpoint for datetime {str(row["Datetime_TZ"])} because does not exist.')
                                     #logger.info(f'SwingPoint does not exist.')
