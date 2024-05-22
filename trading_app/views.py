@@ -1970,7 +1970,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=linewidth)
 
     # Find the maximum value of magnitude for swingpoints for this ticker.
-    max_magnitude = SwingPoint.objects.filter(ticker=ticker.symbol).aggregate(Max('magnitude'))['magnitude__max']
+    max_magnitude = SwingPoint.objects.filter(ticker=ticker).aggregate(Max('magnitude'))['magnitude__max']
 
     magnitude_step = 1
     while magnitude_step <= max_magnitude:
