@@ -1213,7 +1213,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                                 #    f"About to check for existing SwingPoint instance. ticker:{str(ticker)}, row['Datetime_TZ']: {str(row['Datetime_TZ'])}., "
                                 #    f"content_type: {str(content_type)}")
                                 #logger.info(f'This record is labelled as a swingpoint.')
-                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],magnitude=row["magnitude"],content_type=content_type)
+                                existing_swing_point_instance = SwingPoint.objects.filter(ticker=ticker,date=row["Datetime_TZ"],magnitude=row["magnitude"],content_type=content_type).first()
                                 step = 7
                                 #logger.info(f'existing_swing_point_instance: {str(existing_swing_point_instance)}.')
                                 if not existing_swing_point_instance.exists():
