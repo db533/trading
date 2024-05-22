@@ -1035,18 +1035,32 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
             if current_sp_price > most_recent_sp_price:
                 # If second price is higher, uptrend, else downtrend
                 trend = 1
-                most_recent_sp_price = row['Close']
+                #most_recent_sp_price = row['Close']
             else:
                 trend = -1
-                most_recent_sp_price = row['Close']
+                #most_recent_sp_price = row['Close']
         elif counter > 2:
             current_sp_price = row['Close']
-            if (trend == 1 and current_sp_price < most_recent_sp_price) or \
-                    (trend == -1 and current_sp_price > most_recent_sp_price):
-                # Trend changed at prior swingpoint. Mark it as a swingpoint.
-                price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
-                trend = -1 * trend # Reverse the trend.
-                sp_count +=1
+            if trend == 1:
+                if row['swing_point_label'][1] == 'H':
+                    # A new high has been found. Check if it is lower than the prior high.
+                    if current_sp_price < most_recent_sp_price:
+                        # The low is higher, so the prior low was a swing point.
+                        price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                        trend = -1
+                        sp_count += 1
+                    most_recent_sp_price = current_sp_price
+                    most_recent_sp_index = index
+            else:
+                if row['swing_point_label'][1] == 'L':
+                    # A new low has been found. Check if it is higher than the prior low.
+                    if current_sp_price > most_recent_sp_price:
+                        # The low is higher, so the prior low was a swing point.
+                        price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                        trend = 1
+                        sp_count += 1
+                    most_recent_sp_price = current_sp_price
+                    most_recent_sp_index = index
         counter += 1
     return price_history, sp_count
 
