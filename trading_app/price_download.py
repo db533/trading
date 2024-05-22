@@ -1026,7 +1026,7 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
         if counter == 1:
             #first_sp_price = row['Close']
             #first_sp_index = index
-            swing_points.at[index, 'magnitude'] = magnitude_to_test
+            price_history.at[index, 'magnitude'] = magnitude_to_test
             most_recent_sp_price = row['Close']
             sp_count += 1
         elif counter == 2:
@@ -1044,7 +1044,7 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
             if (trend == 1 and current_sp_price < most_recent_sp_price) or \
                     (trend == -1 and current_sp_price > most_recent_sp_price):
                 # Trend changed at prior swingpoint. Mark it as a swingpoint.
-                swing_points.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
                 trend = -1 * trend # Reverse the trend.
                 sp_count +=1
         counter += 1
