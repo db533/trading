@@ -1145,6 +1145,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                         # print('Step 15')
                         sp_count = len(price_history[price_history['magnitude'] > 0])
                         magnitude_to_test = 2
+                        logger.info(f'price_history.columns: {price_history.columns}')
                         while sp_count > 6:
                             price_history, sp_count = find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_test)
                             magnitude_to_test += 1
