@@ -341,7 +341,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         func_name = tb_entry.name
         lineno = tb_entry.lineno
         logger.error(
-            f"{script_name} - {func_name} - {lineno}: Error downloading data for {ticker.symbol}: {e}")
+            f"{script_name} - {func_name} - line {lineno} step {step}: Error downloading data for {ticker.symbol}: {e}")
         combined_data = pd.DataFrame(
             columns=['Datetime', 'Datetime_TZ', 'Ticker', 'Open', 'High', 'Low', 'Close', 'Volume'])
     return combined_data
@@ -835,7 +835,7 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
                         change_confirmations += 1
 
                     # If trading volume on day 1 > than on Day 0?
-                    if df.iloc[i + 1]['Volume'] > average_volume*1.2:
+                    if df.iloc[i + 1]['Volume'] > average_volume*1.1:
                         #logger.info(f'Up Step 7D. df.iloc[i + 1][Volume] > average_volume*1.2')
                         change_confirmations += 1
 
@@ -1010,17 +1010,45 @@ def add_ema_and_trend(price_history):
 
     return price_history
 
-def find_higher_order_swing_points(ticker, price_history, logger):
+def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_test):
     func_name = 'find_higher_order_swing_points()'
     # price_history is a pandas dataframe
-    magnitude_to_test = 2
-    # Retrieve the price candles for swing points at the priod magnitude level.
-    swing_points = price_history['magnitude']
-    # If second swing point is higher than first one, First swingpoint = HL else = LH
+    #magnitude_to_test = 2
+    # Retrieve the price candles for swing points at the prior magnitude level.
+    swing_points = price_history[price_history['magnitude']==(magnitude_to_test-1)]
     # Loop through each swing point
+        # If second swing point is higher than first one, First swingpoint = HL else = LH
         # If the swing point label is the first LL, prior swingpoint was a H
         # If the swing point label is the first HH, prior swingpoint was a L
-
+    counter = 1
+    sp_count = 0
+    for index, row in swing_points.iterrows():
+        if counter == 1:
+            #first_sp_price = row['close_price']
+            #first_sp_index = index
+            swing_points.at[index, 'magnitude'] = magnitude_to_test
+            most_recent_sp_price = row['close_price']
+            sp_count += 1
+        elif counter == 2:
+            current_sp_price = row['close_price']
+            most_recent_sp_index = index
+            if current_sp_price > most_recent_sp_price:
+                # If second price is higher, uptrend, else downtrend
+                trend = 1
+                most_recent_sp_price = row['close_price']
+            else:
+                trend = -1
+                most_recent_sp_price = row['close_price']
+        elif counter > 2:
+            current_sp_price = row['close_price']
+            if (trend == 1 and current_sp_price < most_recent_sp_price) or \
+                    (trend == -1 and current_sp_price > most_recent_sp_price):
+                # Trend changed at prior swingpoint. Mark it as a swingpoint.
+                swing_points.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                trend = -1 * trend # Reverse the trend.
+                sp_count +=1
+        counter += 1
+    return price_history, sp_count
 
 def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
     func_name = 'download_daily_ticker_price()'
@@ -1115,6 +1143,11 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
 
                         # print('price_history.tail(30) after identify_highs_lows():', price_history.tail(30))
                         # print('Step 15')
+                        sp_count = len(price_history[price_history['magnitude'] > 0])
+                        magnitude_to_test = 2
+                        while sp_count > 6:
+                            price_history, sp_count = find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_test)
+                            magnitude_to_test += 1
                         ticker.last_high_low = last_high_low_level
                         ticker.swing_point_current_trend = swing_point_current_trend
                         # print('Step 16')

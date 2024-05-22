@@ -25,6 +25,7 @@ from django.db.models import Q
 from time import sleep
 from .tasks import background_manual_ticker_download, delete_ticker, background_update_ticker_strategies
 from .price_download import download_daily_ticker_price
+from django.db.models import Max
 
 logger = logging.getLogger('django')
 from rest_framework.response import Response
@@ -1969,37 +1970,42 @@ def generate_ticker_graph_view(request, ticker_symbol):
         ax.plot([i, i], [low, high], color=bar_colours[i], linewidth=linewidth)
 
     # Find the maximum value of magnitude for swingpoints for this ticker.
+    max_magnitude = SwingPoint.objects.filter(ticker=ticker.symbol).aggregate(Max('magnitude'))['magnitude__max']
+
     magnitude_step = 1
+    while magnitude_step <= max_magnitude:
+        swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude=magnitude_step).order_by('date')
+        sp_dates = [sp.date for sp in swing_point_query]
+        sp_price = [sp.price for sp in swing_point_query]
 
-    swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude=magnitude_step).order_by('date')
-    sp_dates = [sp.date for sp in swing_point_query]
-    sp_price = [sp.price for sp in swing_point_query]
+        # Adjust the swing points plotting logic
+        sp_x_positions = []
+        sp_y_positions = []
+        logger.info(f'[SP on ticker-graph] Adding swing points on graph...')
+        logger.info(f'sp_dates: {sp_dates}')
+        logger.info(f'sp_price: {sp_price}')
+        #logger.info(f'sp_indices: {sp_indices}')
+        for sp in swing_point_query:
+            if sp.date in date_to_price_map:
+                low_price, high_price = date_to_price_map[sp.date]
+                # Determine if the swing point is closer to the high or the low for the day
+                if abs(sp.price - high_price) < abs(sp.price - low_price):
+                    sp_y_positions.append(high_price)
+                    logger.info(f'Date: {sp.date}. sp_price: {sp.price}. HIGH. Price: {high_price}. sp_x_position: {dates.index(sp.date)}')
+                else:
+                    sp_y_positions.append(low_price)
+                    logger.info(f'Date: {sp.date}. LOW. Price: {low_price}. sp_x_position: {dates.index(sp.date)}')
+                sp_x_positions.append(dates.index(sp.date))
 
-    # Adjust the swing points plotting logic
-    sp_x_positions = []
-    sp_y_positions = []
-    logger.info(f'[SP on ticker-graph] Adding swing points on graph...')
-    logger.info(f'sp_dates: {sp_dates}')
-    logger.info(f'sp_price: {sp_price}')
-    #logger.info(f'sp_indices: {sp_indices}')
-    for sp in swing_point_query:
-        if sp.date in date_to_price_map:
-            low_price, high_price = date_to_price_map[sp.date]
-            # Determine if the swing point is closer to the high or the low for the day
-            if abs(sp.price - high_price) < abs(sp.price - low_price):
-                sp_y_positions.append(high_price)
-                logger.info(f'Date: {sp.date}. sp_price: {sp.price}. HIGH. Price: {high_price}. sp_x_position: {dates.index(sp.date)}')
-            else:
-                sp_y_positions.append(low_price)
-                logger.info(f'Date: {sp.date}. LOW. Price: {low_price}. sp_x_position: {dates.index(sp.date)}')
-            sp_x_positions.append(dates.index(sp.date))
-
-    # Plot swing points with corrected y-positions
-    if magnitude_step == 1:
-        point_colour = 'blue'
-    else:
-        point_colour = 'light blue'
-    ax.plot(sp_x_positions, sp_y_positions, 'o', color=point_colour, linestyle='-')  # Example: red markers for visibility
+        # Plot swing points with corrected y-positions
+        if magnitude_step == 1:
+            point_colour = 'blue'
+        elif magnitude_step == 2:
+            point_colour = 'light blue'
+        else:
+            point_colour = 'purple'
+        ax.plot(sp_x_positions, sp_y_positions, 'o', color=point_colour, linestyle='-')  # Example: red markers for visibility
+        magnitude_step += 1
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
@@ -2459,7 +2465,7 @@ from django.shortcuts import render
 from .models import TradingOpp, Trade
 from collections import defaultdict
 from decimal import Decimal
-from django.db.models import Max
+
 
 def monthly_trading_performance_view(request):
     # Annotate each TradingOpp with the date of the last transaction
