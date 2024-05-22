@@ -1309,7 +1309,7 @@ def download_daily_ticker_price(timeframe='Ad hoc', ticker_symbol="All", trigger
                     func_name = tb_entry.name
                     lineno = tb_entry.lineno
                     logger.error(
-                        f"{script_name} - {func_name} - {lineno} - {ticker.symbol} - index: {index}: {e}")
+                        f"{script_name} - {func_name} - {lineno} - {ticker.symbol} : {e}")
                 print('new_record_count:', new_record_count)
                 logger.info(f'Saved {str(new_record_count)} new DailyPrice records for this ticker.')
                 end_time = display_local_time()  # record the end time of the loop
