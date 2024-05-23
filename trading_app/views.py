@@ -1974,7 +1974,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
 
     magnitude_step = 1
     while magnitude_step <= max_magnitude:
-        swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude=magnitude_step).order_by('date')
+        swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude__gte=magnitude_step).order_by('date')
         sp_dates = [sp.date for sp in swing_point_query]
         sp_price = [sp.price for sp in swing_point_query]
 
