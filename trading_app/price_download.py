@@ -1027,6 +1027,7 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
             price_history.at[index, 'magnitude'] = magnitude_to_test
             most_recent_sp_price = row['swing_point_price']
             sp_count += 1
+            logger.info(f'counter: {counter}. most_recent_sp_price: {most_recent_sp_price}')
         elif counter == 2:
             current_sp_price = row['swing_point_price']
 
@@ -1035,10 +1036,12 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
                 trend = 1
                 most_recent_high_index = index
                 most_recent_high_price = row['swing_point_price']
+                logger.info(f'counter: {counter}. trend: {trend}. most_recent_high_price: {most_recent_high_price}')
             else:
                 trend = -1
                 most_recent_low_index = index
                 most_recent_low_price = row['swing_point_price']
+                logger.info(f'counter: {counter}. trend: {trend}. most_recent_low_price: {most_recent_low_price}')
         elif counter > 2:
             current_sp_price = row['swing_point_price']
             if trend == 1:
@@ -1051,6 +1054,7 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
                         sp_count += 1
                     most_recent_high_index = index
                     most_recent_high_price = row['swing_point_price']
+                    logger.info(f'counter: {counter}. trend: {trend}. most_recent_high_price: {most_recent_high_price}')
             else:
                 if row['swing_point_label'][1] == 'L':
                     # A new low has been found. Check if it is higher than the prior low.
@@ -1061,6 +1065,7 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
                         sp_count += 1
                     most_recent_low_price = current_sp_price
                     most_recent_low_index = index
+                    logger.info(f'counter: {counter}. trend: {trend}. most_recent_low_price: {most_recent_low_price}')
         counter += 1
     return price_history, sp_count
 
