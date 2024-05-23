@@ -1029,35 +1029,38 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
             sp_count += 1
         elif counter == 2:
             current_sp_price = row['swing_point_price']
-            most_recent_sp_index = index
+
             if current_sp_price > most_recent_sp_price:
                 # If second price is higher, uptrend, else downtrend
                 trend = 1
+                most_recent_high_index = index
+                most_recent_high_price = row['swing_point_price']
             else:
                 trend = -1
+                most_recent_low_index = index
+                most_recent_low_price = row['swing_point_price']
         elif counter > 2:
             current_sp_price = row['swing_point_price']
             if trend == 1:
                 if row['swing_point_label'][1] == 'H':
                     # A new high has been found. Check if it is lower than the prior high.
-                    if current_sp_price < most_recent_sp_price:
-                        # The low is higher, so the prior low was a swing point.
-                        price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                    if current_sp_price < most_recent_high_price:
+                        # The high is lower, so the prior high was a swing point.
+                        price_history.at[most_recent_high_index, 'magnitude'] = magnitude_to_test
                         trend = -1
                         sp_count += 1
-                    most_recent_sp_price = current_sp_price
-                    most_recent_sp_index = index
-
+                    most_recent_high_index = index
+                    most_recent_high_price = row['swing_point_price']
             else:
                 if row['swing_point_label'][1] == 'L':
                     # A new low has been found. Check if it is higher than the prior low.
-                    if current_sp_price > most_recent_sp_price:
+                    if current_sp_price > most_recent_low_price:
                         # The low is higher, so the prior low was a swing point.
-                        price_history.at[most_recent_sp_index, 'magnitude'] = magnitude_to_test
+                        price_history.at[most_recent_low_index, 'magnitude'] = magnitude_to_test
                         trend = 1
                         sp_count += 1
-                    most_recent_sp_price = current_sp_price
-                    most_recent_sp_index = index
+                    most_recent_low_price = current_sp_price
+                    most_recent_low_index = index
         counter += 1
     return price_history, sp_count
 
