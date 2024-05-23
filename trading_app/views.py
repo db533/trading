@@ -1972,8 +1972,8 @@ def generate_ticker_graph_view(request, ticker_symbol):
     # Find the maximum value of magnitude for swingpoints for this ticker.
     max_magnitude = SwingPoint.objects.filter(ticker=ticker).aggregate(Max('magnitude'))['magnitude__max']
 
-    magnitude_step = 1
-    while magnitude_step <= max_magnitude:
+    magnitude_step = max_magnitude
+    while magnitude_step >= 1:
         swing_point_query = SwingPoint.objects.filter(ticker=ticker).filter(magnitude__gte=magnitude_step).order_by('date')
         sp_dates = [sp.date for sp in swing_point_query]
         sp_price = [sp.price for sp in swing_point_query]
@@ -2005,7 +2005,7 @@ def generate_ticker_graph_view(request, ticker_symbol):
         else:
             point_colour = 'purple'
         ax.plot(sp_x_positions, sp_y_positions, 'o', color=point_colour, linestyle='-')  # Example: red markers for visibility
-        magnitude_step += 1
+        magnitude_step -= 1
 
     ax.set_xticks(month_starts_indices)
     ax.set_xticklabels(labels, rotation=45, ha="right")
