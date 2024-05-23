@@ -1055,6 +1055,10 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
                     most_recent_high_index = index
                     most_recent_high_price = row['swing_point_price']
                     logger.info(f'counter: {counter}. trend: {trend}. most_recent_high_price: {most_recent_high_price}')
+                else:
+                    most_recent_low_price = current_sp_price
+                    most_recent_low_index = index
+                    logger.info(f'counter: {counter}. trend: {trend}. most_recent_low_price: {most_recent_low_price}')
             else:
                 if row['swing_point_label'][1] == 'L':
                     # A new low has been found. Check if it is higher than the prior low.
@@ -1066,6 +1070,10 @@ def find_higher_order_swing_points(ticker, price_history, logger, magnitude_to_t
                     most_recent_low_price = current_sp_price
                     most_recent_low_index = index
                     logger.info(f'counter: {counter}. trend: {trend}. most_recent_low_price: {most_recent_low_price}')
+                else:
+                    most_recent_high_index = index
+                    most_recent_high_price = row['swing_point_price']
+                    logger.info(f'counter: {counter}. trend: {trend}. most_recent_high_price: {most_recent_high_price}')
         counter += 1
     return price_history, sp_count
 
