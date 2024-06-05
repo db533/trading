@@ -206,7 +206,7 @@ LOGGING = {
     },
     'handlers': {
         'stderr': {
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': os.path.join(LOGGING_DIR, 'stderr.log'),
             'level': 'ERROR',
             'when': 'midnight',  # Rotate log file at midnight
