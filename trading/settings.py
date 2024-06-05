@@ -209,6 +209,8 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(LOGGING_DIR, 'stderr.log'),
             'level': 'ERROR',
+            'when': 'midnight',  # Rotate log file at midnight
+            'backupCount': 7,  # Keep 7 days of logs
         },
         'scheduled_tasks': {
             'level': 'DEBUG',
