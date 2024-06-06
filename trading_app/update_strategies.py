@@ -652,7 +652,7 @@ class GannPointFourBuy2(BaseStrategy):
                     swing_point_counter += 1
             if len(T_prev) > 0:
                 max_T = max(T_prev)
-                if max_T < (latest_T + longer_days - 1) and len(T_prev) > 1 and float(latest_price.close_price) > float(last_sp.price):
+                if max_T < (latest_T - longer_days + 1) and len(T_prev) > 1 and float(latest_price.close_price) > float(last_sp.price):
                     # The most recent upward rally is longer than the longest upward rally during the down trend.
                     # And we have had at least 2 sections of upward movement during the down trend.
                     logger.info(f'Latest upswing LONGER than longest up swing during down trend. Strategy valid.')
@@ -745,7 +745,7 @@ class GannPointFourSell(BaseStrategy):
                     swing_point_counter += 1
             if len(T_prev) > 0:
                 max_T = max(T_prev)
-                if max_T < (latest_T + longer_days - 1) and len(T_prev) > 1 and float(latest_price.close_price) < float(last_sp.price):
+                if max_T < (latest_T - longer_days + 1) and len(T_prev) > 1 and float(latest_price.close_price) < float(last_sp.price):
                     # The most recent downward rally is longer than the longest downward rally during the down trend.
                     # And we have at least 2 sections of downward movement during the most recent upward trend.
                     logger.info(f'Latest downswing LONGER than longest down swing during up trend. Strategy valid.')
@@ -861,7 +861,7 @@ class GannPointFiveBuy(BaseStrategy):
                         'section_count': str(section_count), 'prior_trend_duration' : str(prior_trend_duration), 'recent_swing_points' : recent_swing_points,
                         'final_upswing_size' : str(final_upswing_size), 'duration_after_latest_sp' : str(duration_after_latest_sp)}
                 logger.info(f'T_most_recent during prior series of swings: {T_most_recent}.')
-                if T_most_recent < (latest_T + longer_days - 1) and section_count > 1:
+                if T_most_recent < (latest_T - longer_days + 1) and section_count > 1:
                     action_buy = True
             else:
                 data = {'latest_T': str(latest_T),'section_count': str(section_count),}
@@ -948,7 +948,7 @@ class GannPointFiveSell(BaseStrategy):
                         'recent_swing_points' : recent_swing_points, 'final_downswing_size' : str(final_downswing_size),
                         'duration_after_latest_sp' : str(duration_after_latest_sp)}
                 logger.info(f'T_most_recent during prior series of swings: {T_most_recent}.')
-                if T_most_recent < (latest_T + longer_days - 1) and section_count > 1:
+                if T_most_recent < (latest_T - longer_days + 1) and section_count > 1:
                     action_buy = False
             else:
                 data = {'latest_T': str(latest_T),'section_count': str(section_count),}
