@@ -818,6 +818,7 @@ class GannPointFiveBuy(BaseStrategy):
                         last_candle = swing_point.price_object
                         last_sp = swing_point
                         recent_swing_points.append(swing_point)
+                        most_recent_swing_label = swing_point.swing_point_label
                     else:
                         # This strategy cannot be true. End review of swing points.
                         logger.info(f'First swingpoint not LL. Strategy not valid.')
@@ -837,13 +838,10 @@ class GannPointFiveBuy(BaseStrategy):
                         recent_swing_points.append(swing_point)
                     elif swing_point.label == 'LL':
                         logger.info(f'Found a prior {swing_point.label}.')
-                        if swing_point.label == 'LL':
-                            section_count += 1
-                            most_recent_duration = swing_point.candle_count_since_last_swing_point
-                            #most_recent_swing_label = swing_point.swing_point_label
-                            recent_swing_points.append(swing_point)
-                            if T_most_recent is None:
-                                T_most_recent = most_recent_duration
+                        section_count += 1
+                        recent_swing_points.append(swing_point)
+                        if T_most_recent is None and most_recent_swing_label == "LH":
+                            T_most_recent = most_recent_duration
                     elif swing_point.label == 'HH' or swing_point.label == 'HL':
                         # This must be the start of the prior down / up trend.
                         # Stop checking further swing points.
@@ -925,7 +923,7 @@ class GannPointFiveSell(BaseStrategy):
                         hl_prices.append(float(swing_point.price_object.low_price))
                     elif swing_point.label == 'HH':
                         logger.info(f'Found a prior {swing_point.label}.')
-                        if swing_point.label == 'HH' and most_recent_swing_point_label == 'HL':
+                        if most_recent_swing_point_label == 'HL':
                             section_count += 1
                             recent_swing_points.append(swing_point)
                             if T_most_recent is None:
