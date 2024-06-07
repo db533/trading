@@ -994,6 +994,7 @@ class GannPointSixBuy(BaseStrategy):
     def check_criteria(self, func_name):
         data = {}
         action_buy = None
+        longer_days = 2  # How many days does the most recent increase need to be longer than then prior changes for the strategy to be valid.
         try:
             # Access the latest DailyPrice (or other relevant price model) for the ticker
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
@@ -1038,7 +1039,7 @@ class GannPointSixBuy(BaseStrategy):
                     T_latest = count_candles_between(last_sp, last_ll_candle, last_lh_candle)
                     most_recent_label = 'LL'
                     sections += 1
-                    if T_latest > max_T:
+                    if (T_latest - longer_days +1) > max_T:
                         max_T = T_latest
                         start_sp_counter = swing_point_counter
                         end_sp_counter = swing_point_counter-1
@@ -1078,6 +1079,7 @@ class GannPointSixSell(BaseStrategy):
     def check_criteria(self, func_name):
         data = {}
         action_buy = None
+        longer_days = 2  # How many days does the most recent increase need to be longer than then prior changes for the strategy to be valid.
         try:
             # Access the latest DailyPrice (or other relevant price model) for the ticker
             latest_price = DailyPrice.objects.filter(ticker=self.ticker).order_by('-datetime').first()
@@ -1124,7 +1126,7 @@ class GannPointSixSell(BaseStrategy):
                     T_list.append(T_latest)
                     most_recent_label = 'HH'
                     sections += 1
-                    if T_latest > max_T:
+                    if (T_latest - longer_days + 1) > max_T:
                         max_T = T_latest
                         start_sp_counter = swing_point_counter
                         end_sp_counter = swing_point_counter - 1

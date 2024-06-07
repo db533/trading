@@ -93,6 +93,7 @@ def get_largest_index_value(df):
 
 def get_price_data(ticker, interval, start_time, finish_time, logger):
     func_name = 'get_price_data()'
+    script_name = 'price_download.py'
     # Fetching existing data from the database
     try:
         existing_data = DailyPrice.objects.filter(ticker=ticker).values()
@@ -190,7 +191,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         #logger.info(f'step = {step} get_price_data(). data retrieval performed.')
         #logger.info(f'data as received from Yahoo: data.index[0]:{data.index[0]} data.iloc[0].to_dict(): {data.iloc[0].to_dict()}')
         if not data.empty:
-            print('Retrieve new price data records...')
+            #print('Retrieve new price data records...')
 
             # Create a 'Datetime' column from the index
             data['Datetime'] = data.index.tz_convert('UTC').tz_localize(None)
@@ -289,7 +290,7 @@ def get_price_data(ticker, interval, start_time, finish_time, logger):
         first_row_dict = combined_data.iloc[0].to_dict()
 
         # Display the dictionary
-        print(first_row_dict)
+        #print(first_row_dict)
         step = 14
         #logger.info(f'step: {step} combined_data.index[0]: {combined_data.index[0]}')
         #logger.info(f'combined_data: {first_row_dict}')
@@ -763,11 +764,11 @@ def identify_highs_lows_gann2(ticker, df, logger, reversal_days=2, price_move_pe
         df['swing_point_current_trend'] = 0
         df['candle_count_since_last_swing_point'] = 0
         # print('df.columns:',df.columns)
-        print('len(df):', len(df))
+        #print('len(df):', len(df))
         #logger.info(f'len(df): {len(df)}')
 
         # Delete existing swing points for the ticker as new ones will be determined.
-        print('ticker:', ticker)
+        #print('ticker:', ticker)
 
         healthy_bullish_count = 0
         healthy_bearish_count = 0
