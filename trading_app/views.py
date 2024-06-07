@@ -2530,7 +2530,7 @@ def monthly_trading_performance_view(request):
         overall_growth_rate += ((growth_rate -1) * eur_spent)
         difference = date_sold - date_bought
         trade_days = difference.days + 1
-        cagr = round((growth_rate ** (365 / trade_days)), 1) - 1
+        cagr = round(((growth_rate ** (365 / trade_days)))-1, 3)
 
         overall_cagr += (cagr * eur_spent)
         monthly_totals[last_transaction_month]['weighted_cagr'] += (cagr * eur_spent )
@@ -2547,7 +2547,7 @@ def monthly_trading_performance_view(request):
             'commission_eur': round(commission_eur, 2),
             'realised_profit': round(profit, 2),
             'growth_rate' : round((growth_rate-1)*100,1),
-            'cagr' : cagr,
+            'cagr' : cagr * 100,
             'days' : trade_days,
         })
 
