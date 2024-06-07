@@ -2548,6 +2548,7 @@ def monthly_trading_performance_view(request):
             'realised_profit': round(profit, 2),
             'growth_rate' : round((growth_rate-1)*100,1),
             'cagr' : cagr,
+            'days' : trade_days,
         })
 
     # Convert monthly totals to the list format for the template
