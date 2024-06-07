@@ -56,6 +56,7 @@
             <th>Growth rate</th>
             <th>CAGR</th>
             <th>Days held</th>
+            <th>CAGR * eur_spent</th>
         </tr>
     </thead>
     <tbody>
@@ -71,6 +72,8 @@
             <td>{{ opp.growth_rate }} %</td>
             <td>{{ opp.cagr }} %</td>
             <td>{{ opp.days }}</td>
+            <td>{{ opp.cagr_times_eur_spent }}</td>
+
         </tr>
         {% endfor %}
     </tbody>
