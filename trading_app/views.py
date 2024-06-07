@@ -2482,7 +2482,7 @@ def monthly_trading_performance_view(request):
     # Use a temporary dictionary to track monthly totals
     monthly_totals = {}
     overall_profit = 0
-    overall_growth_rate = 0
+    overall_weighted_growth_rate = 0
     overall_cagr = 0
     overall_trade_count = 0
     overall_spent = 0
@@ -2527,15 +2527,15 @@ def monthly_trading_performance_view(request):
 
         # Calculate the difference
         growth_rate = eur_gained / (eur_spent + commission_eur)
-        overall_growth_rate += ((growth_rate -1) * eur_spent)
+        overall_weighted_growth_rate += ((growth_rate -1) * eur_spent)
         difference = date_sold - date_bought
         trade_days = difference.days + 1
-        cagr = round(((growth_rate ** (365 / trade_days)))-1, 3)
+        cagr = round((growth_rate ** (365 / trade_days))-1, 3)
 
-        overall_cagr += (cagr * eur_spent)
-        monthly_totals[last_transaction_month]['weighted_cagr'] += (cagr * eur_spent )
+        overall_cagr += (cagr * (eur_spent + commission_eur))
+        monthly_totals[last_transaction_month]['weighted_cagr'] += (cagr * (eur_spent + commission_eur) )
         monthly_totals[last_transaction_month]['total_days'] += trade_days
-        monthly_totals[last_transaction_month]['growth_rate'] += ((growth_rate -1)  * eur_spent )
+        monthly_totals[last_transaction_month]['growth_rate'] += ((growth_rate -1)  * (eur_spent + commission_eur) )
         monthly_totals[last_transaction_month]['cagr'] += cagr
 
         # Append the performance metrics for this TradingOpp to the list
@@ -2549,14 +2549,14 @@ def monthly_trading_performance_view(request):
             'growth_rate' : round((growth_rate-1)*100,1),
             'cagr' : round(cagr * 100,1),
             'days' : trade_days,
-            'cagr_times_eur_spent' : round((cagr * eur_spent),2),
+            'cagr_times_eur_spent' : round((cagr * (eur_spent + commission_eur)),2),
         })
 
     # Convert monthly totals to the list format for the template
     for month, totals in monthly_totals.items():
         realised_profit = round(totals['total_gained'] - totals['total_spent'] - totals['total_commission'], 2)
         growth_rate = ((totals['growth_rate'] / totals['total_spent'] ))*100
-        cagr = ((totals['weighted_cagr'] / totals['total_spent'])) * 100
+        cagr = ((totals['weighted_cagr'] / (totals['total_spent']+totals['total_commission']))) * 100
         if cagr > 100:
             cagr = int(cagr)
         else:
@@ -2575,13 +2575,13 @@ def monthly_trading_performance_view(request):
             'percent_profitable_trades': round(totals['profitable_trade_count']*100/totals['trade_count'],1),
         })
 
-    overall_growth_rate = ((overall_growth_rate / overall_spent)) * 100
+    overall_weighted_growth_rate = ((overall_weighted_growth_rate / overall_spent)) * 100
     overall_cagr = ((overall_cagr / overall_trade_count)-1) * 100
 
     context = {
         'monthly_performance': monthly_performance,
         'trading_opps_performance': trading_opps_performance,
-        'overall_growth_rate' : round(overall_growth_rate,1),
+        'overall_growth_rate' : round(overall_weighted_growth_rate,1),
         'overall_cagr' : int(overall_cagr),
         'overall_trade_count' : overall_trade_count,
         'overall_profit' : round(overall_profit,2),
