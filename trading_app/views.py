@@ -1002,6 +1002,7 @@ def trading_opps_sorted_view(request):
     # Group TradingOpps by date, ignoring time
     grouped_trading_opps = defaultdict(list)
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
+    current_swing_trade_stocks_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
     for opp in query:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
         date_key = opp.datetime_identified.date()  # Extract date part
@@ -1018,6 +1019,9 @@ def trading_opps_sorted_view(request):
         else:
             current_exchange_rate = float(Params.objects.get(key='usd_rate').value)
             commission_value = 1
+        # Check if this ticker is current bought as a swing trading investment
+        is_current_swing_investment = ticker.categories.filter(pk=current_swing_trade_stocks_category.pk).exists()
+        opp.is_current_swing_investment = is_current_swing_investment
         investment_value_currency = investment_value_eur / current_exchange_rate
 
         # Get the Buy trade for the TradingOpp, if it exists.
