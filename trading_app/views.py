@@ -2619,7 +2619,7 @@ def strategy_trading_performance_view(request):
                 'profitable_trade_count': 0,
                 'total_days' : 0,
                 'growth_rate' : 0,
-                'cagr': 0,
+                'weighted_cagr': 0,
             }
             strategy_details[strategy_name] = []
 
@@ -2627,6 +2627,7 @@ def strategy_trading_performance_view(request):
         eur_spent, eur_gained, commission_eur = 0, 0, 0
         trade_count = 0
         date_bought = None
+        commission_eur = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
             commission = trade.commission * trade.rate_to_eur
@@ -2647,7 +2648,7 @@ def strategy_trading_performance_view(request):
         # Calculate the difference
         difference = date_sold - date_bought
         trade_days = difference.days + 1
-        cagr = round((growth_rate ** (365/trade_days)),1)
+        cagr = round(((growth_rate ** (365/trade_days))-1),1)
         # Update strategy totals here
         strategy_totals[strategy_name]['total_spent'] += eur_spent
         strategy_totals[strategy_name]['total_gained'] += eur_gained
@@ -2655,7 +2656,7 @@ def strategy_trading_performance_view(request):
         strategy_totals[strategy_name]['trade_count'] += trade_count
         strategy_totals[strategy_name]['total_days'] += trade_days
         strategy_totals[strategy_name]['growth_rate'] += growth_rate
-        strategy_totals[strategy_name]['cagr'] += cagr
+        strategy_totals[strategy_name]['weighted_cagr'] += (eur_spent + commission_eur) * cagr
         if realised_profit > 0:
             strategy_totals[strategy_name][
                 'profitable_trade_count'] += 1  # This assumes each TradingOpp is a single transaction for simplicity
@@ -2670,7 +2671,7 @@ def strategy_trading_performance_view(request):
                 'commission_eur': round(commission_eur, 2),
                 'realised_profit': round(realised_profit, 2),
                 'growth_rate': round((growth_rate-1)*100, 1),
-                'cagr': round((cagr-1)*100, 1),
+                'cagr': round((cagr)*100, 1),
                 'trade_days' : trade_days,
             })
 
@@ -2679,7 +2680,7 @@ def strategy_trading_performance_view(request):
         percent_profitable_trades = round(totals['profitable_trade_count'] * 100 / totals['trade_count'], 1) if totals[
                                                                                                                     'trade_count'] > 0 else 0
         growth_rate = ((totals['growth_rate'] / totals['trade_count'] )-1)*100 if (totals['trade_count'] > 0) else 0
-        cagr = ((totals['cagr'] / totals['trade_count'])-1)*100 if (totals['trade_count'] > 0) else 0
+        cagr = ((totals['weighted_cagr'] / (totals['total_spent'] + totals['total_commission']))*100 if (totals['trade_count'] > 0) else 0
         if cagr > 100:
             cagr = int(cagr)
         else:
