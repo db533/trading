@@ -30,7 +30,7 @@
                 <td style="text-align:center;">{{ entry.profitable_trade_count }}</td>
                 <td style="text-align:center;">{{ entry.percent_profitable_trades }} %</td>
                 <td style="text-align:center;">{{ entry.average_duration }}</td>
-                <td style="text-align:right;">{{ entry.growth_rate }} %</td>
+                <td style="text-align:right;">{{ entry.growth_rate }} % +/- {{ entry.growth_rate_sd }} %</td>
                 <td style="text-align:right;">{{ entry.cagr }} %</td>
             </tr>
         {% endfor %}

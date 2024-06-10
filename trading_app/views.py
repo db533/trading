@@ -8,6 +8,7 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import pandas as pd
 import time
 import json
+import numpy as np
 
 from django.shortcuts import render
 from .models import *
@@ -2623,6 +2624,7 @@ def strategy_trading_performance_view(request):
                 'profitable_trade_count': 0,
                 'total_days' : 0,
                 'growth_rate' : 0,
+                'growth_rate_list': [],
                 'weighted_cagr': 0,
             }
             strategy_details[strategy_name] = []
@@ -2660,6 +2662,7 @@ def strategy_trading_performance_view(request):
         strategy_totals[strategy_name]['trade_count'] += trade_count
         strategy_totals[strategy_name]['total_days'] += trade_days
         strategy_totals[strategy_name]['growth_rate'] += growth_rate
+        strategy_totals[strategy_name]['growth_rate_list'].append(growth_rate)
         strategy_totals[strategy_name]['weighted_cagr'] += (eur_spent + commission_eur) * cagr
         if realised_profit > 0:
             strategy_totals[strategy_name][
@@ -2690,6 +2693,8 @@ def strategy_trading_performance_view(request):
         else:
             cagr = round(cagr,1)
 
+        std_dev_population = np.std(totals['growth_rate_list'])
+
         strategy_performance.append({
             'strategy': strategy,
             'total_spent': round(totals['total_spent'], 2),
@@ -2697,6 +2702,7 @@ def strategy_trading_performance_view(request):
             'total_commission': round(totals['total_commission'], 2),
             'realised_profit': realised_profit,
             'growth_rate': round(growth_rate,1)  if growth_rate != 0 else 0,
+            'growth_rate_sd': round(std_dev_population * 100, 1) if growth_rate_sd != 0 else 0,
             'cagr': cagr ,
             'trade_count': totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
