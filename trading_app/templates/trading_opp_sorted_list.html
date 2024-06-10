@@ -58,7 +58,7 @@
                                 <input type="checkbox" name="schedule" id="schedule_{{ opp.id }}" value={% if opp.status == "0" %}"true"{% else %}"false"{% endif %}>
                                 <label for="schedule_{{ opp.id }}">Schedule</label></td>
                             <td><img src="{% url 'swing_point_graph' opp_id=opp.id magnitude=1 %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
-                            <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}<br>is_current_swing_investment: {opp.is_current_swing_investment}</td>
+                            <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}<br>is_current_swing_investment: {{opp.is_current_swing_investment}}</td>
                             <td>{{ opp.strategy.description }}</td>
                             <td>
                                 {% for label, value in opp.translated_metrics.items %}
