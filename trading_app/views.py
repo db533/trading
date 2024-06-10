@@ -2499,9 +2499,10 @@ def monthly_trading_performance_view(request):
         last_date = None
         eur_spent = 0
         eur_gained = 0
+        commission_eur = 0
         for trade in trades:
             amount_eur = trade.units * trade.price * trade.rate_to_eur
-            commission_eur = trade.commission * trade.rate_to_eur
+            commission_eur += trade.commission * trade.rate_to_eur
 
             if trade.action == '1':  # Buy
                 monthly_totals[last_transaction_month]['total_spent'] += amount_eur
@@ -2517,7 +2518,7 @@ def monthly_trading_performance_view(request):
                 date_sold = trade.date
             last_date = trade.date
             monthly_totals[last_transaction_month]['total_commission'] += commission_eur
-            profit -= commission_eur
+        profit -= commission_eur
         if profit > 0:
             monthly_totals[last_transaction_month]['profitable_trade_count'] += 1
         monthly_totals[last_transaction_month]['trade_count'] += 1
