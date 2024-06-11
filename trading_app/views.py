@@ -2702,7 +2702,7 @@ def strategy_trading_performance_view(request):
             'total_commission': round(totals['total_commission'], 2),
             'realised_profit': realised_profit,
             'growth_rate': round(growth_rate,1)  if growth_rate != 0 else 0,
-            'growth_rate_sd': round(std_dev_population * 100, 1) if growth_rate_sd != 0 else 0,
+            'growth_rate_sd': round(std_dev_population * 100, 1) if std_dev_population != 0 else 0,
             'cagr': cagr ,
             'trade_count': totals['trade_count'],
             'profitable_trade_count': totals['profitable_trade_count'],
