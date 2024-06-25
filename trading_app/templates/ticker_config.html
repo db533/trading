@@ -43,7 +43,7 @@
         <th  colspan="2" style="border: 1pt solid black; padding: 3pt;">Double 7's strategy</th>
       </tr>
         <tr>
-        <th style="text-align:center; width: 8ch; border-left: 1px solid black;">Symbol</th>
+        <th style="text-align:center; width: 8ch; border-left: 1px solid black;">Symbol<br>ID</th>
         <th style="text-align:center; width: 8ch;">Details</th>
         <th style="text-align:center; width: 8ch;border-left: 1pt solid black; padding: 3pt;">Daily</th>
         <th style="text-align:center; width: 8ch;">15 mins</th>
@@ -71,7 +71,7 @@
       {% for item in tickers_with_data %}
         <tr style="border: 1pt solid black;">
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
-            <a href="{% url 'edit_ticker' item.ticker.id %}">{{ item.ticker.symbol }}</a>
+            <a href="{% url 'edit_ticker' item.ticker.id %}">{{ item.ticker.symbol }}</a><br>{{ item.ticker.id }}
           <td style="border: 1pt solid black; padding: 3pt; text-align:center;">
             <a href="{% url 'ticker_detail' item.ticker.id %}">Details</a> <a href="{% url 'ticker_delete' item.ticker.id %}">Delete</a>
           </td>
