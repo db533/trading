@@ -21,7 +21,7 @@
         <table border="1">
             <thead>
                 <tr>
-                    <th colspan="1" style="text-align:center;"></th>
+                    <th colspan="2" style="text-align:center;"></th>
                     <th colspan="2" style="text-align:center;">Ticker</th>
                     <th colspan="2" style="text-align:center;">Date</th>
                     <th colspan="2" style="text-align:center;">Initial investment</th>
@@ -35,6 +35,7 @@
                 </tr>
                 <tr>
                     <th style="text-align:center; width: 3ch;"></th>
+                    <th style="text-align:center; width: 4ch;">ID</th>
                     <th style="text-align:center; width: 12ch;">Symbol</th>
                     <th style="text-align:center; width: 12ch;">TradingOpp</th>
                     <th style="text-align:center; width: 12ch;">Purchase</th>
@@ -63,6 +64,7 @@
         {% for opp in trading_opps %}
             <tr style="background-color: {{ opp.colour }};">
                 <td style="text-align:center;">{{ opp.days_since_last_price  }}D</td>
+                <td style="text-align:center;">{{ opp.ticker.id  }}D</td>
                 <td style="text-align:center;"><a href="{% url 'ticker_detail' opp.ticker.id %}">{{ opp.ticker.symbol }}</a></td>
                 <td style="text-align:center;">{{ opp.id }}</td>
                 <td style="text-align:center;">{{ opp.purchase_date|date:"d/m/y" }}</td>
