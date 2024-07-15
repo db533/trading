@@ -1039,7 +1039,7 @@ class GannPointSixBuy(BaseStrategy):
                     T_latest = count_candles_between(last_sp, last_ll_candle, last_lh_candle)
                     most_recent_label = 'LL'
                     sections += 1
-                    if (T_latest - longer_days +1) > max_T:
+                    if T_latest > max_T:
                         max_T = T_latest
                         start_sp_counter = swing_point_counter
                         end_sp_counter = swing_point_counter-1
@@ -1048,7 +1048,7 @@ class GannPointSixBuy(BaseStrategy):
                     logger.info(f'Downtrend started. swing_point.label: {swing_point.label}')
                     break
             if sections > 2:
-                if T_recent > max_T:
+                if (T_recent - longer_days +1) > max_T:
                     # Strategy is valid.
                     data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points,
                             'start_sp_counter' : str(start_sp_counter), 'end_sp_counter' : str(end_sp_counter),}
@@ -1126,7 +1126,7 @@ class GannPointSixSell(BaseStrategy):
                     T_list.append(T_latest)
                     most_recent_label = 'HH'
                     sections += 1
-                    if (T_latest - longer_days + 1) > max_T:
+                    if T_latest > max_T:
                         max_T = T_latest
                         start_sp_counter = swing_point_counter
                         end_sp_counter = swing_point_counter - 1
@@ -1135,7 +1135,7 @@ class GannPointSixSell(BaseStrategy):
                     logger.info(f'Uptrend started. swing_point.label: {swing_point.label}')
                     break
             if sections > 2:
-                if T_recent > max_T:
+                if (T_recent - longer_days +1) > max_T:
                     # Strategy is valid.
                     data = {'T_recent': str(T_recent), 'max_T': str(max_T), 'recent_swing_points': recent_swing_points,
                             'start_sp_counter': str(start_sp_counter), 'end_sp_counter': str(end_sp_counter), }
@@ -1461,7 +1461,7 @@ class GannPointNineBuy(BaseStrategy):
                             most_recent_hh_price = swing_point.price
                     elif swing_point.label == 'HL' and most_recent_label == 'HH':
                         logger.info(f'Found a prior {swing_point.label}. Another peak in the sequence.')
-                        most_recent_label = 'HH'
+                        most_recent_label = 'HL'
                         recent_swing_points.append(swing_point)
                     else :
                         # This must be the start of the prior up trend.
@@ -1613,7 +1613,7 @@ class GannPointNineSell(BaseStrategy):
                             most_recent_ll_price = swing_point.price
                     elif swing_point.label == 'LH' and most_recent_label == 'LL':
                         logger.info(f'Found a prior {swing_point.label}. Another trough in the sequence.')
-                        most_recent_label = 'LL'
+                        most_recent_label = 'LH'
                         recent_swing_points.append(swing_point)
                     else :
                         # This must be the start of the prior up trend.
