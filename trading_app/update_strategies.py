@@ -818,7 +818,7 @@ class GannPointFiveBuy(BaseStrategy):
                         last_candle = swing_point.price_object
                         last_sp = swing_point
                         recent_swing_points.append(swing_point)
-                        most_recent_swing_label = swing_point.swing_point_label
+                        most_recent_swing_label = swing_point.label
                     else:
                         # This strategy cannot be true. End review of swing points.
                         logger.info(f'First swingpoint not LL. Strategy not valid.')
