@@ -2811,6 +2811,7 @@ from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Ticker, TickerCategory
 from .forms import TickerCategoryForm
+from django.core.paginator import Paginator
 
 def manage_ticker_categories(request, category_id=None):
     TickerFormSet = modelformset_factory(Ticker, form=TickerCategoryForm, extra=0)
@@ -2824,17 +2825,23 @@ def manage_ticker_categories(request, category_id=None):
         # Otherwise, get all tickers
         tickers = Ticker.objects.all().order_by('symbol')
 
+    paginator = Paginator(tickers, 50)  # Paginate the tickers, e.g., 50 tickers per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     if request.method == 'POST':
-        formset = TickerFormSet(request.POST, queryset=tickers)
+        formset = TickerFormSet(request.POST, queryset=page_obj)
         if formset.is_valid():
             formset.save()
-            return redirect('manage_ticker_categories')  # Adjust this redirect to your desired path
+            # Redirect after saving to avoid re-submission issues
+            return redirect(request.path_info)
     else:
-        formset = TickerFormSet(queryset=tickers)
+        formset = TickerFormSet(queryset=page_obj)
 
     context = {
         'formset': formset,
         'categories': TickerCategory.objects.all(),  # To allow filtering in the template
+        'page_obj': page_obj,
         'selected_category': category_filter,  # Pass the selected category to the template
     }
     return render(request, 'manage_ticker_categories.html', context)
