@@ -34,21 +34,15 @@
                       <td>
                           <table>
                               <tr>
-                                  {% for checkbox, category in form.categories.field.queryset|slice:":5" %}
+                                  {% for i in form.categories %}
                                       <td>
                                           <label>
-                                              {{ form.categories[forloop.counter0] }} {{ category.name }}
+                                              {{ i.tag }} {{ i.choice_label }}
                                           </label>
                                       </td>
-                                  {% endfor %}
-                              </tr>
-                              <tr>
-                                  {% for checkbox, category in form.categories.field.queryset|slice:"5:" %}
-                                      <td>
-                                          <label>
-                                              {{ form.categories[forloop.counter0] }} {{ category.name }}
-                                          </label>
-                                      </td>
+                                      {% if forloop.counter|divisibleby:5 and not forloop.last %}
+                                          </tr><tr>
+                                      {% endif %}
                                   {% endfor %}
                               </tr>
                           </table>
