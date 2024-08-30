@@ -27,30 +27,54 @@
               </tr>
           </thead>
           <tbody>
-            {% for form in formset %}
-                <tr>
-                    <td>{{ form.instance.symbol }}</td>
-                    <td>{{ form.instance.company_name }}</td>
-                    <td>
-                        <table>
-                            <tr>
-                                {% for category in form.categories.field.queryset %}
-                                    {% if forloop.counter0|divisibleby:5 and not forloop.first %}
-                                        </tr><tr>
-                                    {% endif %}
-                                    <td>
-                                        <label>
-                                            {{ form.categories[field_index=forloop.counter0].tag }} {{ category.name }}
-                                        </label>
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            {% endfor %}
+              {% for form in formset %}
+                  <tr>
+                      <td>{{ form.instance.symbol }}</td>
+                      <td>{{ form.instance.company_name }}</td>
+                      <td>
+                          <table>
+                              <tr>
+                                  {% for checkbox, category in form.categories.field.queryset|slice:":5" %}
+                                      <td>
+                                          <label>
+                                              {{ form.categories[forloop.counter0] }} {{ category.name }}
+                                          </label>
+                                      </td>
+                                  {% endfor %}
+                              </tr>
+                              <tr>
+                                  {% for checkbox, category in form.categories.field.queryset|slice:"5:" %}
+                                      <td>
+                                          <label>
+                                              {{ form.categories[forloop.counter0] }} {{ category.name }}
+                                          </label>
+                                      </td>
+                                  {% endfor %}
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+              {% endfor %}
           </tbody>
       </table>
+
+      <div class="pagination">
+          <span class="step-links">
+              {% if page_obj.has_previous %}
+                  <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page=1">&laquo; first</a>
+                  <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ page_obj.previous_page_number }}">previous</a>
+              {% endif %}
+
+              <span class="current">
+                  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+              </span>
+
+              {% if page_obj.has_next %}
+                  <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ page_obj.next_page_number }}">next</a>
+                  <a href="?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+              {% endif %}
+          </span>
+      </div>
 
       <button type="submit">Save Changes</button>
   </form>
