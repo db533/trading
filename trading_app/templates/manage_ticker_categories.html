@@ -18,39 +18,41 @@
       {% csrf_token %}
       {{ formset.management_form }}
 
-      <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
-        <thead>
-            <tr style="border: 1px solid black;">
-                <th style="border: 1px solid black;">Symbol</th>
-                <th style="border: 1px solid black;">Company Name</th>
-                <th style="border: 1px solid black;">Categories</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for form in formset %}
+      <button type="submit">Save Changes</button>
+
+        <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+            <thead>
                 <tr style="border: 1px solid black;">
-                    <td style="border: 1px solid black;">{{ form.instance.symbol }}</td>
-                    <td style="border: 1px solid black;">{{ form.instance.company_name }}</td>
-                    <td style="border: 1px solid black;">
-                        <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
-                            <tr>
-                                {% for i in form.categories %}
-                                    <td style="border: 1px solid black;">
-                                        <label>
-                                            {{ i.tag }} {{ i.choice_label }}
-                                        </label>
-                                    </td>
-                                    {% if forloop.counter|divisibleby:5 and not forloop.last %}
-                                        </tr><tr>
-                                    {% endif %}
-                                {% endfor %}
-                            </tr>
-                        </table>
-                    </td>
+                    <th style="border: 1px solid black;">Symbol</th>
+                    <th style="border: 1px solid black;">Company Name</th>
+                    <th style="border: 1px solid black;">Categories</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                    <tr style="border: 1px solid black;">
+                        <td style="border: 1px solid black;">{{ form.instance.symbol }}</td>
+                        <td style="border: 1px solid black;">{{ form.instance.company_name }}</td>
+                        <td style="border: 1px solid black;">
+                            <table style="border-collapse: collapse; width: 100%; border: 1px solid black;">
+                                <tr>
+                                    {% for i in form.categories %}
+                                        <td style="border: 1px solid black;">
+                                            <label>
+                                                {{ i.tag }} {{ i.choice_label }}
+                                            </label>
+                                        </td>
+                                        {% if forloop.counter|divisibleby:5 and not forloop.last %}
+                                            </tr><tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
       <div class="pagination">
           <span class="step-links">

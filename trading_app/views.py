@@ -2811,24 +2811,28 @@ from django.core.paginator import Paginator
 def manage_ticker_categories(request, category_id=None):
     TickerFormSet = modelformset_factory(Ticker, form=TickerCategoryForm, extra=0)
 
-    category_filter = request.GET.get('category')  # Retrieve the category filter from the GET request
+    category_filter = request.GET.get('category')
 
     if category_filter:
-        # Filter tickers by the selected category if a category_filter is provided
         tickers = Ticker.objects.filter(categories__id=category_filter).order_by('symbol')
     else:
-        # Otherwise, get all tickers
         tickers = Ticker.objects.all().order_by('symbol')
 
-    paginator = Paginator(tickers, 50)  # Paginate the tickers, e.g., 50 tickers per page
+    paginator = Paginator(tickers, 50)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
         formset = TickerFormSet(request.POST, queryset=page_obj.object_list)
         if formset.is_valid():
-            formset.save()
-            return redirect(request.path_info)  # Redirect after save to avoid resubmission
+            for form in formset:
+                ticker = form.save(commit=False)  # Save the ticker instance without committing to DB yet
+                ticker.categories.clear()  # Clear existing categories
+                if form.cleaned_data['categories']:
+                    for category in form.cleaned_data['categories']:
+                        ticker.categories.add(category)  # Add selected categories
+                ticker.save()  # Save the ticker instance with updated categories
+            return redirect(request.path_info)
         else:
             print(formset.errors)  # Debugging: print form errors to console/log
     else:
@@ -2836,8 +2840,8 @@ def manage_ticker_categories(request, category_id=None):
 
     context = {
         'formset': formset,
-        'categories': TickerCategory.objects.all(),  # To allow filtering in the template
+        'categories': TickerCategory.objects.all(),
         'page_obj': page_obj,
-        'selected_category': category_filter,  # Pass the selected category to the template
+        'selected_category': category_filter,
     }
     return render(request, 'manage_ticker_categories.html', context)
