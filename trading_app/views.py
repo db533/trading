@@ -2826,9 +2826,9 @@ def manage_ticker_categories(request, category_id=None):
         formset = TickerFormSet(request.POST, queryset=page_obj.object_list)
         if formset.is_valid():
             for form in formset:
-                ticker = form.save(commit=False)
-                ticker.categories.set(form.cleaned_data['categories'])
-                ticker.save()
+                ticker = form.save(commit=False)  # Save the ticker instance without committing to DB yet
+                ticker.save()  # Commit the Ticker instance to the DB to get an ID if it's new
+                form.save_m2m()  # Save the many-to-many data (categories)
                 print(f"Saved Ticker: {ticker.symbol} with Categories: {ticker.categories.all()}")
             return redirect(request.path_info)
         else:
