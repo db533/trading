@@ -27,25 +27,28 @@
               </tr>
           </thead>
           <tbody>
-              {% for form in formset %}
-                  <tr>
-                      <td>{{ form.instance.symbol }}</td>
-                      <td>{{ form.instance.company_name }}</td>
-                      <td>
-                          <table>
-                              <tr>
-                                  {% for category in form.categories.field.queryset %}
-                                      <td>
-                                          <label>
-                                              {{ form.categories[field_index=forloop.counter0].tag }} {{ category.name }}
-                                          </label>
-                                      </td>
-                                  {% endfor %}
-                              </tr>
-                          </table>
-                      </td>
-                  </tr>
-              {% endfor %}
+            {% for form in formset %}
+                <tr>
+                    <td>{{ form.instance.symbol }}</td>
+                    <td>{{ form.instance.company_name }}</td>
+                    <td>
+                        <table>
+                            <tr>
+                                {% for category in form.categories.field.queryset %}
+                                    {% if forloop.counter0|divisibleby:5 and not forloop.first %}
+                                        </tr><tr>
+                                    {% endif %}
+                                    <td>
+                                        <label>
+                                            {{ form.categories[field_index=forloop.counter0].tag }} {{ category.name }}
+                                        </label>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            {% endfor %}
           </tbody>
       </table>
 
