@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Manage Ticker Categories</h1>
+
+  <form method="get">
+      <label for="category_filter">Filter by Category:</label>
+      <select id="category_filter" name="category">
+          <option value="">All</option>
+          {% for category in categories %}
+              <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+      </select>
+      <button type="submit">Filter</button>
+  </form>
+
+  <form method="post">
+      {% csrf_token %}
+      {{ formset.management_form }}
+
+      <table>
+          <thead>
+              <tr>
+                  <th>Symbol</th>
+                  <th>Company Name</th>
+                  <th>Categories</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for form in formset %}
+                  <tr>
+                      <td>{{ form.instance.symbol }}</td>
+                      <td>{{ form.instance.company_name }}</td>
+                      <td>{{ form.categories }}</td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+
+      <button type="submit">Save Changes</button>
+  </form>
+{% endblock %}

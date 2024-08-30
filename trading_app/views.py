@@ -2801,3 +2801,32 @@ from django.urls import reverse
 def clear_completed_tasks(request):
     DailyTasks.objects.all().update(completed=False)
     return HttpResponseRedirect(reverse('daily_tasks'))
+
+from django.shortcuts import render, redirect
+from django.forms import modelformset_factory
+from .models import Ticker, TickerCategory
+from .forms import TickerCategoryForm
+
+def manage_ticker_categories(request, category_id=None):
+    TickerFormSet = modelformset_factory(Ticker, form=TickerCategoryForm, extra=0)
+
+    if category_id:
+        # Filter tickers by category if a category_id is provided
+        tickers = Ticker.objects.filter(categories__id=category_id).order_by('symbol')
+    else:
+        # Otherwise, get all tickers
+        tickers = Ticker.objects.all().order_by('symbol')
+
+    if request.method == 'POST':
+        formset = TickerFormSet(request.POST, queryset=tickers)
+        if formset.is_valid():
+            formset.save()
+            return redirect('manage_ticker_categories')  # Adjust this redirect to your desired path
+    else:
+        formset = TickerFormSet(queryset=tickers)
+
+    context = {
+        'formset': formset,
+        'categories': TickerCategory.objects.all(),  # To allow filtering in the template
+    }
+    return render(request, 'manage_ticker_categories.html', context)

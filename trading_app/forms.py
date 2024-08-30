@@ -11,6 +11,17 @@ class TickerForm(forms.ModelForm):
 from django import forms
 from .models import TickerCategory
 
+class TickerCategoryForm(forms.ModelForm):
+    categories = forms.ModelMultipleChoiceField(
+        queryset=TickerCategory.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = Ticker
+        fields = ['categories']
+
 class CategorySelectForm(forms.Form):
     NOT_DEFINED_CHOICE = ('not_defined', 'Not defined')
     categories = forms.ModelMultipleChoiceField(

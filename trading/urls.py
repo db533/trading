@@ -51,6 +51,8 @@ urlpatterns = [
     path('strategy-performance/', strategy_trading_performance_view, name='strategy_performance'),
     path('daily-tasks/', daily_tasks_view, name='daily_tasks'),
     path('clear-completed/', clear_completed_tasks, name='clear_completed_tasks'),
+    path('manage-ticker-categories/', manage_ticker_categories, name='manage_ticker_categories'),
+    path('manage-ticker-categories/<int:category_id>/', manage_ticker_categories,name='manage_ticker_categories_filtered'),
 
 ]
 
