@@ -8,9 +8,6 @@ class TickerForm(forms.ModelForm):
 
 
 # forms.py
-from django import forms
-from .models import TickerCategory
-
 class TickerCategoryForm(forms.ModelForm):
     categories = forms.ModelMultipleChoiceField(
         queryset=TickerCategory.objects.all(),

@@ -2825,14 +2825,14 @@ def manage_ticker_categories(request, category_id=None):
     page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
-        # We pass the queryset to the formset directly using tickers and not page_obj
-        formset = TickerFormSet(request.POST, queryset=tickers)
+        formset = TickerFormSet(request.POST, queryset=page_obj.object_list)
         if formset.is_valid():
             formset.save()
-            # Redirect after saving to avoid re-submission issues
-            return redirect(request.path_info)
+            return redirect(request.path_info)  # Redirect after save to avoid resubmission
+        else:
+            print(formset.errors)  # Debugging: print form errors to console/log
     else:
-        formset = TickerFormSet(queryset=page_obj.object_list)  # Use page_obj.object_list instead of page_obj directly
+        formset = TickerFormSet(queryset=page_obj.object_list)
 
     context = {
         'formset': formset,
