@@ -31,7 +31,19 @@
                   <tr>
                       <td>{{ form.instance.symbol }}</td>
                       <td>{{ form.instance.company_name }}</td>
-                      <td>{{ form.categories }}</td>
+                      <td>
+                          <table>
+                              <tr>
+                                  {% for category in form.categories.field.queryset %}
+                                      <td>
+                                          <label>
+                                              {{ form.categories[field_index=forloop.counter0].tag }} {{ category.name }}
+                                          </label>
+                                      </td>
+                                  {% endfor %}
+                              </tr>
+                          </table>
+                      </td>
                   </tr>
               {% endfor %}
           </tbody>
