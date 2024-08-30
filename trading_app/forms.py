@@ -9,6 +9,7 @@ class TickerForm(forms.ModelForm):
 
 # forms.py
 class TickerCategoryForm(forms.ModelForm):
+    id = forms.IntegerField(widget=forms.HiddenInput())  # Ensure the ID field is included and hidden
     categories = forms.ModelMultipleChoiceField(
         queryset=TickerCategory.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -17,7 +18,7 @@ class TickerCategoryForm(forms.ModelForm):
 
     class Meta:
         model = Ticker
-        fields = ['categories']
+        fields = ['id', 'categories']
 
 class CategorySelectForm(forms.Form):
     NOT_DEFINED_CHOICE = ('not_defined', 'Not defined')

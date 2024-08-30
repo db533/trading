@@ -31,6 +31,7 @@
             <tbody>
                 {% for form in formset %}
                     <tr style="border: 1px solid black;">
+                        {{ form.id }}  <!-- Ensure the hidden ID field is rendered -->
                         <td style="border: 1px solid black;">{{ form.instance.symbol }}</td>
                         <td style="border: 1px solid black;">{{ form.instance.company_name }}</td>
                         <td style="border: 1px solid black;">
