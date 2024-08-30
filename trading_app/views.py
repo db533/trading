@@ -2807,12 +2807,19 @@ from django.forms import modelformset_factory
 from .models import Ticker, TickerCategory
 from .forms import TickerCategoryForm
 
+from django.shortcuts import render, redirect
+from django.forms import modelformset_factory
+from .models import Ticker, TickerCategory
+from .forms import TickerCategoryForm
+
 def manage_ticker_categories(request, category_id=None):
     TickerFormSet = modelformset_factory(Ticker, form=TickerCategoryForm, extra=0)
 
-    if category_id:
-        # Filter tickers by category if a category_id is provided
-        tickers = Ticker.objects.filter(categories__id=category_id).order_by('symbol')
+    category_filter = request.GET.get('category')  # Retrieve the category filter from the GET request
+
+    if category_filter:
+        # Filter tickers by the selected category if a category_filter is provided
+        tickers = Ticker.objects.filter(categories__id=category_filter).order_by('symbol')
     else:
         # Otherwise, get all tickers
         tickers = Ticker.objects.all().order_by('symbol')
@@ -2828,5 +2835,6 @@ def manage_ticker_categories(request, category_id=None):
     context = {
         'formset': formset,
         'categories': TickerCategory.objects.all(),  # To allow filtering in the template
+        'selected_category': category_filter,  # Pass the selected category to the template
     }
     return render(request, 'manage_ticker_categories.html', context)
