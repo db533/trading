@@ -238,11 +238,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'db_query_logger': {
-            'handlers': ['db_query_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
+        #'db_query_logger': {
+        #    'handlers': ['db_query_file'],
+        #    'level': 'INFO',
+        #    'propagate': False,
+        #},
     },
 }
 
