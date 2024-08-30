@@ -2827,13 +2827,11 @@ def manage_ticker_categories(request, category_id=None):
         if formset.is_valid():
             for form in formset:
                 ticker = form.save(commit=False)  # Save the ticker instance without committing to DB yet
-                ticker.categories.clear()  # Clear existing categories
-                if form.cleaned_data['categories']:
-                    for category in form.cleaned_data['categories']:
-                        ticker.categories.add(category)  # Add selected categories
+                form.save_m2m()  # Save the many-to-many data
                 ticker.save()  # Save the ticker instance with updated categories
             return redirect(request.path_info)
         else:
+            print("Formset is not valid:")
             print(formset.errors)  # Debugging: print form errors to console/log
     else:
         formset = TickerFormSet(queryset=page_obj.object_list)
