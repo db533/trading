@@ -987,6 +987,14 @@ def trading_opps_sorted_view(request):
     action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
     category_param = request.GET.get('category', 'all')  # category ID or 'all'
 
+    category_labels=[]
+    for category in TickerCategory.objects.all():
+        category_label = category.name
+        if ' ' in category_label:
+            # Replace all spaces with <br>
+            return category_label.replace(' ', '<br>')
+        category_labels.append(category_label)
+
     # Start with all active TradingOpps
     query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by('-datetime_identified')
 
@@ -1053,6 +1061,7 @@ def trading_opps_sorted_view(request):
     context = {
         'grouped_trading_opps': dict(grouped_trading_opps),
         'categories': TickerCategory.objects.all(),
+        'category_labels' : category_labels
     }
 
     # This return statement is now outside and at the end of the function, ensuring an HttpResponse is always returned
