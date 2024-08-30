@@ -215,7 +215,7 @@ LOGGING = {
         'scheduled_tasks': {
             'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': 'scheduled_tasks.log',
+            'filename': os.path.join(LOGGING_DIR, 'scheduled_tasks.log'),
             'when': 'midnight',  # Rotate log file at midnight
             'backupCount': 7,  # Keep 7 days of logs
             'formatter': 'verbose',
@@ -223,7 +223,7 @@ LOGGING = {
         'db_query_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'logs/db_queries.log',  # Update this path
+            'filename': os.path.join(LOGGING_DIR, 'db_queries.log'),  # Update this path
             'formatter': 'detailed',
         },
     },
@@ -231,7 +231,7 @@ LOGGING = {
         'django': {
             'handlers': ['stderr'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
         'scheduled_tasks': {
             'handlers': ['scheduled_tasks'],
