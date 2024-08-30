@@ -9,8 +9,8 @@
     <table border="1">
         <tr>
             <th style="text-align:center;">Action</th><th  style="text-align:center;">All</th>
-            {% for category in category_labels %}
-                <th style="text-align:center;">{{ category }}</th>
+            {% for category in categories %}
+                <th style="text-align:center;">{{ category.name|linebreaksbr }}</th>
             {% endfor %}
         </tr>
         <tr>
