@@ -2806,11 +2806,6 @@ from django.shortcuts import render, redirect
 from django.forms import modelformset_factory
 from .models import Ticker, TickerCategory
 from .forms import TickerCategoryForm
-
-from django.shortcuts import render, redirect
-from django.forms import modelformset_factory
-from .models import Ticker, TickerCategory
-from .forms import TickerCategoryForm
 from django.core.paginator import Paginator
 
 def manage_ticker_categories(request, category_id=None):
@@ -2830,13 +2825,14 @@ def manage_ticker_categories(request, category_id=None):
     page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
-        formset = TickerFormSet(request.POST, queryset=page_obj)
+        # We pass the queryset to the formset directly using tickers and not page_obj
+        formset = TickerFormSet(request.POST, queryset=tickers)
         if formset.is_valid():
             formset.save()
             # Redirect after saving to avoid re-submission issues
             return redirect(request.path_info)
     else:
-        formset = TickerFormSet(queryset=page_obj)
+        formset = TickerFormSet(queryset=page_obj.object_list)  # Use page_obj.object_list instead of page_obj directly
 
     context = {
         'formset': formset,
