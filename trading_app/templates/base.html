@@ -20,6 +20,7 @@
           {% if user.is_authenticated %}
             <h2>Trading trends</h2>
             <li><a href="{% url 'ticker_config' %}">Ticker config</a></li>
+            <li><a href="{% url 'manage_ticker_categories' %}">Manage ticker categories</a></li>
             <li><a href="{% url 'update_metrics' 'All' %}">Recalculate Metrics</a></li>
             <li><a href="{% url 'ticker_add' %}">Add a Ticker</a></li>
             <li><a href="{% url 'trading-opps' %}">Trading opportunities</a></li>
