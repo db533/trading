@@ -43,16 +43,10 @@
     <h1>Trading Opportunities Grouped by Strategy</h1>
     <table border="1">
         <tr>
-            <th style="text-align:center;">All Categories</th>
-            {% for category in categories %}
-                <th style="text-align:center;">{{ category.name|linebreaksbr }}</th>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category=all">All</a></td>
+            <strong><td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category=all">All</a></td>
             {% for category in categories %}
                 <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category={{ category.id }}">{{ category.name }}</a></td>
-            {% endfor %}
+            {% endfor %}</strong>
         </tr>
     </table><br>
 

@@ -2845,9 +2845,11 @@ def manage_ticker_categories(request, category_id=None):
     }
     return render(request, 'manage_ticker_categories.html', context)
 
+
 from collections import defaultdict
 from django.shortcuts import render
 from .models import TradingOpp, TickerCategory, Params, DailyPrice
+
 
 def trading_opps_by_strategy_view(request):
     # Fetch query parameter for filtering by category
@@ -2896,8 +2898,11 @@ def trading_opps_by_strategy_view(request):
     for strategy_key in grouped_trading_opps:
         grouped_trading_opps[strategy_key].sort(key=lambda opp: opp.datetime_identified, reverse=True)
 
+    # Sort strategies alphabetically by strategy name
+    sorted_grouped_trading_opps = dict(sorted(grouped_trading_opps.items()))
+
     context = {
-        'grouped_trading_opps': dict(grouped_trading_opps),
+        'grouped_trading_opps': sorted_grouped_trading_opps,
         'categories': TickerCategory.objects.all(),
     }
 
