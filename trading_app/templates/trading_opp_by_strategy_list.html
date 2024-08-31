@@ -43,30 +43,15 @@
     <h1>Trading Opportunities Grouped by Strategy</h1>
     <table border="1">
         <tr>
-            <th style="text-align:center;">Action</th><th style="text-align:center;">All</th>
+            <th style="text-align:center;">All Categories</th>
             {% for category in categories %}
                 <th style="text-align:center;">{{ category.name|linebreaksbr }}</th>
             {% endfor %}
         </tr>
         <tr>
-            <td style="text-align:center;">Both</td>
-            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=all">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=all">Date</a></td>
+            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category=all">All</a></td>
             {% for category in categories %}
-                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=all&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">Date</a></td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td style="text-align:center;">Buy</td>
-            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=buy">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=buy">Date</a></td>
-            {% for category in categories %}
-                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=buy&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">Date</a></td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td style="text-align:center;">Sell</td>
-            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=sell">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=sell">Date</a></td>
-            {% for category in categories %}
-                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=sell&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">Date</a></td>
+                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category={{ category.id }}">{{ category.name }}</a></td>
             {% endfor %}
         </tr>
     </table><br>

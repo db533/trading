@@ -2849,31 +2849,19 @@ from collections import defaultdict
 from django.shortcuts import render
 from .models import TradingOpp, TickerCategory, Params, DailyPrice
 
-from collections import defaultdict
-from django.shortcuts import render
-from .models import TradingOpp, TickerCategory, Params, DailyPrice
-
-
 def trading_opps_by_strategy_view(request):
-    # Fetch query parameters for filtering
-    action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
+    # Fetch query parameter for filtering by category
     category_param = request.GET.get('category', 'all')  # category ID or 'all'
 
-    # Start with all active TradingOpps
+    # Start with all active TradingOpps, ordered by datetime_identified (descending)
     query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by(
         '-datetime_identified')
-
-    # Filter by action_buy if applicable
-    if action_param.lower() == 'buy':
-        query = query.filter(action_buy=True)
-    elif action_param.lower() == 'sell':
-        query = query.filter(action_buy=False)
 
     # Filter by TickerCategory if applicable
     if category_param != 'all':
         query = query.filter(ticker__categories__id=category_param)
 
-    # Group TradingOpps by strategy and ensure they are ordered by date within each strategy
+    # Group TradingOpps by strategy
     grouped_trading_opps = defaultdict(list)
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
     current_swing_trade_stocks_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
@@ -2883,40 +2871,25 @@ def trading_opps_by_strategy_view(request):
         strategy_key = opp.strategy.name  # Group by strategy name
         grouped_trading_opps[strategy_key].append(opp)
 
-        # Get the ticker and the latest price for the ticker
+        # Additional logic to compute trade profits, etc.
         ticker = opp.ticker
         investment_value_eur = float(Params.objects.get(key='investment_value').value)
         is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
-        if is_in_tse_stocks:
-            current_exchange_rate = float(Params.objects.get(key='jpy_rate').value)
-            commission_value = 80
-        else:
-            current_exchange_rate = float(Params.objects.get(key='usd_rate').value)
-            commission_value = 1
+        current_exchange_rate = float(Params.objects.get(key='jpy_rate').value) if is_in_tse_stocks else float(
+            Params.objects.get(key='usd_rate').value)
+        commission_value = 80 if is_in_tse_stocks else 1
 
         is_current_swing_investment = ticker.categories.filter(pk=current_swing_trade_stocks_category.pk).exists()
         opp.is_current_swing_investment = is_current_swing_investment
         investment_value_currency = investment_value_eur / current_exchange_rate
 
         trades = opp.trades.filter(action=1)  # Get all related trades
-        if len(trades) > 0:
-            for trade in trades:
-                transaction_price = trade.price
-        else:
-            latest_candle = DailyPrice.objects.filter(ticker=ticker).order_by('-datetime').first()
-            if latest_candle is not None:
-                latest_close_price = float(latest_candle.close_price)
-            else:
-                latest_close_price = 0
-            transaction_price = latest_close_price
+        transaction_price = trades[0].price if trades.exists() else DailyPrice.objects.filter(ticker=ticker).order_by(
+            '-datetime').first().close_price or 0
 
         profit_taker_price = opp.profit_taker_price
-        if profit_taker_price is None or transaction_price == 0:
-            trade_profit = 0
-        else:
-            units = round(investment_value_currency / transaction_price, 0)
-            trade_profit = ((profit_taker_price - transaction_price) * units * current_exchange_rate) - (
-                    commission_value * 2 * current_exchange_rate)
+        trade_profit = ((profit_taker_price - transaction_price) * round(investment_value_currency / transaction_price,
+                                                                         0) * current_exchange_rate - commission_value * 2 * current_exchange_rate) if profit_taker_price and transaction_price else 0
         opp.trade_profit = round(trade_profit, 2)
 
     # Sort each list of trading opportunities within each strategy by 'datetime_identified' in descending order
