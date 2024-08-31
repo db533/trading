@@ -13,6 +13,18 @@
             background-color: #f1f1f1;
             padding: 10px;
             border: 1px solid #ccc;
+            position: relative;
+        }
+
+        .strategy-header h2 {
+            margin: 0;
+            display: inline;
+        }
+
+        .strategy-header p {
+            margin: 5px 0 0 0;
+            font-size: 0.8em;
+            color: #666;
         }
 
         .trading-opps-table {
@@ -26,6 +38,12 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
+        }
+
+        .category-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            text-align: left;
         }
     </style>
     <script>
@@ -41,12 +59,13 @@
 </head>
 <body>
     <h1>Trading Opportunities Grouped by Strategy</h1>
+    <h3>Filter Opportunities by category:</h3>
     <table border="1">
         <tr>
-            <strong><td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category=all">All</a></td>
+            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category=all">All</a></td>
             {% for category in categories %}
                 <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?category={{ category.id }}">{{ category.name }}</a></td>
-            {% endfor %}</strong>
+            {% endfor %}
         </tr>
     </table><br>
 
@@ -55,6 +74,7 @@
             <div class="strategy-section">
                 <div class="strategy-header" onclick="toggleTradingOpps('{{ strategy|slugify }}')">
                     <h2>{{ strategy }}</h2>
+                    <p>{{ opps.0.strategy.description }}</p> <!-- Displaying description of the first TradingOpp as all will have the same strategy description -->
                 </div>
                 <table id="table-{{ strategy|slugify }}" class="trading-opps-table">
                     <thead>
@@ -62,7 +82,7 @@
                             <th style="text-align:center; width: 8ch;">Action</th>
                             <th style="text-align:center; width: 30ch;">Graph</th>
                             <th style="text-align:center; width: 12ch;">Strategy Name</th>
-                            <th style="text-align:center; width: 20ch;">Strategy Description</th>
+                            <th style="text-align:center; width: 20ch;">Ticker Categories</th>
                             <th style="text-align:center; width: 70ch;">Metrics</th>
                             <th style="text-align:center; width: 10ch;">Identified</th>
                         </tr>
@@ -77,7 +97,13 @@
                                     <label for="schedule_{{ opp.id }}">Schedule</label></td>
                                 <td><img src="{% url 'swing_point_graph' opp_id=opp.id magnitude=1 %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
                                 <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
-                                <td>{{ opp.strategy.description }}</td>
+                                <td>
+                                    <ul class="category-list">
+                                        {% for category in opp.ticker_categories %}
+                                            <li>{{ category.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
                                 <td>
                                     {% for label, value in opp.translated_metrics.items %}
                                         <strong>{{ label }}:</strong> {{ value }}<br>

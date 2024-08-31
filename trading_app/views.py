@@ -2875,6 +2875,8 @@ def trading_opps_by_strategy_view(request):
 
         # Additional logic to compute trade profits, etc.
         ticker = opp.ticker
+        opp.ticker_categories = ticker.categories.all()  # Get all categories for the ticker
+
         investment_value_eur = float(Params.objects.get(key='investment_value').value)
         is_in_tse_stocks = ticker.categories.filter(pk=tse_stocks_category.pk).exists()
         current_exchange_rate = float(Params.objects.get(key='jpy_rate').value) if is_in_tse_stocks else float(
