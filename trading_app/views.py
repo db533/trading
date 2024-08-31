@@ -2849,13 +2849,19 @@ from collections import defaultdict
 from django.shortcuts import render
 from .models import TradingOpp, TickerCategory, Params, DailyPrice
 
+from collections import defaultdict
+from django.shortcuts import render
+from .models import TradingOpp, TickerCategory, Params, DailyPrice
+
+
 def trading_opps_by_strategy_view(request):
     # Fetch query parameters for filtering
     action_param = request.GET.get('action', 'all')  # 'buy', 'sell', or 'all'
     category_param = request.GET.get('category', 'all')  # category ID or 'all'
 
     # Start with all active TradingOpps
-    query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by('-datetime_identified')
+    query = TradingOpp.objects.filter(is_active=True).select_related('ticker', 'strategy').order_by(
+        '-datetime_identified')
 
     # Filter by action_buy if applicable
     if action_param.lower() == 'buy':
@@ -2867,10 +2873,11 @@ def trading_opps_by_strategy_view(request):
     if category_param != 'all':
         query = query.filter(ticker__categories__id=category_param)
 
-    # Group TradingOpps by strategy
+    # Group TradingOpps by strategy and ensure they are ordered by date within each strategy
     grouped_trading_opps = defaultdict(list)
     tse_stocks_category = TickerCategory.objects.filter(name='TSE stocks').first()
     current_swing_trade_stocks_category = TickerCategory.objects.filter(name='Current swing trade positions').first()
+
     for opp in query:
         opp.translated_metrics = translate_metrics(opp)  # Assuming this function exists
         strategy_key = opp.strategy.name  # Group by strategy name
@@ -2909,8 +2916,12 @@ def trading_opps_by_strategy_view(request):
         else:
             units = round(investment_value_currency / transaction_price, 0)
             trade_profit = ((profit_taker_price - transaction_price) * units * current_exchange_rate) - (
-                        commission_value * 2 * current_exchange_rate)
+                    commission_value * 2 * current_exchange_rate)
         opp.trade_profit = round(trade_profit, 2)
+
+    # Sort each list of trading opportunities within each strategy by 'datetime_identified' in descending order
+    for strategy_key in grouped_trading_opps:
+        grouped_trading_opps[strategy_key].sort(key=lambda opp: opp.datetime_identified, reverse=True)
 
     context = {
         'grouped_trading_opps': dict(grouped_trading_opps),
