@@ -25,7 +25,7 @@
             <li><a href="{% url 'ticker_add' %}">Add a Ticker</a></li>
             <li><a href="{% url 'trading-opps' %}">Trading opportunities</a></li>
             <li><a href="{% url 'trading_opps_sorted' %}?action=buy">Recent opportunities</a></li>
-            <li><a href="{% url 'trading_opps_by_strategy_view' %}">Opportunities by strategy</a></li>
+            <li><a href="{% url 'trading_opps_by_strategy' %}?action=all">Opportunities by strategy</a></li>
             <li><a href="{% url 'trading-opps-filtered' %}">Filter opportunities</a></li>
             <br>
             <li><a href="{% url 'trading_opps_with_trades' '0'|urlencode %}">Planned trades</a></li>
