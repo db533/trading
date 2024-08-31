@@ -31,6 +31,7 @@ urlpatterns = [
     path('delete_daily_price/<str:symbol>/', delete_daily_price, name='delete_daily_price_with_symbol'),
     path('trading-opps/', trading_opps_view, name='trading-opps'),
     path('trading-opps-recent/', trading_opps_sorted_view, name='trading_opps_sorted'),
+    path('trading-opps-by-strategy/', trading_opps_by_strategy_view, name='trading_opps_by_strategy_view'),
     path('swing_point_graph/<int:opp_id>/<int:magnitude>/', generate_swing_point_graph_view, name='swing_point_graph'),
     path('trading-opps-filtered/', trading_opps_filtered, name='trading-opps-filtered'),
     path('tasks/', task_queue_view, name='task_queue'),

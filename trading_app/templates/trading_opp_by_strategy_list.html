@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <title>Trading Opportunities by Strategy</title>
+</head>
+<body>
+    <h1>Trading Opportunities Grouped by Strategy</h1>
+    <table border="1">
+        <tr>
+            <th style="text-align:center;">Action</th><th style="text-align:center;">All</th>
+            {% for category in categories %}
+                <th style="text-align:center;">{{ category.name|linebreaksbr }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align:center;">Both</td>
+            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=all">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=all">Date</a></td>
+            {% for category in categories %}
+                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=all&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=all&category={{ category.id }}">Date</a></td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align:center;">Buy</td>
+            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=buy">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=buy">Date</a></td>
+            {% for category in categories %}
+                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=buy&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=buy&category={{ category.id }}">Date</a></td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="text-align:center;">Sell</td>
+            <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=sell">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=sell">Date</a></td>
+            {% for category in categories %}
+                <td style="text-align:center;"><a href="{% url 'trading_opps_by_strategy' %}?action=sell&category={{ category.id }}">Ticker</a> | <a href="{% url 'trading_opps_sorted' %}?action=sell&category={{ category.id }}">Date</a></td>
+            {% endfor %}
+        </tr>
+    </table><br>
+
+    {% if grouped_trading_opps %}
+        {% for strategy, opps in grouped_trading_opps.items %}
+            <h2>{{ strategy }}</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th style="text-align:center; width: 8ch;">Action</th>
+                        <th style="text-align:center; width: 30ch;">Graph</th>
+                        <th style="text-align:center; width: 12ch;">Strategy Name</th>
+                        <th style="text-align:center; width: 20ch;">Strategy Description</th>
+                        <th style="text-align:center; width: 70ch;">Metrics</th>
+                        <th style="text-align:center; width: 10ch;">Identified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for opp in opps %}
+                    <tr {% if opp.is_current_swing_investment %}style="background-color:lightyellow"{% endif %}>
+                        <form method="post" action="{% url 'update_tradingopp' opp.id %}">{% csrf_token %}
+                            <td style="text-align:center; color: {% if opp.action_buy %}green{% else %}red{% endif %};">{{ opp.action_buy|yesno:"BUY,SELL" }}<br>id: {{ opp.id }}<br>
+                            {% if opp.reward_risk %}<br>Reward/Risk: {{ opp.reward_risk }} %<br>Trade profit: {{ opp.trade_profit }} EUR<br>{% endif %}
+                                <input type="checkbox" name="schedule" id="schedule_{{ opp.id }}" value={% if opp.status == "0" %}"true"{% else %}"false"{% endif %}>
+                                <label for="schedule_{{ opp.id }}">Schedule</label></td>
+                            <td><img src="{% url 'swing_point_graph' opp_id=opp.id magnitude=1 %}" alt="Swing Points Graph" style="width: 400px; height: auto;"></td>
+                            <td><a href="{% url 'ticker_detail' opp.ticker.id %}" target="_blank">{{ opp.ticker.symbol }}<br>{{ opp.ticker.company_name }}</a><br>{{ opp.strategy.name }}</td>
+                            <td>{{ opp.strategy.description }}</td>
+                            <td>
+                                {% for label, value in opp.translated_metrics.items %}
+                                    <strong>{{ label }}:</strong> {{ value }}<br>
+                                {% endfor %}
+                                <strong>Stop Loss Price:</strong>
+                                <input type="number" step="any" name="stop_loss_price" value="{{ opp.stop_loss_price }}" style="width: 100px;">
+                                <strong>Profit Taker Price:</strong>
+                                <input type="number" step="any" name="profit_taker_price" value="{{ opp.profit_taker_price }}" style="width: 100px;">
+                                <input type="submit" value="Update"><br>
+                                <strong>Original Stop Loss Price:</strong> {{ opp.original_stop_loss_price }}
+                            </td>
+                            <td>{{ opp.datetime_identified }}</td>
+                        </form>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>No active trading opportunities found.</p>
+    {% endif %}
+</body>
+{% endblock %}
