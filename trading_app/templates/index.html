@@ -3,4 +3,10 @@
 {% block content %}
     <h1>Trading index page</h1>
     <p>Testing...</p>
+
+    <h2>Retrieve Crypto Prices</h2>
+    <ul>
+        <li><a href="{% url 'retrieve_crypto_15min' %}">Retrieve BTC-EUR (15 min)</a></li>
+        <li><a href="{% url 'retrieve_crypto_5min' %}">Retrieve BTC-EUR (5 min)</a></li>
+    </ul>
 {% endblock %}

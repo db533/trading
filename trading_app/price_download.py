@@ -1677,3 +1677,89 @@ def download_prices(timeframe='Ad hoc', ticker_symbol="All", trigger='Cron'):
         func_name = tb_entry.name
         lineno = tb_entry.lineno
         logger.error(f"{script_name} - {func_name} - {lineno}: {e}")
+
+
+import environ
+import os
+import http.client
+import json
+from .models import *
+
+# API credentials
+COINBASE_API_KEY = env.str('COINBASE_API_KEY')
+COINBASE_API_SECRET = os.getenv('COINBASE_API_SECRET', '').replace('\\n', '\n')
+
+# Utility to fetch Coinbase data
+from coinbase import jwt_generator
+
+
+def fetch_coinbase_data(method, request_path):
+    """
+    Fetch data from Coinbase API with proper authentication.
+    """
+    jwt_uri = jwt_generator.format_jwt_uri(method, request_path)
+    jwt_token = jwt_generator.build_rest_jwt(jwt_uri, COINBASE_API_KEY, COINBASE_API_SECRET)
+
+    conn = http.client.HTTPSConnection("api.coinbase.com")
+    headers = {
+        "Authorization": f"Bearer {jwt_token}",
+        "Content-Type": "application/json"
+    }
+    conn.request(method, request_path, headers=headers)
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
+
+    if response.status == 200:
+        return json.loads(data.decode("utf-8"))
+    else:
+        raise Exception(f"Error {response.status}: {data.decode('utf-8')}")
+
+
+def retrieve_single_crypto_prices(product_id, granularity):
+    """
+    Fetch and process candle prices for a specific product_id and granularity.
+    """
+    try:
+        end_time = int(datetime.now(timezone.utc).timestamp())
+        start_time = end_time - 3600  # Fetch data for the past hour
+
+        # Map timeframes to Coinbase granularity
+        granularity_map = {
+            '15mins': 'FIFTEEN_MINUTE',
+            '5mins': 'FIVE_MINUTE'
+        }
+        granularity_param = granularity_map[granularity]['granularity']
+        price_model = granularity_map[granularity]['model']
+
+        # Fetch candles
+        request_path = f"/api/v3/brokerage/market/products/{product_id}/candles?granularity={granularity_param}&start={start_time}&end={end_time}"
+        candles_data = fetch_coinbase_data('GET', request_path)
+
+        # Fetch the corresponding ticker
+        ticker = Ticker.objects.get(symbol=product_id)
+
+        # Save new candle data
+        new_candles = 0
+        for candle in candles_data.get("candles", []):
+            timestamp, open_price, high_price, low_price, close_price, volume = candle
+            candle_datetime = datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
+
+            # Avoid duplicates
+            if not price_model.objects.filter(ticker=ticker, datetime=candle_datetime).exists():
+                price_model.objects.create(
+                    ticker=ticker,
+                    datetime=candle_datetime,
+                    open_price=open_price,
+                    high_price=high_price,
+                    low_price=low_price,
+                    close_price=close_price,
+                    volume=volume,
+                    datetime_tz=candle_datetime
+                )
+                new_candles += 1
+
+        return new_candles  # Return number of new candles saved
+    except Exception as e:
+        print(f"Error retrieving/saving prices for {product_id}: {e}")
+        return 0

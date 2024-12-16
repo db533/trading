@@ -54,6 +54,8 @@ urlpatterns = [
     path('clear-completed/', clear_completed_tasks, name='clear_completed_tasks'),
     path('manage-ticker-categories/', manage_ticker_categories, name='manage_ticker_categories'),
     path('manage-ticker-categories/<int:category_id>/', manage_ticker_categories,name='manage_ticker_categories_filtered'),
+    path('retrieve_crypto/15min/', retrieve_crypto_15min, name='retrieve_crypto_15min'),
+    path('retrieve_crypto/5min/', retrieve_crypto_5min, name='retrieve_crypto_5min'),
 
 ]
 

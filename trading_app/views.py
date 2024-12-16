@@ -2909,3 +2909,24 @@ def trading_opps_by_strategy_view(request):
     }
 
     return render(request, 'trading_opp_by_strategy_list.html', context)
+
+from django.http import JsonResponse
+from .price_download import retrieve_single_crypto_prices
+
+def retrieve_crypto_15min(request):
+    product_id = "BTC-EUR"
+    timeframe = "15min"
+    try:
+        retrieve_single_crypto_prices(product_id, timeframe)
+        return JsonResponse({'status': 'success', 'message': '15-minute crypto prices retrieved successfully!'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+def retrieve_crypto_5min(request):
+    product_id = "BTC-EUR"
+    timeframe = "5min"
+    try:
+        retrieve_single_crypto_prices(product_id, timeframe)
+        return JsonResponse({'status': 'success', 'message': '5-minute crypto prices retrieved successfully!'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})

@@ -396,3 +396,4 @@ def update_single_ticker_metrics(ticker_symbol, trigger='Cron'):
         nj_param.value = message
         nj_param.save()
         logger.error(message)
+

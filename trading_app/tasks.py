@@ -183,3 +183,22 @@ def background_update_ticker_strategies(ticker_symbol):
     scheduled_logger.info(
         f'background_update_ticker_strategies() finished for ticker "{str(ticker_symbol)}".')
 
+@background(schedule=5)
+def retrieve_crypto_prices(timeframe='15mins'):
+    """
+    Retrieve and store crypto prices for tickers in the 'Crypto' category.
+    """
+    scheduled_logger.info(f"retrieve_crypto_prices() started for timeframe: {timeframe}...")
+    try:
+        crypto_tickers = Ticker.objects.filter(categories__name='Crypto')
+        for ticker in crypto_tickers:
+            product_id = ticker.symbol  # Assuming symbol matches Coinbase product_id
+            scheduled_logger.info(f"Fetching and saving prices for {product_id}...")
+
+            # Fetch and save candle data
+            new_candles = retrieve_single_crypto_prices(product_id, timeframe)
+            scheduled_logger.info(f"Stored {new_candles} new candles for {product_id}.")
+
+        scheduled_logger.info(f"retrieve_crypto_prices() completed for timeframe: {timeframe}.")
+    except Exception as e:
+        scheduled_logger.error(f"Error in retrieve_crypto_prices: {e}")
