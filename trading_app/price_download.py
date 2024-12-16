@@ -25,6 +25,11 @@ default_logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
 script_name = 'price_download.py'
 
+# Load environment variables
+env = environ.Env()
+environ.Env.read_env(overwrite=True)
+
+
 def format_elapsed_time(start_time, end_time):
     func_name='format_elapsed_time()'
     """
