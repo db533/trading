@@ -1,4 +1,5 @@
 import logging
+import environ
 from .update_strategies import *
 
 logging.basicConfig(level=logging.INFO)
