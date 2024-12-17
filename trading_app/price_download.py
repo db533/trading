@@ -21,6 +21,10 @@ import math
 from django.contrib.contenttypes.models import ContentType
 import time
 import traceback
+from django.conf import settings
+COINBASE_API_KEY = settings.COINBASE_API_KEY
+COINBASE_API_SECRET = settings.COINBASE_API_SECRET
+
 
 default_logger = logging.getLogger('django')
 scheduled_logger = logging.getLogger('scheduled_tasks')
