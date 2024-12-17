@@ -1,15 +1,13 @@
 import logging
 import environ
 from .update_strategies import *
-from .models import FifteenMinPrice, FiveMinPrice
 
 logging.basicConfig(level=logging.INFO)
 import os
 os.environ['OPENBLAS_NUM_THREADS'] = '1'
 import yfinance as yf
 from time import sleep
-from .models import Ticker, DailyPrice, FifteenMinPrice, FiveMinPrice, TickerCategory, SwingPoint, Params, Trade
-
+from .models import *
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta, timezone, date, time
@@ -19,6 +17,7 @@ from django.utils import timezone
 from decimal import Decimal
 import math
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 import time
 import traceback
 from django.conf import settings
@@ -1693,7 +1692,7 @@ import environ
 import os
 import http.client
 import json
-from .models import *
+
 
 # Utility to fetch Coinbase data
 from coinbase import jwt_generator
@@ -1725,31 +1724,50 @@ def fetch_coinbase_data(method, request_path):
 def retrieve_single_crypto_prices(product_id, granularity):
     """
     Fetch and process candle prices for a specific product_id and granularity.
+    Ensures the Ticker exists; creates it if missing and links to 'Crypto' category.
     """
-    default_logger.info(f'Starting retrieve_single_crypto_prices().')
+    default_logger.info(f'Starting retrieve_single_crypto_prices for product_id: {product_id}, granularity: {granularity}')
     try:
-        end_time = int(datetime.now(timezone.utc).timestamp())
-        start_time = end_time - 3600  # Fetch data for the past hour
+        # Step 1: Validate or create the Ticker
+        with transaction.atomic():
+            ticker, created = Ticker.objects.get_or_create(symbol=product_id)
+            if created:
+                default_logger.info(f'Created new Ticker with symbol: {product_id}')
+                # Link to 'Crypto' category
+                crypto_category, _ = TickerCategory.objects.get_or_create(name='Crypto')
+                ticker.categories.add(crypto_category)
+                ticker.save()
+                default_logger.info(f'Linked Ticker "{product_id}" to category "Crypto".')
+            else:
+                default_logger.info(f'Found existing Ticker with symbol: {product_id}')
 
+        # Step 2: Map granularity and fetch model
         granularity_map = {
             '15mins': {'granularity': 'FIFTEEN_MINUTE', 'model': FifteenMinPrice},
             '5mins': {'granularity': 'FIVE_MINUTE', 'model': FiveMinPrice},
         }
+
+        if granularity not in granularity_map:
+            raise ValueError(f"Invalid granularity: {granularity}")
+
         granularity_param = granularity_map[granularity]['granularity']
         price_model = granularity_map[granularity]['model']
 
-        # Fetch candles
+        # Step 3: Fetch candles from Coinbase API
+        end_time = int(datetime.now(timezone.utc).timestamp())
+        start_time = end_time - 3600  # Fetch data for the past hour
         request_path = f"/api/v3/brokerage/market/products/{product_id}/candles?granularity={granularity_param}&start={start_time}&end={end_time}"
-        default_logger.info(f'Fetching data from coinbase. request_path: {str(request_path)}')
+
+        default_logger.info(f'Fetching data from Coinbase API: {request_path}')
         candles_data = fetch_coinbase_data('GET', request_path)
 
-        # Fetch the corresponding ticker
-        ticker = Ticker.objects.get(symbol=product_id)
-        default_logger.info(f'Retrieved ticker for crypto. ticker.symbol: {str(ticker.symbol)}')
+        if not candles_data or "candles" not in candles_data:
+            default_logger.error(f"No valid candles data returned for {product_id}")
+            raise ValueError("No candles data returned from API.")
 
-        # Save new candle data
+        # Step 4: Save candle data
         new_candles = 0
-        for candle in candles_data.get("candles", []):
+        for candle in candles_data["candles"]:
             timestamp, open_price, high_price, low_price, close_price, volume = candle
             candle_datetime = datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
 
@@ -1766,8 +1784,10 @@ def retrieve_single_crypto_prices(product_id, granularity):
                     datetime_tz=candle_datetime
                 )
                 new_candles += 1
-        default_logger.info(f'Added candles for crypto. new_candles: {str(new_candles)}')
-        return new_candles  # Return number of new candles saved
+
+        default_logger.info(f'Added {new_candles} new candles for {product_id}')
+        return new_candles  # Return the number of new candles saved
+
     except Exception as e:
-        print(f"Error retrieving/saving prices for {product_id}: {e}")
+        default_logger.error(f"Exception in retrieve_single_crypto_prices: {str(e)}", exc_info=True)
         return 0
