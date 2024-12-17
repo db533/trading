@@ -1795,8 +1795,26 @@ def retrieve_single_crypto_prices(product_id, granularity):
                         low_price=low_price,
                         close_price=close_price,
                         volume=volume,
-                        datetime_tz=candle_datetime
+                        datetime_tz=candle_datetime,
+                        bearish_detected=0,
+                        bullish_detected=0,
+                        reversal_detected=0,
+                        bearish_reversal_detected=0,
+                        bullish_reversal_detected=0,
+                        patterns_detected="",
+                        level=0.0,
+                        level_type=0,
+                        level_strength=0,
+                        ema_200=None,
+                        ema_50=None,
+                        trend=0,
+                        swing_point_label="",
+                        swing_point_current_trend=0,
+                        healthy_bullish_count=0,
+                        healthy_bearish_count=0,
+                        candle_count_since_last_swing_point=0
                     )
+
                     new_candles += 1
             except (KeyError, ValueError, TypeError) as e:
                 crypto_logger.error(f"Error processing candle at index {idx}: {candle} - {e}", exc_info=True)
