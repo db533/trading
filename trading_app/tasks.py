@@ -191,6 +191,7 @@ def retrieve_crypto_prices(timeframe='15mins'):
     scheduled_logger.info(f"retrieve_crypto_prices() started for timeframe: {timeframe}...")
     try:
         crypto_tickers = Ticker.objects.filter(categories__name='Crypto')
+        scheduled_logger.info(f"Looking for tickers in Crypto category...")
         for ticker in crypto_tickers:
             product_id = ticker.symbol  # Assuming symbol matches Coinbase product_id
             scheduled_logger.info(f"Fetching and saving prices for {product_id}...")

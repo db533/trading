@@ -2916,8 +2916,10 @@ from .price_download import retrieve_single_crypto_prices
 def retrieve_crypto_15min(request):
     product_id = "BTC-EUR"
     timeframe = "15min"
+    logger.info(f'About to call retrieve_single_crypto_prices()...')
     try:
-        retrieve_single_crypto_prices(product_id, timeframe)
+        new_candles=retrieve_single_crypto_prices(product_id, timeframe)
+        logger.info(f'Number of new_candles downloaded: "{str(new_candles)}"...')
         return JsonResponse({'status': 'success', 'message': '15-minute crypto prices retrieved successfully!'})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
