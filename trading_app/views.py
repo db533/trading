@@ -2915,7 +2915,7 @@ from .price_download import retrieve_single_crypto_prices
 
 def retrieve_crypto_15min(request):
     product_id = "BTC-EUR"
-    timeframe = "15min"
+    timeframe = "15mins"
     logger.info(f'About to call retrieve_single_crypto_prices()...')
     try:
         new_candles=retrieve_single_crypto_prices(product_id, timeframe)
@@ -2926,7 +2926,7 @@ def retrieve_crypto_15min(request):
 
 def retrieve_crypto_5min(request):
     product_id = "BTC-EUR"
-    timeframe = "5min"
+    timeframe = "5mins"
     try:
         retrieve_single_crypto_prices(product_id, timeframe)
         return JsonResponse({'status': 'success', 'message': '5-minute crypto prices retrieved successfully!'})
