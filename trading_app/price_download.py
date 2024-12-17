@@ -24,8 +24,7 @@ from django.conf import settings
 COINBASE_API_KEY = settings.COINBASE_API_KEY
 COINBASE_API_SECRET = settings.COINBASE_API_SECRET
 
-
-default_logger = logging.getLogger('django')
+crypto_logger = logging.getLogger('scheduled_tasks')
 scheduled_logger = logging.getLogger('scheduled_tasks')
 script_name = 'price_download.py'
 
@@ -1726,20 +1725,20 @@ def retrieve_single_crypto_prices(product_id, granularity):
     Fetch and process candle prices for a specific product_id and granularity.
     Ensures the Ticker exists; creates it if missing and links to 'Crypto' category.
     """
-    default_logger.info(f'Starting retrieve_single_crypto_prices for product_id: {product_id}, granularity: {granularity}')
+    crypto_logger.info(f'Starting retrieve_single_crypto_prices for product_id: {product_id}, granularity: {granularity}')
     try:
         # Step 1: Validate or create the Ticker
         with transaction.atomic():
             ticker, created = Ticker.objects.get_or_create(symbol=product_id)
             if created:
-                default_logger.info(f'Created new Ticker with symbol: {product_id}')
+                crypto_logger.info(f'Created new Ticker with symbol: {product_id}')
                 # Link to 'Crypto' category
                 crypto_category, _ = TickerCategory.objects.get_or_create(name='Crypto')
                 ticker.categories.add(crypto_category)
                 ticker.save()
-                default_logger.info(f'Linked Ticker "{product_id}" to category "Crypto".')
+                crypto_logger.info(f'Linked Ticker "{product_id}" to category "Crypto".')
             else:
-                default_logger.info(f'Found existing Ticker with symbol: {product_id}')
+                crypto_logger.info(f'Found existing Ticker with symbol: {product_id}')
 
         # Step 2: Map granularity and fetch model
         granularity_map = {
@@ -1758,11 +1757,11 @@ def retrieve_single_crypto_prices(product_id, granularity):
         start_time = end_time - 3600  # Fetch data for the past hour
         request_path = f"/api/v3/brokerage/market/products/{product_id}/candles?granularity={granularity_param}&start={start_time}&end={end_time}"
 
-        default_logger.info(f'Fetching data from Coinbase API: {request_path}')
+        crypto_logger.info(f'Fetching data from Coinbase API: {request_path}')
         candles_data = fetch_coinbase_data('GET', request_path)
 
         if not candles_data or "candles" not in candles_data:
-            default_logger.error(f"No valid candles data returned for {product_id}")
+            crypto_logger.error(f"No valid candles data returned for {product_id}")
             raise ValueError("No candles data returned from API.")
 
         # Step 4: Save candle data
@@ -1785,9 +1784,9 @@ def retrieve_single_crypto_prices(product_id, granularity):
                 )
                 new_candles += 1
 
-        default_logger.info(f'Added {new_candles} new candles for {product_id}')
+        crypto_logger.info(f'Added {new_candles} new candles for {product_id}')
         return new_candles  # Return the number of new candles saved
 
     except Exception as e:
-        default_logger.error(f"Exception in retrieve_single_crypto_prices: {str(e)}", exc_info=True)
+        crypto_logger.error(f"Exception in retrieve_single_crypto_prices: {str(e)}", exc_info=True)
         return 0
