@@ -27,8 +27,8 @@ scheduled_logger = logging.getLogger('scheduled_tasks')
 script_name = 'price_download.py'
 
 # Load environment variables
-env = environ.Env()
-environ.Env.read_env(overwrite=True)
+#env = environ.Env()
+#environ.Env.read_env(overwrite=True)
 
 
 def format_elapsed_time(start_time, end_time):
@@ -1690,10 +1690,6 @@ import os
 import http.client
 import json
 from .models import *
-
-# API credentials
-COINBASE_API_KEY = env.str('COINBASE_API_KEY')
-COINBASE_API_SECRET = os.getenv('COINBASE_API_SECRET', '').replace('\\n', '\n')
 
 # Utility to fetch Coinbase data
 from coinbase import jwt_generator

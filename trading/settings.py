@@ -56,6 +56,10 @@ else:
     db_user = env.str('MYSQL_LOCAL_DB_USER')
     db_pwd = env.str('MYSQL_LOCAL_PWD')
 
+# API credentials
+COINBASE_API_KEY = env.str('COINBASE_API_KEY')
+COINBASE_API_SECRET = os.getenv('COINBASE_API_SECRET', '').replace('\\n', '\n')
+
 #print('db_name:',db_name)
 #print('db_user:',db_user)
 #print('db_pwd:',db_pwd)
