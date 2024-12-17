@@ -1722,6 +1722,7 @@ def retrieve_single_crypto_prices(product_id, granularity):
     """
     Fetch and process candle prices for a specific product_id and granularity.
     """
+    default_logger.info(f'Starting retrieve_single_crypto_prices().')
     try:
         end_time = int(datetime.now(timezone.utc).timestamp())
         start_time = end_time - 3600  # Fetch data for the past hour
