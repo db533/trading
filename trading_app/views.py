@@ -2914,7 +2914,7 @@ from django.http import JsonResponse
 from .price_download import retrieve_single_crypto_prices
 
 def retrieve_crypto_15min(request):
-    product_id = "BTCEUR"
+    product_id = "BTC-EUR"
     timeframe = "15mins"
     logger.info(f'About to call retrieve_single_crypto_prices()...')
     try:
@@ -2925,7 +2925,7 @@ def retrieve_crypto_15min(request):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 def retrieve_crypto_5min(request):
-    product_id = "BTCEUR"
+    product_id = "BTC-EUR"
     timeframe = "5mins"
     try:
         retrieve_single_crypto_prices(product_id, timeframe)
