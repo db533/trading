@@ -1736,10 +1736,12 @@ def retrieve_single_crypto_prices(product_id, granularity):
 
         # Fetch candles
         request_path = f"/api/v3/brokerage/market/products/{product_id}/candles?granularity={granularity_param}&start={start_time}&end={end_time}"
+        logger.info(f'Fetching data from coinbase. request_path: {str(request_path)}')
         candles_data = fetch_coinbase_data('GET', request_path)
 
         # Fetch the corresponding ticker
         ticker = Ticker.objects.get(symbol=product_id)
+        logger.info(f'Retrieved ticker for crypto. ticker.symbol: {str(ticker.symbol)}')
 
         # Save new candle data
         new_candles = 0
@@ -1760,7 +1762,7 @@ def retrieve_single_crypto_prices(product_id, granularity):
                     datetime_tz=candle_datetime
                 )
                 new_candles += 1
-
+        logger.info(f'Added candles for crypto. new_candles: {str(new_candles)}')
         return new_candles  # Return number of new candles saved
     except Exception as e:
         print(f"Error retrieving/saving prices for {product_id}: {e}")
