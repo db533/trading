@@ -1,7 +1,7 @@
 import logging
 import environ
 from .update_strategies import *
-from .models import FifteenMinutePrice, FiveMinutePrice
+from .models import FifteenMinPrice, FiveMinPrice
 
 logging.basicConfig(level=logging.INFO)
 import os
@@ -1728,8 +1728,8 @@ def retrieve_single_crypto_prices(product_id, granularity):
         start_time = end_time - 3600  # Fetch data for the past hour
 
         granularity_map = {
-            '15mins': {'granularity': 'FIFTEEN_MINUTE', 'model': FifteenMinutePrice},
-            '5mins': {'granularity': 'FIVE_MINUTE', 'model': FiveMinutePrice},
+            '15mins': {'granularity': 'FIFTEEN_MINUTE', 'model': FifteenMinPrice},
+            '5mins': {'granularity': 'FIVE_MINUTE', 'model': FiveMinPrice},
         }
         granularity_param = granularity_map[granularity]['granularity']
         price_model = granularity_map[granularity]['model']
