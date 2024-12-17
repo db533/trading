@@ -16,7 +16,6 @@ from datetime import datetime, timedelta, timezone, date, time
 from candlestick import candlestick
 from . import db_candlestick
 from django.utils import timezone
-import logging
 from decimal import Decimal
 import math
 from django.contrib.contenttypes.models import ContentType
