@@ -2925,7 +2925,7 @@ def retrieve_crypto_15min(request):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 def retrieve_crypto_5min(request):
-    product_id = "BTC-EUR"
+    product_id = "BTCEUR"
     timeframe = "5mins"
     try:
         retrieve_single_crypto_prices(product_id, timeframe)
