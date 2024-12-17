@@ -1760,19 +1760,29 @@ def retrieve_single_crypto_prices(product_id, granularity):
         crypto_logger.info(f'Fetching data from Coinbase API: {request_path}')
         candles_data = fetch_coinbase_data('GET', request_path)
 
-        if not candles_data or "candles" not in candles_data:
-            crypto_logger.error(f"No valid candles data returned for {product_id}")
-            raise ValueError("No candles data returned from API.")
+        # Step 4: Validate candles response
+        candles = candles_data.get("candles", [])
+        if not candles or not isinstance(candles, list):
+            crypto_logger.error(f"No valid candles data returned from API: {candles_data}")
+            raise ValueError("Invalid candles data in API response.")
 
-        # Step 4: Save candle data
+        # Step 5: Process and save candle data
         new_candles = 0
-        for candle in candles_data.get("candles", []):
+        for idx, candle in enumerate(candles):
             try:
-                # Ensure timestamp is converted to an integer
-                timestamp = int(candle[0])  # Convert to integer
-                open_price, high_price, low_price, close_price, volume = candle[1:6]
+                # Ensure each candle is a list and has 6 elements
+                if isinstance(candle, list) and len(candle) >= 6:
+                    timestamp = int(candle[0])  # Convert timestamp to integer
+                    open_price = float(candle[1])
+                    high_price = float(candle[2])
+                    low_price = float(candle[3])
+                    close_price = float(candle[4])
+                    volume = float(candle[5])
+                else:
+                    crypto_logger.warning(f"Invalid candle format at index {idx}: {candle}")
+                    continue
 
-                # Convert timestamp to datetime
+                # Convert timestamp to UTC datetime
                 candle_datetime = datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
 
                 # Avoid duplicates
@@ -1789,10 +1799,10 @@ def retrieve_single_crypto_prices(product_id, granularity):
                     )
                     new_candles += 1
             except (ValueError, TypeError) as e:
-                crypto_logger.error(f"Error processing candle data: {candle} - {e}", exc_info=True)
+                crypto_logger.error(f"Error processing candle at index {idx}: {candle} - {e}", exc_info=True)
 
         crypto_logger.info(f'Added {new_candles} new candles for {product_id}')
-        return new_candles  # Return the number of new candles saved
+        return new_candles
 
     except Exception as e:
         crypto_logger.error(f"Exception in retrieve_single_crypto_prices: {str(e)}", exc_info=True)
