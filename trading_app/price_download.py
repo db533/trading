@@ -1766,23 +1766,30 @@ def retrieve_single_crypto_prices(product_id, granularity):
 
         # Step 4: Save candle data
         new_candles = 0
-        for candle in candles_data["candles"]:
-            timestamp, open_price, high_price, low_price, close_price, volume = candle
-            candle_datetime = datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
+        for candle in candles_data.get("candles", []):
+            try:
+                # Ensure timestamp is converted to an integer
+                timestamp = int(candle[0])  # Convert to integer
+                open_price, high_price, low_price, close_price, volume = candle[1:6]
 
-            # Avoid duplicates
-            if not price_model.objects.filter(ticker=ticker, datetime=candle_datetime).exists():
-                price_model.objects.create(
-                    ticker=ticker,
-                    datetime=candle_datetime,
-                    open_price=open_price,
-                    high_price=high_price,
-                    low_price=low_price,
-                    close_price=close_price,
-                    volume=volume,
-                    datetime_tz=candle_datetime
-                )
-                new_candles += 1
+                # Convert timestamp to datetime
+                candle_datetime = datetime.utcfromtimestamp(timestamp).replace(tzinfo=timezone.utc)
+
+                # Avoid duplicates
+                if not price_model.objects.filter(ticker=ticker, datetime=candle_datetime).exists():
+                    price_model.objects.create(
+                        ticker=ticker,
+                        datetime=candle_datetime,
+                        open_price=open_price,
+                        high_price=high_price,
+                        low_price=low_price,
+                        close_price=close_price,
+                        volume=volume,
+                        datetime_tz=candle_datetime
+                    )
+                    new_candles += 1
+            except (ValueError, TypeError) as e:
+                crypto_logger.error(f"Error processing candle data: {candle} - {e}", exc_info=True)
 
         crypto_logger.info(f'Added {new_candles} new candles for {product_id}')
         return new_candles  # Return the number of new candles saved
