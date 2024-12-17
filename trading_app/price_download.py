@@ -1770,16 +1770,16 @@ def retrieve_single_crypto_prices(product_id, granularity):
         new_candles = 0
         for idx, candle in enumerate(candles):
             try:
-                # Ensure each candle is a list and has 6 elements
-                if isinstance(candle, list) and len(candle) >= 6:
-                    timestamp = int(candle[0])  # Convert timestamp to integer
-                    open_price = float(candle[1])
-                    high_price = float(candle[2])
-                    low_price = float(candle[3])
-                    close_price = float(candle[4])
-                    volume = float(candle[5])
+                # Ensure candle is a dictionary with required keys
+                if isinstance(candle, dict):
+                    timestamp = int(candle['start'])  # Convert 'start' to an integer timestamp
+                    open_price = float(candle['open'])
+                    high_price = float(candle['high'])
+                    low_price = float(candle['low'])
+                    close_price = float(candle['close'])
+                    volume = float(candle['volume'])
                 else:
-                    crypto_logger.warning(f"Invalid candle format at index {idx}: {candle}")
+                    crypto_logger.warning(f"Unexpected candle format at index {idx}: {candle}")
                     continue
 
                 # Convert timestamp to UTC datetime
@@ -1798,7 +1798,7 @@ def retrieve_single_crypto_prices(product_id, granularity):
                         datetime_tz=candle_datetime
                     )
                     new_candles += 1
-            except (ValueError, TypeError) as e:
+            except (KeyError, ValueError, TypeError) as e:
                 crypto_logger.error(f"Error processing candle at index {idx}: {candle} - {e}", exc_info=True)
 
         crypto_logger.info(f'Added {new_candles} new candles for {product_id}')
