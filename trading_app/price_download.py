@@ -1,6 +1,7 @@
 import logging
 import environ
 from .update_strategies import *
+from .models import FifteenMinutePrice, FiveMinutePrice
 
 logging.basicConfig(level=logging.INFO)
 import os
@@ -1727,10 +1728,9 @@ def retrieve_single_crypto_prices(product_id, granularity):
         end_time = int(datetime.now(timezone.utc).timestamp())
         start_time = end_time - 3600  # Fetch data for the past hour
 
-        # Map timeframes to Coinbase granularity
         granularity_map = {
-            '15mins': 'FIFTEEN_MINUTE',
-            '5mins': 'FIVE_MINUTE'
+            '15mins': {'granularity': 'FIFTEEN_MINUTE', 'model': FifteenMinutePrice},
+            '5mins': {'granularity': 'FIVE_MINUTE', 'model': FiveMinutePrice},
         }
         granularity_param = granularity_map[granularity]['granularity']
         price_model = granularity_map[granularity]['model']
